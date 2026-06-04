@@ -1,0 +1,3039 @@
+{
+  "Kitae Kim Busan": {
+    "emoji": "🌌",
+    "name": "Kitae Kim Busan",
+    "rarity": "Abyssal",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472259080486650062/Picsart_26-02-14_04-00-30-013.png?ex=69b2385e&is=69b0e6de&hm=5cf14183368f31712ba2876fa13724c88512b7d6bc72995850dce2dba27f86bf&",
+    "path": {
+      "name": "Despair Fury",
+      "description": "Despair Fury — a storm of rage that breaks the soul before the body."
+    },
+    "mastery": {
+      "type": "Strength",
+      "description": "Overwhelming raw strength mastery — no technique needed when power is absolute."
+    },
+    "unique_skill": {
+      "name": "Busan Beast",
+      "description": "From the streets of Busan, he carries a fury that cannot be trained away."
+    },
+    "default_dialogue": "You think you can handle me? You don't know what I've been through.",
+    "unique_path_dialogue": "Despair Fury — everything I've suppressed, unleashed.",
+    "unique_skill_dialogue": "Busan raised me. This is what it made.",
+    "stats": {
+      "strength": 100,
+      "speed": 90,
+      "endurance": 95,
+      "technique": 80,
+      "iq": 70,
+      "biq": 85,
+      "str": 100,
+      "spd": 90,
+      "end": 95,
+      "tec": 80
+    },
+    "stats_max": {
+      "strength": 110,
+      "speed": 95,
+      "endurance": 100,
+      "technique": 85,
+      "iq": 75,
+      "biq": 90,
+      "str": 110,
+      "spd": 95,
+      "end": 100,
+      "tec": 85
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "Plain and painful.",
+        "crit_dialogue": "That hit like a truck!",
+        "miss_dialogue": "You got lucky."
+      },
+      {
+        "name": "Slam",
+        "type": "Normal",
+        "dialogue": "I'll drive you into the ground.",
+        "crit_dialogue": "The ground shakes on impact!",
+        "miss_dialogue": "Wasted effort."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Get out of my way.",
+        "crit_dialogue": "Full force connects!",
+        "miss_dialogue": "Stepped back just in time."
+      },
+      {
+        "name": "Grab",
+        "type": "Normal",
+        "dialogue": "You're not going anywhere.",
+        "crit_dialogue": "Iron grip takes hold!",
+        "miss_dialogue": "Slipped free."
+      },
+      {
+        "name": "Side Punch",
+        "type": "Normal",
+        "dialogue": "Blind side. Too late.",
+        "crit_dialogue": "Came from nowhere!",
+        "miss_dialogue": "You sensed it somehow."
+      },
+      {
+        "name": "Knee Strike",
+        "type": "Special",
+        "dialogue": "No room to breathe.",
+        "crit_dialogue": "Devastating close-range impact!",
+        "miss_dialogue": "You created distance just in time."
+      },
+      {
+        "name": "Focus Punch",
+        "type": "Special",
+        "dialogue": "Every bit of strength behind this.",
+        "crit_dialogue": "Unstoppable concentrated force!",
+        "miss_dialogue": "The power went wide."
+      },
+      {
+        "name": "Torque Punch",
+        "type": "Ultimate",
+        "dialogue": "This is where Despair Fury ends everything.",
+        "crit_dialogue": "The rotational power obliterates all defense!",
+        "miss_dialogue": "Barely avoided the finishing blow."
+      },
+      {
+        "name": "Despair Block",
+        "type": "Defensive",
+        "dialogue": "You can't hurt what's already been through despair.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Slam",
+      "Kick",
+      "Grab",
+      "Side Punch"
+    ],
+    "special": [
+      "Knee Strike",
+      "Focus Punch"
+    ],
+    "ultimate": [
+      "Torque Punch"
+    ],
+    "defensive_moves": [
+      "Despair Block"
+    ]
+  },
+  "Kitae Kim Cheongliang": {
+    "emoji": "🌌",
+    "name": "Kitae Kim Cheongliang",
+    "rarity": "Abyssal",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472259025574957292/Picsart_26-02-14_21-21-16-246.png?ex=69b23850&is=69b0e6d0&hm=590ff1eb487351db12a3d69032802112811d52c3d69872a0549d6fa59f90abb1&",
+    "path": {
+      "name": "Despair Fury",
+      "description": "Cheongliang's Despair Fury is colder — calculated rage, not blind fury."
+    },
+    "mastery": {
+      "type": "Strength",
+      "description": "Mastery of Strength forged through surviving the Cheongliang hierarchy."
+    },
+    "unique_skill": {
+      "name": "Cheongliang Iron Will",
+      "description": "He climbed Cheongliang not with talent — with absolute refusal to lose."
+    },
+    "default_dialogue": "Cheongliang made me this way. Thank them.",
+    "unique_path_dialogue": "Despair Fury — cold, calculated, unstoppable.",
+    "unique_skill_dialogue": "Iron Will. You don't break what was already broken and rebuilt.",
+    "stats": {
+      "strength": 95,
+      "speed": 90,
+      "endurance": 95,
+      "technique": 80,
+      "iq": 70,
+      "biq": 85,
+      "str": 95,
+      "spd": 90,
+      "end": 95,
+      "tec": 80
+    },
+    "stats_max": {
+      "strength": 100,
+      "speed": 95,
+      "endurance": 100,
+      "technique": 85,
+      "iq": 75,
+      "biq": 90,
+      "str": 100,
+      "spd": 95,
+      "end": 100,
+      "tec": 85
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "No hesitation.",
+        "crit_dialogue": "Pure impact, no wasted energy!",
+        "miss_dialogue": "Fast reflexes."
+      },
+      {
+        "name": "Slam",
+        "type": "Normal",
+        "dialogue": "Your footing is gone.",
+        "crit_dialogue": "The slam reverberates!",
+        "miss_dialogue": "Managed to brace somehow."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Break the base.",
+        "crit_dialogue": "Leg buckles on impact!",
+        "miss_dialogue": "Shifted weight in time."
+      },
+      {
+        "name": "Grab",
+        "type": "Normal",
+        "dialogue": "Nowhere to run.",
+        "crit_dialogue": "Locked in with no escape!",
+        "miss_dialogue": "Pulled away just in time."
+      },
+      {
+        "name": "Side Punch",
+        "type": "Normal",
+        "dialogue": "Coming from your blind spot.",
+        "crit_dialogue": "Caught you completely off guard!",
+        "miss_dialogue": "Barely turned in time."
+      },
+      {
+        "name": "Knee Strike",
+        "type": "Special",
+        "dialogue": "This is what Cheongliang taught me.",
+        "crit_dialogue": "Cheongliang technique at its finest!",
+        "miss_dialogue": "You read the angle."
+      },
+      {
+        "name": "Focus Punch",
+        "type": "Special",
+        "dialogue": "Every ounce of will behind this.",
+        "crit_dialogue": "Iron Will channeled into a single blow!",
+        "miss_dialogue": "The power went wide."
+      },
+      {
+        "name": "Despair Fury Strike",
+        "type": "Ultimate",
+        "dialogue": "Everything I've suppressed — released.",
+        "crit_dialogue": "Despair Fury tears through all resistance!",
+        "miss_dialogue": "You survived the wave. Barely."
+      },
+      {
+        "name": "Iron Wall Guard",
+        "type": "Defensive",
+        "dialogue": "Cheongliang taught me to endure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Slam",
+      "Kick",
+      "Grab",
+      "Side Punch"
+    ],
+    "special": [
+      "Knee Strike",
+      "Focus Punch"
+    ],
+    "ultimate": [
+      "Despair Fury Strike"
+    ],
+    "defensive_moves": [
+      "Iron Wall Guard"
+    ]
+  },
+  "James Lee Mastermind": {
+    "emoji": "👑",
+    "name": "James Lee Mastermind",
+    "rarity": "Abyssal",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472234562955513927/Picsart_26-02-14_19-43-58-117.png?ex=69b22188&is=69b0d008&hm=a5d3e373f6326381ddde865d157bef5445bcdb635ebcd59a32ecdf6d55d76228&",
+    "path": {
+      "name": "Mastermind",
+      "description": "The Mastermind sees every outcome before it happens — he fights the conclusion, not the fight."
+    },
+    "mastery": {
+      "type": "Speed",
+      "description": "Mastermind-level Speed mastery — every step placed with purpose at maximum velocity."
+    },
+    "unique_skill": {
+      "name": "God of IA",
+      "description": "IA Kick. IA Punch. Repeated until you can't stand. That's James Lee."
+    },
+    "default_dialogue": "I've already seen how this ends.",
+    "unique_path_dialogue": "The Mastermind path — I don't react. I decide.",
+    "unique_skill_dialogue": "IA. Again. Again. You'll break before I slow down.",
+    "stats": {
+      "strength": 85,
+      "speed": 100,
+      "endurance": 80,
+      "technique": 90,
+      "iq": 95,
+      "biq": 95,
+      "str": 85,
+      "spd": 100,
+      "end": 80,
+      "tec": 90
+    },
+    "stats_max": {
+      "strength": 90,
+      "speed": 110,
+      "endurance": 85,
+      "technique": 95,
+      "iq": 100,
+      "biq": 100,
+      "str": 90,
+      "spd": 110,
+      "end": 85,
+      "tec": 95
+    },
+    "moves": [
+      {
+        "name": "IA Kick",
+        "type": "Normal",
+        "dialogue": "First one. There will be more.",
+        "crit_dialogue": "Precision kick connects cleanly!",
+        "miss_dialogue": "You read the rhythm."
+      },
+      {
+        "name": "IA Punch",
+        "type": "Normal",
+        "dialogue": "Clean. Efficient.",
+        "crit_dialogue": "Masterful execution!",
+        "miss_dialogue": "Slipped the line."
+      },
+      {
+        "name": "Flip Kick",
+        "type": "Normal",
+        "dialogue": "High-low. You can't guard both.",
+        "crit_dialogue": "The aerial angle was unguardable!",
+        "miss_dialogue": "Unexpected defense."
+      },
+      {
+        "name": "Spin Kick",
+        "type": "Normal",
+        "dialogue": "Rotation multiplies force.",
+        "crit_dialogue": "The centrifugal strike lands perfectly!",
+        "miss_dialogue": "You ducked the sweep."
+      },
+      {
+        "name": "Front Kick",
+        "type": "Normal",
+        "dialogue": "Direct. No flourish needed.",
+        "crit_dialogue": "Textbook power!",
+        "miss_dialogue": "Sidestepped it."
+      },
+      {
+        "name": "Handstand Kick",
+        "type": "Special",
+        "dialogue": "Unpredictable angles are my language.",
+        "crit_dialogue": "Inverted power stuns the opponent!",
+        "miss_dialogue": "You anticipated the inversion."
+      },
+      {
+        "name": "Kick Barrage",
+        "type": "Special",
+        "dialogue": "One. Two. Three. You won't count them all.",
+        "crit_dialogue": "The barrage overwhelms all defense!",
+        "miss_dialogue": "You managed to weather it."
+      },
+      {
+        "name": "Consecutive IA",
+        "type": "Ultimate",
+        "dialogue": "IA. IA. IA. It doesn't stop until you do.",
+        "crit_dialogue": "Consecutive IA — the signature of the Mastermind at full power!",
+        "miss_dialogue": "Impossibly, you broke the chain."
+      },
+      {
+        "name": "Mastermind Parry",
+        "type": "Defensive",
+        "dialogue": "I predicted that three moves ago.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "IA Kick",
+      "IA Punch",
+      "Flip Kick",
+      "Spin Kick",
+      "Front Kick"
+    ],
+    "special": [
+      "Handstand Kick",
+      "Kick Barrage"
+    ],
+    "ultimate": [
+      "Consecutive IA"
+    ],
+    "defensive_moves": [
+      "Mastermind Parry"
+    ]
+  },
+  "James Lee Peak": {
+    "emoji": "👑",
+    "name": "James Lee Peak",
+    "rarity": "Abyssal",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472204187004702800/Picsart_26-02-14_17-42-01-723.jpg?ex=69b2053e&is=69b0b3be&hm=66794393a438b21c6b298a92902f5df87ef465aa0c6d9a7c37d2a3eff52981fe&",
+    "path": {
+      "name": "Peak Human",
+      "description": "Peak Human — the ceiling other fighters look up at and call a wall."
+    },
+    "mastery": {
+      "type": "Speed",
+      "description": "Peak-level Speed mastery — every movement a statement of what human limits truly are."
+    },
+    "unique_skill": {
+      "name": "Peak Execution",
+      "description": "At peak, there is no wasted motion. No wasted breath. Only victory."
+    },
+    "default_dialogue": "This is what peak looks like. Study it.",
+    "unique_path_dialogue": "Peak Human — I am the limit.",
+    "unique_skill_dialogue": "Peak Execution. No openings. No mistakes.",
+    "stats": {
+      "strength": 90,
+      "speed": 100,
+      "endurance": 80,
+      "technique": 95,
+      "iq": 95,
+      "biq": 95,
+      "str": 90,
+      "spd": 100,
+      "end": 80,
+      "tec": 95
+    },
+    "stats_max": {
+      "strength": 95,
+      "speed": 110,
+      "endurance": 85,
+      "technique": 100,
+      "iq": 100,
+      "biq": 100,
+      "str": 95,
+      "spd": 110,
+      "end": 85,
+      "tec": 100
+    },
+    "moves": [
+      {
+        "name": "IA Kick",
+        "type": "Normal",
+        "dialogue": "Textbook execution.",
+        "crit_dialogue": "Absolute precision!",
+        "miss_dialogue": "You moved well."
+      },
+      {
+        "name": "IA Punch",
+        "type": "Normal",
+        "dialogue": "No delay. No openings.",
+        "crit_dialogue": "Relentless clean hits!",
+        "miss_dialogue": "Somehow slipped the chain."
+      },
+      {
+        "name": "Flip Kick",
+        "type": "Normal",
+        "dialogue": "Angles you can't defend.",
+        "crit_dialogue": "The form is perfect from every angle!",
+        "miss_dialogue": "Your instincts saved you."
+      },
+      {
+        "name": "Spin Kick",
+        "type": "Normal",
+        "dialogue": "At peak rotation, this is a wall.",
+        "crit_dialogue": "The centrifugal force is overwhelming!",
+        "miss_dialogue": "You read the setup."
+      },
+      {
+        "name": "Front Kick",
+        "type": "Normal",
+        "dialogue": "Efficient. Final.",
+        "crit_dialogue": "Peak form, peak impact!",
+        "miss_dialogue": "You backed off in time."
+      },
+      {
+        "name": "Handstand Kick",
+        "type": "Special",
+        "dialogue": "At peak, even this is lethal.",
+        "crit_dialogue": "Inverted peak power — unblockable!",
+        "miss_dialogue": "You disrupted the angle."
+      },
+      {
+        "name": "Kick Barrage",
+        "type": "Special",
+        "dialogue": "At peak speed — good luck counting.",
+        "crit_dialogue": "Peak barrage — relentless and overwhelming!",
+        "miss_dialogue": "You tanked it somehow."
+      },
+      {
+        "name": "Human Limit Break",
+        "type": "Ultimate",
+        "dialogue": "This is where human potential ends and legend begins.",
+        "crit_dialogue": "Beyond the limit — James Lee at absolute peak!",
+        "miss_dialogue": "Even the peak can be endured."
+      },
+      {
+        "name": "Peak Reflex",
+        "type": "Defensive",
+        "dialogue": "At peak, defense is offense waiting.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "IA Kick",
+      "IA Punch",
+      "Flip Kick",
+      "Spin Kick",
+      "Front Kick"
+    ],
+    "special": [
+      "Handstand Kick",
+      "Kick Barrage"
+    ],
+    "ultimate": [
+      "Human Limit Break"
+    ],
+    "defensive_moves": [
+      "Peak Reflex"
+    ]
+  },
+  "Diego Kang": {
+    "emoji": "🌌",
+    "name": "Diego Kang",
+    "rarity": "Abyssal",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472219651613134879/Picsart_26-02-14_18-41-59-697.jpg?ex=69b213a5&is=69b0c225&hm=84a29d534efc6c8a302ec1ba85e34fe0513ecafbb7282aba4d1121cf9b163673&",
+    "path": {
+      "name": "K-Star Dominance",
+      "description": "K-Star Dominance — celebrity status backed by combat that would end careers."
+    },
+    "mastery": {
+      "type": "Speed",
+      "description": "Speed mastery refined through years of disciplined peak-performance training."
+    },
+    "unique_skill": {
+      "name": "Star Power",
+      "description": "The cameras don't show how dangerous he really is."
+    },
+    "default_dialogue": "Don't confuse the fame for weakness.",
+    "unique_path_dialogue": "K-Star Dominance — the stage is the battlefield.",
+    "unique_skill_dialogue": "Star Power activated. You won't see this coming.",
+    "stats": {
+      "strength": 85,
+      "speed": 100,
+      "endurance": 80,
+      "technique": 90,
+      "iq": 95,
+      "biq": 95,
+      "str": 85,
+      "spd": 100,
+      "end": 80,
+      "tec": 90
+    },
+    "stats_max": {
+      "strength": 90,
+      "speed": 110,
+      "endurance": 85,
+      "technique": 95,
+      "iq": 100,
+      "biq": 100,
+      "str": 90,
+      "spd": 110,
+      "end": 85,
+      "tec": 95
+    },
+    "moves": [
+      {
+        "name": "IA Kick",
+        "type": "Normal",
+        "dialogue": "Fast. Clean. Elegant.",
+        "crit_dialogue": "A strike worthy of the spotlight!",
+        "miss_dialogue": "Missed the mark."
+      },
+      {
+        "name": "IA Punch",
+        "type": "Normal",
+        "dialogue": "Signature form.",
+        "crit_dialogue": "Classic execution — devastating!",
+        "miss_dialogue": "You had good timing."
+      },
+      {
+        "name": "Flip Kick",
+        "type": "Normal",
+        "dialogue": "Style and substance.",
+        "crit_dialogue": "Acrobatic precision lands perfectly!",
+        "miss_dialogue": "You anticipated the flip."
+      },
+      {
+        "name": "Spin Kick",
+        "type": "Normal",
+        "dialogue": "Rotation from a K-Star — lethal.",
+        "crit_dialogue": "Spinning at full force!",
+        "miss_dialogue": "You ducked just in time."
+      },
+      {
+        "name": "Front Kick",
+        "type": "Normal",
+        "dialogue": "Direct delivery.",
+        "crit_dialogue": "Clean and powerful!",
+        "miss_dialogue": "You stepped aside."
+      },
+      {
+        "name": "Handstand Kick",
+        "type": "Special",
+        "dialogue": "This speed isn't for show.",
+        "crit_dialogue": "K-Star velocity overwhelms!",
+        "miss_dialogue": "You backed off fast."
+      },
+      {
+        "name": "Kick Barrage",
+        "type": "Special",
+        "dialogue": "Precision learned from the best.",
+        "crit_dialogue": "Every hit lands in perfect sequence!",
+        "miss_dialogue": "You disrupted the chain."
+      },
+      {
+        "name": "K-Star Finale",
+        "type": "Ultimate",
+        "dialogue": "End scene.",
+        "crit_dialogue": "Diego Kang delivers the finishing performance!",
+        "miss_dialogue": "The curtain call was avoided."
+      },
+      {
+        "name": "Celebrity Guard",
+        "type": "Defensive",
+        "dialogue": "Even my blocks are clean.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "IA Kick",
+      "IA Punch",
+      "Flip Kick",
+      "Spin Kick",
+      "Front Kick"
+    ],
+    "special": [
+      "Handstand Kick",
+      "Kick Barrage"
+    ],
+    "ultimate": [
+      "K-Star Finale"
+    ],
+    "defensive_moves": [
+      "Celebrity Guard"
+    ]
+  },
+  "James Lee 3T": {
+    "emoji": "🔴",
+    "name": "James Lee 3T",
+    "rarity": "Mythical",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472183861143142574/Picsart_26-02-14_16-18-04-187.jpg?ex=69b1f250&is=69b0a0d0&hm=90c204496c8f3099643ad6b9bc2e893bc77aeb1484b930138b97838ecad7849d&",
+    "path": {
+      "name": "3-Talent Rising",
+      "description": "3-Talent Rising — three gifts developing at once. The potential is already frightening."
+    },
+    "mastery": {
+      "type": "Speed",
+      "description": "Speed mastery emerging naturally — his footwork at 3T already outpaces trained fighters."
+    },
+    "unique_skill": {
+      "name": "Triple Threat",
+      "description": "Three talents, one fighter. He hasn't even peaked yet."
+    },
+    "default_dialogue": "I'm still learning. That should scare you.",
+    "unique_path_dialogue": "3-Talent Rising — I'm not there yet. But I'm close.",
+    "unique_skill_dialogue": "Triple Threat — three gifts, one moment.",
+    "stats": {
+      "strength": 75,
+      "speed": 75,
+      "endurance": 65,
+      "technique": 70,
+      "iq": 70,
+      "biq": 75,
+      "str": 75,
+      "spd": 75,
+      "end": 65,
+      "tec": 70
+    },
+    "stats_max": {
+      "strength": 80,
+      "speed": 80,
+      "endurance": 70,
+      "technique": 75,
+      "iq": 75,
+      "biq": 80,
+      "str": 80,
+      "spd": 80,
+      "end": 70,
+      "tec": 75
+    },
+    "moves": [
+      {
+        "name": "IA Kick",
+        "type": "Normal",
+        "dialogue": "Raw and real.",
+        "crit_dialogue": "The talent shows through!",
+        "miss_dialogue": "Not yet refined."
+      },
+      {
+        "name": "IA Punch",
+        "type": "Normal",
+        "dialogue": "No technique yet — just instinct.",
+        "crit_dialogue": "Natural instinct hits hard!",
+        "miss_dialogue": "Needs more refinement."
+      },
+      {
+        "name": "Flip Kick",
+        "type": "Normal",
+        "dialogue": "I picked this up fast.",
+        "crit_dialogue": "Rapid learning on display!",
+        "miss_dialogue": "Still figuring out the angles."
+      },
+      {
+        "name": "Spin Kick",
+        "type": "Normal",
+        "dialogue": "Something clicks when I spin.",
+        "crit_dialogue": "Natural rotation hits clean!",
+        "miss_dialogue": "Off balance on that one."
+      },
+      {
+        "name": "Front Kick",
+        "type": "Normal",
+        "dialogue": "Straightforward. I'll refine it.",
+        "crit_dialogue": "More power than expected!",
+        "miss_dialogue": "Mistimed."
+      },
+      {
+        "name": "Handstand Kick",
+        "type": "Special",
+        "dialogue": "Something clicks.",
+        "crit_dialogue": "A flash of future greatness!",
+        "miss_dialogue": "Not quite there yet."
+      },
+      {
+        "name": "Kick Barrage",
+        "type": "Special",
+        "dialogue": "I'm figuring this out fast.",
+        "crit_dialogue": "Rapid growth on full display!",
+        "miss_dialogue": "Still learning the angles."
+      },
+      {
+        "name": "Triple Unleash",
+        "type": "Ultimate",
+        "dialogue": "Three talents. One moment. Everything.",
+        "crit_dialogue": "3T James Lee shows why the future belongs to him!",
+        "miss_dialogue": "The potential was there — timing wasn't."
+      },
+      {
+        "name": "Instinct Block",
+        "type": "Defensive",
+        "dialogue": "I don't know why I moved there. It worked.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "IA Kick",
+      "IA Punch",
+      "Flip Kick",
+      "Spin Kick",
+      "Front Kick"
+    ],
+    "special": [
+      "Handstand Kick",
+      "Kick Barrage"
+    ],
+    "ultimate": [
+      "Triple Unleash"
+    ],
+    "defensive_moves": [
+      "Instinct Block"
+    ]
+  },
+  "James Lee 2T": {
+    "emoji": "🟠",
+    "name": "James Lee 2T",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472183831384559741/Picsart_26-02-14_12-46-46-222.jpg?ex=69b1f249&is=69b0a0c9&hm=b47da285023a6ed3c22622154c69ec439e695c112d17358322c0e821fb86a6a1&",
+    "path": {
+      "name": "2-Talent Awakening",
+      "description": "2-Talent Awakening — two gifts discovered. The journey to the top has begun."
+    },
+    "mastery": {
+      "type": "Speed",
+      "description": "Early Speed mastery — fast enough to surprise fighters who've trained for years."
+    },
+    "unique_skill": {
+      "name": "Double Awakening",
+      "description": "Two talents unlocked. The third is coming."
+    },
+    "default_dialogue": "Two talents aren't enough for you? Watch me prove you wrong.",
+    "unique_path_dialogue": "2-Talent Awakening — two gifts, one path forward.",
+    "unique_skill_dialogue": "Double Awakening — both talents firing at once.",
+    "stats": {
+      "strength": 60,
+      "speed": 75,
+      "endurance": 65,
+      "technique": 65,
+      "iq": 70,
+      "biq": 70,
+      "str": 60,
+      "spd": 75,
+      "end": 65,
+      "tec": 65
+    },
+    "stats_max": {
+      "strength": 65,
+      "speed": 80,
+      "endurance": 70,
+      "technique": 70,
+      "iq": 75,
+      "biq": 75,
+      "str": 65,
+      "spd": 80,
+      "end": 70,
+      "tec": 70
+    },
+    "moves": [
+      {
+        "name": "IA Kick",
+        "type": "Normal",
+        "dialogue": "I'm just getting started.",
+        "crit_dialogue": "More power than expected!",
+        "miss_dialogue": "Still sharpening this."
+      },
+      {
+        "name": "IA Punch",
+        "type": "Normal",
+        "dialogue": "Speed is already there.",
+        "crit_dialogue": "Natural speed closes the gap instantly!",
+        "miss_dialogue": "Mistimed it."
+      },
+      {
+        "name": "Flip Kick",
+        "type": "Normal",
+        "dialogue": "Learning from the best.",
+        "crit_dialogue": "Aerial strike connects!",
+        "miss_dialogue": "Lost the angle."
+      },
+      {
+        "name": "Spin Kick",
+        "type": "Normal",
+        "dialogue": "Two talents make this hit harder.",
+        "crit_dialogue": "The awakening powers through!",
+        "miss_dialogue": "Off-balance."
+      },
+      {
+        "name": "Front Kick",
+        "type": "Normal",
+        "dialogue": "Simple. Effective.",
+        "crit_dialogue": "Hits harder than it looks!",
+        "miss_dialogue": "You stepped back in time."
+      },
+      {
+        "name": "Handstand Kick",
+        "type": "Special",
+        "dialogue": "Something's unlocking inside me.",
+        "crit_dialogue": "The awakening shows — raw and explosive!",
+        "miss_dialogue": "Not fully in control yet."
+      },
+      {
+        "name": "Kick Barrage",
+        "type": "Special",
+        "dialogue": "Two talents channeled into this.",
+        "crit_dialogue": "Double-talent barrage lands!",
+        "miss_dialogue": "You weathered it somehow."
+      },
+      {
+        "name": "Double Talent Finish",
+        "type": "Ultimate",
+        "dialogue": "Two talents. One knockout.",
+        "crit_dialogue": "Both talents firing at once — the future is here!",
+        "miss_dialogue": "The combination fell short."
+      },
+      {
+        "name": "Raw Guard",
+        "type": "Defensive",
+        "dialogue": "Instinct over training, for now.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "IA Kick",
+      "IA Punch",
+      "Flip Kick",
+      "Spin Kick",
+      "Front Kick"
+    ],
+    "special": [
+      "Handstand Kick",
+      "Kick Barrage"
+    ],
+    "ultimate": [
+      "Double Talent Finish"
+    ],
+    "defensive_moves": [
+      "Raw Guard"
+    ]
+  },
+  "Seonji Yuk 3T": {
+    "emoji": "🔴",
+    "name": "Seonji Yuk 3T",
+    "rarity": "Mythical",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472335157737291876/Picsart_26-02-15_02-23-58-777.jpg?ex=69b327f8&is=69b1d678&hm=fb0d77a5c7510334827ed602e935938118bf3aef311df2096749bfc2ecd6980f&",
+    "path": {
+      "name": "Ssirium Warrior",
+      "description": "Ssirium Warrior — traditional wrestling elevated to a new level of lethality."
+    },
+    "mastery": {
+      "type": "Strength",
+      "description": "Strength and Speed mastery from years of Ssirium discipline."
+    },
+    "unique_skill": {
+      "name": "Ssirium Dominance",
+      "description": "Traditional Ssirium turned into something the art never anticipated."
+    },
+    "default_dialogue": "Ssirium is not just a sport. It's a weapon.",
+    "unique_path_dialogue": "Ssirium Warrior — I don't fight. I dismantle.",
+    "unique_skill_dialogue": "Ssirium Dominance — you're already on the ground. You just don't know it.",
+    "stats": {
+      "strength": 80,
+      "speed": 75,
+      "endurance": 75,
+      "technique": 60,
+      "iq": 60,
+      "biq": 70,
+      "str": 80,
+      "spd": 75,
+      "end": 75,
+      "tec": 60
+    },
+    "stats_max": {
+      "strength": 85,
+      "speed": 80,
+      "endurance": 80,
+      "technique": 65,
+      "iq": 65,
+      "biq": 75,
+      "str": 85,
+      "spd": 80,
+      "end": 80,
+      "tec": 65
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "Straight and heavy.",
+        "crit_dialogue": "Seonji's raw strength connects!",
+        "miss_dialogue": "You moved quick."
+      },
+      {
+        "name": "Heavy Kick",
+        "type": "Normal",
+        "dialogue": "Legs like tree trunks.",
+        "crit_dialogue": "The weight behind that kick is devastating!",
+        "miss_dialogue": "Barely avoided it."
+      },
+      {
+        "name": "Slam",
+        "type": "Normal",
+        "dialogue": "Down you go.",
+        "crit_dialogue": "Slammed with full force!",
+        "miss_dialogue": "Rolled out of it."
+      },
+      {
+        "name": "Grab & Toss",
+        "type": "Normal",
+        "dialogue": "Ssirium basics.",
+        "crit_dialogue": "Perfect grip and execution!",
+        "miss_dialogue": "Slipped the grab."
+      },
+      {
+        "name": "Spear",
+        "type": "Normal",
+        "dialogue": "Traditional Ssirium entry.",
+        "crit_dialogue": "Spear tackle lands with full momentum!",
+        "miss_dialogue": "You sprawled in time."
+      },
+      {
+        "name": "Ssirium Slam",
+        "type": "Special",
+        "dialogue": "This is what Ssirium was made for.",
+        "crit_dialogue": "Ssirium technique executed to perfection!",
+        "miss_dialogue": "You escaped the clinch."
+      },
+      {
+        "name": "Consecutive Blows",
+        "type": "Special",
+        "dialogue": "One after another. No breathing room.",
+        "crit_dialogue": "Relentless pressure overwhelms!",
+        "miss_dialogue": "You covered up well."
+      },
+      {
+        "name": "Ssirium Throw",
+        "type": "Ultimate",
+        "dialogue": "Traditional or not — you're airborne.",
+        "crit_dialogue": "The throw sends them crashing down!",
+        "miss_dialogue": "You counterbalanced just in time."
+      },
+      {
+        "name": "Ssirium Brace",
+        "type": "Defensive",
+        "dialogue": "Ssirium stance is a wall.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Heavy Kick",
+      "Slam",
+      "Grab & Toss",
+      "Spear"
+    ],
+    "special": [
+      "Ssirium Slam",
+      "Consecutive Blows"
+    ],
+    "ultimate": [
+      "Ssirium Throw"
+    ],
+    "defensive_moves": [
+      "Ssirium Brace"
+    ]
+  },
+  "Seonji Yuk 2T": {
+    "emoji": "🟠",
+    "name": "Seonji Yuk 2T",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472284537869308150/Picsart_26-02-14_23-00-58-056.png?ex=69b2f8d3&is=69b1a753&hm=546e4d2526484241b711660769011fb20ead389b2ab8b1969191fb07d21a200c&",
+    "path": {
+      "name": "Ssirium Rising",
+      "description": "Ssirium Rising — the traditional art finding its true form in combat."
+    },
+    "mastery": {
+      "type": "Strength",
+      "description": "Strength and Endurance mastery rooted in Ssirium foundation."
+    },
+    "unique_skill": {
+      "name": "Ssirium Foundation",
+      "description": "The fundamentals are stronger than most fighters' finishing moves."
+    },
+    "default_dialogue": "My base is stronger than your best.",
+    "unique_path_dialogue": "Ssirium Rising — the old ways don't break.",
+    "unique_skill_dialogue": "Ssirium Foundation — built on something you can't copy.",
+    "stats": {
+      "strength": 75,
+      "speed": 65,
+      "endurance": 75,
+      "technique": 60,
+      "iq": 60,
+      "biq": 70,
+      "str": 75,
+      "spd": 65,
+      "end": 75,
+      "tec": 60
+    },
+    "stats_max": {
+      "strength": 80,
+      "speed": 70,
+      "endurance": 80,
+      "technique": 65,
+      "iq": 65,
+      "biq": 75,
+      "str": 80,
+      "spd": 70,
+      "end": 80,
+      "tec": 65
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "Heavy and direct.",
+        "crit_dialogue": "Lands with full weight!",
+        "miss_dialogue": "Quick step back."
+      },
+      {
+        "name": "Heavy Kick",
+        "type": "Normal",
+        "dialogue": "Ssirium stance gives this power.",
+        "crit_dialogue": "Powerful kick from solid footing!",
+        "miss_dialogue": "You sidestepped it."
+      },
+      {
+        "name": "Slam",
+        "type": "Normal",
+        "dialogue": "Ssirium basics.",
+        "crit_dialogue": "Textbook slam!",
+        "miss_dialogue": "You braced in time."
+      },
+      {
+        "name": "Grab & Toss",
+        "type": "Normal",
+        "dialogue": "Grip and control.",
+        "crit_dialogue": "Clean grab and throw!",
+        "miss_dialogue": "Broke the grip."
+      },
+      {
+        "name": "Spear",
+        "type": "Normal",
+        "dialogue": "Low and fast.",
+        "crit_dialogue": "Spear tackle connects!",
+        "miss_dialogue": "You stuffed it."
+      },
+      {
+        "name": "Ssirium Slam",
+        "type": "Special",
+        "dialogue": "The real Ssirium.",
+        "crit_dialogue": "Traditional power reimagined!",
+        "miss_dialogue": "You sprawled away."
+      },
+      {
+        "name": "Consecutive Blows",
+        "type": "Special",
+        "dialogue": "Pressure and power.",
+        "crit_dialogue": "Back-to-back hits land clean!",
+        "miss_dialogue": "You covered up."
+      },
+      {
+        "name": "Ssirium Throw",
+        "type": "Ultimate",
+        "dialogue": "End of the line.",
+        "crit_dialogue": "The definitive Ssirium throw!",
+        "miss_dialogue": "You escaped at the last second."
+      },
+      {
+        "name": "Ssirium Brace",
+        "type": "Defensive",
+        "dialogue": "Rooted. You can't move me.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Heavy Kick",
+      "Slam",
+      "Grab & Toss",
+      "Spear"
+    ],
+    "special": [
+      "Ssirium Slam",
+      "Consecutive Blows"
+    ],
+    "ultimate": [
+      "Ssirium Throw"
+    ],
+    "defensive_moves": [
+      "Ssirium Brace"
+    ]
+  },
+  "Beolgu Lee Cheongliang": {
+    "emoji": "🟣",
+    "name": "Beolgu Lee Cheongliang",
+    "rarity": "Epic",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472513935176630347/Picsart_26-02-15_14-04-29-426.jpg?ex=69b325b8&is=69b1d438&hm=f9ee4a103cdbd54543381563cc7d543a0e657226cd51f31e4c524543d34b8bc1&",
+    "path": {
+      "name": "Cheongliang Brawler",
+      "description": "Cheongliang Brawler — forged in the streets, tested in the school."
+    },
+    "mastery": {
+      "type": "Strength",
+      "description": "Raw Strength mastery from Cheongliang street fights."
+    },
+    "unique_skill": {
+      "name": "Street Toughness",
+      "description": "He didn't train in a gym. He trained in survival."
+    },
+    "default_dialogue": "You don't know what Cheongliang does to a person.",
+    "unique_path_dialogue": "Cheongliang Brawler — I've been hit harder than this my whole life.",
+    "unique_skill_dialogue": "Street Toughness — I don't stop. That's the only skill I needed.",
+    "stats": {
+      "strength": 45,
+      "speed": 35,
+      "endurance": 35,
+      "technique": 30,
+      "iq": 20,
+      "biq": 25,
+      "str": 45,
+      "spd": 35,
+      "end": 35,
+      "tec": 30
+    },
+    "stats_max": {
+      "strength": 50,
+      "speed": 40,
+      "endurance": 40,
+      "technique": 35,
+      "iq": 25,
+      "biq": 30,
+      "str": 50,
+      "spd": 40,
+      "end": 40,
+      "tec": 35
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "Basic but effective.",
+        "crit_dialogue": "Street-hardened impact!",
+        "miss_dialogue": "Swung wide."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Low and dirty.",
+        "crit_dialogue": "Connects clean!",
+        "miss_dialogue": "Stepped aside."
+      },
+      {
+        "name": "Side Kick",
+        "type": "Normal",
+        "dialogue": "Come from the side.",
+        "crit_dialogue": "Caught you off guard!",
+        "miss_dialogue": "You turned in time."
+      },
+      {
+        "name": "Throw",
+        "type": "Normal",
+        "dialogue": "Grab and send.",
+        "crit_dialogue": "Full momentum throw!",
+        "miss_dialogue": "You reversed it."
+      },
+      {
+        "name": "Slam",
+        "type": "Normal",
+        "dialogue": "Down.",
+        "crit_dialogue": "Ground impact!",
+        "miss_dialogue": "You rolled away."
+      },
+      {
+        "name": "Focus Punch",
+        "type": "Special",
+        "dialogue": "Everything into this one.",
+        "crit_dialogue": "All strength channeled!",
+        "miss_dialogue": "The focus broke at the last second."
+      },
+      {
+        "name": "Knee Strike",
+        "type": "Special",
+        "dialogue": "Close range. No escape.",
+        "crit_dialogue": "Close-range knee devastates!",
+        "miss_dialogue": "You created space just in time."
+      },
+      {
+        "name": "Uppercut",
+        "type": "Ultimate",
+        "dialogue": "From the ground up — everything.",
+        "crit_dialogue": "Chin-breaking uppercut!",
+        "miss_dialogue": "You saw it coming."
+      },
+      {
+        "name": "Cheongliang Guard",
+        "type": "Defensive",
+        "dialogue": "Cheongliang taught me to take hits.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Side Kick",
+      "Throw",
+      "Slam"
+    ],
+    "special": [
+      "Focus Punch",
+      "Knee Strike"
+    ],
+    "ultimate": [
+      "Uppercut"
+    ],
+    "defensive_moves": [
+      "Cheongliang Guard"
+    ]
+  },
+  "Gwang Yo Cheongliang": {
+    "emoji": "🟣",
+    "name": "Gwang Yo Cheongliang",
+    "rarity": "Epic",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472513950624256175/Picsart_26-02-15_14-07-08-949.jpg?ex=69b325bb&is=69b1d43b&hm=fa4e248bd5f55854fde8a6b7f7a946b7612cf4464e8172f51603844dc74410a6&",
+    "path": {
+      "name": "MMA Circuit",
+      "description": "MMA Circuit — speed and grappling blended into something dangerous."
+    },
+    "mastery": {
+      "type": "Speed",
+      "description": "Speed mastery honed through MMA training."
+    },
+    "unique_skill": {
+      "name": "Lock & Strike",
+      "description": "He controls the range and punishes every mistake."
+    },
+    "default_dialogue": "Speed is just the beginning.",
+    "unique_path_dialogue": "MMA Circuit — I trained for real fights, not exhibitions.",
+    "unique_skill_dialogue": "Lock & Strike — I control where this goes.",
+    "stats": {
+      "strength": 35,
+      "speed": 45,
+      "endurance": 30,
+      "technique": 35,
+      "iq": 20,
+      "biq": 25,
+      "str": 35,
+      "spd": 45,
+      "end": 30,
+      "tec": 35
+    },
+    "stats_max": {
+      "strength": 40,
+      "speed": 50,
+      "endurance": 35,
+      "technique": 40,
+      "iq": 25,
+      "biq": 30,
+      "str": 40,
+      "spd": 50,
+      "end": 35,
+      "tec": 40
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "Quick and clean.",
+        "crit_dialogue": "Speed makes this hit twice as hard!",
+        "miss_dialogue": "Went wide."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "MMA range kick.",
+        "crit_dialogue": "Perfect range — full damage!",
+        "miss_dialogue": "You backed off."
+      },
+      {
+        "name": "Grab",
+        "type": "Normal",
+        "dialogue": "Control the fight.",
+        "crit_dialogue": "Clinch secured!",
+        "miss_dialogue": "Shook it off."
+      },
+      {
+        "name": "Hold",
+        "type": "Normal",
+        "dialogue": "You're not going anywhere.",
+        "crit_dialogue": "Lock applied — no escape!",
+        "miss_dialogue": "You broke free."
+      },
+      {
+        "name": "Front Punch",
+        "type": "Normal",
+        "dialogue": "Straight down the middle.",
+        "crit_dialogue": "Direct hit — textbook!",
+        "miss_dialogue": "You slipped it."
+      },
+      {
+        "name": "MMA Strikes",
+        "type": "Special",
+        "dialogue": "This is what I trained for.",
+        "crit_dialogue": "MMA combination lands clean!",
+        "miss_dialogue": "You disrupted the rhythm."
+      },
+      {
+        "name": "Hand Lock",
+        "type": "Special",
+        "dialogue": "Your arm is mine.",
+        "crit_dialogue": "Lock secured — devastating leverage!",
+        "miss_dialogue": "You twisted out."
+      },
+      {
+        "name": "Multiple Pinches",
+        "type": "Ultimate",
+        "dialogue": "Every nerve, every pressure point.",
+        "crit_dialogue": "Precision targeting overwhelms!",
+        "miss_dialogue": "You endured it somehow."
+      },
+      {
+        "name": "MMA Shell",
+        "type": "Defensive",
+        "dialogue": "MMA defense is built for this.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Grab",
+      "Hold",
+      "Front Punch"
+    ],
+    "special": [
+      "MMA Strikes",
+      "Hand Lock"
+    ],
+    "ultimate": [
+      "Multiple Pinches"
+    ],
+    "defensive_moves": [
+      "MMA Shell"
+    ]
+  },
+  "Jaesu Noh Cheongliang": {
+    "emoji": "🟣",
+    "name": "Jaesu Noh Cheongliang",
+    "rarity": "Epic",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472513966998818932/Picsart_26-02-15_14-12-38-403.jpg?ex=69b325bf&is=69b1d43f&hm=edc23c3cd695f2960d6b147ae9217e2d6c3d15a6e443050cee5d47ee80b506d9&",
+    "path": {
+      "name": "Endurance Fighter",
+      "description": "Endurance Fighter — he takes the hits and keeps coming."
+    },
+    "mastery": {
+      "type": "Endurance",
+      "description": "Endurance mastery — built to outlast everyone in the room."
+    },
+    "unique_skill": {
+      "name": "Iron Body",
+      "description": "The hits don't stop him. They fuel him."
+    },
+    "default_dialogue": "Hit me harder. I need the warm-up.",
+    "unique_path_dialogue": "Endurance Fighter — I don't dodge. I outlast.",
+    "unique_skill_dialogue": "Iron Body — keep swinging. I'll still be standing.",
+    "stats": {
+      "strength": 35,
+      "speed": 35,
+      "endurance": 45,
+      "technique": 30,
+      "iq": 20,
+      "biq": 25,
+      "str": 35,
+      "spd": 35,
+      "end": 45,
+      "tec": 30
+    },
+    "stats_max": {
+      "strength": 40,
+      "speed": 40,
+      "endurance": 50,
+      "technique": 35,
+      "iq": 25,
+      "biq": 30,
+      "str": 40,
+      "spd": 40,
+      "end": 50,
+      "tec": 35
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "Slow but it hurts.",
+        "crit_dialogue": "That landed with full weight!",
+        "miss_dialogue": "Telegraphed it."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Solid base.",
+        "crit_dialogue": "Heavy kick connects!",
+        "miss_dialogue": "You stepped back."
+      },
+      {
+        "name": "Elbow Strike",
+        "type": "Normal",
+        "dialogue": "Close and painful.",
+        "crit_dialogue": "Elbow to the face — brutal!",
+        "miss_dialogue": "You ducked under."
+      },
+      {
+        "name": "Headbutt",
+        "type": "Normal",
+        "dialogue": "I don't care if it hurts me too.",
+        "crit_dialogue": "Headbutt lands — both hurt, but you more!",
+        "miss_dialogue": "You leaned back in time."
+      },
+      {
+        "name": "Body Slam",
+        "type": "Normal",
+        "dialogue": "All body weight forward.",
+        "crit_dialogue": "Full weight crashes down!",
+        "miss_dialogue": "You sidestepped."
+      },
+      {
+        "name": "Spear",
+        "type": "Special",
+        "dialogue": "Forward. Always forward.",
+        "crit_dialogue": "Unstoppable charge!",
+        "miss_dialogue": "You sprawled away."
+      },
+      {
+        "name": "Choke",
+        "type": "Special",
+        "dialogue": "No more air for you.",
+        "crit_dialogue": "Choke locked in tight!",
+        "miss_dialogue": "You pulled free."
+      },
+      {
+        "name": "Force Punch",
+        "type": "Ultimate",
+        "dialogue": "Every bit of endurance turned into force.",
+        "crit_dialogue": "Endurance-fueled haymaker!",
+        "miss_dialogue": "You barely slipped it."
+      },
+      {
+        "name": "Iron Stance",
+        "type": "Defensive",
+        "dialogue": "I've been hit worse. Keep going.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Elbow Strike",
+      "Headbutt",
+      "Body Slam"
+    ],
+    "special": [
+      "Spear",
+      "Choke"
+    ],
+    "ultimate": [
+      "Force Punch"
+    ],
+    "defensive_moves": [
+      "Iron Stance"
+    ]
+  },
+  "Kojima Brothers Cheongliang": {
+    "emoji": "🟣",
+    "name": "Kojima Brothers Cheongliang",
+    "rarity": "Epic",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472524006707040349/Picsart_26-02-15_14-53-41-941.jpg?ex=69b32f19&is=69b1dd99&hm=ee76882edae0e045ec109d049fe0582a36ed840024f12b0dff4340374247bc9e&",
+    "path": {
+      "name": "Tag Team Tactics",
+      "description": "Tag Team Tactics — synchronized combat that overwhelms any solo fighter."
+    },
+    "mastery": {
+      "type": "Strength",
+      "description": "Strength and Endurance mastery forged in synchronized combat."
+    },
+    "unique_skill": {
+      "name": "Brother's Combo",
+      "description": "You can't block what comes from two directions at once."
+    },
+    "default_dialogue": "You think you can fight both of us?",
+    "unique_path_dialogue": "Tag Team Tactics — two minds, one goal.",
+    "unique_skill_dialogue": "Brother's Combo — together we hit twice as hard.",
+    "stats": {
+      "strength": 45,
+      "speed": 45,
+      "endurance": 30,
+      "technique": 40,
+      "iq": 20,
+      "biq": 30,
+      "str": 45,
+      "spd": 45,
+      "end": 30,
+      "tec": 40
+    },
+    "stats_max": {
+      "strength": 50,
+      "speed": 50,
+      "endurance": 35,
+      "technique": 45,
+      "iq": 25,
+      "biq": 35,
+      "str": 50,
+      "spd": 50,
+      "end": 35,
+      "tec": 45
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "One of us hits. Then the other.",
+        "crit_dialogue": "Back-to-back strikes land!",
+        "miss_dialogue": "You read the pattern."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Low from one side.",
+        "crit_dialogue": "The angle was impossible to cover!",
+        "miss_dialogue": "You blocked the kick."
+      },
+      {
+        "name": "Lower Kick",
+        "type": "Normal",
+        "dialogue": "Take out the base.",
+        "crit_dialogue": "Leg sweep — footing gone!",
+        "miss_dialogue": "You jumped over it."
+      },
+      {
+        "name": "Headbutt",
+        "type": "Normal",
+        "dialogue": "While you're distracted.",
+        "crit_dialogue": "Direct headbutt while guard is split!",
+        "miss_dialogue": "You turned at the right moment."
+      },
+      {
+        "name": "Knee Strike",
+        "type": "Normal",
+        "dialogue": "Close range — no way out.",
+        "crit_dialogue": "Knee strike in the clinch!",
+        "miss_dialogue": "You pushed off."
+      },
+      {
+        "name": "Kojima Special",
+        "type": "Special",
+        "dialogue": "This is what we practiced.",
+        "crit_dialogue": "Synchronized special technique lands!",
+        "miss_dialogue": "You disrupted the timing."
+      },
+      {
+        "name": "Grapple Shot",
+        "type": "Special",
+        "dialogue": "Grab, hold, throw.",
+        "crit_dialogue": "Grapple and slam — perfect execution!",
+        "miss_dialogue": "You sprawled out of it."
+      },
+      {
+        "name": "Side Slam",
+        "type": "Ultimate",
+        "dialogue": "From both sides at once.",
+        "crit_dialogue": "Tag team finishing slam — nowhere to go!",
+        "miss_dialogue": "You split through the gap."
+      },
+      {
+        "name": "Tag Cover",
+        "type": "Defensive",
+        "dialogue": "One of us always has the other's back.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Lower Kick",
+      "Headbutt",
+      "Knee Strike"
+    ],
+    "special": [
+      "Kojima Special",
+      "Grapple Shot"
+    ],
+    "ultimate": [
+      "Side Slam"
+    ],
+    "defensive_moves": [
+      "Tag Cover"
+    ]
+  },
+  "Shamen Guards Cheongliang": {
+    "emoji": "⚪",
+    "name": "Shamen Guards Cheongliang",
+    "rarity": "Common",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472552347145339011/Picsart_26-02-15_16-46-08-890.png?ex=69b3497e&is=69b1f7fe&hm=7a941ed3bbc4e48e438629e7c6555f7d55939598729ab279d05cb9812d37c53d&",
+    "path": {
+      "name": "Guard Duty",
+      "description": "Guard Duty — they're not here to win. They're here to not lose quickly."
+    },
+    "mastery": {
+      "type": "None",
+      "description": "No mastery — just showing up."
+    },
+    "unique_skill": {
+      "name": "Numbers Game",
+      "description": "There's more of us. That counts for something."
+    },
+    "default_dialogue": "We follow orders. That's it.",
+    "unique_path_dialogue": "Guard Duty — we hold the line.",
+    "unique_skill_dialogue": "Numbers Game — you can't get all of us.",
+    "stats": {
+      "strength": 15,
+      "speed": 10,
+      "endurance": 15,
+      "technique": 5,
+      "iq": 5,
+      "biq": 10,
+      "str": 15,
+      "spd": 10,
+      "end": 15,
+      "tec": 5
+    },
+    "stats_max": {
+      "strength": 20,
+      "speed": 15,
+      "endurance": 20,
+      "technique": 10,
+      "iq": 10,
+      "biq": 15,
+      "str": 20,
+      "spd": 15,
+      "end": 20,
+      "tec": 10
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "Basic.",
+        "crit_dialogue": "Actually landed!",
+        "miss_dialogue": "Swung wide."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Slow kick.",
+        "crit_dialogue": "Connects somehow!",
+        "miss_dialogue": "Stepped around it."
+      },
+      {
+        "name": "Throw",
+        "type": "Normal",
+        "dialogue": "Grab and toss.",
+        "crit_dialogue": "Got the grip!",
+        "miss_dialogue": "Couldn't hold on."
+      },
+      {
+        "name": "Slam",
+        "type": "Normal",
+        "dialogue": "All weight forward.",
+        "crit_dialogue": "Lands with body weight!",
+        "miss_dialogue": "You sidestepped."
+      },
+      {
+        "name": "Grab",
+        "type": "Normal",
+        "dialogue": "Hold them down.",
+        "crit_dialogue": "Got a hold!",
+        "miss_dialogue": "Broke free easily."
+      },
+      {
+        "name": "Double Hit",
+        "type": "Special",
+        "dialogue": "Two at once.",
+        "crit_dialogue": "Both hits connect!",
+        "miss_dialogue": "You dodged both."
+      },
+      {
+        "name": "Side Kick",
+        "type": "Special",
+        "dialogue": "From the flank.",
+        "crit_dialogue": "Caught the side!",
+        "miss_dialogue": "You turned in time."
+      },
+      {
+        "name": "Front Kick",
+        "type": "Ultimate",
+        "dialogue": "This is everything we have.",
+        "crit_dialogue": "Guard puts everything in one kick!",
+        "miss_dialogue": "You blocked it easily."
+      },
+      {
+        "name": "Guard Stance",
+        "type": "Defensive",
+        "dialogue": "We're guards. We guard.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Throw",
+      "Slam",
+      "Grab"
+    ],
+    "special": [
+      "Double Hit",
+      "Side Kick"
+    ],
+    "ultimate": [
+      "Front Kick"
+    ],
+    "defensive_moves": [
+      "Guard Stance"
+    ]
+  },
+  "Yakuza Guard Cheongliang": {
+    "emoji": "⚪",
+    "name": "Yakuza Guard Cheongliang",
+    "rarity": "Common",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472571922217963632/Picsart_26-02-15_18-04-51-460.png?ex=69b35bb9&is=69b20a39&hm=b0e5126d6b263cbcbd0d9836d1e80db2aafa2451030cf69cd9167e0a7d75e73c&",
+    "path": {
+      "name": "Yakuza Loyalty",
+      "description": "Yakuza Loyalty — fight for the family. Fall for the family."
+    },
+    "mastery": {
+      "type": "None",
+      "description": "No mastery — loyalty doesn't come with combat expertise."
+    },
+    "unique_skill": {
+      "name": "Yakuza Backup",
+      "description": "Someone is always behind you in the yakuza. Always."
+    },
+    "default_dialogue": "I'm loyal to the family. That's enough.",
+    "unique_path_dialogue": "Yakuza Loyalty — I serve, I fight, I fall if I must.",
+    "unique_skill_dialogue": "Yakuza Backup — you thought you only had to deal with me?",
+    "stats": {
+      "strength": 5,
+      "speed": 5,
+      "endurance": 5,
+      "technique": 5,
+      "iq": 5,
+      "biq": 5,
+      "str": 5,
+      "spd": 5,
+      "end": 5,
+      "tec": 5
+    },
+    "stats_max": {
+      "strength": 10,
+      "speed": 10,
+      "endurance": 10,
+      "technique": 10,
+      "iq": 10,
+      "biq": 10,
+      "str": 10,
+      "spd": 10,
+      "end": 10,
+      "tec": 10
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "Yakuza basics.",
+        "crit_dialogue": "Somehow connects!",
+        "miss_dialogue": "Didn't even come close."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Slow kick.",
+        "crit_dialogue": "Got lucky!",
+        "miss_dialogue": "You walked around it."
+      },
+      {
+        "name": "Slap",
+        "type": "Normal",
+        "dialogue": "Desperation.",
+        "crit_dialogue": "Actually stings!",
+        "miss_dialogue": "You barely moved."
+      },
+      {
+        "name": "Grab",
+        "type": "Normal",
+        "dialogue": "Hold on for dear life.",
+        "crit_dialogue": "Got the grab somehow!",
+        "miss_dialogue": "You shook them off."
+      },
+      {
+        "name": "Elbow Strike",
+        "type": "Normal",
+        "dialogue": "Close range panic.",
+        "crit_dialogue": "Elbow sneaks through!",
+        "miss_dialogue": "You stepped back."
+      },
+      {
+        "name": "Regular Hit",
+        "type": "Special",
+        "dialogue": "This is the best I've got.",
+        "crit_dialogue": "A real hit for once!",
+        "miss_dialogue": "Whiffed completely."
+      },
+      {
+        "name": "Double Punch",
+        "type": "Special",
+        "dialogue": "Two swings, maybe one connects.",
+        "crit_dialogue": "Both land — miraculously!",
+        "miss_dialogue": "Zero for two."
+      },
+      {
+        "name": "Side Kick",
+        "type": "Ultimate",
+        "dialogue": "I give everything I have — which isn't much.",
+        "crit_dialogue": "Yakuza guard goes all out!",
+        "miss_dialogue": "You barely needed to move."
+      },
+      {
+        "name": "Yakuza Crouch",
+        "type": "Defensive",
+        "dialogue": "Just... trying not to die.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Slap",
+      "Grab",
+      "Elbow Strike"
+    ],
+    "special": [
+      "Regular Hit",
+      "Double Punch"
+    ],
+    "ultimate": [
+      "Side Kick"
+    ],
+    "defensive_moves": [
+      "Yakuza Crouch"
+    ]
+  },
+  "Taebong Lim Cheongliang": {
+    "emoji": "⚪",
+    "name": "Taebong Lim Cheongliang",
+    "rarity": "Common",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472918072728748245/Picsart_26-02-16_16-37-52-677.jpg?ex=69b34c9a&is=69b1fb1a&hm=e58201cf623f62c5ef7195c06c7f5ea20ce76fa78d4b9843960614c56a5e8fa6&",
+    "path": {
+      "name": "Cheongliang Streets",
+      "description": "Cheongliang Streets — born into the chaos, fighting to survive it."
+    },
+    "mastery": {
+      "type": "None",
+      "description": "No mastery — raw street survival."
+    },
+    "unique_skill": {
+      "name": "Stubborn Will",
+      "description": "He doesn't know when to quit. That alone makes him dangerous."
+    },
+    "default_dialogue": "I've been knocked down my whole life. Getting back up is the only thing I'm good at.",
+    "unique_path_dialogue": "Cheongliang raised me. I fight like it.",
+    "unique_skill_dialogue": "Stubborn Will — I'm still here, aren't I?",
+    "stats": {
+      "strength": 10,
+      "speed": 10,
+      "endurance": 10,
+      "technique": 10,
+      "iq": 10,
+      "biq": 10,
+      "str": 10,
+      "spd": 10,
+      "end": 10,
+      "tec": 10
+    },
+    "stats_max": {
+      "strength": 15,
+      "speed": 15,
+      "endurance": 15,
+      "technique": 15,
+      "iq": 15,
+      "biq": 15,
+      "str": 15,
+      "spd": 15,
+      "end": 15,
+      "tec": 15
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "It's all I've got.",
+        "crit_dialogue": "Landed clean for once!",
+        "miss_dialogue": "Arm went wide."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Back off.",
+        "crit_dialogue": "Connects harder than it looks!",
+        "miss_dialogue": "Kicked nothing but air."
+      },
+      {
+        "name": "Throw",
+        "type": "Normal",
+        "dialogue": "Get away from me.",
+        "crit_dialogue": "Full momentum throw!",
+        "miss_dialogue": "You slipped the grip."
+      },
+      {
+        "name": "Slam",
+        "type": "Special",
+        "dialogue": "Everything I have — right now.",
+        "crit_dialogue": "Slams with desperate force!",
+        "miss_dialogue": "Overcommitted and missed."
+      },
+      {
+        "name": "Taebong Guard",
+        "type": "Defensive",
+        "dialogue": "Cheongliang taught me to take a beating.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Throw"
+    ],
+    "special": [
+      "Slam"
+    ],
+    "ultimate": [],
+    "defensive_moves": [
+      "Taebong Guard"
+    ]
+  },
+  "Vin Jin Cheongliang": {
+    "emoji": "⚪",
+    "name": "Vin Jin Cheongliang",
+    "rarity": "Common",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472918090562928763/Picsart_26-02-16_16-44-09-601.jpg?ex=69b34c9e&is=69b1fb1e&hm=b8146a154329d730c9efc81defbe4fd378b4fd0651912138fc94c0ebe56679cc&",
+    "path": {
+      "name": "Cheongliang Streets",
+      "description": "Cheongliang Streets — survival carved into every swing."
+    },
+    "mastery": {
+      "type": "None",
+      "description": "No mastery — just nerve and desperation."
+    },
+    "unique_skill": {
+      "name": "Reckless Aggression",
+      "description": "He throws himself in without thinking. Sometimes that's enough."
+    },
+    "default_dialogue": "I don't fight smart. I fight hard.",
+    "unique_path_dialogue": "Cheongliang made me reckless. And reckless wins sometimes.",
+    "unique_skill_dialogue": "Reckless Aggression — I'm coming at you no matter what.",
+    "stats": {
+      "strength": 15,
+      "speed": 15,
+      "endurance": 10,
+      "technique": 10,
+      "iq": 5,
+      "biq": 10,
+      "str": 15,
+      "spd": 15,
+      "end": 10,
+      "tec": 10
+    },
+    "stats_max": {
+      "strength": 20,
+      "speed": 20,
+      "endurance": 15,
+      "technique": 15,
+      "iq": 10,
+      "biq": 15,
+      "str": 20,
+      "spd": 20,
+      "end": 15,
+      "tec": 15
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "No thinking — just swinging.",
+        "crit_dialogue": "Reckless hit lands square!",
+        "miss_dialogue": "Telegraphed it a mile away."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Stay down.",
+        "crit_dialogue": "Kicks with everything he's got!",
+        "miss_dialogue": "You stepped around it easily."
+      },
+      {
+        "name": "Throw",
+        "type": "Normal",
+        "dialogue": "I'll send you flying.",
+        "crit_dialogue": "Wild throw connects!",
+        "miss_dialogue": "You broke the grip."
+      },
+      {
+        "name": "Slam",
+        "type": "Special",
+        "dialogue": "This is how we end it in Cheongliang.",
+        "crit_dialogue": "Raw street power lands!",
+        "miss_dialogue": "You sidestepped the charge."
+      },
+      {
+        "name": "Vin Jin Guard",
+        "type": "Defensive",
+        "dialogue": "I've taken worse hits in the streets.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Throw"
+    ],
+    "special": [
+      "Slam"
+    ],
+    "ultimate": [],
+    "defensive_moves": [
+      "Vin Jin Guard"
+    ]
+  },
+  "Hyungjae Lee Cheongliang": {
+    "emoji": "⚪",
+    "name": "Hyungjae Lee Cheongliang",
+    "rarity": "Common",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472918105066967182/Picsart_26-02-16_16-54-26-717.jpg?ex=69b34ca1&is=69b1fb21&hm=79f0b3ebef3b9ec0f670acc2f5b87d8e770dc8a6a9f4c07a6ec9c8196e2d18ce&",
+    "path": {
+      "name": "Cheongliang Streets",
+      "description": "Cheongliang Streets — every scar tells a story."
+    },
+    "mastery": {
+      "type": "None",
+      "description": "No mastery — built by experience, not training."
+    },
+    "unique_skill": {
+      "name": "Quiet Grit",
+      "description": "He doesn't say much. His fists do the talking."
+    },
+    "default_dialogue": "I don't need to be the best. I just need to outlast you.",
+    "unique_path_dialogue": "Cheongliang Streets — silent and steady.",
+    "unique_skill_dialogue": "Quiet Grit — no speech. Just pressure.",
+    "stats": {
+      "strength": 10,
+      "speed": 10,
+      "endurance": 10,
+      "technique": 10,
+      "iq": 10,
+      "biq": 10,
+      "str": 10,
+      "spd": 10,
+      "end": 10,
+      "tec": 10
+    },
+    "stats_max": {
+      "strength": 15,
+      "speed": 15,
+      "endurance": 15,
+      "technique": 15,
+      "iq": 15,
+      "biq": 15,
+      "str": 15,
+      "spd": 15,
+      "end": 15,
+      "tec": 15
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "Quiet and direct.",
+        "crit_dialogue": "More behind that than you thought!",
+        "miss_dialogue": "Silent miss."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Low and steady.",
+        "crit_dialogue": "Connects clean!",
+        "miss_dialogue": "You moved back in time."
+      },
+      {
+        "name": "Throw",
+        "type": "Normal",
+        "dialogue": "Out of my space.",
+        "crit_dialogue": "Steady throw lands!",
+        "miss_dialogue": "You slipped the grip."
+      },
+      {
+        "name": "Slam",
+        "type": "Special",
+        "dialogue": "I put everything quiet into this one.",
+        "crit_dialogue": "Grit and force combine!",
+        "miss_dialogue": "The silence didn't help this time."
+      },
+      {
+        "name": "Hyungjae Guard",
+        "type": "Defensive",
+        "dialogue": "I endure. That's what I do.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Throw"
+    ],
+    "special": [
+      "Slam"
+    ],
+    "ultimate": [],
+    "defensive_moves": [
+      "Hyungjae Guard"
+    ]
+  },
+  "Jaewoo Park Cheongliang": {
+    "emoji": "⚪",
+    "name": "Jaewoo Park Cheongliang",
+    "rarity": "Common",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472918121798176930/Picsart_26-02-16_16-55-52-596.jpg?ex=69b34ca5&is=69b1fb25&hm=78e30dc22e4b62776563fa72b0504ddb0a5baba5342091b1de26883aeffbacb2&",
+    "path": {
+      "name": "Cheongliang Streets",
+      "description": "Cheongliang Streets — you learn to fight or you learn to lose."
+    },
+    "mastery": {
+      "type": "None",
+      "description": "No mastery — street instincts only."
+    },
+    "unique_skill": {
+      "name": "Corner Fighter",
+      "description": "He fights best when his back is against the wall."
+    },
+    "default_dialogue": "You back me into a corner — that's when I'm most dangerous.",
+    "unique_path_dialogue": "Cheongliang Streets — the corner is home.",
+    "unique_skill_dialogue": "Corner Fighter — no retreat, no choice.",
+    "stats": {
+      "strength": 10,
+      "speed": 10,
+      "endurance": 10,
+      "technique": 10,
+      "iq": 10,
+      "biq": 10,
+      "str": 10,
+      "spd": 10,
+      "end": 10,
+      "tec": 10
+    },
+    "stats_max": {
+      "strength": 15,
+      "speed": 15,
+      "endurance": 15,
+      "technique": 15,
+      "iq": 15,
+      "biq": 15,
+      "str": 15,
+      "spd": 15,
+      "end": 15,
+      "tec": 15
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "Corner punch — nowhere to go.",
+        "crit_dialogue": "Desperation makes it land harder!",
+        "miss_dialogue": "You pushed off the corner."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Low kick to create space.",
+        "crit_dialogue": "Forces you back!",
+        "miss_dialogue": "You hopped over it."
+      },
+      {
+        "name": "Throw",
+        "type": "Normal",
+        "dialogue": "Get off me.",
+        "crit_dialogue": "Throws you clear!",
+        "miss_dialogue": "You reversed the throw."
+      },
+      {
+        "name": "Slam",
+        "type": "Special",
+        "dialogue": "When my back's against the wall — I slam.",
+        "crit_dialogue": "Corner power — raw and real!",
+        "miss_dialogue": "You slipped the rush."
+      },
+      {
+        "name": "Jaewoo Guard",
+        "type": "Defensive",
+        "dialogue": "Cornered animals fight harder.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Throw"
+    ],
+    "special": [
+      "Slam"
+    ],
+    "ultimate": [],
+    "defensive_moves": [
+      "Jaewoo Guard"
+    ]
+  },
+  "Wooseok Choi Cheongliang": {
+    "emoji": "⚪",
+    "name": "Wooseok Choi Cheongliang",
+    "rarity": "Common",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472918132753694722/Picsart_26-02-16_16-58-37-422.jpg?ex=69b34ca8&is=69b1fb28&hm=73b9b6ef6663a77574be0dc9e8a804b721c9efd6f7d0a2f40466031e77e45ffc&",
+    "path": {
+      "name": "Cheongliang Streets",
+      "description": "Cheongliang Streets — pride is all you've got sometimes."
+    },
+    "mastery": {
+      "type": "None",
+      "description": "No mastery — pride-fuelled fighting."
+    },
+    "unique_skill": {
+      "name": "Pride Strike",
+      "description": "He fights like he has something to prove. Every single time."
+    },
+    "default_dialogue": "I have nothing but pride and I'll fight with every bit of it.",
+    "unique_path_dialogue": "Cheongliang Streets — pride is the path.",
+    "unique_skill_dialogue": "Pride Strike — I refuse to look weak in front of anyone.",
+    "stats": {
+      "strength": 10,
+      "speed": 10,
+      "endurance": 10,
+      "technique": 10,
+      "iq": 10,
+      "biq": 10,
+      "str": 10,
+      "spd": 10,
+      "end": 10,
+      "tec": 10
+    },
+    "stats_max": {
+      "strength": 15,
+      "speed": 15,
+      "endurance": 15,
+      "technique": 15,
+      "iq": 15,
+      "biq": 15,
+      "str": 15,
+      "spd": 15,
+      "end": 15,
+      "tec": 15
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "My pride is in every hit.",
+        "crit_dialogue": "Lands with everything he's worth!",
+        "miss_dialogue": "Pride wasn't enough that time."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "I won't be looked down on.",
+        "crit_dialogue": "The kick hits clean!",
+        "miss_dialogue": "You didn't even flinch."
+      },
+      {
+        "name": "Throw",
+        "type": "Normal",
+        "dialogue": "Out of my way.",
+        "crit_dialogue": "Throws with conviction!",
+        "miss_dialogue": "You slipped free."
+      },
+      {
+        "name": "Slam",
+        "type": "Special",
+        "dialogue": "This is what pride looks like.",
+        "crit_dialogue": "Every ounce of pride behind this slam!",
+        "miss_dialogue": "Pride hit the floor, not you."
+      },
+      {
+        "name": "Wooseok Guard",
+        "type": "Defensive",
+        "dialogue": "I won't go down without a fight.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Throw"
+    ],
+    "special": [
+      "Slam"
+    ],
+    "ultimate": [],
+    "defensive_moves": [
+      "Wooseok Guard"
+    ]
+  },
+  "Kid Seonji Cheongliang": {
+    "emoji": "⚪",
+    "name": "Kid Seonji Cheongliang",
+    "rarity": "Common",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472924371671842836/Picsart_26-02-16_17-25-18-079.jpg?ex=69b35277&is=69b200f7&hm=88e15a418efd36b6a464a7bea5fe55610fe3821a2f918276c614accb0a71ff7b&",
+    "path": {
+      "name": "Cheongliang Streets",
+      "description": "Cheongliang Streets — too young, too stubborn to know when to stop."
+    },
+    "mastery": {
+      "type": "None",
+      "description": "No mastery — just a kid who refuses to back down."
+    },
+    "unique_skill": {
+      "name": "Young Blood",
+      "description": "He's got nothing to lose and everything to prove."
+    },
+    "default_dialogue": "Don't underestimate me because I'm young. That's your mistake.",
+    "unique_path_dialogue": "Cheongliang Streets — grew up too fast.",
+    "unique_skill_dialogue": "Young Blood — I'm just getting started.",
+    "stats": {
+      "strength": 5,
+      "speed": 5,
+      "endurance": 5,
+      "technique": 5,
+      "iq": 5,
+      "biq": 5,
+      "str": 5,
+      "spd": 5,
+      "end": 5,
+      "tec": 5
+    },
+    "stats_max": {
+      "strength": 10,
+      "speed": 10,
+      "endurance": 10,
+      "technique": 10,
+      "iq": 10,
+      "biq": 10,
+      "str": 10,
+      "spd": 10,
+      "end": 10,
+      "tec": 10
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "I'll show you what a kid can do.",
+        "crit_dialogue": "Young and fierce — lands clean!",
+        "miss_dialogue": "Too eager — swung wide."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Back off!",
+        "crit_dialogue": "Quick kick clips you!",
+        "miss_dialogue": "You stepped around it."
+      },
+      {
+        "name": "Throw",
+        "type": "Normal",
+        "dialogue": "You're going down.",
+        "crit_dialogue": "Throws with all his small weight!",
+        "miss_dialogue": "You shrugged him off."
+      },
+      {
+        "name": "Slam",
+        "type": "Special",
+        "dialogue": "This is everything a kid from Cheongliang has.",
+        "crit_dialogue": "Young blood and pure grit!",
+        "miss_dialogue": "Fell short — but he tried."
+      },
+      {
+        "name": "Kid Guard",
+        "type": "Defensive",
+        "dialogue": "I'm not scared of you.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Throw"
+    ],
+    "special": [
+      "Slam"
+    ],
+    "ultimate": [],
+    "defensive_moves": [
+      "Kid Guard"
+    ]
+  },
+  "Cheongliang Fam Cheongliang": {
+    "emoji": "🟡",
+    "name": "Cheongliang Fam Cheongliang",
+    "rarity": "Rare",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1473029927568937103/Picsart_26-02-17_00-24-18-533.png?ex=69b30c06&is=69b1ba86&hm=155f7c5df4fc7e481807bbf26a294eeebe56bc588556da87dc69c7fa9e5b5564&",
+    "path": {
+      "name": "Cheongliang Brotherhood",
+      "description": "Cheongliang Brotherhood — they move as one, they fall as one."
+    },
+    "mastery": {
+      "type": "None",
+      "description": "No individual mastery — their strength is the group."
+    },
+    "unique_skill": {
+      "name": "Family Pressure",
+      "description": "They don't fight for themselves. They fight for the family."
+    },
+    "default_dialogue": "You're not just fighting me. You're fighting all of Cheongliang.",
+    "unique_path_dialogue": "Cheongliang Brotherhood — the family stands together.",
+    "unique_skill_dialogue": "Family Pressure — every member of the fam is watching.",
+    "stats": {
+      "strength": 15,
+      "speed": 15,
+      "endurance": 15,
+      "technique": 15,
+      "iq": 15,
+      "biq": 15,
+      "str": 15,
+      "spd": 15,
+      "end": 15,
+      "tec": 15
+    },
+    "stats_max": {
+      "strength": 20,
+      "speed": 20,
+      "endurance": 20,
+      "technique": 20,
+      "iq": 20,
+      "biq": 20,
+      "str": 20,
+      "spd": 20,
+      "end": 20,
+      "tec": 20
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "For the family.",
+        "crit_dialogue": "Family pride behind that hit!",
+        "miss_dialogue": "The family is watching — embarrassing."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "We don't back down.",
+        "crit_dialogue": "Cheongliang Fam connects!",
+        "miss_dialogue": "You moved fast."
+      },
+      {
+        "name": "Fam Guard",
+        "type": "Defensive",
+        "dialogue": "The family protects each other.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick"
+    ],
+    "special": [],
+    "ultimate": [],
+    "defensive_moves": [
+      "Fam Guard"
+    ]
+  },
+  "Vin Jin Rage Cheongliang": {
+    "emoji": "🟡",
+    "name": "Vin Jin Rage Cheongliang",
+    "rarity": "Rare",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1473686359863464139/Picsart_26-02-18_19-53-16-367.png?ex=69b3751f&is=69b2239f&hm=3d3c79ffdc93f0c8c977dc17957d76f73d3d8693704cfe5dd38f6357cef625f9&",
+    "path": {
+      "name": "Rage Unleashed",
+      "description": "Rage Unleashed — when everything he's held back finally breaks free."
+    },
+    "mastery": {
+      "type": "None",
+      "description": "No mastery — pure uncontrolled rage."
+    },
+    "unique_skill": {
+      "name": "Rage Mode",
+      "description": "When he snaps — there's no stopping what comes next."
+    },
+    "default_dialogue": "You made me angry. You won't like what happens next.",
+    "unique_path_dialogue": "Rage Unleashed — I've been holding this back for too long.",
+    "unique_skill_dialogue": "Rage Mode — I'm done holding back.",
+    "stats": {
+      "strength": 20,
+      "speed": 15,
+      "endurance": 15,
+      "technique": 15,
+      "iq": 10,
+      "biq": 15,
+      "str": 20,
+      "spd": 15,
+      "end": 15,
+      "tec": 15
+    },
+    "stats_max": {
+      "strength": 25,
+      "speed": 20,
+      "endurance": 20,
+      "technique": 20,
+      "iq": 15,
+      "biq": 20,
+      "str": 25,
+      "spd": 20,
+      "end": 20,
+      "tec": 20
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "Rage fuels every hit.",
+        "crit_dialogue": "Rage-powered punch lands hard!",
+        "miss_dialogue": "Anger made him sloppy."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Get out of my way.",
+        "crit_dialogue": "Fury kick connects!",
+        "miss_dialogue": "You stepped aside."
+      },
+      {
+        "name": "Throw",
+        "type": "Normal",
+        "dialogue": "I'll throw you like you're nothing.",
+        "crit_dialogue": "Rage throw sends you flying!",
+        "miss_dialogue": "You held your ground."
+      },
+      {
+        "name": "Grab",
+        "type": "Normal",
+        "dialogue": "I've got you now.",
+        "crit_dialogue": "Iron rage grip locks in!",
+        "miss_dialogue": "You wrenched free."
+      },
+      {
+        "name": "Slam",
+        "type": "Special",
+        "dialogue": "This is what rage looks like.",
+        "crit_dialogue": "Rage slam — uncontrolled and devastating!",
+        "miss_dialogue": "The fury went wild."
+      },
+      {
+        "name": "Ssirium Style",
+        "type": "Special",
+        "dialogue": "I picked up something from watching Seonji.",
+        "crit_dialogue": "Borrowed Ssirium technique lands clean!",
+        "miss_dialogue": "The form wasn't quite right."
+      },
+      {
+        "name": "Rage Guard",
+        "type": "Defensive",
+        "dialogue": "I'm too angry to feel pain right now.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Throw",
+      "Grab"
+    ],
+    "special": [
+      "Slam",
+      "Ssirium Style"
+    ],
+    "ultimate": [],
+    "defensive_moves": [
+      "Rage Guard"
+    ]
+  },
+  "Goo Kim Cheongliang": {
+    "emoji": "🟠",
+    "name": "Goo Kim Cheongliang",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1467086100873875539/1487130368518918375/Picsart_26-03-27_22-14-58-848.jpg?ex=69c80595&is=69c6b415&hm=76812513d86ed6659a84f2c7b850266ba2aab512fbfdbf0bc55051630d175077&",
+    "path": {
+      "name": "Sword Arts",
+      "description": "Sword Arts — a blade that has ended more fights than anyone remembers."
+    },
+    "mastery": {
+      "type": "Speed",
+      "description": "Speed and Technique mastery — the sword only works if it's faster than the eye."
+    },
+    "unique_skill": {
+      "name": "Goo Kim's Blade",
+      "description": "He doesn't just use a sword. He IS the sword."
+    },
+    "default_dialogue": "A sword in the hands of someone like me is not a weapon. It's a verdict.",
+    "unique_path_dialogue": "Sword Arts — the blade decides everything.",
+    "unique_skill_dialogue": "Goo Kim's Blade — I am the sharpest thing in this room.",
+    "stats": {
+      "strength": 65,
+      "speed": 65,
+      "endurance": 65,
+      "technique": 70,
+      "iq": 60,
+      "biq": 70,
+      "str": 65,
+      "spd": 65,
+      "end": 65,
+      "tec": 70
+    },
+    "stats_max": {
+      "strength": 70,
+      "speed": 70,
+      "endurance": 70,
+      "technique": 75,
+      "iq": 65,
+      "biq": 75,
+      "str": 70,
+      "spd": 70,
+      "end": 70,
+      "tec": 75
+    },
+    "moves": [
+      {
+        "name": "Sword Slash",
+        "type": "Normal",
+        "dialogue": "First cut. Clean.",
+        "crit_dialogue": "The blade finds its mark!",
+        "miss_dialogue": "You ducked under the swing."
+      },
+      {
+        "name": "Double Slash",
+        "type": "Normal",
+        "dialogue": "Two lines. Two wounds.",
+        "crit_dialogue": "Both slashes connect perfectly!",
+        "miss_dialogue": "You backed away from both."
+      },
+      {
+        "name": "Straight Slash",
+        "type": "Normal",
+        "dialogue": "Direct. No wasted motion.",
+        "crit_dialogue": "Perfectly straight cut — devastating!",
+        "miss_dialogue": "You slipped to the side."
+      },
+      {
+        "name": "Heavy Blow",
+        "type": "Normal",
+        "dialogue": "The weight of the blade behind this one.",
+        "crit_dialogue": "Heavy blade crashes down!",
+        "miss_dialogue": "You stepped back just in time."
+      },
+      {
+        "name": "Overturn Slash",
+        "type": "Normal",
+        "dialogue": "Reverse grip — different angle.",
+        "crit_dialogue": "The unexpected angle cuts clean!",
+        "miss_dialogue": "You anticipated the reversal."
+      },
+      {
+        "name": "Consecutive Slashes",
+        "type": "Special",
+        "dialogue": "One. Two. Three. Count them if you can.",
+        "crit_dialogue": "Consecutive slashes overwhelm all defense!",
+        "miss_dialogue": "You survived the flurry somehow."
+      },
+      {
+        "name": "Sword Dance",
+        "type": "Special",
+        "dialogue": "The blade moves like it has a mind of its own.",
+        "crit_dialogue": "The sword dance lands every strike!",
+        "miss_dialogue": "You found a gap in the pattern."
+      },
+      {
+        "name": "Vital Stroke",
+        "type": "Ultimate",
+        "dialogue": "One strike. One ending.",
+        "crit_dialogue": "Vital Stroke — the blade finds the only place that matters!",
+        "miss_dialogue": "You moved at the last possible moment."
+      },
+      {
+        "name": "Blade Guard",
+        "type": "Defensive",
+        "dialogue": "The sword is shield and blade both.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Sword Slash",
+      "Double Slash",
+      "Straight Slash",
+      "Heavy Blow",
+      "Overturn Slash"
+    ],
+    "special": [
+      "Consecutive Slashes",
+      "Sword Dance"
+    ],
+    "ultimate": [
+      "Vital Stroke"
+    ],
+    "defensive_moves": [
+      "Blade Guard"
+    ]
+  },
+  "Jinyong Go Cheongliang": {
+    "emoji": "🟡",
+    "name": "Jinyong Go Cheongliang",
+    "rarity": "Rare",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1474404207632060580/Picsart_26-02-20_19-14-29-026.png?ex=69b36eac&is=69b21d2c&hm=6983cf59757481ba8f6bf5dda994e31e088523846eae856fe47e65fc006a8498&",
+    "path": {
+      "name": "Cheongliang Striker",
+      "description": "Cheongliang Striker — every hit placed with clear intent."
+    },
+    "mastery": {
+      "type": "None",
+      "description": "No mastery — disciplined street striking."
+    },
+    "unique_skill": {
+      "name": "Pressure Points",
+      "description": "He knows where it hurts. And he aims there every time."
+    },
+    "default_dialogue": "I don't fight loud. I fight precise.",
+    "unique_path_dialogue": "Cheongliang Striker — controlled and calculated.",
+    "unique_skill_dialogue": "Pressure Points — I know exactly where to hit.",
+    "stats": {
+      "strength": 25,
+      "speed": 25,
+      "endurance": 25,
+      "technique": 20,
+      "iq": 10,
+      "biq": 25,
+      "str": 25,
+      "spd": 25,
+      "end": 25,
+      "tec": 20
+    },
+    "stats_max": {
+      "strength": 30,
+      "speed": 30,
+      "endurance": 30,
+      "technique": 25,
+      "iq": 15,
+      "biq": 30,
+      "str": 30,
+      "spd": 30,
+      "end": 30,
+      "tec": 25
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "Straight down the line.",
+        "crit_dialogue": "Clean hit — no wasted motion!",
+        "miss_dialogue": "You slipped the punch."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Measured and sharp.",
+        "crit_dialogue": "Precise kick lands!",
+        "miss_dialogue": "You read the angle."
+      },
+      {
+        "name": "Elbow Strike",
+        "type": "Normal",
+        "dialogue": "Close range. No escape.",
+        "crit_dialogue": "Elbow drives through clean!",
+        "miss_dialogue": "You created distance."
+      },
+      {
+        "name": "Knee Strike",
+        "type": "Normal",
+        "dialogue": "In the clinch — this is mine.",
+        "crit_dialogue": "Knee strike in tight!",
+        "miss_dialogue": "You pushed off before impact."
+      },
+      {
+        "name": "Neck Strike",
+        "type": "Normal",
+        "dialogue": "Precision targeting.",
+        "crit_dialogue": "Neck strike stuns!",
+        "miss_dialogue": "You tilted your head just enough."
+      },
+      {
+        "name": "Spinning Kick",
+        "type": "Special",
+        "dialogue": "Momentum and precision combined.",
+        "crit_dialogue": "Spinning kick lands flush!",
+        "miss_dialogue": "You ducked the rotation."
+      },
+      {
+        "name": "Tackle",
+        "type": "Special",
+        "dialogue": "Bring it to the ground.",
+        "crit_dialogue": "Full tackle drives you down!",
+        "miss_dialogue": "You sprawled away."
+      },
+      {
+        "name": "Heavy Punch",
+        "type": "Ultimate",
+        "dialogue": "Everything precise — delivered in one.",
+        "crit_dialogue": "Heavy and exact — the perfect punch!",
+        "miss_dialogue": "You slipped at the last second."
+      },
+      {
+        "name": "Jinyong Guard",
+        "type": "Defensive",
+        "dialogue": "I block what I see coming.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Elbow Strike",
+      "Knee Strike",
+      "Neck Strike"
+    ],
+    "special": [
+      "Spinning Kick",
+      "Tackle"
+    ],
+    "ultimate": [
+      "Heavy Punch"
+    ],
+    "defensive_moves": [
+      "Jinyong Guard"
+    ]
+  },
+  "Doksu Heo Cheongliang": {
+    "emoji": "🟡",
+    "name": "Doksu Heo Cheongliang",
+    "rarity": "Rare",
+    "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1474404225764167792/Picsart_26-02-20_19-24-19-714.png?ex=69b36eb0&is=69b21d30&hm=4d5123c956533a0c84968809bfd2b3519577c7822e45429b9dae72eaa7f3e32f&",
+    "path": {
+      "name": "Cheongliang Striker",
+      "description": "Cheongliang Striker — relentless pressure, same as Jinyong but with heavier intent."
+    },
+    "mastery": {
+      "type": "None",
+      "description": "No mastery — raw aggression with structure."
+    },
+    "unique_skill": {
+      "name": "Heavy Pressure",
+      "description": "He doesn't stop coming. Every hit says he's not done."
+    },
+    "default_dialogue": "I don't need to be clever. I just need to be relentless.",
+    "unique_path_dialogue": "Cheongliang Striker — heavier, slower, harder.",
+    "unique_skill_dialogue": "Heavy Pressure — I push until you break.",
+    "stats": {
+      "strength": 25,
+      "speed": 25,
+      "endurance": 25,
+      "technique": 20,
+      "iq": 10,
+      "biq": 25,
+      "str": 25,
+      "spd": 25,
+      "end": 25,
+      "tec": 20
+    },
+    "stats_max": {
+      "strength": 30,
+      "speed": 30,
+      "endurance": 30,
+      "technique": 25,
+      "iq": 15,
+      "biq": 30,
+      "str": 30,
+      "spd": 30,
+      "end": 30,
+      "tec": 25
+    },
+    "moves": [
+      {
+        "name": "Punch",
+        "type": "Normal",
+        "dialogue": "Heavy and forward.",
+        "crit_dialogue": "Drives through with full weight!",
+        "miss_dialogue": "You sidestepped."
+      },
+      {
+        "name": "Kick",
+        "type": "Normal",
+        "dialogue": "Low and grinding.",
+        "crit_dialogue": "Grinding kick wears you down!",
+        "miss_dialogue": "You lifted your leg in time."
+      },
+      {
+        "name": "Elbow Strike",
+        "type": "Normal",
+        "dialogue": "Up close — this is where I live.",
+        "crit_dialogue": "Elbow smashes through!",
+        "miss_dialogue": "You backed out of range."
+      },
+      {
+        "name": "Knee Strike",
+        "type": "Normal",
+        "dialogue": "Clinch work — my specialty.",
+        "crit_dialogue": "Knee strike crunches in!",
+        "miss_dialogue": "You sprawled out of the clinch."
+      },
+      {
+        "name": "Neck Strike",
+        "type": "Normal",
+        "dialogue": "I know the spot.",
+        "crit_dialogue": "Targeted neck strike lands!",
+        "miss_dialogue": "You rolled your head away."
+      },
+      {
+        "name": "Spinning Kick",
+        "type": "Special",
+        "dialogue": "Weight behind the rotation.",
+        "crit_dialogue": "Heavy spinning kick connects!",
+        "miss_dialogue": "You ducked under."
+      },
+      {
+        "name": "Tackle",
+        "type": "Special",
+        "dialogue": "Down. Now.",
+        "crit_dialogue": "Drives you straight into the ground!",
+        "miss_dialogue": "You checked the tackle."
+      },
+      {
+        "name": "Heavy Punch",
+        "type": "Ultimate",
+        "dialogue": "This is all the pressure in one hit.",
+        "crit_dialogue": "Maximum pressure — one devastating punch!",
+        "miss_dialogue": "You slipped just outside."
+      },
+      {
+        "name": "Doksu Guard",
+        "type": "Defensive",
+        "dialogue": "I take hits and keep walking.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Punch",
+      "Kick",
+      "Elbow Strike",
+      "Knee Strike",
+      "Neck Strike"
+    ],
+    "special": [
+      "Spinning Kick",
+      "Tackle"
+    ],
+    "ultimate": [
+      "Heavy Punch"
+    ],
+    "defensive_moves": [
+      "Doksu Guard"
+    ]
+  }
+}

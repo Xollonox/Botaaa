@@ -1,0 +1,2007 @@
+2026-06-03 19:33:23 [WARNING] discord.client: PyNaCl is not installed, voice will NOT be supported
+2026-06-03 19:33:23 [WARNING] discord.client: davey is not installed, voice will NOT be supported
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.onboarding
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile_owner
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.economy
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.inventory
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.cards_admin
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.card_tools
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.market
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.market_owner
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.trades
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.rewards
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.owner_rewards
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.redeem
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.shop
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.squad
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.battle
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.tournament
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.leaderboards
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.league_overview
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.achievements
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.season
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.alliance
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.gangs
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.server_settings
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.announce_owner
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.attacks_owner
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.confirm
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs_panel
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.emoji_panel
+2026-06-03 19:33:25 [INFO] __main__: [BOOT] Loaded extension: bot.features.gang_war
+2026-06-03 19:33:26 [INFO] __main__: [BOOT] Synced owner-guild commands to guild 1447875474364829748
+2026-06-03 19:33:27 [INFO] __main__: [BOOT] Synced commands globally.
+2026-06-03 19:33:27 [INFO] __main__: === REGISTERED SLASH COMMANDS ===
+2026-06-03 19:33:27 [INFO] __main__: /start
+2026-06-03 19:33:27 [INFO] __main__: /help
+2026-06-03 19:33:27 [INFO] __main__: /profile
+2026-06-03 19:33:27 [INFO] __main__: /balance
+2026-06-03 19:33:27 [INFO] __main__: /collection
+2026-06-03 19:33:27 [INFO] __main__: /card_info
+2026-06-03 19:33:27 [INFO] __main__: /card_lock
+2026-06-03 19:33:27 [INFO] __main__: /fuse
+2026-06-03 19:33:27 [INFO] __main__: /market
+2026-06-03 19:33:27 [INFO] __main__: /market browse
+2026-06-03 19:33:27 [INFO] __main__: /market add
+2026-06-03 19:33:27 [INFO] __main__: /market remove
+2026-06-03 19:33:27 [INFO] __main__: /trade
+2026-06-03 19:33:27 [INFO] __main__: /trade start
+2026-06-03 19:33:27 [INFO] __main__: /trade cancel
+2026-06-03 19:33:27 [INFO] __main__: /trade history
+2026-06-03 19:33:27 [INFO] __main__: /hourly
+2026-06-03 19:33:27 [INFO] __main__: /daily
+2026-06-03 19:33:27 [INFO] __main__: /weekly
+2026-06-03 19:33:27 [INFO] __main__: /monthly
+2026-06-03 19:33:27 [INFO] __main__: /redeem
+2026-06-03 19:33:27 [INFO] __main__: /shop
+2026-06-03 19:33:27 [INFO] __main__: /squad
+2026-06-03 19:33:27 [INFO] __main__: /battle
+2026-06-03 19:33:27 [INFO] __main__: /battle_cancel
+2026-06-03 19:33:27 [INFO] __main__: /friendly
+2026-06-03 19:33:27 [INFO] __main__: /friendly_cancel
+2026-06-03 19:33:27 [INFO] __main__: /forfeit
+2026-06-03 19:33:27 [INFO] __main__: /tournament
+2026-06-03 19:33:27 [INFO] __main__: /tournament_join
+2026-06-03 19:33:27 [INFO] __main__: /tournament_battle
+2026-06-03 19:33:27 [INFO] __main__: /lb
+2026-06-03 19:33:27 [INFO] __main__: /lb global
+2026-06-03 19:33:27 [INFO] __main__: /lb league
+2026-06-03 19:33:27 [INFO] __main__: /lb gang
+2026-06-03 19:33:27 [INFO] __main__: /lb alliance
+2026-06-03 19:33:27 [INFO] __main__: /league
+2026-06-03 19:33:27 [INFO] __main__: /league overview
+2026-06-03 19:33:27 [INFO] __main__: /achievements
+2026-06-03 19:33:27 [INFO] __main__: /season
+2026-06-03 19:33:27 [INFO] __main__: /season_pass
+2026-06-03 19:33:27 [INFO] __main__: /season_missions
+2026-06-03 19:33:27 [INFO] __main__: /alliance
+2026-06-03 19:33:27 [INFO] __main__: /alliance create
+2026-06-03 19:33:27 [INFO] __main__: /alliance info
+2026-06-03 19:33:27 [INFO] __main__: /alliance invite
+2026-06-03 19:33:27 [INFO] __main__: /alliance leave
+2026-06-03 19:33:27 [INFO] __main__: /gang
+2026-06-03 19:33:27 [INFO] __main__: /gang create
+2026-06-03 19:33:27 [INFO] __main__: /gang info
+2026-06-03 19:33:27 [INFO] __main__: /gang invite
+2026-06-03 19:33:27 [INFO] __main__: /gang join
+2026-06-03 19:33:27 [INFO] __main__: /gang leave
+2026-06-03 19:33:27 [INFO] __main__: /gang kick
+2026-06-03 19:33:27 [INFO] __main__: /gang promote
+2026-06-03 19:33:27 [INFO] __main__: /gang demote
+2026-06-03 19:33:27 [INFO] __main__: /gang members
+2026-06-03 19:33:27 [INFO] __main__: /gang transfer_owner
+2026-06-03 19:33:27 [INFO] __main__: /gang set_description
+2026-06-03 19:33:27 [INFO] __main__: /gang set_status
+2026-06-03 19:33:27 [INFO] __main__: /gang stats
+2026-06-03 19:33:27 [INFO] __main__: /server_mode
+2026-06-03 19:33:27 [INFO] __main__: /server_set_channel
+2026-06-03 19:33:27 [INFO] __main__: /server_set_announce
+2026-06-03 19:33:27 [INFO] __main__: /server_set_battle
+2026-06-03 19:33:27 [INFO] __main__: /confirm
+2026-06-03 19:33:27 [INFO] __main__: /packs
+2026-06-03 19:33:27 [INFO] __main__: /gang_war
+2026-06-03 19:33:27 [INFO] __main__: /gang_war start
+2026-06-03 19:33:27 [INFO] __main__: /gang_war status
+2026-06-03 19:33:27 [INFO] __main__: /gang_war attack
+2026-06-03 19:33:27 [INFO] __main__: /gang_war record
+2026-06-03 19:33:27 [INFO] __main__: /gang_war cancel_queue
+2026-06-03 19:33:27 [INFO] __main__: /gang_war preference
+2026-06-03 19:33:27 [INFO] __main__: /defensive_squad_setup
+2026-06-03 19:33:27 [INFO] __main__: /o_war_start
+2026-06-03 19:33:27 [INFO] __main__: /o_war_end
+2026-06-03 19:33:27 [INFO] __main__: /o_war_set_phase
+2026-06-03 19:33:27 [INFO] __main__: /o_war_set_durations
+2026-06-03 19:33:27 [INFO] __main__: /o_war_list
+2026-06-03 19:33:27 [INFO] __main__: === TOTAL COMMANDS: 80 ===
+2026-06-03 19:33:31 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
+2026-06-03 19:44:00 [INFO] bot.features.battle: [BATTLE_START] success mode=ranked battle_id=84625cfd-42da-4f9f-a24d-b404744838dc c=799962124594970624 o=cpu:Diego Kang:Balanced
+2026-06-03 19:44:01 [ERROR] bot.features.battle_views: [RANKED_QUEUE_VIEW] failed to disable CPU button view user=799962124594970624
+Traceback (most recent call last):
+  File "/storage/emulated/0/Bot/Bot/bot2/bot/features/battle_views.py", line 285, in cpu_button
+    await interaction.message.edit(view=self)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/message.py", line 2988, in edit
+    data = await self._state.http.edit_message(self.channel.id, self.id, params=params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 774, in request
+    raise NotFound(response, data)
+discord.errors.NotFound: 404 Not Found (error code: 10008): Unknown Message
+2026-06-03 19:44:15 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:45:07 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:45:43 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:46:09 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:47:11 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:47:13 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:48:15 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:48:17 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:49:18 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:49:20 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:50:22 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:50:24 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:51:26 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:51:29 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:52:32 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:52:34 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:54:06 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:54:08 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:54:14 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:55:16 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:55:18 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:56:28 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:56:32 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:58:40 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 19:58:42 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:01:19 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:01:22 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:03:22 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:03:25 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:05:41 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:05:44 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:08:09 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:08:13 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:09:49 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:09:52 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:12:28 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:12:31 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:16:17 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:16:20 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:19:03 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:19:06 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:22:45 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:22:47 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:24:53 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:24:59 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:25:31 [ERROR] discord.client: Attempting a reconnect in 1.75s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-03 20:30:11 [ERROR] discord.client: Attempting a reconnect in 0.16s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-03 20:30:12 [ERROR] discord.client: Attempting a reconnect in 4.11s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-03 20:30:46 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
+2026-06-03 20:31:08 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:31:11 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:32:58 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:33:00 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:34:57 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:35:00 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:36:31 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:36:33 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:38:06 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:38:12 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:40:52 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:40:55 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:42:44 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:42:49 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:45:22 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:45:27 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:47:15 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:47:17 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:50:03 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:50:08 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:52:07 [INFO] bot.features.battle: [TURN_TIMEOUT] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:52:09 [INFO] bot.features.battle: [AI_TURN] advanced battle_id=84625cfd-42da-4f9f-a24d-b404744838dc skipped=False
+2026-06-03 20:54:24 [INFO] bot.features.battle: [TURN_TIMEOUT] ended battle_id=84625cfd-42da-4f9f-a24d-b404744838dc reason=all_fainted
+2026-06-03 21:40:03 [ERROR] discord.client: Attempting a reconnect in 0.48s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1091, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 124, in start_connection
+    raise first_exception
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 75, in start_connection
+    sock = await _connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 210, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/selector_events.py", line 645, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/selector_events.py", line 653, in _sock_connect
+    sock.connect(address)
+    ~~~~~~~~~~~~^^^^^^^^^
+OSError: [Errno 101] Network is unreachable
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1366, in _create_direct_connection
+    raise last_exc
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1335, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1106, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [Network is unreachable]
+2026-06-03 21:40:04 [ERROR] discord.client: Attempting a reconnect in 2.57s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1091, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 124, in start_connection
+    raise first_exception
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 75, in start_connection
+    sock = await _connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 210, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/selector_events.py", line 645, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/selector_events.py", line 653, in _sock_connect
+    sock.connect(address)
+    ~~~~~~~~~~~~^^^^^^^^^
+OSError: [Errno 101] Network is unreachable
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1366, in _create_direct_connection
+    raise last_exc
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1335, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1106, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [Network is unreachable]
+2026-06-03 21:40:10 [ERROR] discord.client: Attempting a reconnect in 0.03s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1091, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 124, in start_connection
+    raise first_exception
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 75, in start_connection
+    sock = await _connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 210, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/selector_events.py", line 645, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/selector_events.py", line 653, in _sock_connect
+    sock.connect(address)
+    ~~~~~~~~~~~~^^^^^^^^^
+OSError: [Errno 101] Network is unreachable
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1366, in _create_direct_connection
+    raise last_exc
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1335, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1106, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [Network is unreachable]
+2026-06-03 21:40:10 [ERROR] discord.client: Attempting a reconnect in 1.46s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1091, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 124, in start_connection
+    raise first_exception
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 75, in start_connection
+    sock = await _connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 210, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/selector_events.py", line 645, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/selector_events.py", line 653, in _sock_connect
+    sock.connect(address)
+    ~~~~~~~~~~~~^^^^^^^^^
+OSError: [Errno 101] Network is unreachable
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1366, in _create_direct_connection
+    raise last_exc
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1335, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1106, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [Network is unreachable]
+2026-06-03 21:40:11 [ERROR] discord.client: Attempting a reconnect in 2.41s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1091, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 124, in start_connection
+    raise first_exception
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 75, in start_connection
+    sock = await _connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 210, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/selector_events.py", line 645, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/selector_events.py", line 653, in _sock_connect
+    sock.connect(address)
+    ~~~~~~~~~~~~^^^^^^^^^
+OSError: [Errno 101] Network is unreachable
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1366, in _create_direct_connection
+    raise last_exc
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1335, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1106, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [Network is unreachable]
+2026-06-03 21:40:15 [ERROR] discord.client: Attempting a reconnect in 39.32s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-03 21:41:38 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
+2026-06-03 21:45:19 [ERROR] discord.client: Attempting a reconnect in 7.39s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1335, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1098, in _wrap_create_connection
+    return await self._loop.create_connection(*args, **kwargs, sock=sock)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 1201, in create_connection
+    transport, protocol = await self._create_connection_transport(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        ssl_shutdown_timeout=ssl_shutdown_timeout)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 1234, in _create_connection_transport
+    await waiter
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+2026-06-03 21:47:55 [ERROR] discord.client: Attempting a reconnect in 212.99s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1335, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1091, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 89, in start_connection
+    sock, _, _ = await _staggered.staggered_race(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<13 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/_staggered.py", line 155, in staggered_race
+    done = await _wait_one(
+           ^^^^^^^^^^^^^^^^
+        (*tasks, start_next) if start_next else tasks, loop
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/_staggered.py", line 36, in _wait_one
+    return await wait_next
+           ^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+2026-06-03 21:55:44 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
+2026-06-03 22:21:30 [WARNING] discord.gateway: Can't keep up, shard ID None websocket is 10.7s behind.
+2026-06-04 00:38:20 [WARNING] discord.client: PyNaCl is not installed, voice will NOT be supported
+2026-06-04 00:38:20 [WARNING] discord.client: davey is not installed, voice will NOT be supported
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.onboarding
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile_owner
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.economy
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.inventory
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.cards_admin
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.card_tools
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.market
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.market_owner
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.trades
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.rewards
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.owner_rewards
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.redeem
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.shop
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.squad
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.battle
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.tournament
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.leaderboards
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.league_overview
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.achievements
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.season
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.alliance
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.gangs
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.server_settings
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.announce_owner
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.attacks_owner
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.confirm
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs_panel
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.emoji_panel
+2026-06-04 00:38:23 [INFO] __main__: [BOOT] Loaded extension: bot.features.gang_war
+2026-06-04 00:38:24 [INFO] __main__: [BOOT] Synced owner-guild commands to guild 1447875474364829748
+2026-06-04 00:38:25 [INFO] __main__: [BOOT] Synced commands globally.
+2026-06-04 00:38:25 [INFO] __main__: === REGISTERED SLASH COMMANDS ===
+2026-06-04 00:38:25 [INFO] __main__: /start
+2026-06-04 00:38:25 [INFO] __main__: /help
+2026-06-04 00:38:25 [INFO] __main__: /profile
+2026-06-04 00:38:25 [INFO] __main__: /balance
+2026-06-04 00:38:25 [INFO] __main__: /collection
+2026-06-04 00:38:25 [INFO] __main__: /card_info
+2026-06-04 00:38:25 [INFO] __main__: /card_lock
+2026-06-04 00:38:25 [INFO] __main__: /fuse
+2026-06-04 00:38:25 [INFO] __main__: /market
+2026-06-04 00:38:25 [INFO] __main__: /market browse
+2026-06-04 00:38:25 [INFO] __main__: /market add
+2026-06-04 00:38:25 [INFO] __main__: /market remove
+2026-06-04 00:38:25 [INFO] __main__: /trade
+2026-06-04 00:38:25 [INFO] __main__: /trade start
+2026-06-04 00:38:25 [INFO] __main__: /trade cancel
+2026-06-04 00:38:25 [INFO] __main__: /trade history
+2026-06-04 00:38:25 [INFO] __main__: /hourly
+2026-06-04 00:38:25 [INFO] __main__: /daily
+2026-06-04 00:38:25 [INFO] __main__: /weekly
+2026-06-04 00:38:25 [INFO] __main__: /monthly
+2026-06-04 00:38:25 [INFO] __main__: /redeem
+2026-06-04 00:38:25 [INFO] __main__: /shop
+2026-06-04 00:38:25 [INFO] __main__: /squad
+2026-06-04 00:38:25 [INFO] __main__: /battle
+2026-06-04 00:38:25 [INFO] __main__: /battle_cancel
+2026-06-04 00:38:25 [INFO] __main__: /friendly
+2026-06-04 00:38:25 [INFO] __main__: /friendly_cancel
+2026-06-04 00:38:25 [INFO] __main__: /forfeit
+2026-06-04 00:38:25 [INFO] __main__: /tournament
+2026-06-04 00:38:25 [INFO] __main__: /tournament_join
+2026-06-04 00:38:25 [INFO] __main__: /tournament_battle
+2026-06-04 00:38:25 [INFO] __main__: /lb
+2026-06-04 00:38:25 [INFO] __main__: /lb global
+2026-06-04 00:38:25 [INFO] __main__: /lb league
+2026-06-04 00:38:25 [INFO] __main__: /lb gang
+2026-06-04 00:38:25 [INFO] __main__: /lb alliance
+2026-06-04 00:38:25 [INFO] __main__: /league
+2026-06-04 00:38:25 [INFO] __main__: /league overview
+2026-06-04 00:38:25 [INFO] __main__: /achievements
+2026-06-04 00:38:25 [INFO] __main__: /season
+2026-06-04 00:38:25 [INFO] __main__: /season_pass
+2026-06-04 00:38:25 [INFO] __main__: /season_missions
+2026-06-04 00:38:25 [INFO] __main__: /alliance
+2026-06-04 00:38:25 [INFO] __main__: /alliance create
+2026-06-04 00:38:25 [INFO] __main__: /alliance info
+2026-06-04 00:38:25 [INFO] __main__: /alliance invite
+2026-06-04 00:38:25 [INFO] __main__: /alliance leave
+2026-06-04 00:38:25 [INFO] __main__: /gang
+2026-06-04 00:38:25 [INFO] __main__: /gang create
+2026-06-04 00:38:25 [INFO] __main__: /gang info
+2026-06-04 00:38:25 [INFO] __main__: /gang invite
+2026-06-04 00:38:25 [INFO] __main__: /gang join
+2026-06-04 00:38:25 [INFO] __main__: /gang leave
+2026-06-04 00:38:25 [INFO] __main__: /gang kick
+2026-06-04 00:38:25 [INFO] __main__: /gang promote
+2026-06-04 00:38:25 [INFO] __main__: /gang demote
+2026-06-04 00:38:25 [INFO] __main__: /gang members
+2026-06-04 00:38:25 [INFO] __main__: /gang transfer_owner
+2026-06-04 00:38:25 [INFO] __main__: /gang set_description
+2026-06-04 00:38:25 [INFO] __main__: /gang set_status
+2026-06-04 00:38:25 [INFO] __main__: /gang stats
+2026-06-04 00:38:25 [INFO] __main__: /server_mode
+2026-06-04 00:38:25 [INFO] __main__: /server_set_channel
+2026-06-04 00:38:25 [INFO] __main__: /server_set_announce
+2026-06-04 00:38:25 [INFO] __main__: /server_set_battle
+2026-06-04 00:38:25 [INFO] __main__: /confirm
+2026-06-04 00:38:25 [INFO] __main__: /packs
+2026-06-04 00:38:25 [INFO] __main__: /gang_war
+2026-06-04 00:38:25 [INFO] __main__: /gang_war start
+2026-06-04 00:38:25 [INFO] __main__: /gang_war status
+2026-06-04 00:38:25 [INFO] __main__: /gang_war attack
+2026-06-04 00:38:25 [INFO] __main__: /gang_war record
+2026-06-04 00:38:25 [INFO] __main__: /gang_war cancel_queue
+2026-06-04 00:38:25 [INFO] __main__: /gang_war preference
+2026-06-04 00:38:25 [INFO] __main__: /defensive_squad_setup
+2026-06-04 00:38:25 [INFO] __main__: /o_war_start
+2026-06-04 00:38:25 [INFO] __main__: /o_war_end
+2026-06-04 00:38:25 [INFO] __main__: /o_war_set_phase
+2026-06-04 00:38:25 [INFO] __main__: /o_war_set_durations
+2026-06-04 00:38:25 [INFO] __main__: /o_war_list
+2026-06-04 00:38:25 [INFO] __main__: === TOTAL COMMANDS: 80 ===
+2026-06-04 00:38:29 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
+2026-06-04 05:45:55 [ERROR] discord.client: Attempting a reconnect in 0.81s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 422, in from_client
+    await ws.identify()
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 490, in identify
+    await self.send_as_json(payload)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 681, in send_as_json
+    await self.send(utils._to_json(data))
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 677, in send
+    await self.socket.send_str(data)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client_ws.py", line 226, in send_str
+    await self._writer.send(data, binary=False, compress=compress)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 750, in send
+    await self._send_frame(message, WSMsgType.TEXT, compress)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 690, in _send_frame
+    self._write(header + mask + message)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 723, in _write
+    raise ClientConnectionResetError("Cannot write to closing transport")
+aiohttp.client_exceptions.ClientConnectionResetError: Cannot write to closing transport
+2026-06-04 05:47:25 [ERROR] discord.client: Attempting a reconnect in 0.51s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 422, in from_client
+    await ws.identify()
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 490, in identify
+    await self.send_as_json(payload)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 681, in send_as_json
+    await self.send(utils._to_json(data))
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 677, in send
+    await self.socket.send_str(data)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client_ws.py", line 226, in send_str
+    await self._writer.send(data, binary=False, compress=compress)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 750, in send
+    await self._send_frame(message, WSMsgType.TEXT, compress)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 690, in _send_frame
+    self._write(header + mask + message)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 723, in _write
+    raise ClientConnectionResetError("Cannot write to closing transport")
+aiohttp.client_exceptions.ClientConnectionResetError: Cannot write to closing transport
+2026-06-04 05:48:43 [ERROR] discord.client: Attempting a reconnect in 0.73s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 422, in from_client
+    await ws.identify()
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 490, in identify
+    await self.send_as_json(payload)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 681, in send_as_json
+    await self.send(utils._to_json(data))
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 677, in send
+    await self.socket.send_str(data)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client_ws.py", line 226, in send_str
+    await self._writer.send(data, binary=False, compress=compress)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 750, in send
+    await self._send_frame(message, WSMsgType.TEXT, compress)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 690, in _send_frame
+    self._write(header + mask + message)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 723, in _write
+    raise ClientConnectionResetError("Cannot write to closing transport")
+aiohttp.client_exceptions.ClientConnectionResetError: Cannot write to closing transport
+2026-06-04 05:50:15 [ERROR] discord.client: Attempting a reconnect in 3.83s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 422, in from_client
+    await ws.identify()
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 490, in identify
+    await self.send_as_json(payload)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 681, in send_as_json
+    await self.send(utils._to_json(data))
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 677, in send
+    await self.socket.send_str(data)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client_ws.py", line 226, in send_str
+    await self._writer.send(data, binary=False, compress=compress)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 750, in send
+    await self._send_frame(message, WSMsgType.TEXT, compress)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 690, in _send_frame
+    self._write(header + mask + message)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 723, in _write
+    raise ClientConnectionResetError("Cannot write to closing transport")
+aiohttp.client_exceptions.ClientConnectionResetError: Cannot write to closing transport
+2026-06-04 05:52:32 [ERROR] asyncio: Unclosed connection
+client_connection: Connection<ConnectionKey(host='gateway-us-east1-b.discord.gg', port=443, is_ssl=True, ssl=True, proxy=None, proxy_auth=None, proxy_headers_hash=None)>
+2026-06-04 05:52:34 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
+2026-06-04 07:06:04 [ERROR] discord.client: Attempting a reconnect in 0.21s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-04 07:06:05 [ERROR] discord.client: Attempting a reconnect in 3.66s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-04 07:07:01 [ERROR] discord.client: Attempting a reconnect in 3.46s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-04 07:09:43 [ERROR] discord.client: Attempting a reconnect in 3.04s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-04 07:12:10 [ERROR] discord.client: Attempting a reconnect in 26.47s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-04 07:18:30 [ERROR] discord.client: Attempting a reconnect in 41.62s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-04 07:19:12 [ERROR] discord.client: Attempting a reconnect in 106.20s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-04 07:20:58 [ERROR] discord.client: Attempting a reconnect in 141.55s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-04 07:38:48 [ERROR] discord.client: Attempting a reconnect in 400.63s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-b.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-04 08:28:16 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
+2026-06-04 08:50:24 [ERROR] discord.client: Attempting a reconnect in 151.29s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1335, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1091, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 89, in start_connection
+    sock, _, _ = await _staggered.staggered_race(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<13 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/_staggered.py", line 155, in staggered_race
+    done = await _wait_one(
+           ^^^^^^^^^^^^^^^^
+        (*tasks, start_next) if start_next else tasks, loop
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohappyeyeballs/_staggered.py", line 36, in _wait_one
+    return await wait_next
+           ^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+2026-06-04 08:59:08 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
+2026-06-04 09:17:13 [ERROR] discord.client: Attempting a reconnect in 550.89s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 422, in from_client
+    await ws.identify()
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 490, in identify
+    await self.send_as_json(payload)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 681, in send_as_json
+    await self.send(utils._to_json(data))
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 677, in send
+    await self.socket.send_str(data)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client_ws.py", line 226, in send_str
+    await self._writer.send(data, binary=False, compress=compress)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 750, in send
+    await self._send_frame(message, WSMsgType.TEXT, compress)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 690, in _send_frame
+    self._write(header + mask + message)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/http_websocket.py", line 723, in _write
+    raise ClientConnectionResetError("Cannot write to closing transport")
+aiohttp.client_exceptions.ClientConnectionResetError: Cannot write to closing transport
+2026-06-04 09:44:27 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
+2026-06-04 09:48:07 [ERROR] asyncio: Unclosed connection
+client_connection: Connection<ConnectionKey(host='gateway-us-east1-b.discord.gg', port=443, is_ssl=True, ssl=True, proxy=None, proxy_auth=None, proxy_headers_hash=None)>
+2026-06-04 10:40:21 [ERROR] discord.client: Attempting a reconnect in 0.36s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-d.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-04 10:40:22 [ERROR] discord.client: Attempting a reconnect in 3.70s
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1317, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 971, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1002, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/resolver.py", line 38, in resolve
+    infos = await self._loop.getaddrinfo(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/base_events.py", line 939, in getaddrinfo
+    return await self.run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        None, getaddr_func, host, port, family, type, proto, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.13/socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 7] No address associated with hostname
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/client.py", line 728, in connect
+    self.ws = await asyncio.wait_for(coro, timeout=60.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/gateway.py", line 392, in from_client
+    socket = await client.http.ws_connect(str(url))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/http.py", line 571, in ws_connect
+    return await self.__session.ws_connect(url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 937, in _ws_connect
+    resp = await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/client.py", line 663, in _request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 563, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1032, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-d.discord.gg:443 ssl:default [No address associated with hostname]
