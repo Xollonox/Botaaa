@@ -63,6 +63,7 @@ EXTENSIONS = [
     "bot.features.packs_panel",
     "bot.features.emoji_panel",
     "bot.features.gang_war",
+    "bot.features.stats_guide",
 ]
 
 
@@ -123,6 +124,13 @@ class LookismBot(commands.Bot):
     async def _global_terms_gate(self, interaction: discord.Interaction) -> bool:
         command = getattr(interaction, "command", None)
         if command is None:
+            return True
+
+        # Autocomplete interactions can only be answered with response type 8
+        # (autocomplete result). Sending an embed/message here raises a 400.
+        # Let autocomplete through; the actual command invocation will still be
+        # gated below.
+        if interaction.type is discord.InteractionType.autocomplete:
             return True
 
         data = self.storage.load()

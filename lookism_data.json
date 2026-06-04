@@ -2168,11 +2168,10 @@
         "Tag Cover"
       ],
       "emoji": "🟣",
-      "image_url": "https://cdn.discordapp.com/attachments/1472183558843142277/1472524006707040349/Picsart_26-02-15_14-53-41-941.jpg?ex=69b32f19&is=69b1dd99&hm=ee76882edae0e045ec109d049fe0582a36ed840024f12b0dff4340374247bc9e&",
-      "mastery": {
-        "description": "Strength and Endurance mastery forged in synchronized combat.",
-        "type": "Strength"
-      },
+      "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1482384808289112276/Picsart_26-02-15_14-53-41-941.jpg?ex=6a22342f&is=6a20e2af&hm=d2955bea454f9a30d36e6a778047e6629dd79d7a5cda47936c4e92ed0c12742f&",
+      "mastery": [
+        "Strength"
+      ],
       "moves": [
         {
           "crit_dialogue": "Back-to-back strikes land!",
@@ -3702,7 +3701,94 @@
       "total_spent": 0
     }
   },
-  "players": {},
+  "players": {
+    "1152936208742240316": {
+      "achievement_points": 0,
+      "achievements": {
+        "earned": {}
+      },
+      "alliance_id": null,
+      "gang_id": null,
+      "market": {
+        "active_listing_ids": []
+      },
+      "packs": {
+        "opened": 0,
+        "spent": 0
+      },
+      "ranked_stats": {
+        "last_10": [],
+        "losses": 0,
+        "streak": 0,
+        "wins": 0
+      },
+      "redeemed_codes": {},
+      "season_claims": {},
+      "season_pass": {
+        "claimed": {},
+        "level": 1,
+        "season": 1,
+        "xp": 0
+      },
+      "squad": {
+        "active": [],
+        "backup": [],
+        "supervisor": ""
+      },
+      "trade_history": [],
+      "user": {
+        "balance": 1000,
+        "cooldowns": {
+          "daily": 0,
+          "hourly": 0,
+          "monthly": 0,
+          "weekly": 0
+        },
+        "id": "1152936208742240316",
+        "inventory": [],
+        "is_premium": false,
+        "name": "xollonox",
+        "pack_inventory": [
+          {
+            "acquired_at": 1780570962,
+            "key": "newbie_pack",
+            "name": "Newbie Pack"
+          },
+          {
+            "acquired_at": 1780570962,
+            "key": "newbie_pack",
+            "name": "Newbie Pack"
+          },
+          {
+            "acquired_at": 1780570962,
+            "key": "newbie_pack",
+            "name": "Newbie Pack"
+          }
+        ],
+        "premium_balance": 0,
+        "privacy_settings": {
+          "show_balance": true,
+          "show_gang": true,
+          "show_trophies": true
+        },
+        "profile": {
+          "background_url": "",
+          "bio": "",
+          "cosmetics": {
+            "badge_id": "",
+            "border_id": "",
+            "theme": ""
+          },
+          "showcase_uid": ""
+        },
+        "rank": "Copper",
+        "registered_at": 1780570962,
+        "starter_granted": true,
+        "tos_accepted": true,
+        "trophies": 0
+      }
+    }
+  },
   "redeem_codes": {},
   "season": {
     "active": true,

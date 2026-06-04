@@ -8,7 +8,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from bot.utils.cards_logic import compute_power, compute_scaled_stats, get_star_multiplier, rarity_rank
+from bot.utils.cards_logic import compute_power, compute_scaled_stats, get_star_multiplier, normalize_mastery_list, rarity_rank
 from bot.utils.checks import ensure_registered
 from bot.utils.interaction_visibility import smart_reply, error_reply
 from bot.utils.ui import e, make_embed, simple_embed
@@ -698,6 +698,8 @@ class InventoryCog(commands.Cog):
 
         stats = _effective_stats(data, item, stars_override=stars)
         locked = bool(item.get("locked", False) or item.get("market_locked", False) or item.get("squad_locked", False))
+        title = str(card_def.get("title", "")).strip() if isinstance(card_def, dict) else ""
+        bio = str(card_def.get("description", "")).strip() if isinstance(card_def, dict) else ""
         def _resolve_field(raw: Any, desc_raw: Any = None) -> tuple[str, str]:
             """Handle both plain-string and dict-stored skill/path fields."""
             if isinstance(raw, dict):
@@ -714,11 +716,18 @@ class InventoryCog(commands.Cog):
         unique_skill, unique_skill_desc = _resolve_field(
             card_def.get("unique_skill"), card_def.get("unique_skill_description")
         )
-        mastery_list: list[str] = [str(m).strip().title() for m in card_def.get("mastery", []) if str(m).strip()] if isinstance(card_def.get("mastery"), list) else []
+        mastery_list: list[str] = normalize_mastery_list(card_def.get("mastery", []) if isinstance(card_def, dict) else [])
         mastery_str = "  ".join(f"• {m}" for m in mastery_list) if mastery_list else "—"
 
+        heading = f"{_rarity_icon(rarity)} {rarity} • {card_name}"
+        if title:
+            heading += f"\n{title}"
+
         body = (
-            f"{_rarity_icon(rarity)} {rarity} • {card_name}\n\n"
+            f"{heading}\n\n"
+            "╭─ Bio\n"
+            f"│ {bio or '—'}\n"
+            "╰────────────────\n\n"
             "╭─ Combat Stats\n"
             f"│ 💪 STR: {stats['strength']}\n"
             f"│ ⚡ SPD: {stats['speed']}\n"

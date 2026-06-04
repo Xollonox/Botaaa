@@ -9,7 +9,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from bot.utils.cards_logic import compute_power, compute_scaled_stats, rarity_rank
+from bot.utils.cards_logic import compute_power, compute_scaled_stats, normalize_mastery_list, rarity_rank
 from bot.utils.checks import ensure_registered
 from bot.utils.interaction_visibility import smart_reply, error_reply
 from bot.utils.squad_logic import compute_squad_power, get_inventory, get_player, get_squad
@@ -139,12 +139,13 @@ def _build_fighter_embed(data: dict[str, Any], instance: dict[str, Any]) -> disc
     locked    = bool(instance.get("locked") or instance.get("market_locked") or instance.get("squad_locked"))
 
     card_def  = (data.get("cards") or {}).get(card_name, {})
+    title     = str(card_def.get("title", "")).strip() if isinstance(card_def, dict) else ""
+    bio       = str(card_def.get("description", "")).strip() if isinstance(card_def, dict) else ""
     scaled    = compute_scaled_stats(card_def if isinstance(card_def, dict) else {}, stars)
     power     = compute_power(scaled)
     image_url = str(card_def.get("image_url", "")).strip() if isinstance(card_def, dict) else ""
 
-    mastery_raw  = card_def.get("mastery", []) if isinstance(card_def, dict) else []
-    mastery_list = [str(m).strip().title() for m in mastery_raw if str(m).strip()] if isinstance(mastery_raw, list) else []
+    mastery_list = normalize_mastery_list(card_def.get("mastery", []) if isinstance(card_def, dict) else [])
     mastery_str  = "  ".join(f"• {m}" for m in mastery_list) if mastery_list else "—"
 
     unique_path,  unique_path_desc  = _resolve_field(card_def.get("unique_path") if isinstance(card_def, dict) else None,
@@ -152,8 +153,15 @@ def _build_fighter_embed(data: dict[str, Any], instance: dict[str, Any]) -> disc
     unique_skill, unique_skill_desc = _resolve_field(card_def.get("unique_skill") if isinstance(card_def, dict) else None,
                                                       card_def.get("unique_skill_description") if isinstance(card_def, dict) else None)
 
+    heading = f"{_rarity_icon(rarity)} {rarity} • {card_name}"
+    if title:
+        heading += f"\n{title}"
+
     body = (
-        f"{_rarity_icon(rarity)} {rarity} • {card_name}\n\n"
+        f"{heading}\n\n"
+        "╭─ Bio\n"
+        f"│ {bio or '—'}\n"
+        "╰────────────────\n\n"
         "╭─ Combat Stats\n"
         f"│ 💪 STR: {int(scaled.get('strength', 0))}\n"
         f"│ ⚡ SPD: {int(scaled.get('speed', 0))}\n"

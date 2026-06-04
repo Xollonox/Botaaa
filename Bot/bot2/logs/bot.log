@@ -2005,3 +2005,1109 @@ Traceback (most recent call last):
   File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/aiohttp/connector.py", line 1323, in _create_direct_connection
     raise ClientConnectorDNSError(req.connection_key, exc) from exc
 aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host gateway-us-east1-d.discord.gg:443 ssl:default [No address associated with hostname]
+2026-06-04 16:05:33 [WARNING] discord.client: PyNaCl is not installed, voice will NOT be supported
+2026-06-04 16:05:33 [WARNING] discord.client: davey is not installed, voice will NOT be supported
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.onboarding
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile_owner
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.economy
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.inventory
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.cards_admin
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.card_tools
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.market
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.market_owner
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.trades
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.rewards
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.owner_rewards
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.redeem
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.shop
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.squad
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.battle
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.tournament
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.leaderboards
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.league_overview
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.achievements
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.season
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.alliance
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.gangs
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.server_settings
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.announce_owner
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.attacks_owner
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.confirm
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs_panel
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.emoji_panel
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.gang_war
+2026-06-04 16:05:35 [INFO] __main__: [BOOT] Loaded extension: bot.features.stats_guide
+2026-06-04 16:05:36 [INFO] __main__: [BOOT] Synced owner-guild commands to guild 1447875474364829748
+2026-06-04 16:05:37 [INFO] __main__: [BOOT] Synced commands globally.
+2026-06-04 16:05:37 [INFO] __main__: === REGISTERED SLASH COMMANDS ===
+2026-06-04 16:05:37 [INFO] __main__: /start
+2026-06-04 16:05:37 [INFO] __main__: /help
+2026-06-04 16:05:37 [INFO] __main__: /profile
+2026-06-04 16:05:37 [INFO] __main__: /balance
+2026-06-04 16:05:37 [INFO] __main__: /collection
+2026-06-04 16:05:37 [INFO] __main__: /card_info
+2026-06-04 16:05:37 [INFO] __main__: /card_lock
+2026-06-04 16:05:37 [INFO] __main__: /fuse
+2026-06-04 16:05:37 [INFO] __main__: /market
+2026-06-04 16:05:37 [INFO] __main__: /market browse
+2026-06-04 16:05:37 [INFO] __main__: /market add
+2026-06-04 16:05:37 [INFO] __main__: /market remove
+2026-06-04 16:05:37 [INFO] __main__: /trade
+2026-06-04 16:05:37 [INFO] __main__: /trade start
+2026-06-04 16:05:37 [INFO] __main__: /trade cancel
+2026-06-04 16:05:37 [INFO] __main__: /trade history
+2026-06-04 16:05:37 [INFO] __main__: /hourly
+2026-06-04 16:05:37 [INFO] __main__: /daily
+2026-06-04 16:05:37 [INFO] __main__: /weekly
+2026-06-04 16:05:37 [INFO] __main__: /monthly
+2026-06-04 16:05:37 [INFO] __main__: /redeem
+2026-06-04 16:05:37 [INFO] __main__: /shop
+2026-06-04 16:05:37 [INFO] __main__: /squad
+2026-06-04 16:05:37 [INFO] __main__: /battle
+2026-06-04 16:05:37 [INFO] __main__: /battle_cancel
+2026-06-04 16:05:37 [INFO] __main__: /friendly
+2026-06-04 16:05:37 [INFO] __main__: /friendly_cancel
+2026-06-04 16:05:37 [INFO] __main__: /forfeit
+2026-06-04 16:05:37 [INFO] __main__: /tournament
+2026-06-04 16:05:37 [INFO] __main__: /tournament_join
+2026-06-04 16:05:37 [INFO] __main__: /tournament_battle
+2026-06-04 16:05:37 [INFO] __main__: /lb
+2026-06-04 16:05:37 [INFO] __main__: /lb global
+2026-06-04 16:05:37 [INFO] __main__: /lb league
+2026-06-04 16:05:37 [INFO] __main__: /lb gang
+2026-06-04 16:05:37 [INFO] __main__: /lb alliance
+2026-06-04 16:05:37 [INFO] __main__: /league
+2026-06-04 16:05:37 [INFO] __main__: /league overview
+2026-06-04 16:05:37 [INFO] __main__: /achievements
+2026-06-04 16:05:37 [INFO] __main__: /season
+2026-06-04 16:05:37 [INFO] __main__: /season_pass
+2026-06-04 16:05:37 [INFO] __main__: /season_missions
+2026-06-04 16:05:37 [INFO] __main__: /alliance
+2026-06-04 16:05:37 [INFO] __main__: /alliance create
+2026-06-04 16:05:37 [INFO] __main__: /alliance info
+2026-06-04 16:05:37 [INFO] __main__: /alliance invite
+2026-06-04 16:05:37 [INFO] __main__: /alliance leave
+2026-06-04 16:05:37 [INFO] __main__: /gang
+2026-06-04 16:05:37 [INFO] __main__: /gang create
+2026-06-04 16:05:37 [INFO] __main__: /gang info
+2026-06-04 16:05:37 [INFO] __main__: /gang invite
+2026-06-04 16:05:37 [INFO] __main__: /gang join
+2026-06-04 16:05:37 [INFO] __main__: /gang leave
+2026-06-04 16:05:37 [INFO] __main__: /gang kick
+2026-06-04 16:05:37 [INFO] __main__: /gang promote
+2026-06-04 16:05:37 [INFO] __main__: /gang demote
+2026-06-04 16:05:37 [INFO] __main__: /gang members
+2026-06-04 16:05:37 [INFO] __main__: /gang transfer_owner
+2026-06-04 16:05:37 [INFO] __main__: /gang set_description
+2026-06-04 16:05:37 [INFO] __main__: /gang set_status
+2026-06-04 16:05:37 [INFO] __main__: /gang stats
+2026-06-04 16:05:37 [INFO] __main__: /server_mode
+2026-06-04 16:05:37 [INFO] __main__: /server_set_channel
+2026-06-04 16:05:37 [INFO] __main__: /server_set_announce
+2026-06-04 16:05:37 [INFO] __main__: /server_set_battle
+2026-06-04 16:05:37 [INFO] __main__: /confirm
+2026-06-04 16:05:37 [INFO] __main__: /packs
+2026-06-04 16:05:37 [INFO] __main__: /gang_war
+2026-06-04 16:05:37 [INFO] __main__: /gang_war start
+2026-06-04 16:05:37 [INFO] __main__: /gang_war status
+2026-06-04 16:05:37 [INFO] __main__: /gang_war attack
+2026-06-04 16:05:37 [INFO] __main__: /gang_war record
+2026-06-04 16:05:37 [INFO] __main__: /gang_war cancel_queue
+2026-06-04 16:05:37 [INFO] __main__: /gang_war preference
+2026-06-04 16:05:37 [INFO] __main__: /defensive_squad_setup
+2026-06-04 16:05:37 [INFO] __main__: /o_war_start
+2026-06-04 16:05:37 [INFO] __main__: /o_war_end
+2026-06-04 16:05:37 [INFO] __main__: /o_war_set_phase
+2026-06-04 16:05:37 [INFO] __main__: /o_war_set_durations
+2026-06-04 16:05:37 [INFO] __main__: /o_war_list
+2026-06-04 16:05:37 [INFO] __main__: /stats_guide
+2026-06-04 16:05:37 [INFO] __main__: === TOTAL COMMANDS: 81 ===
+2026-06-04 16:05:40 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
+2026-06-04 16:12:54 [WARNING] discord.client: PyNaCl is not installed, voice will NOT be supported
+2026-06-04 16:12:54 [WARNING] discord.client: davey is not installed, voice will NOT be supported
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.onboarding
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile_owner
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.economy
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.inventory
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.cards_admin
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.card_tools
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.market
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.market_owner
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.trades
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.rewards
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.owner_rewards
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.redeem
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.shop
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.squad
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.battle
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.tournament
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.leaderboards
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.league_overview
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.achievements
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.season
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.alliance
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.gangs
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.server_settings
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.announce_owner
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.attacks_owner
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.confirm
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs_panel
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.emoji_panel
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.gang_war
+2026-06-04 16:12:55 [INFO] __main__: [BOOT] Loaded extension: bot.features.stats_guide
+2026-06-04 16:12:56 [INFO] __main__: [BOOT] Synced owner-guild commands to guild 1447875474364829748
+2026-06-04 16:12:57 [INFO] __main__: [BOOT] Synced commands globally.
+2026-06-04 16:12:57 [INFO] __main__: === REGISTERED SLASH COMMANDS ===
+2026-06-04 16:12:57 [INFO] __main__: /start
+2026-06-04 16:12:57 [INFO] __main__: /help
+2026-06-04 16:12:57 [INFO] __main__: /profile
+2026-06-04 16:12:57 [INFO] __main__: /balance
+2026-06-04 16:12:57 [INFO] __main__: /collection
+2026-06-04 16:12:57 [INFO] __main__: /card_info
+2026-06-04 16:12:57 [INFO] __main__: /card_lock
+2026-06-04 16:12:57 [INFO] __main__: /fuse
+2026-06-04 16:12:57 [INFO] __main__: /market
+2026-06-04 16:12:57 [INFO] __main__: /market browse
+2026-06-04 16:12:57 [INFO] __main__: /market add
+2026-06-04 16:12:57 [INFO] __main__: /market remove
+2026-06-04 16:12:57 [INFO] __main__: /trade
+2026-06-04 16:12:57 [INFO] __main__: /trade start
+2026-06-04 16:12:57 [INFO] __main__: /trade cancel
+2026-06-04 16:12:57 [INFO] __main__: /trade history
+2026-06-04 16:12:57 [INFO] __main__: /hourly
+2026-06-04 16:12:57 [INFO] __main__: /daily
+2026-06-04 16:12:57 [INFO] __main__: /weekly
+2026-06-04 16:12:57 [INFO] __main__: /monthly
+2026-06-04 16:12:57 [INFO] __main__: /redeem
+2026-06-04 16:12:57 [INFO] __main__: /shop
+2026-06-04 16:12:57 [INFO] __main__: /squad
+2026-06-04 16:12:57 [INFO] __main__: /battle
+2026-06-04 16:12:57 [INFO] __main__: /battle_cancel
+2026-06-04 16:12:57 [INFO] __main__: /friendly
+2026-06-04 16:12:57 [INFO] __main__: /friendly_cancel
+2026-06-04 16:12:57 [INFO] __main__: /forfeit
+2026-06-04 16:12:57 [INFO] __main__: /tournament
+2026-06-04 16:12:57 [INFO] __main__: /tournament_join
+2026-06-04 16:12:57 [INFO] __main__: /tournament_battle
+2026-06-04 16:12:57 [INFO] __main__: /lb
+2026-06-04 16:12:57 [INFO] __main__: /lb global
+2026-06-04 16:12:57 [INFO] __main__: /lb league
+2026-06-04 16:12:57 [INFO] __main__: /lb gang
+2026-06-04 16:12:57 [INFO] __main__: /lb alliance
+2026-06-04 16:12:57 [INFO] __main__: /league
+2026-06-04 16:12:57 [INFO] __main__: /league overview
+2026-06-04 16:12:57 [INFO] __main__: /achievements
+2026-06-04 16:12:57 [INFO] __main__: /season
+2026-06-04 16:12:57 [INFO] __main__: /season_pass
+2026-06-04 16:12:57 [INFO] __main__: /season_missions
+2026-06-04 16:12:57 [INFO] __main__: /alliance
+2026-06-04 16:12:57 [INFO] __main__: /alliance create
+2026-06-04 16:12:57 [INFO] __main__: /alliance info
+2026-06-04 16:12:57 [INFO] __main__: /alliance invite
+2026-06-04 16:12:57 [INFO] __main__: /alliance leave
+2026-06-04 16:12:57 [INFO] __main__: /gang
+2026-06-04 16:12:57 [INFO] __main__: /gang create
+2026-06-04 16:12:57 [INFO] __main__: /gang info
+2026-06-04 16:12:57 [INFO] __main__: /gang invite
+2026-06-04 16:12:57 [INFO] __main__: /gang join
+2026-06-04 16:12:57 [INFO] __main__: /gang leave
+2026-06-04 16:12:57 [INFO] __main__: /gang kick
+2026-06-04 16:12:57 [INFO] __main__: /gang promote
+2026-06-04 16:12:57 [INFO] __main__: /gang demote
+2026-06-04 16:12:57 [INFO] __main__: /gang members
+2026-06-04 16:12:57 [INFO] __main__: /gang transfer_owner
+2026-06-04 16:12:57 [INFO] __main__: /gang set_description
+2026-06-04 16:12:57 [INFO] __main__: /gang set_status
+2026-06-04 16:12:57 [INFO] __main__: /gang stats
+2026-06-04 16:12:57 [INFO] __main__: /server_mode
+2026-06-04 16:12:57 [INFO] __main__: /server_set_channel
+2026-06-04 16:12:57 [INFO] __main__: /server_set_announce
+2026-06-04 16:12:57 [INFO] __main__: /server_set_battle
+2026-06-04 16:12:57 [INFO] __main__: /confirm
+2026-06-04 16:12:57 [INFO] __main__: /packs
+2026-06-04 16:12:57 [INFO] __main__: /gang_war
+2026-06-04 16:12:57 [INFO] __main__: /gang_war start
+2026-06-04 16:12:57 [INFO] __main__: /gang_war status
+2026-06-04 16:12:57 [INFO] __main__: /gang_war attack
+2026-06-04 16:12:57 [INFO] __main__: /gang_war record
+2026-06-04 16:12:57 [INFO] __main__: /gang_war cancel_queue
+2026-06-04 16:12:57 [INFO] __main__: /gang_war preference
+2026-06-04 16:12:57 [INFO] __main__: /defensive_squad_setup
+2026-06-04 16:12:57 [INFO] __main__: /o_war_start
+2026-06-04 16:12:57 [INFO] __main__: /o_war_end
+2026-06-04 16:12:57 [INFO] __main__: /o_war_set_phase
+2026-06-04 16:12:57 [INFO] __main__: /o_war_set_durations
+2026-06-04 16:12:57 [INFO] __main__: /o_war_list
+2026-06-04 16:12:57 [INFO] __main__: /stats_guide
+2026-06-04 16:12:57 [INFO] __main__: === TOTAL COMMANDS: 81 ===
+2026-06-04 16:13:00 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
+2026-06-04 16:13:04 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:13:05 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:13:08 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:13:12 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:13:13 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:13:15 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:13:16 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:13:16 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:13:17 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:13:17 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:13:18 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:13:20 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:14:00 [WARNING] discord.client: PyNaCl is not installed, voice will NOT be supported
+2026-06-04 16:14:00 [WARNING] discord.client: davey is not installed, voice will NOT be supported
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.onboarding
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile_owner
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.economy
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.inventory
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.cards_admin
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.card_tools
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.market
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.market_owner
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.trades
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.rewards
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.owner_rewards
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.redeem
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.shop
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.squad
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.battle
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.tournament
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.leaderboards
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.league_overview
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.achievements
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.season
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.alliance
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.gangs
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.server_settings
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.announce_owner
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.attacks_owner
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.confirm
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs_panel
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.emoji_panel
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.gang_war
+2026-06-04 16:14:01 [INFO] __main__: [BOOT] Loaded extension: bot.features.stats_guide
+2026-06-04 16:14:02 [INFO] __main__: [BOOT] Synced owner-guild commands to guild 1447875474364829748
+2026-06-04 16:14:03 [INFO] __main__: [BOOT] Synced commands globally.
+2026-06-04 16:14:03 [INFO] __main__: === REGISTERED SLASH COMMANDS ===
+2026-06-04 16:14:03 [INFO] __main__: /start
+2026-06-04 16:14:03 [INFO] __main__: /help
+2026-06-04 16:14:03 [INFO] __main__: /profile
+2026-06-04 16:14:03 [INFO] __main__: /balance
+2026-06-04 16:14:03 [INFO] __main__: /collection
+2026-06-04 16:14:03 [INFO] __main__: /card_info
+2026-06-04 16:14:03 [INFO] __main__: /card_lock
+2026-06-04 16:14:03 [INFO] __main__: /fuse
+2026-06-04 16:14:03 [INFO] __main__: /market
+2026-06-04 16:14:03 [INFO] __main__: /market browse
+2026-06-04 16:14:03 [INFO] __main__: /market add
+2026-06-04 16:14:03 [INFO] __main__: /market remove
+2026-06-04 16:14:03 [INFO] __main__: /trade
+2026-06-04 16:14:03 [INFO] __main__: /trade start
+2026-06-04 16:14:03 [INFO] __main__: /trade cancel
+2026-06-04 16:14:03 [INFO] __main__: /trade history
+2026-06-04 16:14:03 [INFO] __main__: /hourly
+2026-06-04 16:14:03 [INFO] __main__: /daily
+2026-06-04 16:14:03 [INFO] __main__: /weekly
+2026-06-04 16:14:03 [INFO] __main__: /monthly
+2026-06-04 16:14:03 [INFO] __main__: /redeem
+2026-06-04 16:14:03 [INFO] __main__: /shop
+2026-06-04 16:14:03 [INFO] __main__: /squad
+2026-06-04 16:14:03 [INFO] __main__: /battle
+2026-06-04 16:14:03 [INFO] __main__: /battle_cancel
+2026-06-04 16:14:03 [INFO] __main__: /friendly
+2026-06-04 16:14:03 [INFO] __main__: /friendly_cancel
+2026-06-04 16:14:03 [INFO] __main__: /forfeit
+2026-06-04 16:14:03 [INFO] __main__: /tournament
+2026-06-04 16:14:03 [INFO] __main__: /tournament_join
+2026-06-04 16:14:03 [INFO] __main__: /tournament_battle
+2026-06-04 16:14:03 [INFO] __main__: /lb
+2026-06-04 16:14:03 [INFO] __main__: /lb global
+2026-06-04 16:14:03 [INFO] __main__: /lb league
+2026-06-04 16:14:03 [INFO] __main__: /lb gang
+2026-06-04 16:14:03 [INFO] __main__: /lb alliance
+2026-06-04 16:14:03 [INFO] __main__: /league
+2026-06-04 16:14:03 [INFO] __main__: /league overview
+2026-06-04 16:14:03 [INFO] __main__: /achievements
+2026-06-04 16:14:03 [INFO] __main__: /season
+2026-06-04 16:14:03 [INFO] __main__: /season_pass
+2026-06-04 16:14:03 [INFO] __main__: /season_missions
+2026-06-04 16:14:03 [INFO] __main__: /alliance
+2026-06-04 16:14:03 [INFO] __main__: /alliance create
+2026-06-04 16:14:03 [INFO] __main__: /alliance info
+2026-06-04 16:14:03 [INFO] __main__: /alliance invite
+2026-06-04 16:14:03 [INFO] __main__: /alliance leave
+2026-06-04 16:14:03 [INFO] __main__: /gang
+2026-06-04 16:14:03 [INFO] __main__: /gang create
+2026-06-04 16:14:03 [INFO] __main__: /gang info
+2026-06-04 16:14:03 [INFO] __main__: /gang invite
+2026-06-04 16:14:03 [INFO] __main__: /gang join
+2026-06-04 16:14:03 [INFO] __main__: /gang leave
+2026-06-04 16:14:03 [INFO] __main__: /gang kick
+2026-06-04 16:14:03 [INFO] __main__: /gang promote
+2026-06-04 16:14:03 [INFO] __main__: /gang demote
+2026-06-04 16:14:03 [INFO] __main__: /gang members
+2026-06-04 16:14:03 [INFO] __main__: /gang transfer_owner
+2026-06-04 16:14:03 [INFO] __main__: /gang set_description
+2026-06-04 16:14:03 [INFO] __main__: /gang set_status
+2026-06-04 16:14:03 [INFO] __main__: /gang stats
+2026-06-04 16:14:03 [INFO] __main__: /server_mode
+2026-06-04 16:14:03 [INFO] __main__: /server_set_channel
+2026-06-04 16:14:03 [INFO] __main__: /server_set_announce
+2026-06-04 16:14:03 [INFO] __main__: /server_set_battle
+2026-06-04 16:14:03 [INFO] __main__: /confirm
+2026-06-04 16:14:03 [INFO] __main__: /packs
+2026-06-04 16:14:03 [INFO] __main__: /gang_war
+2026-06-04 16:14:03 [INFO] __main__: /gang_war start
+2026-06-04 16:14:03 [INFO] __main__: /gang_war status
+2026-06-04 16:14:03 [INFO] __main__: /gang_war attack
+2026-06-04 16:14:03 [INFO] __main__: /gang_war record
+2026-06-04 16:14:03 [INFO] __main__: /gang_war cancel_queue
+2026-06-04 16:14:03 [INFO] __main__: /gang_war preference
+2026-06-04 16:14:03 [INFO] __main__: /defensive_squad_setup
+2026-06-04 16:14:03 [INFO] __main__: /o_war_start
+2026-06-04 16:14:03 [INFO] __main__: /o_war_end
+2026-06-04 16:14:03 [INFO] __main__: /o_war_set_phase
+2026-06-04 16:14:03 [INFO] __main__: /o_war_set_durations
+2026-06-04 16:14:03 [INFO] __main__: /o_war_list
+2026-06-04 16:14:03 [INFO] __main__: /stats_guide
+2026-06-04 16:14:03 [INFO] __main__: === TOTAL COMMANDS: 81 ===
+2026-06-04 16:14:06 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
+2026-06-04 16:17:22 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:17:22 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:17:25 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:17:34 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:17:37 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:18:09 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:18:10 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:18:10 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:18:11 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:18:14 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='CommandTree-invoker' coro=<CommandTree._from_interaction.<locals>.wrapper() done, defined at /data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py:1136> exception=HTTPException('400 Bad Request (error code: 50035): Invalid Form Body\nIn type: Value must be one of {8}.')>
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1138, in wrapper
+    await self._call(interaction)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/app_commands/tree.py", line 1259, in _call
+    if not await self.interaction_check(interaction):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 231, in interaction_check
+    return await self.client._global_terms_gate(interaction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/Botaaa/Bot/bot2/main.py", line 139, in _global_terms_gate
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/interactions.py", line 1085, in send_message
+    data = await adapter.create_interaction_response(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/discord/webhook/async_.py", line 226, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50035): Invalid Form Body
+In type: Value must be one of {8}.
+2026-06-04 16:20:05 [WARNING] discord.client: PyNaCl is not installed, voice will NOT be supported
+2026-06-04 16:20:05 [WARNING] discord.client: davey is not installed, voice will NOT be supported
+2026-06-04 16:20:06 [INFO] __main__: [BOOT] Loaded extension: bot.features.onboarding
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile_owner
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.economy
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.inventory
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.cards_admin
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.card_tools
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.market
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.market_owner
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.trades
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.rewards
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.owner_rewards
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.redeem
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.shop
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.squad
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.battle
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.tournament
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.leaderboards
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.league_overview
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.achievements
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.season
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.alliance
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.gangs
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.server_settings
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.announce_owner
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.attacks_owner
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.confirm
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs_panel
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.emoji_panel
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.gang_war
+2026-06-04 16:20:07 [INFO] __main__: [BOOT] Loaded extension: bot.features.stats_guide
+2026-06-04 16:20:08 [INFO] __main__: [BOOT] Synced owner-guild commands to guild 1447875474364829748
+2026-06-04 16:20:08 [INFO] __main__: [BOOT] Synced commands globally.
+2026-06-04 16:20:08 [INFO] __main__: === REGISTERED SLASH COMMANDS ===
+2026-06-04 16:20:08 [INFO] __main__: /start
+2026-06-04 16:20:08 [INFO] __main__: /help
+2026-06-04 16:20:08 [INFO] __main__: /profile
+2026-06-04 16:20:08 [INFO] __main__: /balance
+2026-06-04 16:20:08 [INFO] __main__: /collection
+2026-06-04 16:20:08 [INFO] __main__: /card_info
+2026-06-04 16:20:08 [INFO] __main__: /card_lock
+2026-06-04 16:20:08 [INFO] __main__: /fuse
+2026-06-04 16:20:08 [INFO] __main__: /market
+2026-06-04 16:20:08 [INFO] __main__: /market browse
+2026-06-04 16:20:08 [INFO] __main__: /market add
+2026-06-04 16:20:08 [INFO] __main__: /market remove
+2026-06-04 16:20:08 [INFO] __main__: /trade
+2026-06-04 16:20:08 [INFO] __main__: /trade start
+2026-06-04 16:20:08 [INFO] __main__: /trade cancel
+2026-06-04 16:20:08 [INFO] __main__: /trade history
+2026-06-04 16:20:08 [INFO] __main__: /hourly
+2026-06-04 16:20:08 [INFO] __main__: /daily
+2026-06-04 16:20:08 [INFO] __main__: /weekly
+2026-06-04 16:20:08 [INFO] __main__: /monthly
+2026-06-04 16:20:08 [INFO] __main__: /redeem
+2026-06-04 16:20:08 [INFO] __main__: /shop
+2026-06-04 16:20:08 [INFO] __main__: /squad
+2026-06-04 16:20:08 [INFO] __main__: /battle
+2026-06-04 16:20:08 [INFO] __main__: /battle_cancel
+2026-06-04 16:20:08 [INFO] __main__: /friendly
+2026-06-04 16:20:08 [INFO] __main__: /friendly_cancel
+2026-06-04 16:20:08 [INFO] __main__: /forfeit
+2026-06-04 16:20:08 [INFO] __main__: /tournament
+2026-06-04 16:20:08 [INFO] __main__: /tournament_join
+2026-06-04 16:20:08 [INFO] __main__: /tournament_battle
+2026-06-04 16:20:08 [INFO] __main__: /lb
+2026-06-04 16:20:08 [INFO] __main__: /lb global
+2026-06-04 16:20:08 [INFO] __main__: /lb league
+2026-06-04 16:20:08 [INFO] __main__: /lb gang
+2026-06-04 16:20:08 [INFO] __main__: /lb alliance
+2026-06-04 16:20:08 [INFO] __main__: /league
+2026-06-04 16:20:08 [INFO] __main__: /league overview
+2026-06-04 16:20:08 [INFO] __main__: /achievements
+2026-06-04 16:20:08 [INFO] __main__: /season
+2026-06-04 16:20:08 [INFO] __main__: /season_pass
+2026-06-04 16:20:08 [INFO] __main__: /season_missions
+2026-06-04 16:20:08 [INFO] __main__: /alliance
+2026-06-04 16:20:08 [INFO] __main__: /alliance create
+2026-06-04 16:20:08 [INFO] __main__: /alliance info
+2026-06-04 16:20:08 [INFO] __main__: /alliance invite
+2026-06-04 16:20:08 [INFO] __main__: /alliance leave
+2026-06-04 16:20:08 [INFO] __main__: /gang
+2026-06-04 16:20:08 [INFO] __main__: /gang create
+2026-06-04 16:20:08 [INFO] __main__: /gang info
+2026-06-04 16:20:08 [INFO] __main__: /gang invite
+2026-06-04 16:20:08 [INFO] __main__: /gang join
+2026-06-04 16:20:08 [INFO] __main__: /gang leave
+2026-06-04 16:20:08 [INFO] __main__: /gang kick
+2026-06-04 16:20:08 [INFO] __main__: /gang promote
+2026-06-04 16:20:08 [INFO] __main__: /gang demote
+2026-06-04 16:20:08 [INFO] __main__: /gang members
+2026-06-04 16:20:08 [INFO] __main__: /gang transfer_owner
+2026-06-04 16:20:08 [INFO] __main__: /gang set_description
+2026-06-04 16:20:08 [INFO] __main__: /gang set_status
+2026-06-04 16:20:08 [INFO] __main__: /gang stats
+2026-06-04 16:20:08 [INFO] __main__: /server_mode
+2026-06-04 16:20:08 [INFO] __main__: /server_set_channel
+2026-06-04 16:20:08 [INFO] __main__: /server_set_announce
+2026-06-04 16:20:08 [INFO] __main__: /server_set_battle
+2026-06-04 16:20:08 [INFO] __main__: /confirm
+2026-06-04 16:20:08 [INFO] __main__: /packs
+2026-06-04 16:20:08 [INFO] __main__: /gang_war
+2026-06-04 16:20:08 [INFO] __main__: /gang_war start
+2026-06-04 16:20:08 [INFO] __main__: /gang_war status
+2026-06-04 16:20:08 [INFO] __main__: /gang_war attack
+2026-06-04 16:20:08 [INFO] __main__: /gang_war record
+2026-06-04 16:20:08 [INFO] __main__: /gang_war cancel_queue
+2026-06-04 16:20:08 [INFO] __main__: /gang_war preference
+2026-06-04 16:20:08 [INFO] __main__: /defensive_squad_setup
+2026-06-04 16:20:08 [INFO] __main__: /o_war_start
+2026-06-04 16:20:08 [INFO] __main__: /o_war_end
+2026-06-04 16:20:08 [INFO] __main__: /o_war_set_phase
+2026-06-04 16:20:08 [INFO] __main__: /o_war_set_durations
+2026-06-04 16:20:08 [INFO] __main__: /o_war_list
+2026-06-04 16:20:08 [INFO] __main__: /stats_guide
+2026-06-04 16:20:08 [INFO] __main__: === TOTAL COMMANDS: 81 ===
+2026-06-04 16:20:12 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
+2026-06-04 17:23:35 [WARNING] discord.client: PyNaCl is not installed, voice will NOT be supported
+2026-06-04 17:23:35 [WARNING] discord.client: davey is not installed, voice will NOT be supported
+2026-06-04 17:23:36 [INFO] __main__: [BOOT] Loaded extension: bot.features.onboarding
+2026-06-04 17:23:36 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile
+2026-06-04 17:23:36 [INFO] __main__: [BOOT] Loaded extension: bot.features.profile_owner
+2026-06-04 17:23:36 [INFO] __main__: [BOOT] Loaded extension: bot.features.economy
+2026-06-04 17:23:36 [INFO] __main__: [BOOT] Loaded extension: bot.features.inventory
+2026-06-04 17:23:36 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs
+2026-06-04 17:23:36 [INFO] __main__: [BOOT] Loaded extension: bot.features.cards_admin
+2026-06-04 17:23:36 [INFO] __main__: [BOOT] Loaded extension: bot.features.card_tools
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.market
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.market_owner
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.trades
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.rewards
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.owner_rewards
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.redeem
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.shop
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.squad
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.battle
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.tournament
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.leaderboards
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.league_overview
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.achievements
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.season
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.alliance
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.gangs
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.server_settings
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.announce_owner
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.attacks_owner
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.confirm
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.packs_panel
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.emoji_panel
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.gang_war
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Loaded extension: bot.features.stats_guide
+2026-06-04 17:23:37 [INFO] __main__: [BOOT] Synced owner-guild commands to guild 1447875474364829748
+2026-06-04 17:23:38 [INFO] __main__: [BOOT] Synced commands globally.
+2026-06-04 17:23:38 [INFO] __main__: === REGISTERED SLASH COMMANDS ===
+2026-06-04 17:23:38 [INFO] __main__: /start
+2026-06-04 17:23:38 [INFO] __main__: /help
+2026-06-04 17:23:38 [INFO] __main__: /profile
+2026-06-04 17:23:38 [INFO] __main__: /balance
+2026-06-04 17:23:38 [INFO] __main__: /collection
+2026-06-04 17:23:38 [INFO] __main__: /card_info
+2026-06-04 17:23:38 [INFO] __main__: /card_lock
+2026-06-04 17:23:38 [INFO] __main__: /fuse
+2026-06-04 17:23:38 [INFO] __main__: /market
+2026-06-04 17:23:38 [INFO] __main__: /market browse
+2026-06-04 17:23:38 [INFO] __main__: /market add
+2026-06-04 17:23:38 [INFO] __main__: /market remove
+2026-06-04 17:23:38 [INFO] __main__: /trade
+2026-06-04 17:23:38 [INFO] __main__: /trade start
+2026-06-04 17:23:38 [INFO] __main__: /trade cancel
+2026-06-04 17:23:38 [INFO] __main__: /trade history
+2026-06-04 17:23:38 [INFO] __main__: /hourly
+2026-06-04 17:23:38 [INFO] __main__: /daily
+2026-06-04 17:23:38 [INFO] __main__: /weekly
+2026-06-04 17:23:38 [INFO] __main__: /monthly
+2026-06-04 17:23:38 [INFO] __main__: /redeem
+2026-06-04 17:23:38 [INFO] __main__: /shop
+2026-06-04 17:23:38 [INFO] __main__: /squad
+2026-06-04 17:23:38 [INFO] __main__: /battle
+2026-06-04 17:23:38 [INFO] __main__: /battle_cancel
+2026-06-04 17:23:38 [INFO] __main__: /friendly
+2026-06-04 17:23:38 [INFO] __main__: /friendly_cancel
+2026-06-04 17:23:38 [INFO] __main__: /forfeit
+2026-06-04 17:23:38 [INFO] __main__: /tournament
+2026-06-04 17:23:38 [INFO] __main__: /tournament_join
+2026-06-04 17:23:38 [INFO] __main__: /tournament_battle
+2026-06-04 17:23:38 [INFO] __main__: /lb
+2026-06-04 17:23:38 [INFO] __main__: /lb global
+2026-06-04 17:23:38 [INFO] __main__: /lb league
+2026-06-04 17:23:38 [INFO] __main__: /lb gang
+2026-06-04 17:23:38 [INFO] __main__: /lb alliance
+2026-06-04 17:23:38 [INFO] __main__: /league
+2026-06-04 17:23:38 [INFO] __main__: /league overview
+2026-06-04 17:23:38 [INFO] __main__: /achievements
+2026-06-04 17:23:38 [INFO] __main__: /season
+2026-06-04 17:23:38 [INFO] __main__: /season_pass
+2026-06-04 17:23:38 [INFO] __main__: /season_missions
+2026-06-04 17:23:38 [INFO] __main__: /alliance
+2026-06-04 17:23:38 [INFO] __main__: /alliance create
+2026-06-04 17:23:38 [INFO] __main__: /alliance info
+2026-06-04 17:23:38 [INFO] __main__: /alliance invite
+2026-06-04 17:23:38 [INFO] __main__: /alliance leave
+2026-06-04 17:23:38 [INFO] __main__: /gang
+2026-06-04 17:23:38 [INFO] __main__: /gang create
+2026-06-04 17:23:38 [INFO] __main__: /gang info
+2026-06-04 17:23:38 [INFO] __main__: /gang invite
+2026-06-04 17:23:38 [INFO] __main__: /gang join
+2026-06-04 17:23:38 [INFO] __main__: /gang leave
+2026-06-04 17:23:38 [INFO] __main__: /gang kick
+2026-06-04 17:23:38 [INFO] __main__: /gang promote
+2026-06-04 17:23:38 [INFO] __main__: /gang demote
+2026-06-04 17:23:38 [INFO] __main__: /gang members
+2026-06-04 17:23:38 [INFO] __main__: /gang transfer_owner
+2026-06-04 17:23:38 [INFO] __main__: /gang set_description
+2026-06-04 17:23:38 [INFO] __main__: /gang set_status
+2026-06-04 17:23:38 [INFO] __main__: /gang stats
+2026-06-04 17:23:38 [INFO] __main__: /server_mode
+2026-06-04 17:23:38 [INFO] __main__: /server_set_channel
+2026-06-04 17:23:38 [INFO] __main__: /server_set_announce
+2026-06-04 17:23:38 [INFO] __main__: /server_set_battle
+2026-06-04 17:23:38 [INFO] __main__: /confirm
+2026-06-04 17:23:38 [INFO] __main__: /packs
+2026-06-04 17:23:38 [INFO] __main__: /gang_war
+2026-06-04 17:23:38 [INFO] __main__: /gang_war start
+2026-06-04 17:23:38 [INFO] __main__: /gang_war status
+2026-06-04 17:23:38 [INFO] __main__: /gang_war attack
+2026-06-04 17:23:38 [INFO] __main__: /gang_war record
+2026-06-04 17:23:38 [INFO] __main__: /gang_war cancel_queue
+2026-06-04 17:23:38 [INFO] __main__: /gang_war preference
+2026-06-04 17:23:38 [INFO] __main__: /defensive_squad_setup
+2026-06-04 17:23:38 [INFO] __main__: /o_war_start
+2026-06-04 17:23:38 [INFO] __main__: /o_war_end
+2026-06-04 17:23:38 [INFO] __main__: /o_war_set_phase
+2026-06-04 17:23:38 [INFO] __main__: /o_war_set_durations
+2026-06-04 17:23:38 [INFO] __main__: /o_war_list
+2026-06-04 17:23:38 [INFO] __main__: /stats_guide
+2026-06-04 17:23:38 [INFO] __main__: === TOTAL COMMANDS: 81 ===
+2026-06-04 17:23:41 [INFO] __main__: [READY] Logged in as Lookism hxcc#4772 (ID: 1469383271824490719)
