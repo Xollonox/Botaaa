@@ -8,7 +8,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card
+from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card, normalize_mastery_list
 from bot.utils.ui import e, make_embed
 from bot.utils.interaction_visibility import smart_reply, error_reply
 
@@ -32,6 +32,8 @@ def _resolve_field(raw: Any, desc_raw: Any = None) -> tuple[str, str]:
 def _build_catalog_card_embed(data: dict[str, Any], card: dict[str, Any]) -> discord.Embed:
     """Build a card embed matching the collection_view layout exactly."""
     card_name = str(card.get("name", "Unknown"))
+    title     = str(card.get("title", "")).strip()
+    bio       = str(card.get("description", "")).strip() or "—"
     rarity     = str(card.get("rarity", "Common"))
     raw_stats  = card.get("stats", {})
     image_url  = str(card.get("image_url", "")).strip()
@@ -40,15 +42,21 @@ def _build_catalog_card_embed(data: dict[str, Any], card: dict[str, Any]) -> dis
     scaled = compute_scaled_stats(card, 0)
     power  = compute_power(scaled)
 
-    mastery_raw  = card.get("mastery", [])
-    mastery_list = [str(m).strip().title() for m in mastery_raw if str(m).strip()] if isinstance(mastery_raw, list) else []
+    mastery_list = normalize_mastery_list(card.get("mastery", []))
     mastery_str  = "  ".join(f"• {m}" for m in mastery_list) if mastery_list else "—"
 
     unique_path,  unique_path_desc  = _resolve_field(card.get("unique_path"),  card.get("unique_path_description"))
     unique_skill, unique_skill_desc = _resolve_field(card.get("unique_skill"), card.get("unique_skill_description"))
 
+    heading = f"{_rarity_icon(rarity)} {rarity} • {card_name}"
+    if title:
+        heading += f"\n{title}"
+
     body = (
-        f"{_rarity_icon(rarity)} {rarity} • {card_name}\n\n"
+        f"{heading}\n\n"
+        "╭─ Bio\n"
+        f"│ {bio}\n"
+        "╰────────────────\n\n"
         "╭─ Combat Stats\n"
         f"│ 💪 STR: {int(scaled.get('strength', 0))}\n"
         f"│ ⚡ SPD: {int(scaled.get('speed', 0))}\n"

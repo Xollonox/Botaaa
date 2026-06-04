@@ -12,6 +12,14 @@ from bot.utils.battle_engine_pdf import normalize_attack_type
 from bot.utils.cards_logic import compute_scaled_stats
 from bot.utils.squad_logic import get_player
 from bot.utils.timeutil import now_ts
+from bot.utils.typing_matchup import (
+    MASTERMIND_BIQ_BONUS,
+    MASTERMIND_IQ_BONUS,
+    defensive_multiplier,
+    has_mastermind,
+    normalize_typing,
+    type_multiplier,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -232,6 +240,7 @@ def _build_cpu_side(data: dict[str, Any], team_size: int = 4, min_rarity: str = 
             "technique": int(scaled.get("technique", 1)),
             "iq": int(scaled.get("iq", 1)),
             "biq": int(scaled.get("battle_iq", scaled.get("biq", 1))),
+            "typing": normalize_typing(card_def.get("typing", [])),
         }
         fighter_names[uid] = card_name
         mastery_by_uid[uid] = [str(m).lower() for m in mastery]
@@ -283,6 +292,7 @@ def _build_player_side(data: dict[str, Any], user_id: str, team_uids: list[str])
             "technique": int(scaled.get("technique", 1)),
             "iq": int(scaled.get("iq", 1)),
             "biq": int(scaled.get("battle_iq", scaled.get("biq", 1))),
+            "typing": normalize_typing(card_def.get("typing", [])),
         }
         fighter_names[uid] = card_name
         mastery_by_uid[uid] = [str(m).lower() for m in mastery]
@@ -338,9 +348,15 @@ def _strength_bonus(strength: int, move_type: str, has_strength_mastery: bool) -
 
 
 def calculate_stat_damage(attacker: dict[str, Any], defender: dict[str, Any], move_type: str) -> tuple[int, dict[str, Any]]:
-    att_biq = int(attacker.get("biq", 0))
-    def_biq = int(defender.get("biq", 0))
+    att_typing = normalize_typing(attacker.get("typing", []))
+    def_typing = normalize_typing(defender.get("typing", []))
+    att_iq_eff = int(attacker.get("iq", 0)) + (MASTERMIND_IQ_BONUS if has_mastermind(att_typing) else 0)
+    def_iq_eff = int(defender.get("iq", 0)) + (MASTERMIND_IQ_BONUS if has_mastermind(def_typing) else 0)
+    att_biq = int(attacker.get("biq", 0)) + (MASTERMIND_BIQ_BONUS if has_mastermind(att_typing) else 0)
+    def_biq = int(defender.get("biq", 0)) + (MASTERMIND_BIQ_BONUS if has_mastermind(def_typing) else 0)
     detail: dict[str, Any] = {"miss": False, "move_type": normalize_attack_type(move_type)}
+    detail["attacker_typing"] = att_typing
+    detail["defender_typing"] = def_typing
     if att_biq < def_biq:
         miss_chance = max(0, min(100, def_biq - att_biq))
         roll = random.randint(1, 100)
@@ -386,13 +402,19 @@ def calculate_stat_damage(attacker: dict[str, Any], defender: dict[str, Any], mo
     damage = float(damage) * tec_mult
     detail["technique_mult"] = tec_mult
 
-    iq_bonus = float(attacker.get("iq", 0)) / 5.0
+    iq_bonus = float(att_iq_eff) / 5.0
     damage *= (1 + iq_bonus / 100.0)
     detail["attacker_iq_bonus_pct"] = iq_bonus
 
-    def_iq_bonus = float(defender.get("iq", 0)) / 5.0
+    def_iq_bonus = float(def_iq_eff) / 5.0
     damage *= (1 - def_iq_bonus / 100.0)
     detail["defender_iq_reduce_pct"] = def_iq_bonus
+
+    type_mult = type_multiplier(att_typing, def_typing)
+    def_mult = defensive_multiplier(att_typing, def_typing)
+    damage *= type_mult * def_mult
+    detail["typing_mult"] = type_mult
+    detail["typing_defensive_mult"] = def_mult
 
     out = max(0, int(round(damage)))
     detail["final_damage"] = out

@@ -66,6 +66,7 @@ def build_card_def(
     *,
     name: str,
     title: str = "",
+    description: str = "",
     rarity: str = "Common",
     strength: int = 0,
     speed: int = 0,
@@ -79,6 +80,7 @@ def build_card_def(
     unique_path: str | None = None,
     unique_path_description: str | None = None,
     image_url: str | None = None,
+    emoji: str | None = None,
 ) -> dict[str, Any]:
     """Build a card catalog definition dict."""
     stats = {
@@ -88,17 +90,21 @@ def build_card_def(
         "technique": int(technique),
         "iq": int(iq),
         "battle_iq": int(battle_iq),
+        "biq": int(battle_iq),
     }
     card: dict[str, Any] = {
         "name": str(name).strip(),
         "title": str(title).strip(),
+        "description": str(description).strip(),
         "rarity": str(rarity),
         "stats": stats,
         "power": compute_power(stats),
-        "mastery": mastery_list or [],
+        "mastery": normalize_mastery_list(mastery_list or []),
         "attacks": [],
         "image_url": str(image_url).strip() if image_url else "",
     }
+    if emoji:
+        card["emoji"] = str(emoji).strip()
     if unique_skill:
         card["unique_skill"] = str(unique_skill).strip()
         card["unique_skill_description"] = str(unique_skill_description or "").strip()
@@ -106,6 +112,144 @@ def build_card_def(
         card["unique_path"] = str(unique_path).strip()
         card["unique_path_description"] = str(unique_path_description or "").strip()
     return card
+
+
+def normalize_mastery_list(values: list[str] | tuple[str, ...] | set[str] | Any) -> list[str]:
+    """Return canonical mastery values in display order."""
+    if isinstance(values, dict):
+        raw_values = [values.get("type", "")]
+    elif isinstance(values, (list, tuple, set)):
+        raw_values = list(values)
+    elif values:
+        raw_values = [values]
+    else:
+        raw_values = []
+
+    wanted = {str(v).strip().lower() for v in raw_values if str(v).strip()}
+    return [m for m in MASTERY_VALUES if m.lower() in wanted]
+
+
+def mastery_list_from_flags(
+    *,
+    strength: bool = False,
+    speed: bool = False,
+    endurance: bool = False,
+    technique: bool = False,
+) -> list[str]:
+    """Build a mastery list from slash-command boolean fields."""
+    return [
+        label
+        for label, enabled in (
+            ("Strength", strength),
+            ("Speed", speed),
+            ("Endurance", endurance),
+            ("Technique", technique),
+        )
+        if bool(enabled)
+    ]
+
+
+def find_catalog_key(catalog: dict[str, Any], query: str) -> str | None:
+    """Find the storage key for a catalog card by key or case-insensitive card name."""
+    if not isinstance(catalog, dict):
+        return None
+    q = str(query).strip()
+    if q in catalog and isinstance(catalog[q], dict):
+        return q
+    q_lower = q.lower()
+    for key, card in catalog.items():
+        if not isinstance(card, dict):
+            continue
+        if str(card.get("name", key)).strip().lower() == q_lower:
+            return str(key)
+    return None
+
+
+def add_card_def(data: dict[str, Any], card: dict[str, Any]) -> tuple[bool, str]:
+    """Add a card definition to catalog data."""
+    cards = data.setdefault("cards", {})
+    if not isinstance(cards, dict):
+        data["cards"] = {}
+        cards = data["cards"]
+    ok, msg = validate_card_def(card)
+    if not ok:
+        return False, msg
+    name = str(card.get("name", "")).strip()
+    if find_catalog_key(cards, name) is not None:
+        return False, "Card already exists."
+    cards[name] = card
+    clear_scaled_cache()
+    return True, name
+
+
+def edit_card_def(data: dict[str, Any], card_name: str, updates: dict[str, Any]) -> tuple[bool, str]:
+    """Apply non-None field updates to an existing catalog card."""
+    cards = data.setdefault("cards", {})
+    if not isinstance(cards, dict):
+        return False, "Card catalog is unavailable."
+    key = find_catalog_key(cards, card_name)
+    if key is None:
+        return False, "Card not found."
+    card = cards.get(key)
+    if not isinstance(card, dict):
+        return False, "Card not found."
+
+    if "name" in updates and updates["name"] is not None:
+        new_name = str(updates["name"]).strip()
+        if not new_name:
+            return False, "Card name cannot be empty."
+        existing = find_catalog_key(cards, new_name)
+        if existing is not None and existing != key:
+            return False, "Another card already has that name."
+        card["name"] = new_name
+
+    for field in ("title", "description", "image_url", "rarity", "unique_path", "unique_path_description", "unique_skill", "unique_skill_description", "emoji"):
+        if field in updates and updates[field] is not None:
+            card[field] = str(updates[field]).strip()
+
+    stat_updates = updates.get("stats")
+    if isinstance(stat_updates, dict):
+        stats = card.setdefault("stats", {})
+        if not isinstance(stats, dict):
+            stats = {}
+            card["stats"] = stats
+        for field, value in stat_updates.items():
+            if value is None:
+                continue
+            key_name = "battle_iq" if field == "biq" else field
+            stats[key_name] = int(value)
+            if field == "biq":
+                stats["biq"] = int(value)
+
+    mastery = updates.get("mastery")
+    if mastery is not None:
+        card["mastery"] = normalize_mastery_list(mastery)
+
+    ok, msg = validate_card_def(card)
+    if not ok:
+        return False, msg
+
+    new_key = str(card.get("name", key)).strip()
+    if new_key != key:
+        cards[new_key] = card
+        del cards[key]
+    clear_scaled_cache()
+    return True, new_key
+
+
+def delete_card_def(data: dict[str, Any], card_name: str, confirm: str) -> tuple[bool, str]:
+    """Delete a catalog card when confirm is exactly DELETE."""
+    if str(confirm).strip() != "DELETE":
+        return False, "Confirmation must be DELETE."
+    cards = data.get("cards", {})
+    if not isinstance(cards, dict):
+        return False, "Card catalog is unavailable."
+    key = find_catalog_key(cards, card_name)
+    if key is None:
+        return False, "Card not found."
+    del cards[key]
+    clear_scaled_cache()
+    return True, key
 
 
 def validate_card_def(card: dict[str, Any]) -> tuple[bool, str]:
@@ -123,6 +267,11 @@ def validate_card_def(card: dict[str, Any]) -> tuple[bool, str]:
         val = stats.get(stat, 0)
         if not isinstance(val, int) or val < 0:
             return False, f"Stat '{stat}' must be a non-negative integer."
+    if "mastery" in card:
+        current_mastery = card.get("mastery", [])
+        normalized_mastery = normalize_mastery_list(current_mastery)
+        if not isinstance(current_mastery, list) or current_mastery != normalized_mastery:
+            card["mastery"] = normalized_mastery
     return True, "OK"
 
 

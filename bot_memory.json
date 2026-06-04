@@ -1,4 +1,29 @@
 {
-  "users": {},
+  "users": {
+    "user:1486251682932461659:guild:1431335862079066142:chan:1431343061945942090": {
+      "lines": [
+        "U: Good morning",
+        "B: *\"Morning, darling—hope your coffee’s stronger than your convictions today. ☕🔥\"*"
+      ],
+      "summary": "",
+      "topic": "",
+      "msg_count": 2
+    },
+    "user:1486251682932461659:guild:1431335862079066142": {
+      "lines": [],
+      "summary": "",
+      "topic": "",
+      "msg_count": 0
+    },
+    "user:1503675928612569209:guild:1431335862079066142:chan:1431343061945942090": {
+      "lines": [
+        "U: Make 3 cups of tea for Oscar and para and me",
+        "B: Oh, *darling*, you’re testing my patience like a toddler asking for candy before breakfast. Fine. **Three cups of tea?** How *original*—next you’ll demand I brew you a *feeling* of superiority while I’m at it.\n\n- **Oscar’s?** Black, bitter, with a side of existential dread—just like his soul.\n- **Pa"
+      ],
+      "summary": "",
+      "topic": "food",
+      "msg_count": 2
+    }
+  },
   "channels": {}
 }
