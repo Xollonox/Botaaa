@@ -1,0 +1,644 @@
+LOOKISM HXCC BOT2 - DETAILED MIND MAP
+
+1. ENTRY / BOOT SYSTEM
+|-- main.py
+|   |-- Creates LookismBot
+|   |-- Loads all cogs/extensions
+|   |-- Syncs slash commands
+|   |-- Applies global Terms gate
+|   |-- Initializes JSON storage
+|   |-- Initializes SQLite repositories/services
+|   |-- Cleans stale trade locks on startup
+|
+|-- bot/config.py
+|   |-- BOT_TOKEN
+|   |-- OWNER_IDS
+|   |-- DATA_PATH = lookism_data.json
+|   |-- SQLITE_PATH = lookism_data.sqlite3
+|   |-- OWNER_GUILD_ID
+|
+|-- Loaded feature cogs
+    |-- onboarding
+    |-- profile / profile_owner
+    |-- economy
+    |-- inventory
+    |-- packs / packs_panel / shop
+    |-- market / market_owner
+    |-- trades
+    |-- rewards / owner_rewards
+    |-- redeem
+    |-- squad
+    |-- battle
+    |-- tournament
+    |-- leaderboards / league_overview
+    |-- achievements
+    |-- season
+    |-- alliance / gangs / gang_war
+    |-- server_settings
+    |-- announce_owner
+    |-- attacks_owner
+    |-- confirm
+    |-- emoji_panel
+
+2. STORAGE / DATA LAYER
+|-- JSON storage
+|   |-- bot/data/storage.py
+|   |-- Thread-safe lock
+|   |-- In-memory cache
+|   |-- Atomic file writes
+|   |-- Corrupt file backup
+|   |-- Main game state
+|
+|-- Default data
+|   |-- bot/data/defaults.py
+|   |-- Default players
+|   |-- Default packs
+|   |-- Default rewards
+|   |-- Default market settings
+|   |-- Default season
+|   |-- Default tournament
+|   |-- Default achievements
+|   |-- Default UI emoji config
+|
+|-- Card catalog
+|   |-- bot/data/cards.json
+|   |-- 26 card definitions
+|   |-- Rarities: Common, Rare, Epic, Legendary, Mythical, Infernal, Abyssal
+|   |-- Stats
+|   |-- Images
+|   |-- Dialogue
+|   |-- Mastery
+|   |-- Unique skill
+|   |-- Path attack
+|
+|-- Constants
+|   |-- bot/data/constants.py
+|   |-- Rarity order
+|   |-- Rarity icons
+|   |-- Rank order
+|   |-- Market price bands
+|   |-- Instant sell values
+|   |-- Embed colors
+|
+|-- Typed schemas
+|   |-- bot/data/schemas.py
+|   |-- Player
+|   |-- Card
+|   |-- Listing
+|   |-- TradeRecord
+|   |-- Battle
+|   |-- Season
+|
+|-- SQLite repositories
+    |-- bot/data/sqlite_store.py
+    |-- app_migrations
+    |-- market_settings
+    |-- market_store_items
+    |-- market_listings
+    |-- trade_pending
+    |-- trade_history
+    |-- battle_queue
+    |-- battle_pending_friendly
+    |-- battle_active_by_user
+
+3. SERVICE LAYER
+|-- MarketService
+|   |-- SQLite-backed market state
+|   |-- JSON mirror compatibility
+|   |-- Market settings
+|   |-- Store items
+|   |-- Listings
+|   |-- Quick sell values
+|
+|-- TradeService
+|   |-- SQLite-backed pending trades
+|   |-- Trade history
+|   |-- Pending pair reservation
+|   |-- Cancel/remove pending
+|   |-- JSON hydration
+|
+|-- BattleService
+    |-- SQLite-backed ranked queue
+    |-- Friendly invite state
+    |-- Active battle user map
+    |-- Queue add/remove
+    |-- Friendly pending upsert/remove
+    |-- JSON hydration
+
+4. PLAYER ONBOARDING LOOP
+|-- /start
+|   |-- Creates player
+|   |-- Accepts terms
+|   |-- Grants starter coins
+|   |-- Grants newbie packs
+|   |-- Shows quick-start panel
+|
+|-- Terms gate
+|   |-- Blocks commands until accepted
+|   |-- Shows TOS embed
+|   |-- Accept button
+|   |-- Shared starter path
+|
+|-- /help
+    |-- Paginated categories
+    |-- User commands
+    |-- Admin commands
+    |-- Owner sections hidden from normal users
+    |-- Correct grouped command names
+
+5. CORE GAME LOOP
+|-- Register
+|   |-- /start
+|
+|-- Get packs
+|   |-- Starter newbie packs
+|   |-- /shop buy controls
+|   |-- Rewards
+|   |-- Redeem codes
+|   |-- War/event rewards
+|
+|-- Open packs
+|   |-- /packs
+|   |-- Pack inventory panel
+|   |-- Open 1
+|   |-- Open all
+|   |-- Open quantity
+|   |-- Reveal UI
+|   |-- Quick sell
+|   |-- Add to squad
+|
+|-- Build squad
+|   |-- /squad
+|   |-- Active slots
+|   |-- Backup slots
+|   |-- Supervisor
+|   |-- Assign
+|   |-- Remove
+|   |-- Swap
+|   |-- Clear squad
+|
+|-- Battle
+|   |-- /battle
+|   |-- Ranked queue
+|   |-- PvP match
+|   |-- CPU fallback
+|   |-- Friendly battle
+|   |-- Turn UI
+|   |-- Attacks
+|   |-- Defense
+|   |-- Switch
+|   |-- Forfeit
+|   |-- Rewards
+|
+|-- Progress
+|   |-- Trophies
+|   |-- Rank
+|   |-- XP
+|   |-- CP
+|   |-- Season missions
+|   |-- Achievements
+|   |-- Leaderboards
+|
+|-- Social/economy
+    |-- Market
+    |-- Trades
+    |-- Gangs
+    |-- Alliances
+    |-- Gang wars
+
+6. PACK / SHOP SYSTEM
+|-- Default packs
+|   |-- Newbie Pack
+|   |-- Amateur Pack
+|   |-- Basic Pack
+|   |-- Intermediate Pack
+|   |-- Experienced Pack
+|   |-- Advanced Pack
+|   |-- Veteran Pack
+|   |-- VIP Pack
+|   |-- Ranker Pack
+|   |-- War Pack
+|
+|-- /shop
+|   |-- Shows public enabled packs
+|   |-- Filters by price
+|   |-- Sorts by price/name
+|   |-- Select pack
+|   |-- Buy quantity modal
+|   |-- Deducts coins
+|   |-- Adds unopened packs
+|   |-- Tracks spend stats
+|
+|-- War Pack handling
+|   |-- Reward/event pack
+|   |-- Hidden from public shop
+|   |-- Prevents free farming exploit
+|
+|-- Pack opening
+    |-- Weighted rarity roll
+    |-- Catalog card selection
+    |-- Card instance creation
+    |-- Inventory add
+    |-- Pack stats update
+    |-- Reveal interaction
+
+7. CARD / COLLECTION SYSTEM
+|-- /collection
+|   |-- Browse inventory
+|   |-- Detail view
+|   |-- Favorite/lock
+|   |-- Upgrade
+|   |-- Quick sell
+|   |-- Add to squad
+|
+|-- /card_info
+|   |-- Shows catalog card
+|   |-- Rarity
+|   |-- Stats
+|   |-- Power
+|   |-- Mastery
+|   |-- Skill/path
+|   |-- Image
+|
+|-- /card_lock
+|   |-- Protects owned card instance
+|   |-- Blocks market listing
+|   |-- Blocks trade
+|   |-- Blocks accidental sale
+|
+|-- /fuse
+    |-- Requires 3 copies
+    |-- Consumes 2 copies
+    |-- Adds +1 star
+    |-- Excludes locked copies
+    |-- Caps max stars
+
+8. BATTLE SYSTEM
+|-- Commands
+|   |-- /battle
+|   |-- /battle_cancel
+|   |-- /friendly
+|   |-- /friendly_cancel
+|   |-- /forfeit
+|   |-- /o_battle_unstuck
+|
+|-- Ranked queue
+|   |-- Adds user to queue
+|   |-- Checks active battle
+|   |-- Checks pending friendly
+|   |-- Checks squad
+|   |-- Adaptive trophy bracket
+|   |-- 60-second CPU fallback
+|   |-- SQLite queue mirror
+|
+|-- Battle state
+|   |-- Active battle ID
+|   |-- Players
+|   |-- Teams
+|   |-- Active fighter
+|   |-- HP
+|   |-- Turn owner
+|   |-- Attack uses
+|   |-- Pending defense
+|   |-- Battle result
+|
+|-- Turn actions
+|   |-- Normal attack
+|   |-- Special attack
+|   |-- Unique skill
+|   |-- Ultimate
+|   |-- Path attack
+|   |-- Block
+|   |-- Dodge
+|   |-- Parry
+|   |-- Revert
+|   |-- Switch
+|   |-- Forfeit
+|
+|-- Rewards
+|   |-- Coin reward
+|   |-- Trophy delta
+|   |-- XP
+|   |-- CP
+|   |-- Season mission progress
+|   |-- Tournament XP
+|
+|-- Anti-farm
+    |-- CPU trophy scaling
+    |-- Recent CPU win tracking
+    |-- Daily CPU trophy cap
+    |-- Reduced farming rewards
+
+9. ECONOMY SYSTEM
+|-- Balance
+|   |-- Coins
+|   |-- Premium currency
+|   |-- /balance
+|
+|-- Rewards
+|   |-- /hourly
+|   |-- /daily
+|   |-- /weekly
+|   |-- /monthly
+|   |-- Cooldowns
+|   |-- Coin path
+|   |-- Card path
+|   |-- Quick sell reward cards
+|
+|-- Owner economy
+|   |-- /o_add_balance
+|   |-- /o_add_premium
+|   |-- /o_set_hourly
+|   |-- /o_set_daily
+|   |-- /o_set_weekly
+|   |-- /o_set_monthly
+|
+|-- Economy sinks
+    |-- Pack purchases
+    |-- Market fees
+    |-- Tournament entry fees
+    |-- Gang creation
+    |-- Upgrades/fusion
+
+10. MARKET SYSTEM
+|-- /market browse
+|   |-- Listings panel
+|   |-- Sort/filter
+|   |-- Select listing
+|   |-- Buy confirmation
+|
+|-- /market add
+|   |-- Select owned card
+|   |-- Checks locked flags
+|   |-- Checks rarity price band
+|   |-- Locks card as market_locked
+|   |-- Creates listing ID
+|   |-- Saves listing to SQLite
+|
+|-- /market remove
+|   |-- Finds seller listing
+|   |-- Deletes listing
+|   |-- Unlocks card
+|   |-- Updates JSON mirror
+|
+|-- Owner market
+    |-- Toggle market
+    |-- Set fee
+    |-- Set max listings
+    |-- Official store add/remove/toggle
+    |-- Force remove listing
+    |-- Set quick sell values
+
+11. TRADE SYSTEM
+|-- /trade start
+|   |-- Checks registration
+|   |-- Checks self-trade
+|   |-- Checks pending trade
+|   |-- Reserves both players
+|   |-- Creates trade panel
+|   |-- Sends public trade UI
+|
+|-- Trade panel
+|   |-- Player A card
+|   |-- Player B card
+|   |-- Player A coins
+|   |-- Player B coins
+|   |-- Lock offer
+|   |-- Validate fairness
+|   |-- Confirm
+|   |-- Cancel
+|
+|-- /trade cancel
+|   |-- Unlocks selected cards
+|   |-- Clears pending state
+|   |-- Stops panel
+|   |-- Updates SQLite
+|
+|-- /trade history
+    |-- Reads SQLite history
+    |-- Shows recent trades
+    |-- User-specific rows
+
+12. SEASON SYSTEM
+|-- /season
+|   |-- Current season overview
+|   |-- Leaderboard
+|   |-- Timing
+|   |-- Progress context
+|
+|-- /season_pass
+|   |-- CP progress
+|   |-- Tier rewards
+|   |-- Free rewards
+|   |-- Paid rewards
+|   |-- Claim status
+|
+|-- /season_missions
+|   |-- Daily missions
+|   |-- Weekly missions
+|   |-- Monthly missions
+|   |-- Season missions
+|   |-- CP payouts
+|
+|-- Owner season
+    |-- Create season
+    |-- End season
+    |-- Configure pass tiers
+    |-- Add CP manually
+    |-- Create missions
+
+13. TOURNAMENT SYSTEM
+|-- /tournament
+|   |-- Active tournament
+|   |-- Participants
+|   |-- Leaderboard
+|   |-- Prize pool
+|
+|-- /tournament_join
+|   |-- Checks active tournament
+|   |-- Checks max players
+|   |-- Checks rank gate
+|   |-- Charges entry fee
+|   |-- Adds participant
+|
+|-- /tournament_battle
+|   |-- Starts tournament fight
+|   |-- Records win
+|   |-- Adds tournament XP
+|   |-- Advances progress
+|
+|-- Owner tournament
+    |-- Create tournament
+    |-- Cancel tournament
+    |-- Refund fees
+    |-- Manage active event
+
+14. SOCIAL SYSTEM
+|-- Gangs
+|   |-- /gang create
+|   |-- /gang info
+|   |-- /gang invite
+|   |-- /gang join
+|   |-- /gang leave
+|   |-- /gang kick
+|   |-- /gang promote
+|   |-- /gang demote
+|   |-- /gang members
+|   |-- /gang transfer_owner
+|   |-- /gang set_description
+|   |-- /gang set_status
+|   |-- /gang stats
+|
+|-- Alliances
+|   |-- /alliance create
+|   |-- /alliance info
+|   |-- /alliance invite
+|   |-- /alliance leave
+|
+|-- Gang War
+    |-- /gang_war start
+    |-- /gang_war status
+    |-- /gang_war attack
+    |-- /gang_war record
+    |-- /gang_war cancel_queue
+    |-- /gang_war preference
+    |-- /defensive_squad_setup
+    |-- War queue
+    |-- War matching
+    |-- Prep phase
+    |-- Battle phase
+    |-- Score calculation
+    |-- Winner determination
+    |-- War rewards
+
+15. PROFILE / COSMETICS
+|-- /profile
+|   |-- Profile image render
+|   |-- Username
+|   |-- Rank
+|   |-- Win rate
+|   |-- Balance visibility
+|   |-- Featured card
+|   |-- Bio
+|   |-- Cosmetics
+|
+|-- Player customization
+|   |-- Set bio
+|   |-- Set featured card
+|   |-- Theme
+|   |-- Border
+|   |-- Badge
+|
+|-- Owner profile commands
+    |-- Default background
+    |-- Default featured card
+    |-- Premium flag
+    |-- Theme
+    |-- Border
+    |-- Badge
+    |-- Preview
+
+16. ACHIEVEMENTS / LEADERBOARDS
+|-- /achievements
+|   |-- Earned achievements
+|   |-- Locked achievements
+|   |-- Points
+|   |-- Pagination
+|
+|-- Achievement catalog
+|   |-- First Blood
+|   |-- AI Slayer
+|   |-- Collector
+|   |-- Trader
+|   |-- Market Seller
+|   |-- Pack Opener
+|   |-- Gang Member
+|   |-- Alliance Member
+|   |-- Tournament Entry
+|   |-- Tournament Champion
+|   |-- Season Claimer
+|
+|-- Leaderboards
+    |-- /lb global
+    |-- /lb league
+    |-- /lb gang
+    |-- /lb alliance
+
+17. REDEEM / CONFIRM SYSTEM
+|-- /redeem
+|   |-- Code normalize
+|   |-- Expiry check
+|   |-- Usage limits
+|   |-- User claim tracking
+|   |-- Reward grant
+|
+|-- Owner redeem
+|   |-- Create code
+|   |-- Delete code
+|   |-- List codes
+|
+|-- /confirm
+    |-- Pending action ID
+    |-- User validation
+    |-- Expiry validation
+    |-- Handler execution
+
+18. ADMIN / OWNER TOOLS
+|-- Cards
+|   |-- Add card
+|   |-- Edit card
+|   |-- Delete card
+|   |-- Edit stats
+|   |-- Edit rarity
+|   |-- Edit mastery
+|   |-- Edit moves
+|   |-- Edit dialogue
+|
+|-- Attacks
+|   |-- Add attack
+|   |-- Edit attack
+|   |-- Delete attack
+|   |-- View attack
+|   |-- List attacks
+|   |-- Assign attack
+|   |-- Remove assignment
+|
+|-- Server settings
+|   |-- Server mode
+|   |-- Locked command channel
+|   |-- Announce channel
+|   |-- Battle channel
+|
+|-- Emoji panel
+|   |-- Set emoji
+|   |-- Reset emoji
+|   |-- Reset all
+|
+|-- Announcements
+    |-- Manual owner announcement
+
+19. TEST COVERAGE
+|-- Battle engine
+|-- Card fusion
+|-- Constants
+|-- Daily trophy cap
+|-- Matchmaking bracket
+|-- Profile context
+|-- Race conditions
+|-- SQLite bootstrap
+|-- Storage
+|-- Swap cap
+|-- Tournament rank gate
+|-- Trade lifecycle
+|-- Onboarding starter resources
+|-- Shop purchase flow
+|-- Command text / queue timeout
+
+20. CURRENT HEALTH
+|-- Tests passing: 127
+|-- Main urgent security issue: bot token in config.py
+|-- Strong game-loop foundation
+|-- Needs better first-session tutorial
+|-- Needs richer card identity/archetypes
+|-- Needs economy balancing metrics
+|-- Needs more integration tests for live Discord UI flows

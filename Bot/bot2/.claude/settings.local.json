@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m py_compile bot/features/market.py bot/features/trades.py bot/utils/battle_state.py)",
+      "Bash(grep \"pass\\\\s*$\")",
+      "Bash(grep -rn \"except.*:\\\\s*$\" /storage/emulated/0/Bot/Bot/bot2 --include=\"*.py\" -A 1)",
+      "Bash(grep -B1 \"^\\\\s*pass$\")",
+      "Bash(grep *)",
+      "Bash(python -m py_compile bot/features/battle.py bot/features/battle_helpers.py bot/data/storage.py)",
+      "Bash(python -m py_compile bot/features/attacks_owner.py bot/features/market_owner.py bot/features/season.py bot/features/tournament.py bot/features/market.py)",
+      "Bash(python -m py_compile bot/features/market.py bot/data/constants.py)",
+      "Bash(python -m py_compile bot/features/shop.py bot/features/trades.py bot/features/inventory.py bot/features/card_tools.py bot/features/cards_admin.py)",
+      "Bash(python -m py_compile bot/features/rewards.py)",
+      "Bash(pytest -q)",
+      "Bash(python -m py_compile bot/utils/battle_state.py)",
+      "Bash(python -m py_compile bot/features/battle.py)",
+      "Bash(python -m py_compile bot/features/card_tools.py)",
+      "Bash(python -m py_compile bot/features/tournament.py bot/data/constants.py)",
+      "Bash(python -m py_compile bot/features/battle.py bot/features/battle_helpers.py bot/features/battle_views.py)"
+    ]
+  }
+}
