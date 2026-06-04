@@ -1,0 +1,216 @@
+"""Central help command index for the paginated help UI."""
+
+HELP_CATEGORIES = [
+    {
+        "name": "Onboarding",
+        "emoji_key": "start",
+        "items": [
+            ("/start", "Creates or refreshes your player account, accepts the bot terms for your profile, gives first-time starter resources when eligible, and opens the account quick-start panel."),
+            ("/help", "Opens this premium command guide with paginated categories, navigation buttons, a category dropdown, and owner-only sections hidden from normal users."),
+        ],
+    },
+    {
+        "name": "Economy & Rewards",
+        "emoji_key": "coin",
+        "items": [
+            ("/balance", "Shows your current coin balance and premium currency balance so you can quickly check what you can spend on packs, market purchases, and other systems."),
+            ("/hourly", "Claims your hourly reward when the cooldown is ready, adding configured coins and any enabled bonus card rewards to your account."),
+            ("/daily", "Claims the daily reward package, including configured coins and optional daily card bonus rolls when that reward type is enabled."),
+            ("/weekly", "Claims the weekly reward package after its cooldown expires, usually intended as a larger periodic payout than hourly or daily rewards."),
+            ("/monthly", "Claims the monthly reward package, the longest cooldown reward tier and typically the strongest recurring payout."),
+        ],
+    },
+    {
+        "name": "Profile & Collection",
+        "emoji_key": "profile",
+        "items": [
+            ("/profile", "Displays a premium profile card for you or another user, showing player identity, progression, economy visibility, featured card, cosmetics, and public stats."),
+            ("/collection", "Opens your owned card collection browser, letting you inspect inventory pages and review cards you can use for squads, trading, or market listings."),
+            ("/card_info", "Looks up a global catalog card by name and shows its rarity, stats, power, mastery/path/skill data, image, and core fighter information."),
+            ("/card_lock", "Locks one of your owned card instances so it is protected from accidental sale, trade, or other destructive inventory actions."),
+        ],
+    },
+    {
+        "name": "Squad",
+        "emoji_key": "squad",
+        "items": [
+            ("/squad", "Opens the squad management panel where you build your active lineup, backups, and supervisor setup used by battles and related competitive systems."),
+            ("/defensive_squad_setup", "Sets the defensive squad used during gang wars, letting your gang prepare a separate war defense lineup instead of relying only on normal squad state."),
+        ],
+    },
+    {
+        "name": "Battle",
+        "emoji_key": "battle",
+        "items": [
+            ("/battle", "Places you into ranked matchmaking queue; when matched, the bot creates an active battle using your prepared squad and ranked battle rules."),
+            ("/battle_cancel", "Removes you from ranked matchmaking queue before a match starts, preventing the bot from pairing you into a new ranked battle."),
+            ("/friendly", "Sends a friendly battle challenge to another player, allowing a non-ranked match flow that does not need normal queue matchmaking."),
+            ("/friendly_cancel", "Cancels your outgoing friendly challenge if the target has not accepted yet, clearing the pending invite state."),
+            ("/forfeit", "Forfeits your currently active battle, immediately ending your side of the match and applying whatever loss/result handling the battle system defines."),
+        ],
+    },
+    {
+        "name": "Market",
+        "emoji_key": "market",
+        "items": [
+            ("/market browse", "Opens the player market browser so you can view active listings, compare cards and prices, and find listing IDs for purchases."),
+            ("/market add", "Lists one of your unlocked owned card instance on the market for a chosen price, making it available for other players to buy."),
+            ("/market remove", "Cancels one of your active market listings and returns the listed card back to your normal inventory state."),
+        ],
+    },
+    {
+        "name": "Trading",
+        "emoji_key": "trade",
+        "items": [
+            ("/trade start", "Starts a trade negotiation with another player, marking both users as involved in a pending trade session until completed or cancelled."),
+            ("/trade cancel", "Cancels your active trade session and clears your pending trade state so you can start or receive another trade."),
+            ("/trade history", "Shows recent trade history for your account, helping you review completed trades and previous exchange activity."),
+            ("/confirm", "Confirms a pending sensitive action by action ID, used when a command requires an extra safety confirmation before final execution."),
+        ],
+    },
+    {
+        "name": "Packs & Shop",
+        "emoji_key": "pack",
+        "items": [
+            ("/packs", "Opens your pack inventory panel, showing owned packs and letting you manage or open available pack rewards."),
+            ("/shop", "Shows enabled shop packs, drop-rate tables, filters, and buy controls so you can purchase packs before opening them with /packs."),
+        ],
+    },
+    {
+        "name": "Tournament",
+        "emoji_key": "tournament",
+        "items": [
+            ("/tournament", "Displays the active tournament overview and leaderboard, including participation state and competitive standings for the current event."),
+            ("/tournament_join", "Joins the active tournament if registration is open, charging the configured entry fee when required and adding you to participants."),
+            ("/tournament_battle", "Starts a tournament battle against another participant, using tournament rules and recording progress toward event results."),
+        ],
+    },
+    {
+        "name": "Season",
+        "emoji_key": "season",
+        "items": [
+            ("/season", "Shows current season details, active status, season name, timing, leaderboard information, and the main progression context."),
+            ("/season_pass", "Opens your season pass progress, showing your pass XP, level, available rewards, and claimable tier rewards."),
+            ("/season_missions", "Lists daily, weekly, monthly, and seasonal missions so you can see objectives that award season CP or progression."),
+        ],
+    },
+    {
+        "name": "Codes & Achievements",
+        "emoji_key": "achievement",
+        "items": [
+            ("/redeem", "Redeems a reward code created by staff or events, granting configured coins, premium currency, cards, packs, or other rewards if valid."),
+            ("/achievements", "Shows earned and locked achievements, including achievement names, descriptions, tiers, point values, and your completion progress."),
+        ],
+    },
+    {
+        "name": "Server Settings",
+        "emoji_key": "settings",
+        "items": [
+            ("/server_mode", "Admin command that controls whether bot commands are available everywhere or restricted to a configured single channel mode."),
+            ("/server_set_channel", "Admin command that sets the locked command channel used when the server is in single-channel mode."),
+            ("/server_set_announce", "Admin command that stores the announcement channel used by systems that post public bot updates or event notices."),
+            ("/server_set_battle", "Admin command that stores the preferred battle channel for ranked and friendly battle command activity."),
+        ],
+    },
+    {
+        "name": "Owner Cards",
+        "emoji_key": "owner",
+        "items": [
+            ("/o_add_card", "Owner command that opens the card creation flow for adding a new fighter to the global catalog with stats, rarity, image, and metadata."),
+            ("/o_card", "Owner command that opens the interactive card editor panel for managing existing catalog cards and their stored data."),
+            ("/o_attack_add", "Owner command that creates a new attack entry in the global attack catalog for use by battle or card assignment systems."),
+            ("/o_attack_edit", "Owner command that edits attack catalog fields such as name, values, descriptions, or other stored attack metadata."),
+            ("/o_attack_delete", "Owner command that deletes an attack from the catalog and removes references from cards so stale assignments do not remain."),
+            ("/o_attack_view", "Owner command that displays one attack and shows where that attack is currently assigned across the card catalog."),
+            ("/o_attack_list", "Owner command that lists the available attack catalog entries for quick review and maintenance."),
+            ("/o_assign_add", "Owner command that assigns an existing attack to a specific card, connecting catalog attacks to fighter definitions."),
+            ("/o_assign_remove", "Owner command that removes an assigned attack from a card without deleting the attack from the global catalog."),
+            ("/o_assign_view", "Owner command that shows all attacks currently assigned to a chosen card so card battle setup can be audited."),
+        ],
+    },
+    {
+        "name": "Owner Economy",
+        "emoji_key": "owner",
+        "items": [
+            ("/o_add_balance", "Owner command that adds coin balance to a registered player for grants, corrections, event payouts, or manual compensation."),
+            ("/o_add_premium", "Owner command that adds premium currency to a registered player for purchases, rewards, corrections, or event distribution."),
+            ("/o_set_hourly", "Owner command that configures hourly reward coins and optional card bonus rates used by the hourly reward claim."),
+            ("/o_set_daily", "Owner command that configures daily reward coins and optional card bonus rates used by the daily reward claim."),
+            ("/o_set_weekly", "Owner command that configures weekly reward coins and optional card bonus rates used by the weekly reward claim."),
+            ("/o_set_monthly", "Owner command that configures monthly reward coins and optional card bonus rates used by the monthly reward claim."),
+        ],
+    },
+    {
+        "name": "Owner Market & Shop",
+        "emoji_key": "owner",
+        "items": [
+            ("/o_feature_card", "Owner command that sets or posts the featured card of the day for market/shop promotion and community visibility."),
+            ("/o_special_offer", "Owner command that posts a special offer announcement for limited-time shop, market, or reward promotions."),
+            ("/o_market_remove", "Owner command that forcibly removes any market listing, useful for moderation, invalid listings, or manual cleanup."),
+            ("/o_market_set_quick_sell", "Owner command that changes quick-sell base value by rarity, directly affecting how much users receive from instant sales."),
+            ("/o_market_toggle", "Owner command that opens or closes the market globally, enabling or disabling user market activity."),
+            ("/o_market_set_fee", "Owner command that sets the market fee percent deducted from seller payouts during successful purchases."),
+            ("/o_market_set_max_listings", "Owner command that sets how many active listings each player may have at once."),
+            ("/o_market_store_add", "Owner command that adds or updates an official store item with stock and optional price override."),
+            ("/o_market_store_remove", "Owner command that removes a card from the official store catalog."),
+            ("/o_market_store_toggle", "Owner command that enables or disables an official store item without deleting its saved configuration."),
+            ("/o_pack", "Owner command that opens the pack management panel used to review and maintain pack definitions."),
+            ("/o_shop_pack_list", "Owner command that lists all packs, including disabled packs that normal users cannot currently buy."),
+            ("/o_shop_pack_set_enabled", "Owner command that enables or disables whether a pack appears in the public shop."),
+        ],
+    },
+    {
+        "name": "Owner Season & Tournament",
+        "emoji_key": "owner",
+        "items": [
+            ("/o_tournament_create", "Owner command that creates a tournament with configured entry fee, player limits, prize pool, timing, and metadata."),
+            ("/o_tournament_cancel", "Owner command that cancels the active tournament and refunds entry fees when the event should be stopped."),
+            ("/o_season_create", "Owner command that starts a new season and updates season timing, reset type, and active season configuration."),
+            ("/o_season_end", "Owner command that ends the current season and triggers season-end handling such as rewards or archival logic."),
+            ("/o_season_pass_setup", "Owner command that configures a season pass tier, including CP requirements and free or paid rewards."),
+            ("/o_season_add_cp", "Owner command that manually adds season CP to a player for correction, compensation, or event reward purposes."),
+            ("/o_season_mission_create", "Owner command that creates a season mission with period, target, requirement key, type, and CP payout."),
+        ],
+    },
+    {
+        "name": "Owner War",
+        "emoji_key": "owner",
+        "items": [
+            ("/o_war_start", "Owner command that force-starts a gang war using selected format and gangs, bypassing normal scheduling or queue flow."),
+            ("/o_war_end", "Owner command that force-ends an active gang war and finalizes or clears the current war state."),
+            ("/o_war_set_phase", "Owner command that manually changes the current gang war phase for moderation, recovery, or event control."),
+            ("/o_war_set_durations", "Owner command that updates gang war phase durations in seconds, changing how long each war phase lasts."),
+            ("/o_war_list", "Owner command that lists active wars and queued war state so staff can monitor or debug gang war progress."),
+        ],
+    },
+    {
+        "name": "Owner Profile & System",
+        "emoji_key": "owner",
+        "items": [
+            ("/o_profile_set_default_bg", "Owner command that sets the global default profile background URL used when players have no custom background."),
+            ("/o_profile_set_default_featured", "Owner command that sets the default featured catalog card shown on profiles when no user-specific showcase is selected."),
+            ("/o_profile_set_premium", "Owner command that grants or revokes premium status for a user, affecting premium profile and cosmetic behavior."),
+            ("/o_profile_theme", "Owner command that sets a user's profile theme cosmetic value for premium visual customization."),
+            ("/o_profile_border", "Owner command that sets a user's profile border cosmetic value for premium visual customization."),
+            ("/o_profile_badge", "Owner command that sets a user's profile badge cosmetic value for premium visual customization."),
+            ("/o_profile_preview", "Owner command that previews a player's profile using owner-level visibility for auditing profile configuration."),
+            ("/o_emoji_panel", "Owner command that opens the interactive emoji configuration panel used to customize bot UI emoji keys."),
+            ("/o_emoji_set", "Owner command that sets the emoji value for a specific UI key across bot embeds and controls."),
+            ("/o_emoji_reset", "Owner command that resets one emoji key back to its default value."),
+            ("/o_emoji_reset_all", "Owner command that resets every configured emoji key back to default values."),
+            ("/o_announce", "Owner command that manually posts an announcement to the configured announcement channel."),
+        ],
+    },
+    {
+        "name": "Owner Codes & Achievements",
+        "emoji_key": "owner",
+        "items": [
+            ("/o_redeem_create", "Owner command that creates a redeem code with configured reward type, amount, usage limits, and expiration behavior."),
+            ("/o_redeem_delete", "Owner command that deletes a redeem code so users can no longer claim it."),
+            ("/o_redeem_list", "Owner command that lists existing redeem codes for review, moderation, and event management."),
+            ("/o_achievement_grant", "Owner command that grants an achievement to a user manually, awarding its point value and earned state."),
+            ("/o_achievement_remove", "Owner command that removes an earned achievement from a user and updates achievement state accordingly."),
+            ("/o_achievement_reset", "Owner command that resets a user's achievement data, clearing earned records for a fresh state."),
+        ],
+    },
+]
