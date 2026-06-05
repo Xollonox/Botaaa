@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import random
+from datetime import datetime
 from typing import Any
 
 import discord
@@ -23,10 +24,10 @@ REWARD_COOLDOWNS = {
     "monthly": 2592000,
 }
 
-HOURLY_COLOR = 0x2B2D31
-DAILY_COLOR  = 0x2B2D31
-WEEKLY_COLOR = 0x2B2D31
-MONTHLY_COLOR = 0x2B2D31
+HOURLY_COLOR  = 0x5C6BC0  # indigo/grey
+DAILY_COLOR   = 0x1565C0  # blue
+WEEKLY_COLOR  = 0x6A1B9A  # purple
+MONTHLY_COLOR = 0xF9A825  # gold
 
 REWARD_CARD_RARITY = {
     "daily": "Common",
@@ -66,6 +67,19 @@ def _weighted_rarity(rates: dict[str, int]) -> str:
         if w > 0:
             pool.extend([str(rarity)] * w)
     return random.choice(pool) if pool else ""
+
+
+def _streak_multiplier(streak: int) -> float:
+    """Calculate coin multiplier based on login streak."""
+    if streak >= 30:
+        return 3.0
+    if streak >= 14:
+        return 2.0
+    if streak >= 7:
+        return 1.5
+    if streak >= 3:
+        return 1.25
+    return 1.0
 
 
 def _reward_embed(*, panel: str, footer: str, body: str, color: int) -> discord.Embed:
@@ -294,14 +308,40 @@ class RewardsCog(commands.Cog):
         now = now_ts()
         user_id = str(interaction.user.id)
 
-        def mutate(data: dict[str, Any]) -> tuple[bool, int, dict[str, Any] | None, dict[str, Any] | None, str, int, bool, int]:
+        def mutate(data: dict[str, Any]) -> tuple[bool, int, dict[str, Any] | None, dict[str, Any] | None, str, int, bool, int, int, float]:
             player = data["players"][user_id]
             user = player["user"]
             cooldowns = user.setdefault("cooldowns", {})
             last = int(cooldowns.get(reward_type, 0))
             remaining = cooldown_remaining(last, REWARD_COOLDOWNS[reward_type], now)
             if remaining > 0:
-                return False, remaining, None, None, "", 0, False, 0
+                return False, remaining, None, None, "", 0, False, 0, 0, 1.0
+
+            # Handle daily login streak
+            streak = 0
+            multiplier = 1.0
+            if reward_type == "daily":
+                today = datetime.utcnow().strftime("%Y-%m-%d")
+                yesterday = datetime.utcfromtimestamp(now - 86400).strftime("%Y-%m-%d")
+
+                current_streak = int(user.get("login_streak", 0))
+                last_daily_date = user.get("last_daily_date", "")
+
+                # Update streak logic
+                if last_daily_date == yesterday:
+                    # Continued streak
+                    streak = current_streak + 1
+                elif last_daily_date != today:
+                    # Broken streak or first daily
+                    streak = 1
+                else:
+                    # Already claimed today
+                    streak = current_streak
+
+                user["login_streak"] = streak
+                user["last_daily_date"] = today
+                multiplier = _streak_multiplier(streak)
+                coin_amount = int(coin_amount * multiplier)
 
             # Coinflip: either coins-only or card-only, never both.
             coins_path = random.random() < coin_chance
@@ -311,7 +351,7 @@ class RewardsCog(commands.Cog):
                 new_balance += coin_amount
                 user["balance"] = new_balance
                 cooldowns[reward_type] = now
-                return True, 0, None, None, "", new_balance, True, coin_amount
+                return True, 0, None, None, "", new_balance, True, coin_amount, streak, multiplier
 
             rarity = _weighted_rarity(rates)
             card_def = _pick_card_by_rarity(data, rarity) if rarity else None
@@ -320,7 +360,7 @@ class RewardsCog(commands.Cog):
                 new_balance += coin_amount
                 user["balance"] = new_balance
                 cooldowns[reward_type] = now
-                return True, 0, None, None, "", new_balance, True, coin_amount
+                return True, 0, None, None, "", new_balance, True, coin_amount, streak, multiplier
 
             card_instance = build_card_instance(card_def, acquired_at=now, stars=0)
             inventory = user.setdefault("inventory", [])
@@ -329,11 +369,11 @@ class RewardsCog(commands.Cog):
                 user["inventory"] = inventory
             inventory.append(card_instance)
             cooldowns[reward_type] = now
-            return True, 0, card_def, card_instance, rarity, new_balance, False, 0
+            return True, 0, card_def, card_instance, rarity, new_balance, False, 0, streak, multiplier
 
         (
             claimed, remaining, card_def, card_instance,
-            pulled_rarity, new_balance, coins_path, granted_coins,
+            pulled_rarity, new_balance, coins_path, granted_coins, streak, multiplier,
         ) = self.bot.storage.with_lock(mutate)
 
         panel_map = {
@@ -359,6 +399,17 @@ class RewardsCog(commands.Cog):
             return
 
         if coins_path:
+            # Build streak info for daily rewards
+            streak_info = ""
+            if reward_type == "daily" and streak > 0:
+                streak_info = f"\n│ 🔥 Login Streak: {streak} days"
+                if multiplier > 1.0:
+                    bonus_pct = int((multiplier - 1.0) * 100)
+                    streak_info += f"\n│ ✨ Streak Bonus: +{bonus_pct}%"
+                # Check for milestones
+                if streak in [3, 7, 14, 30]:
+                    streak_info += f"\n│ 🎉 Milestone Reached: {streak} days!"
+
             embed = _reward_embed(
                 panel=panel,
                 footer=footer,
@@ -366,7 +417,8 @@ class RewardsCog(commands.Cog):
                     f"**{heading.replace('CARD OBTAINED', 'COINS OBTAINED').replace('Card Obtained', 'Coins Obtained')}**\n\n"
                     "╭─ Reward\n"
                     f"│ Coins: +{granted_coins:,}\n"
-                    f"│ New Balance: {new_balance:,}\n"
+                    f"│ New Balance: {new_balance:,}"
+                    f"{streak_info}\n"
                     "╰────────────────"
                 ),
                 color=color,
@@ -379,6 +431,17 @@ class RewardsCog(commands.Cog):
         if not image_url:
             image_url = "https://placehold.co/512x512/png?text=LOOKISM+CARD"
 
+        # Build streak info for daily rewards
+        streak_info = ""
+        if reward_type == "daily" and streak > 0:
+            streak_info = f"\n│ 🔥 Login Streak: {streak} days"
+            if multiplier > 1.0:
+                bonus_pct = int((multiplier - 1.0) * 100)
+                streak_info += f"\n│ ✨ Streak Bonus: +{bonus_pct}%"
+            # Check for milestones
+            if streak in [3, 7, 14, 30]:
+                streak_info += f"\n│ 🎉 Milestone Reached: {streak} days!"
+
         embed = _reward_embed(
             panel=panel,
             footer=footer,
@@ -387,7 +450,8 @@ class RewardsCog(commands.Cog):
                 "╭─ Card\n"
                 f"│ {card_name}\n"
                 f"│ Rarity: {pulled_rarity}\n"
-                "│ Stars: ☆☆☆☆☆\n"
+                "│ Stars: ☆☆☆☆☆"
+                f"{streak_info}\n"
                 "╰────────────────"
             ),
             color=color,
