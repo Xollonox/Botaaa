@@ -1014,6 +1014,110 @@ def _grant_battle_rewards(data: dict, state: dict, winner_id: str, loser_id: str
             _update_mission_progress(data, pid, battle_type, won)
 
 
+_RANK_ACHIEVEMENT: dict[str, str] = {
+    "Silver":  "reach_silver",
+    "Gold":    "reach_gold",
+    "Diamond": "reach_diamond",
+    "Ruby":    "reach_ruby",
+}
+
+
+def _update_ranked_stats_and_achievements(data: dict[str, Any], state: dict[str, Any], winner_id: str, loser_id: str, battle_type: str, is_draw: bool, no_contest: bool) -> None:
+    """Update ranked_stats wins/losses/streak and fire achievement checks."""
+    if battle_type != "ranked" or no_contest:
+        return
+
+    players = state.get("players", {}) if isinstance(state.get("players"), dict) else {}
+
+    for pid in list(players.keys()):
+        is_cpu = bool(players.get(pid, {}).get("is_cpu", False)) if isinstance(players.get(pid), dict) else False
+        if is_cpu:
+            continue
+        player = get_player(data, str(pid))
+        if not isinstance(player, dict):
+            continue
+        ranked = player.setdefault("ranked_stats", {"wins": 0, "losses": 0, "streak": 0, "last_10": []})
+        if not isinstance(ranked, dict):
+            ranked = {"wins": 0, "losses": 0, "streak": 0, "last_10": []}
+            player["ranked_stats"] = ranked
+
+        won = (not is_draw) and (str(pid) == str(winner_id))
+        lost = (not is_draw) and (str(pid) == str(loser_id))
+
+        if won:
+            ranked["wins"] = int(ranked.get("wins", 0)) + 1
+            ranked["streak"] = int(ranked.get("streak", 0)) + 1
+        elif lost:
+            ranked["losses"] = int(ranked.get("losses", 0)) + 1
+            ranked["streak"] = 0
+
+        last_10 = ranked.get("last_10", [])
+        if not isinstance(last_10, list):
+            last_10 = []
+        last_10.append("W" if won else ("L" if lost else "D"))
+        ranked["last_10"] = last_10[-10:]
+
+        # Achievement checks
+        wins = int(ranked.get("wins", 0))
+        streak = int(ranked.get("streak", 0))
+
+        if won:
+            for ach_id, threshold in (("first_blood", 1), ("win_10_battles", 10), ("win_50_battles", 50), ("win_100_battles", 100)):
+                if wins == threshold:
+                    _ach.grant(data, player, ach_id)
+            if streak >= 5:
+                _ach.grant(data, player, "win_streak_5")
+
+        # Rank-up achievements — check current rank vs previous
+        user_data = player.get("user", {}) if isinstance(player, dict) else {}
+        new_rank = str(user_data.get("rank", "Copper")) if isinstance(user_data, dict) else "Copper"
+        ach_id = _RANK_ACHIEVEMENT.get(new_rank)
+        if ach_id:
+            _ach.grant(data, player, ach_id)
+
+    # Battle-move stat achievements (ultimates + successful blocks)
+    for pid in list(players.keys()):
+        is_cpu = bool(players.get(pid, {}).get("is_cpu", False)) if isinstance(players.get(pid), dict) else False
+        if is_cpu:
+            continue
+        player = get_player(data, str(pid))
+        if not isinstance(player, dict):
+            continue
+        user_data = player.get("user", {}) if isinstance(player, dict) else {}
+        if not isinstance(user_data, dict):
+            continue
+
+        # Count ultimates used by this player this battle
+        used_ult_count = state.get("used_ultimate_count_by_side", {})
+        if isinstance(used_ult_count, dict):
+            ult_this_battle = int(used_ult_count.get(str(pid), 0))
+            if ult_this_battle > 0:
+                prev = int(user_data.get("total_ultimates_landed", 0))
+                user_data["total_ultimates_landed"] = prev + ult_this_battle
+                if user_data["total_ultimates_landed"] >= 10:
+                    _ach.grant(data, player, "land_10_ultimates")
+
+        # Count successful blocks by this player: blocks that weren't rejected
+        # We track via used_defenses_by_char_uid — count 'block' entries for player's chars
+        my_side = players.get(str(pid))
+        if isinstance(my_side, dict):
+            my_team = my_side.get("team_uids", []) if isinstance(my_side.get("team_uids"), list) else []
+            blocks_this_battle = 0
+            used_defs = state.get("used_defenses_by_char_uid", {}) if isinstance(state.get("used_defenses_by_char_uid"), dict) else {}
+            log = state.get("log", []) if isinstance(state.get("log"), list) else []
+            rejected_blocks = sum(1 for entry in log if str(entry) == "block_rejected")
+            for uid in my_team:
+                defs = used_defs.get(str(uid))
+                if isinstance(defs, (set, list)) and "block" in defs:
+                    blocks_this_battle += 1
+            successful_blocks = max(0, blocks_this_battle - rejected_blocks)
+            if successful_blocks > 0:
+                prev_blocks = int(user_data.get("total_blocks_landed", 0))
+                user_data["total_blocks_landed"] = prev_blocks + successful_blocks
+                if user_data["total_blocks_landed"] >= 10:
+                    _ach.grant(data, player, "perfect_block_10")
+
+
 def end_battle(data: dict[str, Any], battle_id: str, winner_id: str, loser_id: str, reason: str) -> dict[str, Any]:
     """End a battle: validate state, award trophies/rewards, and mark complete."""
     battle = data.get("battle", {})
@@ -1098,6 +1202,9 @@ def end_battle(data: dict[str, Any], battle_id: str, winner_id: str, loser_id: s
     # XP, CP, tournament, missions
     battle_type = str(state.get("type", "ranked"))
     _grant_battle_rewards(data, state, winner_id, loser_id, battle_type, is_draw, no_contest)
+
+    # Ranked stats + achievement triggers
+    _update_ranked_stats_and_achievements(data, state, winner_id, loser_id, battle_type, is_draw, no_contest)
 
     return {
         "ok": True, "success": True, "battle_over": True,

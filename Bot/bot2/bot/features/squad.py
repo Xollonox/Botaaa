@@ -14,6 +14,7 @@ from bot.utils.checks import ensure_registered
 from bot.utils.interaction_visibility import smart_reply, error_reply
 from bot.utils.squad_logic import compute_squad_power, get_inventory, get_player, get_squad
 from bot.utils.ui import e, make_embed
+from bot.features.tutorial import advance_tutorial
 
 BASE_HP   = 100
 NUM_SLOTS = 4
@@ -524,6 +525,9 @@ class SquadCog(commands.Cog):
                     item["squad_locked"] = True
                 elif iuid == old_uid:
                     item["squad_locked"] = iuid in all_assigned
+            user = player.get("user", {})
+            if isinstance(user, dict):
+                advance_tutorial(user, "assign_squad")
             return "ok", str(inst.get("card_name", "Unknown")), compute_squad_power(data, player)
         return self.bot.storage.with_lock(mutate)
 
