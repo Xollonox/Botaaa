@@ -2204,9 +2204,116 @@ class BattleCog(commands.Cog):
         if task and not task.done():
             task.cancel()
 
+    def _remove_ranked_queue_state(self, user_id: str) -> dict[str, bool]:
+        uid = str(user_id)
+        removed_json = self.bot.storage.with_lock(lambda data: self._remove_queue_entry(data, uid))
+        removed_sqlite = self.bot.battle_service.remove_queue_user(uid)
+        self._cancel_ranked_queue_task(uid)
+        return {
+            "removed_json": bool(removed_json),
+            "removed_sqlite": bool(removed_sqlite),
+            "removed": bool(removed_json or removed_sqlite),
+        }
+
+    def _remove_pending_friendly_state(self, target_id: str, *, cancel_task: bool = False) -> dict[str, bool]:
+        tid = str(target_id)
+
+        def mutate(data: dict[str, Any]) -> bool:
+            pending = self._battle_root(data).get("pending_friendly", {})
+            if not isinstance(pending, dict):
+                return False
+            before = tid in pending
+            pending.pop(tid, None)
+            return before
+
+        removed_json = self.bot.storage.with_lock(mutate)
+        removed_sqlite = self.bot.battle_service.remove_pending_friendly(tid)
+        if cancel_task:
+            task = self.friendly_cpu_tasks.pop(tid, None)
+            if task and not task.done():
+                task.cancel()
+        return {
+            "removed_json": bool(removed_json),
+            "removed_sqlite": bool(removed_sqlite),
+            "removed": bool(removed_json or removed_sqlite),
+        }
+
+    async def recover_active_battles_after_restart(self) -> dict[str, int]:
+        for bucket in (self.turn_tasks, self.battle_stall_tasks, self.queue_cpu_tasks, self.friendly_cpu_tasks):
+            for key, task in list(bucket.items()):
+                if not task.done():
+                    task.cancel()
+                bucket.pop(key, None)
+
+        def mutate(data: dict[str, Any]) -> dict[str, int]:
+            root = self._battle_root(data)
+            self._cleanup_expired(data)
+            active = root.get("active", {})
+            if not isinstance(active, dict):
+                root["active"] = {}
+                active = root["active"]
+
+            ended = 0
+            cleared = 0
+            affected_users: set[str] = set()
+
+            for battle_id, battle in list(active.items()):
+                if not isinstance(battle, dict):
+                    active.pop(battle_id, None)
+                    cleared += 1
+                    continue
+                players = battle.get("players", {})
+                player_ids = {str(pid) for pid in players.keys()} if isinstance(players, dict) else set()
+                if not player_ids:
+                    active.pop(battle_id, None)
+                    cleared += 1
+                    continue
+                if bool(battle.get("ended", False)):
+                    continue
+                result = end_battle(data, str(battle_id), "", "", "abandoned")
+                if result.get("ok"):
+                    ended += 1
+                    affected_users.update(player_ids)
+                else:
+                    active.pop(battle_id, None)
+                    cleared += 1
+                    affected_users.update(player_ids)
+
+            rebuilt_active_by_user: dict[str, str] = {}
+            for battle_id, battle in active.items():
+                if not isinstance(battle, dict) or bool(battle.get("ended", False)):
+                    continue
+                players = battle.get("players", {})
+                if not isinstance(players, dict):
+                    continue
+                for pid in players.keys():
+                    rebuilt_active_by_user[str(pid)] = str(battle_id)
+            root["active_by_user"] = rebuilt_active_by_user
+
+            return {
+                "ended": ended,
+                "cleared": cleared,
+                "active_by_user": len(rebuilt_active_by_user),
+                "affected_users": len(affected_users),
+            }
+
+        summary = self.bot.storage.with_lock(mutate)
+        refreshed = self._load_battle_data()
+        self.bot.battle_service.sync_active_by_user_from_data(refreshed)
+        if summary["ended"] or summary["cleared"] or summary["affected_users"]:
+            logger.warning(
+                "[BATTLE_STARTUP_RECOVERY] ended=%s cleared=%s affected_users=%s active_by_user=%s",
+                summary["ended"],
+                summary["cleared"],
+                summary["affected_users"],
+                summary["active_by_user"],
+            )
+        else:
+            logger.info("[BATTLE_STARTUP_RECOVERY] no stale active battle state found")
+        return summary
+
     async def _leave_ranked_queue(self, interaction: discord.Interaction, user_id: str, *, message: str = "You've been removed from the ranked queue.") -> bool:
-        removed = self.bot.battle_service.remove_queue_user(str(user_id))
-        self._cancel_ranked_queue_task(user_id)
+        removed = self._remove_ranked_queue_state(user_id)["removed"]
         data = self._load_battle_data()
         if not removed:
             await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)
@@ -2330,8 +2437,7 @@ class BattleCog(commands.Cog):
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Channel", f"{reason or 'not_allowed'}: Use <#{route_channel_id}>" if route_channel_id else str(reason or 'not_allowed')), ephemeral=True)
             return
         uid = str(interaction.user.id)
-        removed = self.bot.battle_service.remove_queue_user(uid)
-        self._cancel_ranked_queue_task(uid)
+        removed = self._remove_ranked_queue_state(uid)["removed"]
         data = self._load_battle_data()
         if not removed:
             await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)

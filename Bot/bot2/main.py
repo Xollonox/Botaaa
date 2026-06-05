@@ -210,6 +210,17 @@ class LookismBot(commands.Bot):
         # Unlock any cards left trade_locked from a crash
         await self._unlock_stale_trades()
 
+        battle_cog = self.get_cog("BattleCog")
+        if battle_cog is not None and hasattr(battle_cog, "recover_active_battles_after_restart"):
+            summary = await battle_cog.recover_active_battles_after_restart()
+            logger.info(
+                "[BOOT] Battle startup recovery finished ended=%s cleared=%s active_by_user=%s affected_users=%s",
+                summary.get("ended", 0),
+                summary.get("cleared", 0),
+                summary.get("active_by_user", 0),
+                summary.get("affected_users", 0),
+            )
+
     def _log_registered_slash_commands(self) -> None:
         commands_list = self.tree.get_commands()
         logger.info("=== REGISTERED SLASH COMMANDS ===")
