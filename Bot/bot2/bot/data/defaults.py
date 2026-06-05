@@ -333,6 +333,10 @@ DEFAULT_PLAYER = {
             "weekly": 0,
             "monthly": 0,
         },
+        "tutorial": {
+            "step": 0,
+            "completed": False,
+        },
     },
     "gang_id": None,
     "alliance_id": None,
@@ -347,6 +351,12 @@ DEFAULT_PLAYER = {
         "streak": 0,
         "last_10": [],
     },
+    "rival": {
+        "rival_id": None,
+        "rival_name": "",
+        "losses_to": 0,
+        "wins_vs": 0,
+    },
     "season_claims": {},
     "season_pass": {"season": 1, "xp": 0, "level": 1, "claimed": {}},
     "achievements": {"earned": {}},
@@ -355,6 +365,7 @@ DEFAULT_PLAYER = {
     "market": {"active_listing_ids": []},
     "trade_history": [],
     "packs": {"opened": 0, "spent": 0},
+    "pity": {},
 }
 
 DEFAULT_DATA = {
@@ -368,6 +379,11 @@ DEFAULT_DATA = {
     },
     "attacks": {
         "catalog": {}
+    },
+    "cotd": {},
+    "active_events": {
+        "double_xp": {"active": False, "ends_at": 0},
+        "double_coins": {"active": False, "ends_at": 0},
     },
     "ai": {
         "settings": {
@@ -564,6 +580,13 @@ DEFAULT_DATA = {
         "end_time":     1742256000,
         "participants": {},
         "tid":          "s1-grand",
+    },
+    "bounty": {
+        "target_id": None,
+        "target_name": "",
+        "streak": 0,
+        "reward": 3000,
+        "week": 0,
     },
 }
 

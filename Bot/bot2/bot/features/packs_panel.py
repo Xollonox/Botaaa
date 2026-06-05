@@ -14,6 +14,7 @@ from bot.utils.checks import ensure_registered
 from bot.utils.ui import make_embed, e
 from bot.utils.interaction_visibility import error_reply
 from bot.features.packs import _get_player_pack_inventory, _open_pack_from_inventory
+from bot.features.tutorial import advance_tutorial
 from bot.utils.squad_logic import get_player, get_squad
 from bot.utils.market_logic import quick_sell_value
 

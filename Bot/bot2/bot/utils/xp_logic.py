@@ -83,6 +83,8 @@ def grant_battle_xp_cp(data: dict[str, Any], user_id: str, battle_type: str) -> 
 
     milestone_rewards_list contains dicts with keys: level, coins, gems, pack, message.
     """
+    from bot.utils.timeutil import now_ts
+
     xp_gain = XP_TABLE.get(battle_type, 0)
     cp_gain = CP_TABLE.get(battle_type, 0)
     player  = data.get("players", {}).get(str(user_id))
@@ -91,6 +93,15 @@ def grant_battle_xp_cp(data: dict[str, Any], user_id: str, battle_type: str) -> 
     user = player.get("user", {})
     if not isinstance(user, dict):
         return 0, 0, []
+
+    # Apply double XP event buff
+    events = data.get("active_events", {})
+    if events.get("double_xp", {}).get("active") and now_ts() < events["double_xp"].get("ends_at", 0):
+        xp_gain = int(xp_gain * 2)
+
+    # Apply double coins event buff
+    if events.get("double_coins", {}).get("active") and now_ts() < events["double_coins"].get("ends_at", 0):
+        cp_gain = int(cp_gain * 1.5)
 
     # Track old level before XP is applied
     old_level = level_from_xp(int(user.get("xp", 0)))
