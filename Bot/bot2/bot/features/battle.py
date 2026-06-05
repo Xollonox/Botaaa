@@ -226,7 +226,26 @@ def build_battle_stats_embed(battle_state: dict, winner_name: str) -> discord.Em
         if move_parts:
             lines.append("Moves: " + "  ·  ".join(move_parts))
 
+        # Add milestone packs if any were granted
+        packs_key = f"{pid}_milestone_packs"
+        if packs_key in battle_state and isinstance(battle_state[packs_key], list):
+            packs = battle_state[packs_key]
+            if packs:
+                pack_names = [p.replace("_", " ").title() for p in packs]
+                lines.append(f"🎁 Milestone Pack: {', '.join(pack_names)}")
+
         embed.add_field(name=side_display(pid), value="\n".join(lines), inline=True)
+
+    # Also check winner_milestone_packs and loser_milestone_packs if used
+    if "winner_milestone_packs" in battle_state and battle_state["winner_milestone_packs"]:
+        packs = battle_state["winner_milestone_packs"]
+        pack_names = [p.replace("_", " ").title() for p in packs]
+        embed.add_field(name="🎁 Winner Milestone", value=", ".join(pack_names), inline=False)
+
+    if "loser_milestone_packs" in battle_state and battle_state["loser_milestone_packs"]:
+        packs = battle_state["loser_milestone_packs"]
+        pack_names = [p.replace("_", " ").title() for p in packs]
+        embed.add_field(name="🎁 Loser Milestone", value=", ".join(pack_names), inline=False)
 
     embed.set_footer(text="Battle Stats")
     return embed
