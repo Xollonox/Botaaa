@@ -365,6 +365,21 @@ class SQLiteTradeRepository:
                 )
                 """
             )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS trade_offer_board (
+                    id TEXT PRIMARY KEY,
+                    poster_id TEXT NOT NULL,
+                    poster_name TEXT NOT NULL,
+                    have_card TEXT NOT NULL,
+                    want_card TEXT NOT NULL,
+                    item_uid TEXT NOT NULL,
+                    created_at INTEGER NOT NULL,
+                    expires_at INTEGER NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'open'
+                )
+                """
+            )
             conn.commit()
 
     def json_bootstrap_completed(self) -> bool:
@@ -490,6 +505,53 @@ class SQLiteTradeRepository:
             if isinstance(payload, dict):
                 out.append(payload)
         return out
+
+    def post_offer(self, offer_id: str, poster_id: str, poster_name: str, have_card: str, want_card: str, item_uid: str, created_at: int, expires_at: int) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO trade_offer_board (id, poster_id, poster_name, have_card, want_card, item_uid, created_at, expires_at, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'open')
+                """,
+                (offer_id, poster_id, poster_name, have_card, want_card, item_uid, created_at, expires_at),
+            )
+            conn.commit()
+
+    def get_open_offers(self, limit: int = 10) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            now = int(time.time())
+            rows = conn.execute(
+                """
+                SELECT id, poster_id, poster_name, have_card, want_card, created_at, expires_at, status
+                FROM trade_offer_board
+                WHERE status = 'open' AND expires_at > ?
+                ORDER BY created_at DESC
+                LIMIT ?
+                """,
+                (now, limit),
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+    def cancel_offer(self, offer_id: str, poster_id: str) -> bool:
+        with self._connect() as conn:
+            cur = conn.execute(
+                "UPDATE trade_offer_board SET status = 'cancelled' WHERE id = ? AND poster_id = ?",
+                (offer_id, poster_id),
+            )
+            conn.commit()
+        return cur.rowcount > 0
+
+    def accept_offer(self, offer_id: str) -> dict[str, Any] | None:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT * FROM trade_offer_board WHERE id = ? AND status = 'open'",
+                (offer_id,),
+            ).fetchone()
+            if row is None:
+                return None
+            conn.execute("UPDATE trade_offer_board SET status = 'accepted' WHERE id = ?", (offer_id,))
+            conn.commit()
+        return dict(row) if row else None
 
 
 class SQLiteBattleRepository:

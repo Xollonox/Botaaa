@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import logging
+import time
+import uuid
 from typing import Any
 
 import discord
@@ -149,6 +151,216 @@ class TradeGroup(app_commands.Group):
         rows = self.cog.bot.trade_service.history_for_user(str(interaction.user.id), limit=20)
         embed = _history_embed_rows(str(interaction.user.id), str(interaction.user.display_name), rows)
         await smart_reply(interaction, embed=embed, ephemeral=True)
+
+    @app_commands.command(name="post", description="Post a trade offer: I have X, I want Y.")
+    @app_commands.describe(have_card="Card you're offering", want_card="Card you want in return")
+    async def post(self, interaction: discord.Interaction, have_card: str, want_card: str) -> None:
+        if not await ensure_registered(interaction, self.cog.bot.storage):
+            return
+
+        user_id = str(interaction.user.id)
+        data = self.cog._load_trade_data()
+        player = get_player(data, user_id)
+        if not isinstance(player, dict):
+            await smart_reply(interaction, embed=make_embed(None, "❌ Error", "Player data not found."), ephemeral=True)
+            return
+
+        inventory = player.get("user", {}).get("inventory", [])
+        if not isinstance(inventory, list):
+            inventory = []
+
+        have_item = None
+        for item in inventory:
+            if isinstance(item, dict) and str(item.get("name", "")).lower() == have_card.lower() and not item.get("trade_locked"):
+                have_item = item
+                break
+
+        if not have_item:
+            await smart_reply(
+                interaction,
+                embed=make_embed(None, "❌ Card Not Available", f"You don't have '{have_card}' available to trade."),
+                ephemeral=True,
+            )
+            return
+
+        item_uid = str(have_item.get("uid", ""))
+        offer_id = str(uuid.uuid4())[:8]
+        now = int(time.time())
+        expires_at = now + 172800
+
+        def lock_card(data: dict[str, Any]) -> None:
+            player = get_player(data, user_id)
+            if isinstance(player, dict):
+                inventory = player.get("user", {}).get("inventory", [])
+                if isinstance(inventory, list):
+                    for item in inventory:
+                        if isinstance(item, dict) and str(item.get("uid", "")) == item_uid:
+                            item["trade_locked"] = True
+                            break
+
+        self.cog.bot.storage.with_lock(lock_card)
+        self.cog.bot.trade_service.post_offer(offer_id, user_id, str(interaction.user.display_name), have_card, want_card, item_uid, now, expires_at)
+
+        embed = make_embed(
+            None,
+            "✅ Offer Posted",
+            f"**ID:** `{offer_id}`\n**You have:** {have_card}\n**You want:** {want_card}\n**Expires in:** 48 hours",
+            color=0x2ECC71,
+        )
+        await smart_reply(interaction, embed=embed, ephemeral=True)
+
+    @app_commands.command(name="board", description="Browse open trade offers.")
+    async def board(self, interaction: discord.Interaction) -> None:
+        if not await ensure_registered(interaction, self.cog.bot.storage):
+            return
+
+        offers = self.cog.bot.trade_service.get_open_offers(limit=10)
+        if not offers:
+            await smart_reply(interaction, embed=make_embed(None, "📋 Trade Board", "No open offers at the moment."), ephemeral=True)
+            return
+
+        lines = []
+        for offer in offers:
+            offer_id = offer.get("id", "???")
+            poster_name = offer.get("poster_name", "Unknown")
+            have_card = offer.get("have_card", "?")
+            want_card = offer.get("want_card", "?")
+            lines.append(f"`{offer_id}` • **{poster_name}** has {have_card} wants {want_card}")
+
+        description = "\n".join(lines)
+        embed = make_embed(None, "📋 Trade Board", description)
+        embed.set_footer(text="Use /trade accept <id> to accept an offer")
+        await smart_reply(interaction, embed=embed, ephemeral=True)
+
+    @app_commands.command(name="accept", description="Accept a trade offer by ID.")
+    @app_commands.describe(offer_id="The offer ID from /trade board")
+    async def accept(self, interaction: discord.Interaction, offer_id: str) -> None:
+        if not await ensure_registered(interaction, self.cog.bot.storage):
+            return
+
+        acceptor_id = str(interaction.user.id)
+        offer = self.cog.bot.trade_service.accept_offer(offer_id)
+        if not offer:
+            await smart_reply(
+                interaction,
+                embed=make_embed(None, "❌ Offer Not Found", "The offer is no longer available or has expired."),
+                ephemeral=True,
+            )
+            return
+
+        poster_id = offer.get("poster_id", "")
+        have_card = offer.get("have_card", "")
+        want_card = offer.get("want_card", "")
+
+        data = self.cog._load_trade_data()
+        acceptor = get_player(data, acceptor_id)
+        if not isinstance(acceptor, dict):
+            await smart_reply(interaction, embed=make_embed(None, "❌ Error", "Your player data not found."), ephemeral=True)
+            return
+
+        acceptor_inventory = acceptor.get("user", {}).get("inventory", [])
+        if not isinstance(acceptor_inventory, list):
+            acceptor_inventory = []
+
+        want_item = None
+        for item in acceptor_inventory:
+            if isinstance(item, dict) and str(item.get("name", "")).lower() == want_card.lower() and not item.get("trade_locked"):
+                want_item = item
+                break
+
+        if not want_item:
+            await smart_reply(
+                interaction,
+                embed=make_embed(None, "❌ Card Not Available", f"You don't have '{want_card}' to complete this trade."),
+                ephemeral=True,
+            )
+            return
+
+        def execute_trade(data: dict[str, Any]) -> tuple[bool, str]:
+            poster = get_player(data, poster_id)
+            acceptor = get_player(data, acceptor_id)
+
+            if not isinstance(poster, dict) or not isinstance(acceptor, dict):
+                return False, "Player data not found."
+
+            poster_inv = poster.get("user", {}).get("inventory", [])
+            acceptor_inv = acceptor.get("user", {}).get("inventory", [])
+
+            if not isinstance(poster_inv, list) or not isinstance(acceptor_inv, list):
+                return False, "Invalid inventory."
+
+            have_idx = None
+            for i, item in enumerate(poster_inv):
+                if isinstance(item, dict) and str(item.get("name", "")).lower() == have_card.lower():
+                    have_idx = i
+                    break
+
+            want_idx = None
+            for i, item in enumerate(acceptor_inv):
+                if isinstance(item, dict) and str(item.get("name", "")).lower() == want_card.lower():
+                    want_idx = i
+                    break
+
+            if have_idx is None or want_idx is None:
+                return False, "One of the cards no longer exists."
+
+            have_item = poster_inv.pop(have_idx)
+            want_item = acceptor_inv.pop(want_idx)
+
+            have_item.pop("trade_locked", None)
+            want_item.pop("trade_locked", None)
+
+            acceptor_inv.append(have_item)
+            poster_inv.append(want_item)
+
+            return True, "ok"
+
+        ok, msg = self.cog.bot.storage.with_lock(execute_trade)
+        if not ok:
+            await smart_reply(interaction, embed=make_embed(None, "❌ Trade Failed", msg), ephemeral=True)
+            return
+
+        embed = make_embed(
+            None,
+            "✅ Trade Complete",
+            f"You received **{have_card}** and gave **{want_card}**.",
+            color=0x2ECC71,
+        )
+        await smart_reply(interaction, embed=embed, ephemeral=True)
+
+    @app_commands.command(name="cancel", description="Cancel your open trade offer.")
+    @app_commands.describe(offer_id="Your offer ID to cancel")
+    async def cancel_offer(self, interaction: discord.Interaction, offer_id: str) -> None:
+        if not await ensure_registered(interaction, self.cog.bot.storage):
+            return
+
+        user_id = str(interaction.user.id)
+        cancelled = self.cog.bot.trade_service.cancel_offer(offer_id, user_id)
+
+        if not cancelled:
+            await smart_reply(
+                interaction,
+                embed=make_embed(None, "❌ Not Found", "Offer not found or you don't own it."),
+                ephemeral=True,
+            )
+            return
+
+        offer = self.cog.bot.trade_service.get_open_offers(limit=1000)
+        item_uid = None
+        for o in offer:
+            if o.get("id") == offer_id:
+                item_uid = o.get("item_uid")
+                break
+
+        def unlock_card(data: dict[str, Any]) -> None:
+            player = get_player(data, user_id)
+            if isinstance(player, dict) and item_uid:
+                inventory = player.get("user", {}).get("inventory", [])
+                if isinstance(inventory, list):
+                    _unlock(inventory, item_uid)
+
+        self.cog.bot.storage.with_lock(unlock_card)
+        await smart_reply(interaction, embed=make_embed(None, "✅ Cancelled", "Your trade offer has been cancelled."), ephemeral=True)
 
 
 async def setup(bot: commands.Bot) -> None:
