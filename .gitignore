@@ -4,3 +4,7 @@ __pycache__/
 *.pyc
 Bot/bot2/bot/**/__pycache__/
 Bot/bot2/logs/*.log
+bot_memory.json
+bot_settings.json
+lookism_data.json
+lookism_data.sqlite3
