@@ -17,6 +17,7 @@ from bot.features.packs import _get_player_pack_inventory, _open_pack_from_inven
 from bot.features.tutorial import advance_tutorial
 from bot.utils.squad_logic import get_player, get_squad
 from bot.utils.market_logic import quick_sell_value
+from bot.utils.pack_logic import PITY_THRESHOLDS
 
 RARITY_ICONS = {
     "common": "⚪", "rare": "🔵", "epic": "🟣", "legendary": "🟠", "mythical": "🔴", "infernal": "🔥", "abyssal": "🌌",
@@ -38,7 +39,7 @@ def _rv(rarity: str) -> int:
 
 # ── Embed builders ────────────────────────────────────────────────
 
-def _panel_embed(user_id: str, slot: int, pack_inv: list[dict[str, Any]]) -> discord.Embed:
+def _panel_embed(user_id: str, slot: int, pack_inv: list[dict[str, Any]], player: dict[str, Any] | None = None) -> discord.Embed:
     counts: dict[str, int] = {}
     names:  dict[str, str] = {}
     for item in pack_inv:
@@ -60,11 +61,30 @@ def _panel_embed(user_id: str, slot: int, pack_inv: list[dict[str, Any]]) -> dis
         return make_embed(None, "LOOKISM HXCC • PACKS", desc, color=0xE11D48, footer="Pack Inventory")
 
     slot = max(0, min(slot, len(keys) - 1))
+
+    # Collect pity info for the selected slot's pack key.
+    pity_lines: dict[str, str] = {}
+    if player is not None:
+        user_data = player.get("user", {})
+        pity_all = user_data.get("pity", {}) if isinstance(user_data, dict) else {}
+        if isinstance(pity_all, dict):
+            selected_key = keys[slot]
+            thresholds = PITY_THRESHOLDS.get(selected_key, {})
+            if thresholds:
+                pity_counters = pity_all.get(selected_key, {})
+                pity_parts = []
+                for rarity, threshold in thresholds.items():
+                    count = int(pity_counters.get(f"pulls_since_{rarity.lower()}", 0)) if isinstance(pity_counters, dict) else 0
+                    pity_parts.append(f"{count}/{threshold} to guaranteed {rarity}")
+                if pity_parts:
+                    pity_lines[selected_key] = " • ".join(pity_parts)
+
     blocks = [overview]
     for i, k in enumerate(keys):
         marker = "👉 " if i == slot else ""
+        pity_str = f"\n│ 🎯 Pity: {pity_lines[k]}" if k in pity_lines else ""
         blocks.append(
-            f"╭─ {marker}{names[k]}\n│ Quantity: ×{counts[k]}\n│ Secret contents inside...\n╰────────────────"
+            f"╭─ {marker}{names[k]}\n│ Quantity: ×{counts[k]}\n│ Secret contents inside...{pity_str}\n╰────────────────"
         )
 
     return make_embed(None, "LOOKISM HXCC • PACKS", "\n\n".join(blocks), color=0xE11D48, footer=f"Pack Inventory • Slot {slot + 1}/{len(keys)}")
@@ -268,7 +288,7 @@ class PostRevealView(discord.ui.View):
         player = get_player(data, str(interaction.user.id))
         inv    = _get_player_pack_inventory(player) if player else []
         uid    = str(interaction.user.id)
-        embed  = _panel_embed(uid, self.main_panel.current_slot, inv)
+        embed  = _panel_embed(uid, self.main_panel.current_slot, inv, player)
         await interaction.response.edit_message(embed=embed, view=self.main_panel)
         self.main_panel.message = interaction.message
 
@@ -366,7 +386,7 @@ class PacksPanel(discord.ui.View):
         if keys: self.current_slot = (self.current_slot - 1) % len(keys)
         player = get_player(data, str(interaction.user.id))
         inv = _get_player_pack_inventory(player) if player else []
-        await interaction.response.edit_message(embed=_panel_embed(str(interaction.user.id), self.current_slot, inv), view=self)
+        await interaction.response.edit_message(embed=_panel_embed(str(interaction.user.id), self.current_slot, inv, player), view=self)
 
     @discord.ui.button(label="Next ▶", style=discord.ButtonStyle.primary, row=0)
     async def next_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
@@ -375,7 +395,7 @@ class PacksPanel(discord.ui.View):
         if keys: self.current_slot = (self.current_slot + 1) % len(keys)
         player = get_player(data, str(interaction.user.id))
         inv = _get_player_pack_inventory(player) if player else []
-        await interaction.response.edit_message(embed=_panel_embed(str(interaction.user.id), self.current_slot, inv), view=self)
+        await interaction.response.edit_message(embed=_panel_embed(str(interaction.user.id), self.current_slot, inv, player), view=self)
 
     # Row 1 — Open actions
     @discord.ui.button(label="📦 Open 1", style=discord.ButtonStyle.success, row=1)
@@ -488,7 +508,12 @@ class PacksPanel(discord.ui.View):
             rolls: list[dict[str, str]] = []
             for _ in range(qty):
                 ok, _, r = _open_pack_from_inventory(d, user_id, key)
-                if ok: rolls.extend(r)
+                if ok:
+                    rolls.extend(r)
+                    player = d.get("players", {}).get(user_id, {})
+                    user = player.get("user", {})
+                    if isinstance(user, dict):
+                        advance_tutorial(user, "open_pack")
             return rolls
 
         all_rolls = self.cog.bot.storage.with_lock(mutate)
@@ -533,7 +558,7 @@ class PacksPanelCog(commands.Cog):
         player = get_player(data, uid)
         inv    = _get_player_pack_inventory(player) if player else []
         panel  = PacksPanel(self, interaction.user.id)
-        embed  = _panel_embed(uid, 0, inv)
+        embed  = _panel_embed(uid, 0, inv, player)
         await interaction.followup.send(embed=embed, view=panel)
         panel.message = await interaction.original_response()
 
