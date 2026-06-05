@@ -123,6 +123,115 @@ def _cpu_pick_move(personality: str, available_moves: list, fighter_hp_pct: floa
         return "normal"
 
 
+def build_battle_stats_embed(battle_state: dict, winner_name: str) -> discord.Embed:
+    """Build a post-battle scoreboard embed from the finished battle state."""
+    embed = discord.Embed(title="⚔️ Battle Summary", color=0x2B2D31)
+
+    # ── Outcome label ────────────────────────────────────────────────
+    reason = str(battle_state.get("reason", ""))
+    outcome_map = {
+        "all_fainted":        "KO",
+        "no_active_fighter":  "KO",
+        "forfeit":            "Forfeit",
+        "timeout_abandoned":  "Timeout (No Contest)",
+        "abandoned":          "No Contest",
+        "no_contest":         "No Contest",
+        "draw":               "Draw",
+    }
+    outcome_label = outcome_map.get(reason, reason.replace("_", " ").title() if reason else "Unknown")
+
+    # ── Rounds / duration ────────────────────────────────────────────
+    rounds = int(battle_state.get("round", 1))
+    created_at = int(battle_state.get("created_at", 0))
+    last_ts = int(battle_state.get("turn_started_at", 0))
+    duration_str: str | None = None
+    if created_at and last_ts and last_ts > created_at:
+        secs = last_ts - created_at
+        duration_str = f"{secs // 60}m {secs % 60}s" if secs >= 60 else f"{secs}s"
+
+    # ── Parse log for per-player damage + move counts ────────────────
+    # Log entries for attacks follow the format  "pid:move_type:damage"
+    players: dict[str, Any] = battle_state.get("players", {}) if isinstance(battle_state.get("players"), dict) else {}
+    pid_list = list(players.keys())
+
+    damage_by_pid: dict[str, int] = {pid: 0 for pid in pid_list}
+    move_counts: dict[str, dict[str, int]] = {
+        pid: {"normal": 0, "special": 0, "ultimate": 0, "unique_skill": 0, "unique_path": 0, "defensive": 0}
+        for pid in pid_list
+    }
+    logs = battle_state.get("log", []) if isinstance(battle_state.get("log"), list) else []
+    for entry in logs:
+        if not isinstance(entry, str):
+            continue
+        parts = entry.split(":", 2)
+        if len(parts) == 3 and parts[0] and parts[1]:
+            pid, move_raw, dmg_raw = parts[0].strip(), parts[1].strip(), parts[2].strip()
+            if pid not in damage_by_pid:
+                continue
+            try:
+                dmg = int(dmg_raw)
+                if dmg > 0:
+                    damage_by_pid[pid] += dmg
+            except (ValueError, TypeError):
+                pass
+            norm = normalize_attack_type(move_raw)
+            mc = move_counts[pid]
+            if norm in {"block", "dodge", "revert", "parry", "tank"}:
+                mc["defensive"] += 1
+            elif norm in mc:
+                mc[norm] += 1
+            else:
+                mc["normal"] += 1
+
+    # ── Per-side helpers ─────────────────────────────────────────────
+    def side_display(pid: str) -> str:
+        pstate = players.get(pid, {}) if isinstance(players.get(pid), dict) else {}
+        if isinstance(pstate, dict) and bool(pstate.get("is_cpu", False)):
+            cpu_meta = pstate.get("cpu_meta", {}) or {}
+            return str(cpu_meta.get("display_name", "🤖 CPU")) if isinstance(cpu_meta, dict) else "🤖 CPU"
+        return f"<@{pid}>"
+
+    def side_hp_line(pid: str) -> str:
+        pstate = players.get(pid, {}) if isinstance(players.get(pid), dict) else {}
+        if not isinstance(pstate, dict):
+            return "—"
+        hp = pstate.get("hp", {}) if isinstance(pstate.get("hp"), dict) else {}
+        hp_max = pstate.get("hp_max", {}) if isinstance(pstate.get("hp_max"), dict) else {}
+        team = pstate.get("team_uids", []) if isinstance(pstate.get("team_uids"), list) else []
+        alive = sum(1 for uid in team if int(hp.get(uid, 0)) > 0)
+        total = len(team)
+        rem_hp = sum(int(hp.get(uid, 0)) for uid in team)
+        max_hp = sum(int(hp_max.get(uid, 1)) for uid in team)
+        return f"{alive}/{total} fighters standing · {rem_hp}/{max_hp} HP"
+
+    # ── Header row ───────────────────────────────────────────────────
+    embed.add_field(name="Outcome", value=outcome_label, inline=True)
+    embed.add_field(name="Rounds", value=str(rounds), inline=True)
+    embed.add_field(name="Duration", value=duration_str if duration_str else "—", inline=True)
+    embed.add_field(name="🏆 Winner", value=winner_name or "—", inline=False)
+
+    # ── Per-side breakdown ───────────────────────────────────────────
+    for pid in pid_list:
+        mc = move_counts.get(pid, {})
+        move_parts: list[str] = []
+        for label, key in (("Normal", "normal"), ("Special", "special"), ("Ultimate", "ultimate"),
+                           ("Skill", "unique_skill"), ("Path", "unique_path"), ("Defense", "defensive")):
+            if mc.get(key, 0):
+                move_parts.append(f"{label} ×{mc[key]}")
+
+        lines: list[str] = [side_hp_line(pid)]
+        dmg = damage_by_pid.get(pid, 0)
+        if dmg > 0:
+            lines.append(f"Damage dealt: **{dmg}**")
+        if move_parts:
+            lines.append("Moves: " + "  ·  ".join(move_parts))
+
+        embed.add_field(name=side_display(pid), value="\n".join(lines), inline=True)
+
+    embed.set_footer(text="Battle Stats")
+    return embed
+
+
 class BattleCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
@@ -974,6 +1083,25 @@ class BattleCog(commands.Cog):
         card_def = cards.get(card_name, {}) if isinstance(cards.get(card_name, {}), dict) else {}
         return card_image_url(card_def), card_name or None
 
+    async def _send_battle_stats_embed(self, channel: Any, battle: dict) -> None:
+        """Post the post-battle summary embed to the given channel."""
+        try:
+            players: dict = battle.get("players", {}) if isinstance(battle.get("players"), dict) else {}
+            winner_id = str(battle.get("winner_id", ""))
+            winner_state = players.get(winner_id, {}) if isinstance(players.get(winner_id), dict) else {}
+            if winner_id and isinstance(winner_state, dict) and bool(winner_state.get("is_cpu", False)):
+                cpu_meta = winner_state.get("cpu_meta", {}) or {}
+                winner_name = str(cpu_meta.get("display_name", "🤖 CPU")) if isinstance(cpu_meta, dict) else "🤖 CPU"
+            elif winner_id:
+                winner_name = f"<@{winner_id}>"
+            else:
+                winner_name = "—"
+            stats_embed = build_battle_stats_embed(battle, winner_name)
+            if hasattr(channel, "send"):
+                await channel.send(embed=stats_embed)
+        except Exception:
+            logger.exception("[BATTLE_STATS] failed to send stats embed")
+
     async def _refresh_battle_message(self, battle_id: str) -> None:
         data = self.bot.storage.load()
         battle = self._battle_root(data).get("active", {}).get(battle_id)
@@ -1000,6 +1128,11 @@ class BattleCog(commands.Cog):
             await msg.edit(embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None], view=view, attachments=[])
         except Exception:
             logger.exception("[BATTLE_REFRESH] failed to edit message battle_id=%s channel=%s message=%s", battle_id, channel_id, message_id)
+
+        # Send stats summary once when the battle is freshly over
+        if bool(battle.get("ended", False)) and not bool(battle.get("stats_sent", False)):
+            battle["stats_sent"] = True
+            await self._send_battle_stats_embed(channel, battle)
 
     def _schedule_timeout(self, battle_id: str) -> None:
         old = self.turn_tasks.get(battle_id)
@@ -1709,6 +1842,18 @@ class BattleCog(commands.Cog):
         if ended:
             logger.info("[TURN_FLOW] battle ended battle_id=%s reason=%s", battle_id, battle.get("reason", "unknown") if isinstance(battle, dict) else "unknown")
             self._cancel_battle_runtime_tasks(battle_id)
+            # Send the battle stats summary if not already sent
+            if isinstance(battle, dict) and not bool(battle.get("stats_sent", False)):
+                battle["stats_sent"] = True
+                channel = getattr(interaction, "channel", None)
+                if channel is None:
+                    try:
+                        channel = await interaction.original_response()
+                        channel = getattr(channel, "channel", None)
+                    except Exception:
+                        channel = None
+                if channel is not None:
+                    await self._send_battle_stats_embed(channel, battle)
             return
         self._schedule_timeout(battle_id)
         await self._maybe_run_cpu_turn(battle_id)
