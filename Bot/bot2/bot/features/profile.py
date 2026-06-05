@@ -85,10 +85,11 @@ class SetBioModal(discord.ui.Modal, title="Set Bio"):
 
 
 class ProfileActionView(discord.ui.View):
-    def __init__(self, cog: "ProfileCog", invoker_id: int) -> None:
+    def __init__(self, cog: "ProfileCog", invoker_id: int, target_user: discord.User | None = None) -> None:
         super().__init__(timeout=180)
         self.cog = cog
         self.invoker_id = int(invoker_id)
+        self.target_user = target_user
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.invoker_id:
@@ -103,6 +104,11 @@ class ProfileActionView(discord.ui.View):
     @discord.ui.button(label="⭐ Set Featured", style=discord.ButtonStyle.secondary, row=0)
     async def set_featured(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         await self.cog.setfeatured(interaction)
+
+    @discord.ui.button(label="🔄 Refresh", style=discord.ButtonStyle.primary, row=0)
+    async def refresh_profile(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        await interaction.response.defer()
+        await self.cog.profile(interaction, self.target_user)
 
 
 class ProfileCog(commands.Cog):
@@ -121,7 +127,7 @@ class ProfileCog(commands.Cog):
         if not isinstance(players, dict) or target_id not in players:
             await interaction.followup.send("That user is not registered.", ephemeral=True)
             return
-        view = ProfileActionView(self, interaction.user.id) if target.id == interaction.user.id else None
+        view = ProfileActionView(self, interaction.user.id, target) if target.id == interaction.user.id else None
         try:
             file = await render_profile_card(data, target)
             embed = simple_embed("", footer="Player Profile")

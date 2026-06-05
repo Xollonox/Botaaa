@@ -719,6 +719,8 @@ async def render_profile_card(data: dict[str,Any], target: discord.abc.User) -> 
 # ── Embed fallback ────────────────────────────────────────────────────────────
 
 def build_profile_embed(data: dict[str,Any], target: discord.abc.User) -> discord.Embed:
+    from bot.utils.xp_logic import xp_progress
+
     target_id  = str(target.id)
     players    = data.get("players", {})
     player     = players.get(target_id, {}) if isinstance(players,dict) else {}
@@ -747,15 +749,39 @@ def build_profile_embed(data: dict[str,Any], target: discord.abc.User) -> discor
     profile_data   = user_data.get("profile",{}) if isinstance(user_data.get("profile"),dict) else {}
     bio_text       = _sanitize_bio(str(profile_data.get("bio","") or ""))
 
+    # Login streak
+    streak = int(user_data.get("login_streak", 0))
+    streak_text = f"🔥 {streak} day streak" if streak > 1 else "No active streak"
+
+    # Level progress bar
+    xp = int(user_data.get("xp", 0))
+    xp_level, xp_cur, xp_needed = xp_progress(xp)
+    progress_pct = min(100, int((xp_cur / max(1, xp_needed)) * 100))
+    bar_filled = int(progress_pct / 10)
+    bar = "█" * bar_filled + "░" * (10 - bar_filled)
+    xp_text = f"Lv.{xp_level} [{bar}] {progress_pct}%"
+
+    # Badges list
+    badges = user_data.get("badges", [])
+    badges_text_list = " • ".join(str(b) for b in badges) if badges else "No badges yet"
+
+    # Tutorial progress
+    tutorial = user_data.get("tutorial", {}) if isinstance(user_data.get("tutorial"), dict) else {}
+    tutorial_step = int(tutorial.get("step", 0))
+
     desc = (
         f"**{display_name}**\n\n"
         f"Joined: {join_date}  •  Lv. {level}\n"
         f"Gang: {gang_name}\n"
+        f"Login Streak: {streak_text}\n"
+        f"Tutorial Progress: Step {tutorial_step}\n\n"
         f"{badges_text}\n\n"
         f"{league_emoji} {league_name} • {trophies:,} trophies\n"
         f"Global Rank: #{global_rank if global_rank else '—'}\n"
         f"Win Rate: {win_rate:.1f}%  •  Battles: {battles_played:,}  •  Streak: {win_streak}\n"
-        f"War Points: {war_pts:,}  •  Achievements: {achievements}  •  Cards: {cards_unlocked}"
+        f"War Points: {war_pts:,}  •  Achievements: {achievements}  •  Cards: {cards_unlocked}\n\n"
+        f"Level Progress: {xp_text}\n"
+        f"Badges: {badges_text_list}"
     )
     if bio_text:
         desc = f'*"{bio_text}"*\n\n' + desc

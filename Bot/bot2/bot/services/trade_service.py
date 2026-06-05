@@ -73,3 +73,15 @@ class TradeService:
             t = data["trades"]
         t["pending"] = self.repo.list_pending()
         return data
+
+    def post_offer(self, offer_id: str, poster_id: str, poster_name: str, have_card: str, want_card: str, item_uid: str, created_at: int, expires_at: int) -> None:
+        self.repo.post_offer(offer_id, poster_id, poster_name, have_card, want_card, item_uid, created_at, expires_at)
+
+    def get_open_offers(self, limit: int = 10) -> list[dict[str, Any]]:
+        return self.repo.get_open_offers(limit)
+
+    def cancel_offer(self, offer_id: str, poster_id: str) -> bool:
+        return self.repo.cancel_offer(offer_id, poster_id)
+
+    def accept_offer(self, offer_id: str) -> dict[str, Any] | None:
+        return self.repo.accept_offer(offer_id)

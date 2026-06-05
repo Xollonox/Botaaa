@@ -43,6 +43,7 @@ def build_profile_embed(
 ) -> discord.Embed:
     """Build a profile embed for *target_user_obj*."""
     from bot.utils.ui import e, make_embed
+    from bot.utils.xp_logic import xp_progress
 
     target_id = str(target_user_obj.id)
     players = data.get("players", {})
@@ -78,6 +79,39 @@ def build_profile_embed(
     if is_top:
         fields.append((f"{e('top', data)} Global Rank", f"#{rank_num}", True))
 
+    # Login streak
+    streak = user.get("login_streak", 0)
+    streak_text = f"🔥 {streak} day streak" if streak > 1 else "No active streak"
+    fields.append(("Login Streak", streak_text, True))
+
+    # Level progress bar
+    xp = int(user.get("xp", 0))
+    level, xp_cur, xp_needed = xp_progress(xp)
+    progress_pct = min(100, int((xp_cur / max(1, xp_needed)) * 100))
+    bar_filled = int(progress_pct / 10)
+    bar = "█" * bar_filled + "░" * (10 - bar_filled)
+    xp_text = f"Lv.{level} [{bar}] {progress_pct}%"
+    fields.append(("Level Progress", xp_text, True))
+
+    # Win rate and battles
+    ranked_stats = player.get("ranked_stats", {}) if isinstance(player, dict) else {}
+    wins = int(ranked_stats.get("wins", 0)) if isinstance(ranked_stats, dict) else 0
+    losses = int(ranked_stats.get("losses", 0)) if isinstance(ranked_stats, dict) else 0
+    total_battles = wins + losses
+    win_rate = f"{int(wins/total_battles*100)}%" if total_battles > 0 else "N/A"
+    fields.append(("Win Rate", win_rate, True))
+    fields.append(("Total Battles", str(total_battles), True))
+
+    # Badges
+    badges = user.get("badges", [])
+    badges_text = " • ".join(str(b) for b in badges) if badges else "No badges yet"
+    fields.append(("Badges", badges_text, False))
+
+    # Tutorial progress
+    tutorial = user.get("tutorial", {}) if isinstance(user.get("tutorial"), dict) else {}
+    tutorial_step = int(tutorial.get("step", 0))
+    fields.append(("Tutorial Progress", f"Step {tutorial_step}", True))
+
     if show_gang:
         gang_id = player.get("gang_id") if isinstance(player, dict) else None
         alliance_id = player.get("alliance_id") if isinstance(player, dict) else None
@@ -111,6 +145,18 @@ def build_profile_embed(
                     f"{card_name} • {rarity} • {e('star', data)}x{stars}",
                     False,
                 ))
+
+    # Rival
+    rival = user.get("rival", {}) if isinstance(user.get("rival"), dict) else {}
+    if isinstance(rival, dict) and rival.get("rival_id"):
+        rival_name = str(rival.get("rival_name", "Unknown"))
+        losses = rival.get("losses_to", 0)
+        wins = rival.get("wins_vs", 0)
+        fields.append((
+            "⚔️ Rival",
+            f"@{rival_name} (lost to them {losses}x, beat them {wins}x)",
+            False,
+        ))
 
     embed = make_embed(
         data,
