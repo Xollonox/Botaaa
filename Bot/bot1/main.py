@@ -281,9 +281,12 @@ def user_memory_text(user_id: int, guild_id: Optional[int] = None, channel_id: O
 
 
 def remember_line(user_id: int, prefix: str, line: str, guild_id: Optional[int] = None, channel_id: Optional[int] = None) -> None:
+    cleaned = line.strip()
+    if prefix == "B" and cleaned.startswith("I could not reach the AI backend right now"):
+        return
     state = _scope_state(user_id, guild_id, channel_id)
     lines = state["lines"]
-    lines.append(f"{prefix}: {line.strip()[:300]}")
+    lines.append(f"{prefix}: {cleaned[:300]}")
     state["lines"] = lines[-_memory_limit("max_user_memory_items", 80):]
     state["msg_count"] = state.get("msg_count", 0) + 1
     topic = _detect_topic(lines[-10:])
@@ -367,7 +370,12 @@ async def update_conversation_summary(user_id: int, guild_id: Optional[int] = No
             state["lines"] = lines[-4:]
             _save_json_file(MEMORY_FILE, BOT_MEMORY)
     except Exception:
-        pass
+        logger.exception(
+            "Conversation summary update failed | user=%s guild=%s channel=%s",
+            user_id,
+            guild_id,
+            channel_id,
+        )
 
 
 def clear_user_memory(user_id: int, guild_id: Optional[int] = None, channel_id: Optional[int] = None) -> None:
@@ -595,7 +603,13 @@ def detect_chat_image_trigger(content: str) -> Optional[Tuple[str, str]]:
     return None
 
 
-async def enhance_image_prompt(raw_prompt: str, image_url: Optional[str] = None, user_id: int = 0, guild_id: Optional[int] = None) -> str:
+async def enhance_image_prompt(
+    raw_prompt: str,
+    image_url: Optional[str] = None,
+    user_id: int = 0,
+    guild_id: Optional[int] = None,
+    channel_id: Optional[int] = None,
+) -> str:
     """Use vision/LLM to rewrite a short user prompt into a rich image generation prompt."""
     if image_url:
         instruction = (
@@ -609,6 +623,7 @@ async def enhance_image_prompt(raw_prompt: str, image_url: Optional[str] = None,
             image_urls=[image_url],
             user_id=user_id,
             guild_id=guild_id,
+            channel_id=channel_id,
         )
         return enhanced.strip() or raw_prompt
 
@@ -618,12 +633,22 @@ async def enhance_image_prompt(raw_prompt: str, image_url: Optional[str] = None,
         "Add: art style, lighting, mood, composition, color palette, quality tags. "
         "Output only the enhanced prompt, nothing else. Max 120 words."
     )
-    enhanced = await chat_with_fallback(system_prompt=system, user_prompt=raw_prompt)
+    enhanced = await chat_with_fallback(
+        system_prompt=system,
+        user_prompt=build_user_prompt(raw_prompt, user_id=user_id, guild_id=guild_id, channel_id=channel_id),
+    )
     return enhanced.strip() or raw_prompt
 
 
 
-async def improve_image_prompt(original_prompt: str, user_feedback: str, image_url: Optional[str] = None, user_id: int = 0, guild_id: Optional[int] = None) -> str:
+async def improve_image_prompt(
+    original_prompt: str,
+    user_feedback: str,
+    image_url: Optional[str] = None,
+    user_id: int = 0,
+    guild_id: Optional[int] = None,
+    channel_id: Optional[int] = None,
+) -> str:
     """Merge user feedback with original prompt via vision model to produce an improved prompt."""
     feedback_lower = user_feedback.lower().strip()
     is_generic = feedback_lower in {"improve", "better", "enhance", "make it better", "fix it", "redo"}
@@ -637,8 +662,9 @@ async def improve_image_prompt(original_prompt: str, user_feedback: str, image_u
         improved = await vision_chat_from_urls(
             user_text=instruction,
             image_urls=[image_url],
-            user_id=message.author.id,
-            guild_id=current_guild_id,
+            user_id=user_id,
+            guild_id=guild_id,
+            channel_id=channel_id,
         )
         return improved.strip() or original_prompt
 
@@ -649,7 +675,10 @@ async def improve_image_prompt(original_prompt: str, user_feedback: str, image_u
         "Output only the final prompt, no explanation. Max 120 words."
     )
     user_msg = f"Original prompt: {original_prompt}\nUser feedback: {user_feedback}"
-    improved = await chat_with_fallback(system_prompt=system, user_prompt=user_msg)
+    improved = await chat_with_fallback(
+        system_prompt=system,
+        user_prompt=build_user_prompt(user_msg, user_id=user_id, guild_id=guild_id, channel_id=channel_id),
+    )
     return improved.strip() or original_prompt
 
 
@@ -1141,11 +1170,12 @@ async def vision_chat_from_urls(
     image_urls: List[str],
     user_id: int,
     guild_id: Optional[int] = None,
+    channel_id: Optional[int] = None,
     mood: str = "happy",
 ) -> str:
     if not image_urls:
         return ""
-    lang = detect_language(user_text or "")
+    lang = detect_language(user_text or "", channel_id=channel_id)
     system = persona_system_prompt(lang, mood=mood) + " You can analyze images."
     prompt_text = user_text.strip() or "Describe this image in detail and infer context."
 
@@ -1161,7 +1191,7 @@ async def vision_chat_from_urls(
                 {"role": "system", "content": system},
                 {
                     "role": "user",
-                    "content": build_user_prompt(prompt_text, user_id=user_id, guild_id=guild_id),
+                    "content": build_user_prompt(prompt_text, user_id=user_id, guild_id=guild_id, channel_id=channel_id),
                     "images": image_b64,
                 },
             ],
@@ -1173,15 +1203,15 @@ async def vision_chat_from_urls(
         if QWEN_FALLBACK_MODEL:
             qwen_reply = await ollama_client.chat_messages(
                 messages=[
-                    {"role": "system", "content": system},
-                    {
-                        "role": "user",
-                        "content": build_user_prompt(prompt_text, user_id=user_id, guild_id=guild_id),
-                        "images": image_b64,
-                    },
-                ],
-                model_override=QWEN_FALLBACK_MODEL,
-            )
+                {"role": "system", "content": system},
+                {
+                    "role": "user",
+                    "content": build_user_prompt(prompt_text, user_id=user_id, guild_id=guild_id, channel_id=channel_id),
+                    "images": image_b64,
+                },
+            ],
+            model_override=QWEN_FALLBACK_MODEL,
+        )
             if "I could not reach the AI backend right now" not in qwen_reply:
                 return qwen_reply.strip()
 
@@ -1190,7 +1220,7 @@ async def vision_chat_from_urls(
     user_content = [
         {
             "type": "text",
-            "text": build_user_prompt(prompt_text, user_id=user_id, guild_id=guild_id),
+            "text": build_user_prompt(prompt_text, user_id=user_id, guild_id=guild_id, channel_id=channel_id),
         }
     ]
     for u in image_urls:
@@ -1216,6 +1246,7 @@ async def vision_reply_for_message(message: discord.Message, mood: str = "happy"
         image_urls=image_urls,
         user_id=message.author.id,
         guild_id=(message.guild.id if message.guild else None),
+        channel_id=message.channel.id,
         mood=mood,
     )
 
@@ -1225,6 +1256,7 @@ async def build_img2img_edit_prompt(
     image_url: Optional[str],
     user_id: Optional[int] = None,
     guild_id: Optional[int] = None,
+    channel_id: Optional[int] = None,
 ) -> str:
     if not image_url:
         return user_prompt
@@ -1238,19 +1270,20 @@ async def build_img2img_edit_prompt(
         image_urls=[image_url],
         user_id=(user_id or 0),
         guild_id=guild_id,
+        channel_id=channel_id,
     )
     return rewritten.strip() or user_prompt
 
 
-async def generate_trigger_reply(message_text: str, matched_trigger: str, mood: str = "happy", user_id: Optional[int] = None, guild_id: Optional[int] = None) -> str:
-    lang = detect_language(message_text)
+async def generate_trigger_reply(message_text: str, matched_trigger: str, mood: str = "happy", user_id: Optional[int] = None, guild_id: Optional[int] = None, channel_id: Optional[int] = None) -> str:
+    lang = detect_language(message_text, channel_id=channel_id)
     system = persona_system_prompt(lang, mood=mood)
     base_prompt = (
         f'User sent this trigger message: "{message_text}". '
         f'Matched trigger: "{matched_trigger}". '
         "Reply naturally in one short message. Use 1-2 fitting emojis. No hashtags."
     )
-    user_prompt = add_memory_to_prompt(user_id, base_prompt, guild_id=guild_id) if user_id else base_prompt
+    user_prompt = add_memory_to_prompt(user_id, base_prompt, guild_id=guild_id, channel_id=channel_id) if user_id else base_prompt
     reply = (await chat_with_fallback(system_prompt=system, user_prompt=user_prompt)).strip()
     if not reply:
         return "I am here. Tell me what you want to talk about. 🙂"
@@ -1449,12 +1482,15 @@ async def on_app_command_error(
 
 @bot.hybrid_command(name="ask", description="Ask Miss Kim anything")
 async def ask(ctx: commands.Context, *, question: str) -> None:
-    lang = detect_language(question)
+    if ctx.interaction and not ctx.interaction.response.is_done():
+        await ctx.interaction.response.defer(thinking=True)
+
+    guild_id = ctx.guild.id if ctx.guild else None
+    channel_id = ctx.channel.id
+    lang = detect_language(question, channel_id=channel_id)
     mood = get_mood(ctx.channel.id)
     is_power = is_power_user(ctx.author)
     system = persona_system_prompt(lang, mood=mood, is_power=is_power)
-    guild_id = ctx.guild.id if ctx.guild else None
-    channel_id = ctx.channel.id
     remember_line(ctx.author.id, "U", question, guild_id=guild_id, channel_id=channel_id)
     reply = await chat_with_fallback(
         system_prompt=system,
@@ -1464,7 +1500,10 @@ async def ask(ctx: commands.Context, *, question: str) -> None:
     remember_line(ctx.author.id, "B", reply, guild_id=guild_id, channel_id=channel_id)
     if _should_summarize(ctx.author.id, guild_id=guild_id, channel_id=channel_id):
         await update_conversation_summary(ctx.author.id, guild_id=guild_id, channel_id=channel_id)
-    await send_discord_text(ctx.reply, reply, mention_author=False)
+    if ctx.interaction:
+        await send_discord_text(ctx.interaction.followup.send, reply)
+    else:
+        await send_discord_text(ctx.reply, reply, mention_author=False)
 
 
 @bot.command(name="say")
@@ -1488,13 +1527,16 @@ async def purge(ctx: commands.Context, amount: int = 10) -> None:
 
 @bot.command(name="kim")
 async def kim(ctx: commands.Context, *, text: str = "") -> None:
+    if ctx.interaction and not ctx.interaction.response.is_done():
+        await ctx.interaction.response.defer(thinking=True)
+
     prompt = text.strip() or "Start a conversation to make this chat active right now."
-    lang = detect_language(prompt)
+    guild_id = ctx.guild.id if ctx.guild else None
+    channel_id = ctx.channel.id
+    lang = detect_language(prompt, channel_id=channel_id)
     mood = get_mood(ctx.channel.id)
     is_power = is_power_user(ctx.author)
     system = persona_system_prompt(lang, mood=mood, is_power=is_power)
-    guild_id = ctx.guild.id if ctx.guild else None
-    channel_id = ctx.channel.id
     remember_line(ctx.author.id, "U", prompt, guild_id=guild_id, channel_id=channel_id)
     reply = await chat_with_fallback(
         system_prompt=system,
@@ -1504,7 +1546,10 @@ async def kim(ctx: commands.Context, *, text: str = "") -> None:
     remember_line(ctx.author.id, "B", reply, guild_id=guild_id, channel_id=channel_id)
     if _should_summarize(ctx.author.id, guild_id=guild_id, channel_id=channel_id):
         await update_conversation_summary(ctx.author.id, guild_id=guild_id, channel_id=channel_id)
-    await send_discord_text(ctx.reply, reply, mention_author=False)
+    if ctx.interaction:
+        await send_discord_text(ctx.interaction.followup.send, reply)
+    else:
+        await send_discord_text(ctx.reply, reply, mention_author=False)
 
 
 @bot.hybrid_command(name="perchance", description="Fetch a random output from a clean Perchance generator list")
@@ -1535,6 +1580,7 @@ async def _run_slash_image(
             image_url=image.url,
             user_id=interaction.user.id,
             guild_id=interaction.guild_id,
+            channel_id=interaction.channel_id,
         )
     generated = await generate_image_bytes(prompt=effective_prompt, source_image_bytes=source_bytes)
     if not generated:
@@ -1594,6 +1640,7 @@ async def vision(
         image_urls=[image.url],
         user_id=interaction.user.id,
         guild_id=interaction.guild_id,
+        channel_id=interaction.channel_id,
         mood=mood,
     )
     await send_discord_text(interaction.followup.send, reply or "Could not analyze this image.")
@@ -1650,7 +1697,11 @@ class ResetMemoryView(discord.ui.View):
     ) -> None:
         if not await self._guard(interaction):
             return
-        clear_user_memory(interaction.user.id, guild_id=interaction.guild_id)
+        clear_user_memory(
+            interaction.user.id,
+            guild_id=interaction.guild_id,
+            channel_id=interaction.channel_id,
+        )
         await interaction.response.edit_message(content="Your memory was reset.", view=None)
 
     @discord.ui.button(label="Reset All Memory", style=discord.ButtonStyle.danger)
@@ -1770,7 +1821,12 @@ async def on_message(message: discord.Message) -> None:
     is_dm = message.guild is None
     can_send = True
     if not is_dm:
-        if not isinstance(message.author, discord.Member) or not message.channel.permissions_for(message.guild.me).send_messages:
+        me = getattr(message.guild, "me", None)
+        if (
+            me is None
+            or not isinstance(message.author, discord.Member)
+            or not message.channel.permissions_for(me).send_messages
+        ):
             can_send = False
     if not can_send:
         await bot.process_commands(message)
@@ -1813,6 +1869,7 @@ async def on_message(message: discord.Message) -> None:
             image_url=source_url,
             user_id=message.author.id,
             guild_id=current_guild_id,
+            channel_id=message.channel.id,
         )
         if backend == "pollinations":
             generated = await generate_free_image(enhanced)
@@ -1865,12 +1922,16 @@ async def on_message(message: discord.Message) -> None:
                 image_url=ref_image_url,
                 user_id=message.author.id,
                 guild_id=current_guild_id,
+                channel_id=message.channel.id,
             )
 
             if backend == "pollinations":
                 generated = await generate_free_image(improved)
             else:
-                generated = await generate_image_bytes(prompt=improved)
+                generated = await generate_image_bytes(
+                    prompt=improved,
+                    source_image_bytes=await fetch_url_bytes(ref_image_url) if ref_image_url else None,
+                )
 
             if generated:
                 buf = io.BytesIO(generated)
@@ -1912,6 +1973,7 @@ async def on_message(message: discord.Message) -> None:
                 user_prompt=image_prompt,
                 image_url=source_url,
                 user_id=message.author.id,
+                channel_id=cid,
             )
         generated = await generate_image_bytes(prompt=effective_prompt, source_image_bytes=source_bytes)
         if generated:
@@ -1943,6 +2005,7 @@ async def on_message(message: discord.Message) -> None:
             mood=mood,
             user_id=message.author.id,
             guild_id=message.guild.id,
+            channel_id=cid,
         )
         await send_discord_text(message.channel.send, reply)
         remember_line(message.author.id, "B", reply, guild_id=message.guild.id, channel_id=cid)
@@ -1967,7 +2030,7 @@ async def on_message(message: discord.Message) -> None:
         if image_reply:
             reply = image_reply
         else:
-            lang = detect_language(message.content)
+            lang = detect_language(message.content, channel_id=cid)
             is_power = is_power_user(message.author)
             system = persona_system_prompt(lang, mood=mood, is_power=is_power)
             reply = await chat_with_fallback(

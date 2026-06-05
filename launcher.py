@@ -6,17 +6,18 @@ import subprocess
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BOT_ROOT = os.path.join(BASE_DIR, "Bot")
-BOT_DIRS = ["bot1", "bot2", "bot3", "bot4"]
+BOT_DIRS = ["bot1", "bot2"]
 
 
 def start_bot(bot_name: str):
-    script_path = os.path.join(BOT_ROOT, bot_name, "main.py")
+    bot_dir = os.path.join(BOT_ROOT, bot_name)
+    script_path = os.path.join(bot_dir, "main.py")
     if not os.path.exists(script_path):
         print(f"[SKIP] {bot_name}: missing {script_path}")
         return None
 
     cmd = [sys.executable, script_path]
-    proc = subprocess.Popen(cmd)
+    proc = subprocess.Popen(cmd, cwd=bot_dir)
     print(f"[STARTED] {bot_name} (pid={proc.pid})")
     return proc
 

@@ -1,6 +1,2 @@
-import time
-
 if __name__ == "__main__":
-    print("Starter bot running. Replace this file with your real bot code.")
-    while True:
-        time.sleep(60)
+    raise SystemExit("bot3 is a placeholder and is not enabled by default.")

@@ -132,7 +132,7 @@ class ForfeitButton(discord.ui.Button):
     async def callback(self, interaction: discord.Interaction) -> None:
         try:
             await defer_component_update(interaction)
-            await self.cog.forfeit_internal(interaction, self.actor_id)
+            await self.cog.forfeit_internal(interaction, str(interaction.user.id))
         except Exception:
             logger.exception("[BATTLE_FORFEIT_ERROR] battle_id=%s actor=%s", self.battle_id, self.actor_id)
             data = self.cog.bot.storage.load()
@@ -219,15 +219,7 @@ class FriendlyInviteView(discord.ui.View):
 
     @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger)
     async def decline(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        def mutate(data: dict[str, Any]) -> None:
-            pending = self.cog._battle_root(data).get("pending_friendly", {})
-            if isinstance(pending, dict):
-                pending.pop(self.target_id, None)
-
-        self.cog.bot.storage.with_lock(mutate)
-        t = self.cog.friendly_cpu_tasks.pop(self.target_id, None)
-        if t and not t.done():
-            t.cancel()
+        self.cog._remove_pending_friendly_state(self.target_id, cancel_task=True)
         data = self.cog.bot.storage.load()
         await smart_reply(
             interaction,
