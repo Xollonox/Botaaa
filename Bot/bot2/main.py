@@ -50,6 +50,7 @@ EXTENSIONS = [
     "bot.features.shop",
     "bot.features.squad",
     "bot.features.battle",
+    "bot.features.tutorial",
     "bot.features.tournament",
     "bot.features.leaderboards",
     "bot.features.league_overview",

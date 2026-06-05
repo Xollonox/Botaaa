@@ -196,6 +196,38 @@ class ProfileCog(commands.Cog):
         embed = make_embed(None, "Set Featured Card", "Choose the card to showcase on your profile.", footer="Player Profile")
         await interaction.response.send_message(embed=embed, view=view)
 
+    @app_commands.command(name="rival", description="View your current rival stats.")
+    async def rival(self, interaction: discord.Interaction) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
+            return
+        await interaction.response.defer()
+        data = self.bot.storage.load()
+        uid = str(interaction.user.id)
+        players = data.get("players", {})
+        player = players.get(uid, {}) if isinstance(players, dict) else {}
+        user_data = player.get("user", {}) if isinstance(player, dict) else {}
+        rival = user_data.get("rival", {}) if isinstance(user_data, dict) else {}
+
+        if not rival or not rival.get("rival_id"):
+            embed = make_embed(None, "No Rival Yet", "You haven't lost a ranked PvP battle yet. Get one loss to set your rival!", footer="Rival System")
+            await interaction.followup.send(embed=embed)
+            return
+
+        rival_id = str(rival.get("rival_id"))
+        rival_name = str(rival.get("rival_name", "Unknown"))
+        losses = rival.get("losses_to", 0)
+        wins = rival.get("wins_vs", 0)
+
+        fields = [
+            ("Rival", rival_name, False),
+            ("Losses to them", str(losses), True),
+            ("Wins vs them", str(wins), True),
+            ("Head-to-head", f"{wins}W-{losses}L", True),
+        ]
+
+        embed = make_embed(None, f"⚔️ Your Rival: {rival_name}", f"Track your rivalry progress", fields=fields, footer="Rival System")
+        await interaction.followup.send(embed=embed)
+
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(ProfileCog(bot))

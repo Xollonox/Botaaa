@@ -79,6 +79,7 @@ def build_start_embed(username: str) -> discord.Embed:
             "╰────────────────\n"
             "╭─ Begin\n"
             "│ /help\n"
+            "│ 📖 /tutorial — Complete the tutorial for bonus rewards!\n"
             "│ /shop\n"
             "│ Buy packs from the /shop panel\n"
             "│ /squad\n"

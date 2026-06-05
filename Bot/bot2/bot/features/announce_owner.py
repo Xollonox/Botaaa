@@ -1,15 +1,18 @@
-"""Owner manual announcement command."""
+"""Owner manual announcement command and event management."""
 
 from __future__ import annotations
 
 import discord
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
+from datetime import datetime, timedelta
+import random
 
 from bot.config import OWNER_GUILD_ID
 from bot.utils.checks import is_owner
 from bot.utils.ui import e, make_embed
 from bot.utils.interaction_visibility import smart_reply
+from bot.utils.timeutil import now_ts
 
 OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
@@ -17,6 +20,64 @@ OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 class AnnounceOwnerCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
+        self.card_of_the_day.start()
+
+    def cog_unload(self) -> None:
+        self.card_of_the_day.cancel()
+
+    @tasks.loop(hours=24)
+    async def card_of_the_day(self) -> None:
+        """Background task: pick and announce Card of the Day every 24 hours."""
+        data = self.bot.storage.load()
+        cards = data.get("cards", {})
+        if not isinstance(cards, dict) or not cards:
+            return
+
+        card_names = list(cards.keys())
+        if not card_names:
+            return
+
+        selected = random.choice(card_names)
+        today_str = datetime.utcnow().strftime("%Y-%m-%d")
+
+        data["cotd"] = {
+            "card_name": selected,
+            "date": today_str,
+            "buff_pct": 15,
+        }
+        self.bot.storage.save(data)
+
+        settings = data.get("server_settings", {}) if isinstance(data.get("server_settings"), dict) else {}
+        announce_channel_id = int(settings.get("announce_channel_id", 0) or 0)
+
+        if announce_channel_id <= 0:
+            return
+
+        target_channel = self.bot.get_channel(announce_channel_id)
+        if target_channel is None:
+            try:
+                target_channel = await self.bot.fetch_channel(announce_channel_id)
+            except Exception:
+                return
+
+        if not isinstance(target_channel, (discord.TextChannel, discord.Thread)):
+            return
+
+        embed = make_embed(
+            data,
+            f"⚡ CARD OF THE DAY",
+            f"**{selected}** gains **+15% damage** in all battles today!",
+        )
+        embed.set_footer(text=f"Rotation: {today_str}")
+        try:
+            await target_channel.send(embed=embed)
+        except Exception:
+            pass
+
+    @card_of_the_day.before_loop
+    async def before_card_of_the_day(self) -> None:
+        """Wait for bot to be ready before starting the task."""
+        await self.bot.wait_until_ready()
 
     @app_commands.command(name="o_announce", description="Owner: manually post an announcement.")
     @app_commands.guilds(OWNER_GUILD)
@@ -46,7 +107,7 @@ class AnnounceOwnerCog(commands.Cog):
                     target_channel = interaction.channel
 
         if not isinstance(target_channel, (discord.TextChannel, discord.Thread)):
-            await smart_reply(interaction, 
+            await smart_reply(interaction,
                 embed=make_embed(data, f"{e('warning', data)} Announcement Failed", "Target channel unavailable."),
                 ephemeral=True,
             )
@@ -64,7 +125,7 @@ class AnnounceOwnerCog(commands.Cog):
         content = ping_role.mention if ping_role is not None else None
         posted = await target_channel.send(content=content, embed=embed)
 
-        await smart_reply(interaction, 
+        await smart_reply(interaction,
             embed=make_embed(
                 data,
                 f"{e('ok', data)} Announcement Posted",
@@ -73,6 +134,115 @@ class AnnounceOwnerCog(commands.Cog):
             ephemeral=True,
         )
 
+    @app_commands.command(name="cotd", description="View today's Card of the Day buff.")
+    async def cotd(self, interaction: discord.Interaction) -> None:
+        """Show the current Card of the Day."""
+        data = self.bot.storage.load()
+        cotd = data.get("cotd", {})
+
+        if not cotd.get("card_name"):
+            await smart_reply(
+                interaction,
+                embed=make_embed(data, "⚡ Card of the Day", "No card is featured today yet."),
+                ephemeral=True,
+            )
+            return
+
+        card_name = cotd.get("card_name", "")
+        buff_pct = cotd.get("buff_pct", 15)
+        date_str = cotd.get("date", "today")
+
+        # Calculate time until next rotation (next UTC midnight)
+        now = datetime.utcnow()
+        next_rotation = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        time_left = next_rotation - now
+        hours_left = int(time_left.total_seconds() // 3600)
+        mins_left = int((time_left.total_seconds() % 3600) // 60)
+
+        embed = make_embed(
+            data,
+            "⚡ CARD OF THE DAY",
+            f"**{card_name}** gets **+{buff_pct}% damage** boost!\n\n"
+            f"Rotation: {date_str}\n"
+            f"Next rotation: {hours_left}h {mins_left}m",
+        )
+        embed.set_footer(text="Buff applies to all battles")
+        await smart_reply(interaction, embed=embed, ephemeral=True)
+
+    @app_commands.command(name="o_event", description="Owner: activate double XP/coins event.")
+    @app_commands.guilds(OWNER_GUILD)
+    @app_commands.describe(
+        event_type="Event type: double_xp or double_coins",
+        duration_hours="Duration in hours",
+    )
+    async def o_event(
+        self,
+        interaction: discord.Interaction,
+        event_type: str = "double_xp",
+        duration_hours: int = 24,
+    ) -> None:
+        """Activate a timed event for double XP or coins."""
+        data = self.bot.storage.load()
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
+            return
+
+        event_type = event_type.lower().strip()
+        if event_type not in ("double_xp", "double_coins"):
+            await smart_reply(
+                interaction,
+                embed=make_embed(data, f"{e('no', data)} Invalid Event", "Use: double_xp or double_coins"),
+                ephemeral=True,
+            )
+            return
+
+        duration_hours = max(1, min(720, int(duration_hours)))  # clamp 1-730 hours
+        ends_at = now_ts() + (duration_hours * 3600)
+
+        events = data.setdefault("active_events", {})
+        if not isinstance(events, dict):
+            events = {}
+            data["active_events"] = events
+
+        events[event_type] = {
+            "active": True,
+            "ends_at": ends_at,
+        }
+
+        self.bot.storage.save(data)
+
+        # Announce to the announcement channel
+        settings = data.get("server_settings", {}) if isinstance(data.get("server_settings"), dict) else {}
+        announce_channel_id = int(settings.get("announce_channel_id", 0) or 0)
+
+        announce_text = "2x XP 🚀" if event_type == "double_xp" else "1.5x CP Rewards 💰"
+        embed = make_embed(
+            data,
+            "🎉 EVENT ACTIVATED",
+            f"{announce_text} for **{duration_hours}** hours!",
+        )
+
+        if announce_channel_id > 0:
+            try:
+                channel = self.bot.get_channel(announce_channel_id)
+                if channel is None:
+                    channel = await self.bot.fetch_channel(announce_channel_id)
+                if isinstance(channel, (discord.TextChannel, discord.Thread)):
+                    await channel.send(embed=embed)
+            except Exception:
+                pass
+
+        await smart_reply(
+            interaction,
+            embed=make_embed(
+                data,
+                f"{e('ok', data)} Event Started",
+                f"{announce_text} for {duration_hours}h",
+            ),
+            ephemeral=True,
+        )
+
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(AnnounceOwnerCog(bot))
+

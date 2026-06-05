@@ -83,6 +83,28 @@ def format_rates_table(rates: dict[str, int]) -> str:
     return "\n".join(lines) if lines else "All rates are 0."
 
 
+def grant_pending_milestone_packs(data: dict[str, Any], user_id: str) -> list[str]:
+    """Grant any packs queued in pending_milestone_packs. Returns list of granted pack keys."""
+    players = data.get("players", {})
+    player = players.get(str(user_id))
+    if not isinstance(player, dict):
+        return []
+    user = player.get("user", {})
+    if not isinstance(user, dict):
+        return []
+    pending = user.get("pending_milestone_packs", [])
+    if not pending or not isinstance(pending, list):
+        return []
+
+    granted = []
+    for pack_key in pending:
+        _add_packs_to_inventory(data, str(user_id), pack_key, 1)
+        granted.append(pack_key)
+
+    user["pending_milestone_packs"] = []
+    return granted
+
+
 def open_pack_roll(
     data: dict[str, Any],
     user_id: str,

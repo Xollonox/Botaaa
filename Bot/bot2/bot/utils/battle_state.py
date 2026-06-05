@@ -627,6 +627,12 @@ def _compute_attack_damage(data: dict, me: dict, opp: dict, my_uid: str, opp_uid
     else:
         damage, _ = calculate_stat_damage(atk, dfs, mnorm)
 
+    # Check Card of the Day buff
+    fighter_name = me.get("fighter_names", {}).get(my_uid, "") if isinstance(me.get("fighter_names"), dict) else ""
+    cotd = data.get("cotd", {})
+    if fighter_name and cotd.get("card_name") == fighter_name:
+        damage = int(damage * 1.15)
+
     pending = me.get("pending_defense_by_char_uid", {}) if isinstance(me.get("pending_defense_by_char_uid"), dict) else {}
     # Actually pending is on state keyed by opp_uid — re-read from state
     return damage, _move_group(mnorm)
@@ -969,6 +975,7 @@ def _resolve_pvp_outcome(state: dict, data: dict, players: dict, winner_id: str,
 def _grant_battle_rewards(data: dict, state: dict, winner_id: str, loser_id: str, battle_type: str, is_draw: bool, no_contest: bool) -> None:
     """Grant XP, CP, tournament XP, and update season missions after battle."""
     from bot.utils.xp_logic import grant_battle_xp_cp
+    from bot.utils.pack_logic import grant_pending_milestone_packs
 
     if not is_draw and not no_contest:
         w_xp, w_cp = grant_battle_xp_cp(data, winner_id, f"{battle_type}_win")
@@ -977,9 +984,20 @@ def _grant_battle_rewards(data: dict, state: dict, winner_id: str, loser_id: str
         state["loser_xp"]  = l_xp
         state["winner_cp"] = w_cp
         state["loser_cp"]  = l_cp
+
+        # Grant pending milestone packs for both players
+        w_packs = grant_pending_milestone_packs(data, winner_id)
+        l_packs = grant_pending_milestone_packs(data, loser_id)
+        if w_packs:
+            state["winner_milestone_packs"] = w_packs
+        if l_packs:
+            state["loser_milestone_packs"] = l_packs
     elif is_draw:
         for pid in [winner_id, loser_id]:
             grant_battle_xp_cp(data, pid, f"{battle_type}_loss")
+            packs = grant_pending_milestone_packs(data, pid)
+            if packs:
+                state[f"{pid}_milestone_packs"] = packs
 
     # Tournament XP
     if battle_type == "tournament" and not is_draw and not no_contest:
@@ -1028,6 +1046,46 @@ def end_battle(data: dict[str, Any], battle_id: str, winner_id: str, loser_id: s
             _resolve_cpu_outcome(state, data, human_id, winner_id)
         else:
             is_draw = _resolve_pvp_outcome(state, data, players, winner_id, reason, no_contest)
+
+    # Rival tracking (only for ranked PvP, not CPU)
+    players = state.get("players", {}) if isinstance(state.get("players"), dict) else {}
+    cpu_id = next((str(pid) for pid, ps in players.items() if isinstance(ps, dict) and bool(ps.get("is_cpu", False))), "")
+    if str(state.get("type", "ranked")) == "ranked" and not no_contest and not is_draw and not cpu_id:
+        loser_player = get_player(data, loser_id)
+        winner_player = get_player(data, winner_id)
+        loser_user = loser_player.get("user", {}) if isinstance(loser_player, dict) else {}
+        winner_user = winner_player.get("user", {}) if isinstance(winner_player, dict) else {}
+        winner_name = str(winner_user.get("name", "Unknown")) if isinstance(winner_user, dict) else "Unknown"
+
+        # Update loser's rival tracking
+        if isinstance(loser_user, dict):
+            rival = loser_user.setdefault("rival", {"rival_id": None, "rival_name": "", "losses_to": 0, "wins_vs": 0})
+            if not isinstance(rival, dict):
+                rival = {"rival_id": None, "rival_name": "", "losses_to": 0, "wins_vs": 0}
+                loser_user["rival"] = rival
+            if rival.get("rival_id") == winner_id:
+                rival["losses_to"] = rival.get("losses_to", 0) + 1
+            elif rival.get("losses_to", 0) == 0:
+                rival["rival_id"] = winner_id
+                rival["rival_name"] = winner_name
+                rival["losses_to"] = 1
+
+        # Update winner's rival tracking
+        if isinstance(winner_user, dict):
+            w_rival = winner_user.get("rival", {})
+            if not isinstance(w_rival, dict):
+                w_rival = {"rival_id": None, "rival_name": "", "losses_to": 0, "wins_vs": 0}
+                winner_user["rival"] = w_rival
+            if w_rival.get("rival_id") == loser_id:
+                w_rival["wins_vs"] = w_rival.get("wins_vs", 0) + 1
+
+        # Bounty tracking
+        bounty = data.get("bounty", {}) if isinstance(data.get("bounty", {}), dict) else {}
+        if bounty and bounty.get("target_id") == loser_id:
+            winner_user["balance"] = winner_user.get("balance", 0) + bounty.get("reward", 3000)
+            state["bounty_claimed"] = True
+            state["bounty_claimer"] = winner_name
+            data["bounty"] = {}
 
     # XP, CP, tournament, missions
     battle_type = str(state.get("type", "ranked"))
