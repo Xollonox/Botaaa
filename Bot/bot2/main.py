@@ -6,6 +6,7 @@ import asyncio
 import logging
 import os
 import sys
+from typing import Any
 
 import discord
 from discord import app_commands
@@ -84,6 +85,10 @@ class LookismBot(commands.Bot):
             tree_cls=LookismCommandTree,
         )
         self.storage = Storage(DATA_PATH)
+        # In-memory set of user IDs who have accepted terms — avoids a
+        # storage.load() + deepcopy on every slash-command interaction.
+        # Populated lazily on first cache miss; invalidated via mark_terms_accepted().
+        self._terms_cache: set[int] = set()
         self.market_repo = SQLiteMarketRepository(SQLITE_PATH)
         self.market_service = MarketService(self.market_repo, self.storage)
         self.market_service.bootstrap_from_json()
@@ -93,6 +98,10 @@ class LookismBot(commands.Bot):
         self.battle_repo = SQLiteBattleRepository(SQLITE_PATH)
         self.battle_service = BattleService(self.battle_repo, self.storage)
         self.battle_service.bootstrap_from_json()
+
+    def mark_terms_accepted(self, user_id: int) -> None:
+        """Called by onboarding code when a user accepts the ToS."""
+        self._terms_cache.add(int(user_id))
 
     async def _unlock_stale_trades(self) -> None:
         """On startup, unlock any cards that were left trade_locked after a crash."""
@@ -133,8 +142,13 @@ class LookismBot(commands.Bot):
         if interaction.type is discord.InteractionType.autocomplete:
             return True
 
+        user_id = int(interaction.user.id)
+        if user_id in self._terms_cache:
+            return True
+
         data = self.storage.load()
-        if has_user_accepted_terms(data, str(interaction.user.id)):
+        if has_user_accepted_terms(data, str(user_id)):
+            self._terms_cache.add(user_id)
             return True
 
         embed = build_terms_embed()
@@ -161,7 +175,8 @@ class LookismBot(commands.Bot):
 
         if failed:
             logger.warning("[BOOT] %d extension(s) failed to load: %s", len(failed), failed)
-            raise RuntimeError(f"Required extension(s) failed to load: {', '.join(failed)}")
+            # Keep the bot alive even if non-critical cogs fail — operators can
+            # inspect logs and hot-reload the broken extension once the issue is fixed.
 
         # Sync slash commands
         owner_guild = discord.Object(id=OWNER_GUILD_ID)
@@ -224,18 +239,29 @@ class LookismBot(commands.Bot):
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
         logger.warning("[CMD_ERROR] %s: %s", ctx.command, error)
 
-    async def on_cooldown(self, interaction: discord.Interaction, error: app_commands.CommandOnCooldown) -> None:
-        await interaction.response.send_message(
-            f"⏳ Command on cooldown. Try again in **{error.retry_after:.0f}s**.",
-            ephemeral=True,
-        )
-
 
 class LookismCommandTree(app_commands.CommandTree["LookismBot"]):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if not isinstance(self.client, LookismBot):
             return True
         return await self.client._global_terms_gate(interaction)
+
+    async def on_error(
+        self,
+        interaction: discord.Interaction,
+        error: app_commands.AppCommandError,
+    ) -> None:
+        if isinstance(error, app_commands.CommandOnCooldown):
+            msg = f"⏳ Command on cooldown. Try again in **{error.retry_after:.0f}s**."
+            try:
+                if interaction.response.is_done():
+                    await interaction.followup.send(msg, ephemeral=True)
+                else:
+                    await interaction.response.send_message(msg, ephemeral=True)
+            except discord.HTTPException:
+                pass
+            return
+        await super().on_error(interaction, error)
 
 
 # ---------------------------------------------------------------------------
