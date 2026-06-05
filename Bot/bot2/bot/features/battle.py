@@ -57,6 +57,72 @@ logger = logging.getLogger(__name__)
 OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 RANKED_QUEUE_TIMEOUT_SECONDS = 60
 
+
+def _cpu_pick_move(personality: str, available_moves: list, fighter_hp_pct: float, enemy_hp_pct: float) -> str:
+    """Pick a move for the CPU based on personality.
+
+    Args:
+        personality: personality name string
+        available_moves: list of move type strings that still have uses
+            (e.g. ["normal", "special", "ultimate", "block", "dodge"])
+        fighter_hp_pct: current fighter's HP as 0.0-1.0
+        enemy_hp_pct: enemy fighter's HP as 0.0-1.0
+    Returns:
+        move type string to use
+    """
+    has_special = "special" in available_moves
+    has_ultimate = "ultimate" in available_moves
+    has_block = "block" in available_moves
+    has_dodge = "dodge" in available_moves
+
+    p = personality.lower() if personality else "balanced"
+
+    if p == "aggressive":
+        # Always use the most powerful move available
+        if has_ultimate:
+            return "ultimate"
+        if has_special:
+            return "special"
+        return "normal"
+
+    elif p == "defensive":
+        # Block when damaged, dodge when critical, otherwise normal
+        if has_block and fighter_hp_pct < 0.7:
+            return "block"
+        if has_dodge and fighter_hp_pct < 0.5:
+            return "dodge"
+        return "normal"
+
+    elif p == "trickster":
+        # Dodge when healthy, attack unpredictably
+        if has_dodge and fighter_hp_pct > 0.6 and random.random() < 0.4:
+            return "dodge"
+        if has_special and random.random() < 0.5:
+            return "special"
+        pool = [m for m in available_moves if m in ("normal", "special", "block")] or ["normal"]
+        return random.choice(pool)
+
+    elif p == "finisher":
+        # Save ultimate for when enemy is low
+        if has_ultimate and enemy_hp_pct < 0.3:
+            return "ultimate"
+        if has_special and enemy_hp_pct < 0.5:
+            return "special"
+        if has_block and fighter_hp_pct < 0.4:
+            return "block"
+        return "normal"
+
+    else:  # "balanced" or unknown
+        # Mix of offense and defense
+        if has_ultimate and fighter_hp_pct > 0.5 and random.random() < 0.3:
+            return "ultimate"
+        if has_special and random.random() < 0.4:
+            return "special"
+        if has_block and fighter_hp_pct < 0.5 and random.random() < 0.3:
+            return "block"
+        return "normal"
+
+
 class BattleCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
