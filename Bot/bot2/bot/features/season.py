@@ -87,48 +87,86 @@ def _time_until_reset(period: str) -> str:
     return "season end"
 
 def _grant_reward(data: dict[str, Any], user_id: str, reward_str: str) -> str:
-    """Parse and grant a reward string. Returns description of what was given."""
+    """Parse and grant a reward string. Returns description of what was given.
+
+    Handles:
+    - Coins: "500 coins"
+    - Gems: "50 gems"
+    - Packs: "newbie pack", "amateur pack", etc. (case-insensitive)
+    - Multiple rewards: "500 coins, 1 newbie_pack" (comma-separated)
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
     p = data.get("players", {}).get(str(user_id), {})
     u = (p.get("user", {}) or {}) if isinstance(p, dict) else {}
-    r = str(reward_str).strip().lower()
 
-    # Coins
-    if "coin" in r:
-        digits = ''.join(filter(str.isdigit, r))
-        amt = int(digits) if digits else 0
-        if amt:
-            u["balance"] = int(u.get("balance", 0)) + amt
-            return f"💰 +{amt:,} coins"
+    # Handle comma-separated rewards
+    reward_parts = [part.strip() for part in str(reward_str).split(",")]
+    descriptions = []
 
-    # Gems
-    if "gem" in r:
-        digits = ''.join(filter(str.isdigit, r))
-        amt = int(digits) if digits else 0
-        if amt:
-            u["premium_balance"] = int(u.get("premium_balance", 0)) + amt
-            return f"💎 +{amt} gems"
+    for part in reward_parts:
+        if not part:
+            continue
 
-    # Packs
-    pack_map = {
-        "newbie pack": "newbie_pack", "amateur pack": "amateur_pack",
-        "basic pack": "basic_pack", "intermediate pack": "intermediate_pack",
-        "experienced pack": "experienced_pack", "advanced pack": "advanced_pack",
-        "veteran pack": "veteran_pack", "vip pack": "vip_pack",
-        "ranker pack": "ranker_pack",
-    }
-    # Handle "2x" prefix
-    qty = 1
-    rw = r
-    if rw.startswith("2x") or rw.startswith("2 x"):
-        qty = 2
-        rw = rw.replace("2x", "").replace("2 x", "").strip()
-    for pack_name, pack_key in pack_map.items():
-        if pack_name in rw:
-            from bot.features.packs import _add_packs_to_inventory
-            _add_packs_to_inventory(data, user_id, pack_key, qty)
-            return f"🎴 {qty}× {reward_str}"
+        r = part.lower()
+        matched = False
 
-    return f"🎁 {reward_str}"
+        # Coins
+        if "coin" in r:
+            digits = ''.join(filter(str.isdigit, r))
+            amt = int(digits) if digits else 0
+            if amt:
+                u["balance"] = int(u.get("balance", 0)) + amt
+                descriptions.append(f"💰 +{amt:,} coins")
+                matched = True
+
+        # Gems
+        if "gem" in r:
+            digits = ''.join(filter(str.isdigit, r))
+            amt = int(digits) if digits else 0
+            if amt:
+                u["premium_balance"] = int(u.get("premium_balance", 0)) + amt
+                descriptions.append(f"💎 +{amt} gems")
+                matched = True
+
+        # Packs — robust substring matching
+        if not matched:
+            pack_patterns = {
+                "newbie": "newbie_pack",
+                "amateur": "amateur_pack",
+                "basic": "basic_pack",
+                "intermediate": "intermediate_pack",
+                "experienced": "experienced_pack",
+                "veteran": "veteran_pack",
+                "abyssal": "abyssal_pack",
+                "infernal": "infernal_pack",
+            }
+
+            # Handle quantity prefix (e.g., "2x", "2 x", "2")
+            qty = 1
+            rw = r
+            if rw.startswith("2x") or rw.startswith("2 x"):
+                qty = 2
+                rw = rw.replace("2x", "").replace("2 x", "").strip()
+            elif rw.startswith("3x") or rw.startswith("3 x"):
+                qty = 3
+                rw = rw.replace("3x", "").replace("3 x", "").strip()
+
+            for pattern, pack_key in pack_patterns.items():
+                if pattern in rw:
+                    from bot.features.packs import _add_packs_to_inventory
+                    _add_packs_to_inventory(data, user_id, pack_key, qty)
+                    descriptions.append(f"🎴 {qty}× {part.strip()}")
+                    matched = True
+                    break
+
+        # Fallback: unknown format
+        if not matched:
+            logger.warning("[SEASON] Unknown reward format: %r", part)
+            descriptions.append(f"🎁 {part.strip()}")
+
+    return " + ".join(descriptions) if descriptions else f"🎁 {reward_str}"
 
 
 # ── Season Info Panel ─────────────────────────────────────────────
