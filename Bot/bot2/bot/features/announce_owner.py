@@ -21,9 +21,11 @@ class AnnounceOwnerCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.card_of_the_day.start()
+        self.weekly_bounty.start()
 
     def cog_unload(self) -> None:
         self.card_of_the_day.cancel()
+        self.weekly_bounty.cancel()
 
     @tasks.loop(hours=24)
     async def card_of_the_day(self) -> None:
@@ -73,6 +75,81 @@ class AnnounceOwnerCog(commands.Cog):
             await target_channel.send(embed=embed)
         except Exception:
             pass
+
+    @card_of_the_day.before_loop
+    async def before_card_of_the_day(self) -> None:
+        """Wait for bot to be ready before starting the task."""
+        await self.bot.wait_until_ready()
+
+    @tasks.loop(hours=168)
+    async def weekly_bounty(self) -> None:
+        """Background task: pick player with highest win streak and announce bounty every 7 days."""
+        data = self.bot.storage.load()
+        players = data.get("players", {})
+        if not isinstance(players, dict):
+            return
+
+        max_streak = 0
+        target_id = None
+        target_name = "Unknown"
+
+        for uid, player in players.items():
+            if not isinstance(player, dict):
+                continue
+            ranked_stats = player.get("ranked_stats", {})
+            if not isinstance(ranked_stats, dict):
+                continue
+            streak = int(ranked_stats.get("streak", 0))
+            if streak >= 5 and streak > max_streak:
+                max_streak = streak
+                target_id = str(uid)
+                user = player.get("user", {})
+                target_name = str(user.get("name", "Unknown")) if isinstance(user, dict) else "Unknown"
+
+        if target_id is None or max_streak < 5:
+            return
+
+        week_num = (now_ts() // 604800)
+        data["bounty"] = {
+            "target_id": target_id,
+            "target_name": target_name,
+            "streak": max_streak,
+            "reward": 3000,
+            "week": week_num,
+        }
+        self.bot.storage.save(data)
+
+        settings = data.get("server_settings", {}) if isinstance(data.get("server_settings"), dict) else {}
+        announce_channel_id = int(settings.get("announce_channel_id", 0) or 0)
+
+        if announce_channel_id <= 0:
+            return
+
+        target_channel = self.bot.get_channel(announce_channel_id)
+        if target_channel is None:
+            try:
+                target_channel = await self.bot.fetch_channel(announce_channel_id)
+            except Exception:
+                return
+
+        if not isinstance(target_channel, (discord.TextChannel, discord.Thread)):
+            return
+
+        embed = make_embed(
+            data,
+            "🎯 WANTED: BOUNTY BOARD",
+            f"**@{target_name}** is on a **{max_streak}-win streak**!\n\nFirst to beat them earns **3,000 bonus coins**!",
+        )
+        embed.set_footer(text="Bounty Board")
+        try:
+            await target_channel.send(embed=embed)
+        except Exception:
+            pass
+
+    @weekly_bounty.before_loop
+    async def before_weekly_bounty(self) -> None:
+        """Wait for bot to be ready before starting the task."""
+        await self.bot.wait_until_ready()
 
     @card_of_the_day.before_loop
     async def before_card_of_the_day(self) -> None:

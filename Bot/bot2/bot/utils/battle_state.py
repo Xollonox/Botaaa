@@ -12,6 +12,7 @@ from bot.utils.battle_engine_pdf import normalize_attack_type
 from bot.utils.cards_logic import compute_scaled_stats
 from bot.utils.squad_logic import get_player
 from bot.utils.timeutil import now_ts
+from bot.utils import achievement_logic as _ach
 from bot.utils.typing_matchup import (
     MASTERMIND_BIQ_BONUS,
     MASTERMIND_IQ_BONUS,
