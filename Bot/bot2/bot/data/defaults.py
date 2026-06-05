@@ -119,9 +119,9 @@ DEFAULT_PACK_DEFINITIONS = {
 DEFAULT_CONFIG = {
     "rewards": {
         "hourly": 100,
-        "daily": 0,
-        "weekly": 0,
-        "monthly": 0,
+        "daily": 500,
+        "weekly": 2000,
+        "monthly": 8000,
     },
     "ui": {
         "footer": "LOOKISM HXCC • /help",
@@ -534,6 +534,25 @@ DEFAULT_DATA = {
         "tournament_entry": {"id": "tournament_entry", "name": "Tournament Entry", "desc": "Join a tournament.", "tier": "Silver", "icon_key": "tournament", "points": 25},
         "tournament_champ": {"id": "tournament_champ", "name": "Tournament Champion", "desc": "Win a tournament.", "tier": "Diamond", "icon_key": "winner", "points": 80},
         "season_claimer": {"id": "season_claimer", "name": "Season Claimer", "desc": "Claim your first season reward.", "tier": "Gold", "icon_key": "season", "points": 40},
+        "win_10_battles": {"id": "win_10_battles", "name": "Battle Novice", "desc": "Win 10 ranked battles.", "tier": "Bronze", "icon_key": "battle", "points": 200},
+        "win_50_battles": {"id": "win_50_battles", "name": "Battle Warrior", "desc": "Win 50 ranked battles.", "tier": "Silver", "icon_key": "battle", "points": 500},
+        "win_100_battles": {"id": "win_100_battles", "name": "Battle Master", "desc": "Win 100 ranked battles.", "tier": "Gold", "icon_key": "battle", "points": 1000},
+        "win_streak_5": {"id": "win_streak_5", "name": "On Fire", "desc": "Win 5 ranked battles in a row.", "tier": "Silver", "icon_key": "battle", "points": 300},
+        "own_5_cards": {"id": "own_5_cards", "name": "Card Starter", "desc": "Own 5 unique cards.", "tier": "Bronze", "icon_key": "card", "points": 100},
+        "own_15_cards": {"id": "own_15_cards", "name": "Card Enthusiast", "desc": "Own 15 unique cards.", "tier": "Silver", "icon_key": "card", "points": 400},
+        "own_all_cards": {"id": "own_all_cards", "name": "Card Collector", "desc": "Own all 26 unique cards.", "tier": "Diamond", "icon_key": "card", "points": 2000},
+        "reach_silver": {"id": "reach_silver", "name": "Silver Tier", "desc": "Reach Silver rank.", "tier": "Silver", "icon_key": "rank", "points": 200},
+        "reach_gold": {"id": "reach_gold", "name": "Gold Tier", "desc": "Reach Gold rank.", "tier": "Gold", "icon_key": "rank", "points": 400},
+        "reach_diamond": {"id": "reach_diamond", "name": "Diamond Tier", "desc": "Reach Diamond rank.", "tier": "Diamond", "icon_key": "rank", "points": 800},
+        "reach_ruby": {"id": "reach_ruby", "name": "Ruby Tier", "desc": "Reach Ruby rank.", "tier": "Diamond", "icon_key": "rank", "points": 1500},
+        "first_fusion": {"id": "first_fusion", "name": "Fusion Master", "desc": "Fuse a card for the first time.", "tier": "Bronze", "icon_key": "card", "points": 150},
+        "complete_10_trades": {"id": "complete_10_trades", "name": "Trading Expert", "desc": "Complete 10 trades.", "tier": "Silver", "icon_key": "trade", "points": 300},
+        "level_25": {"id": "level_25", "name": "Intermediate Player", "desc": "Reach player level 25.", "tier": "Silver", "icon_key": "level", "points": 500},
+        "level_50": {"id": "level_50", "name": "Veteran Player", "desc": "Reach player level 50.", "tier": "Gold", "icon_key": "level", "points": 1000},
+        "spend_100k_coins": {"id": "spend_100k_coins", "name": "Big Spender", "desc": "Spend 100,000 total coins.", "tier": "Gold", "icon_key": "coins", "points": 400},
+        "win_gang_war": {"id": "win_gang_war", "name": "Gang War Victor", "desc": "Win a gang war.", "tier": "Gold", "icon_key": "gang", "points": 600},
+        "land_10_ultimates": {"id": "land_10_ultimates", "name": "Ultimate Striker", "desc": "Land 10 ultimate moves in battle.", "tier": "Silver", "icon_key": "battle", "points": 250},
+        "perfect_block_10": {"id": "perfect_block_10", "name": "Perfect Defender", "desc": "Successfully block 10 attacks.", "tier": "Silver", "icon_key": "battle", "points": 200},
     },
     "tournament": {
         "active":       True,
@@ -673,7 +692,8 @@ def ensure_structure(data: Any) -> dict[str, Any]:
     if not isinstance(attacks, dict):
         data["attacks"] = {"catalog": {}}
     else:
-        attacks["catalog"] = {}
+        if "catalog" not in attacks or not isinstance(attacks.get("catalog"), dict):
+            attacks["catalog"] = {}
 
     ai = data.get("ai")
     if not isinstance(ai, dict):
