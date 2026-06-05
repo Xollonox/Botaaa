@@ -399,22 +399,19 @@ class OnboardingCog(commands.Cog):
         user_id = str(interaction.user.id)
         username = interaction.user.name
 
+        result = {"granted": False}
+
         def mutate(data: dict[str, Any]) -> dict[str, Any]:
             _player, granted = ensure_started_player(data, user_id, username, accept_terms=True)
-            if granted:
-                data["_newbie_granted"] = True
+            result["granted"] = granted
             return data
 
         self.bot.storage.with_lock(mutate)
+        granted = result["granted"]
+
         # Warm the bot-level terms cache so subsequent commands skip storage.load()
         if hasattr(self.bot, "mark_terms_accepted"):
             self.bot.mark_terms_accepted(interaction.user.id)
-        data = self.bot.storage.load()
-        granted = bool(data.pop("_newbie_granted", False))
-        if granted:
-            def _clean(d):
-                d.pop("_newbie_granted", None)
-            self.bot.storage.with_lock(_clean)
 
         embed = build_start_embed(interaction.user.name)
         view = StartQuickLinksView(self.bot)
