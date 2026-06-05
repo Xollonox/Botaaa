@@ -23,25 +23,13 @@
       "strength": 100,
       "speed": 90,
       "endurance": 95,
-      "technique": 80,
-      "iq": 70,
-      "biq": 85,
-      "str": 100,
-      "spd": 90,
-      "end": 95,
-      "tec": 80
+      "technique": 80
     },
     "stats_max": {
       "strength": 110,
       "speed": 95,
       "endurance": 100,
-      "technique": 85,
-      "iq": 75,
-      "biq": 90,
-      "str": 110,
-      "spd": 95,
-      "end": 100,
-      "tec": 85
+      "technique": 85
     },
     "moves": [
       {
@@ -124,6 +112,10 @@
     ],
     "defensive_moves": [
       "Despair Block"
+    ],
+    "typing": [
+      "Tank",
+      "Assassin"
     ]
   },
   "Kitae Kim Cheongliang": {
@@ -150,25 +142,13 @@
       "strength": 95,
       "speed": 90,
       "endurance": 95,
-      "technique": 80,
-      "iq": 70,
-      "biq": 85,
-      "str": 95,
-      "spd": 90,
-      "end": 95,
-      "tec": 80
+      "technique": 80
     },
     "stats_max": {
       "strength": 100,
       "speed": 95,
       "endurance": 100,
-      "technique": 85,
-      "iq": 75,
-      "biq": 90,
-      "str": 100,
-      "spd": 95,
-      "end": 100,
-      "tec": 85
+      "technique": 85
     },
     "moves": [
       {
@@ -251,6 +231,10 @@
     ],
     "defensive_moves": [
       "Iron Wall Guard"
+    ],
+    "typing": [
+      "Tank",
+      "Assassin"
     ]
   },
   "James Lee Mastermind": {
@@ -277,25 +261,13 @@
       "strength": 85,
       "speed": 100,
       "endurance": 80,
-      "technique": 90,
-      "iq": 95,
-      "biq": 95,
-      "str": 85,
-      "spd": 100,
-      "end": 80,
-      "tec": 90
+      "technique": 90
     },
     "stats_max": {
       "strength": 90,
       "speed": 110,
       "endurance": 85,
-      "technique": 95,
-      "iq": 100,
-      "biq": 100,
-      "str": 90,
-      "spd": 110,
-      "end": 85,
-      "tec": 95
+      "technique": 95
     },
     "moves": [
       {
@@ -378,6 +350,10 @@
     ],
     "defensive_moves": [
       "Mastermind Parry"
+    ],
+    "typing": [
+      "Fighter",
+      "Assassin"
     ]
   },
   "James Lee Peak": {
@@ -404,25 +380,13 @@
       "strength": 90,
       "speed": 100,
       "endurance": 80,
-      "technique": 95,
-      "iq": 95,
-      "biq": 95,
-      "str": 90,
-      "spd": 100,
-      "end": 80,
-      "tec": 95
+      "technique": 95
     },
     "stats_max": {
       "strength": 95,
       "speed": 110,
       "endurance": 85,
-      "technique": 100,
-      "iq": 100,
-      "biq": 100,
-      "str": 95,
-      "spd": 110,
-      "end": 85,
-      "tec": 100
+      "technique": 100
     },
     "moves": [
       {
@@ -505,6 +469,10 @@
     ],
     "defensive_moves": [
       "Peak Reflex"
+    ],
+    "typing": [
+      "Fighter",
+      "Assassin"
     ]
   },
   "Diego Kang": {
@@ -531,25 +499,13 @@
       "strength": 85,
       "speed": 100,
       "endurance": 80,
-      "technique": 90,
-      "iq": 95,
-      "biq": 95,
-      "str": 85,
-      "spd": 100,
-      "end": 80,
-      "tec": 90
+      "technique": 90
     },
     "stats_max": {
       "strength": 90,
       "speed": 110,
       "endurance": 85,
-      "technique": 95,
-      "iq": 100,
-      "biq": 100,
-      "str": 90,
-      "spd": 110,
-      "end": 85,
-      "tec": 95
+      "technique": 95
     },
     "moves": [
       {
@@ -632,6 +588,10 @@
     ],
     "defensive_moves": [
       "Celebrity Guard"
+    ],
+    "typing": [
+      "Fighter",
+      "Assassin"
     ]
   },
   "James Lee 3T": {
@@ -658,25 +618,13 @@
       "strength": 75,
       "speed": 75,
       "endurance": 65,
-      "technique": 70,
-      "iq": 70,
-      "biq": 75,
-      "str": 75,
-      "spd": 75,
-      "end": 65,
-      "tec": 70
+      "technique": 70
     },
     "stats_max": {
       "strength": 80,
       "speed": 80,
       "endurance": 70,
-      "technique": 75,
-      "iq": 75,
-      "biq": 80,
-      "str": 80,
-      "spd": 80,
-      "end": 70,
-      "tec": 75
+      "technique": 75
     },
     "moves": [
       {
@@ -759,7 +707,8 @@
     ],
     "defensive_moves": [
       "Instinct Block"
-    ]
+    ],
+    "typing": "Speedster"
   },
   "James Lee 2T": {
     "emoji": "🟠",
@@ -785,25 +734,13 @@
       "strength": 60,
       "speed": 75,
       "endurance": 65,
-      "technique": 65,
-      "iq": 70,
-      "biq": 70,
-      "str": 60,
-      "spd": 75,
-      "end": 65,
-      "tec": 65
+      "technique": 65
     },
     "stats_max": {
       "strength": 65,
       "speed": 80,
       "endurance": 70,
-      "technique": 70,
-      "iq": 75,
-      "biq": 75,
-      "str": 65,
-      "spd": 80,
-      "end": 70,
-      "tec": 70
+      "technique": 70
     },
     "moves": [
       {
@@ -886,7 +823,8 @@
     ],
     "defensive_moves": [
       "Raw Guard"
-    ]
+    ],
+    "typing": "Speedster"
   },
   "Seonji Yuk 3T": {
     "emoji": "🔴",
@@ -912,25 +850,13 @@
       "strength": 80,
       "speed": 75,
       "endurance": 75,
-      "technique": 60,
-      "iq": 60,
-      "biq": 70,
-      "str": 80,
-      "spd": 75,
-      "end": 75,
-      "tec": 60
+      "technique": 60
     },
     "stats_max": {
       "strength": 85,
       "speed": 80,
       "endurance": 80,
-      "technique": 65,
-      "iq": 65,
-      "biq": 75,
-      "str": 85,
-      "spd": 80,
-      "end": 80,
-      "tec": 65
+      "technique": 65
     },
     "moves": [
       {
@@ -1013,7 +939,8 @@
     ],
     "defensive_moves": [
       "Ssirium Brace"
-    ]
+    ],
+    "typing": "Fighter"
   },
   "Seonji Yuk 2T": {
     "emoji": "🟠",
@@ -1039,25 +966,13 @@
       "strength": 75,
       "speed": 65,
       "endurance": 75,
-      "technique": 60,
-      "iq": 60,
-      "biq": 70,
-      "str": 75,
-      "spd": 65,
-      "end": 75,
-      "tec": 60
+      "technique": 60
     },
     "stats_max": {
       "strength": 80,
       "speed": 70,
       "endurance": 80,
-      "technique": 65,
-      "iq": 65,
-      "biq": 75,
-      "str": 80,
-      "spd": 70,
-      "end": 80,
-      "tec": 65
+      "technique": 65
     },
     "moves": [
       {
@@ -1140,7 +1055,8 @@
     ],
     "defensive_moves": [
       "Ssirium Brace"
-    ]
+    ],
+    "typing": "Tank"
   },
   "Beolgu Lee Cheongliang": {
     "emoji": "🟣",
@@ -1166,25 +1082,13 @@
       "strength": 45,
       "speed": 35,
       "endurance": 35,
-      "technique": 30,
-      "iq": 20,
-      "biq": 25,
-      "str": 45,
-      "spd": 35,
-      "end": 35,
-      "tec": 30
+      "technique": 30
     },
     "stats_max": {
       "strength": 50,
       "speed": 40,
       "endurance": 40,
-      "technique": 35,
-      "iq": 25,
-      "biq": 30,
-      "str": 50,
-      "spd": 40,
-      "end": 40,
-      "tec": 35
+      "technique": 35
     },
     "moves": [
       {
@@ -1267,7 +1171,8 @@
     ],
     "defensive_moves": [
       "Cheongliang Guard"
-    ]
+    ],
+    "typing": "Fighter"
   },
   "Gwang Yo Cheongliang": {
     "emoji": "🟣",
@@ -1293,25 +1198,13 @@
       "strength": 35,
       "speed": 45,
       "endurance": 30,
-      "technique": 35,
-      "iq": 20,
-      "biq": 25,
-      "str": 35,
-      "spd": 45,
-      "end": 30,
-      "tec": 35
+      "technique": 35
     },
     "stats_max": {
       "strength": 40,
       "speed": 50,
       "endurance": 35,
-      "technique": 40,
-      "iq": 25,
-      "biq": 30,
-      "str": 40,
-      "spd": 50,
-      "end": 35,
-      "tec": 40
+      "technique": 40
     },
     "moves": [
       {
@@ -1394,7 +1287,8 @@
     ],
     "defensive_moves": [
       "MMA Shell"
-    ]
+    ],
+    "typing": "Speedster"
   },
   "Jaesu Noh Cheongliang": {
     "emoji": "🟣",
@@ -1420,25 +1314,13 @@
       "strength": 35,
       "speed": 35,
       "endurance": 45,
-      "technique": 30,
-      "iq": 20,
-      "biq": 25,
-      "str": 35,
-      "spd": 35,
-      "end": 45,
-      "tec": 30
+      "technique": 30
     },
     "stats_max": {
       "strength": 40,
       "speed": 40,
       "endurance": 50,
-      "technique": 35,
-      "iq": 25,
-      "biq": 30,
-      "str": 40,
-      "spd": 40,
-      "end": 50,
-      "tec": 35
+      "technique": 35
     },
     "moves": [
       {
@@ -1521,7 +1403,8 @@
     ],
     "defensive_moves": [
       "Iron Stance"
-    ]
+    ],
+    "typing": "Tank"
   },
   "Kojima Brothers Cheongliang": {
     "emoji": "🟣",
@@ -1547,25 +1430,13 @@
       "strength": 45,
       "speed": 45,
       "endurance": 30,
-      "technique": 40,
-      "iq": 20,
-      "biq": 30,
-      "str": 45,
-      "spd": 45,
-      "end": 30,
-      "tec": 40
+      "technique": 40
     },
     "stats_max": {
       "strength": 50,
       "speed": 50,
       "endurance": 35,
-      "technique": 45,
-      "iq": 25,
-      "biq": 35,
-      "str": 50,
-      "spd": 50,
-      "end": 35,
-      "tec": 45
+      "technique": 45
     },
     "moves": [
       {
@@ -1648,7 +1519,8 @@
     ],
     "defensive_moves": [
       "Tag Cover"
-    ]
+    ],
+    "typing": "Speedster"
   },
   "Shamen Guards Cheongliang": {
     "emoji": "⚪",
@@ -1674,25 +1546,13 @@
       "strength": 15,
       "speed": 10,
       "endurance": 15,
-      "technique": 5,
-      "iq": 5,
-      "biq": 10,
-      "str": 15,
-      "spd": 10,
-      "end": 15,
-      "tec": 5
+      "technique": 5
     },
     "stats_max": {
       "strength": 20,
       "speed": 15,
       "endurance": 20,
-      "technique": 10,
-      "iq": 10,
-      "biq": 15,
-      "str": 20,
-      "spd": 15,
-      "end": 20,
-      "tec": 10
+      "technique": 10
     },
     "moves": [
       {
@@ -1775,7 +1635,8 @@
     ],
     "defensive_moves": [
       "Guard Stance"
-    ]
+    ],
+    "typing": "Tank"
   },
   "Yakuza Guard Cheongliang": {
     "emoji": "⚪",
@@ -1801,25 +1662,13 @@
       "strength": 5,
       "speed": 5,
       "endurance": 5,
-      "technique": 5,
-      "iq": 5,
-      "biq": 5,
-      "str": 5,
-      "spd": 5,
-      "end": 5,
-      "tec": 5
+      "technique": 5
     },
     "stats_max": {
       "strength": 10,
       "speed": 10,
       "endurance": 10,
-      "technique": 10,
-      "iq": 10,
-      "biq": 10,
-      "str": 10,
-      "spd": 10,
-      "end": 10,
-      "tec": 10
+      "technique": 10
     },
     "moves": [
       {
@@ -1902,7 +1751,8 @@
     ],
     "defensive_moves": [
       "Yakuza Crouch"
-    ]
+    ],
+    "typing": "Tank"
   },
   "Taebong Lim Cheongliang": {
     "emoji": "⚪",
@@ -1928,25 +1778,13 @@
       "strength": 10,
       "speed": 10,
       "endurance": 10,
-      "technique": 10,
-      "iq": 10,
-      "biq": 10,
-      "str": 10,
-      "spd": 10,
-      "end": 10,
-      "tec": 10
+      "technique": 10
     },
     "stats_max": {
       "strength": 15,
       "speed": 15,
       "endurance": 15,
-      "technique": 15,
-      "iq": 15,
-      "biq": 15,
-      "str": 15,
-      "spd": 15,
-      "end": 15,
-      "tec": 15
+      "technique": 15
     },
     "moves": [
       {
@@ -1996,7 +1834,8 @@
     "ultimate": [],
     "defensive_moves": [
       "Taebong Guard"
-    ]
+    ],
+    "typing": "Tank"
   },
   "Vin Jin Cheongliang": {
     "emoji": "⚪",
@@ -2022,25 +1861,13 @@
       "strength": 15,
       "speed": 15,
       "endurance": 10,
-      "technique": 10,
-      "iq": 5,
-      "biq": 10,
-      "str": 15,
-      "spd": 15,
-      "end": 10,
-      "tec": 10
+      "technique": 10
     },
     "stats_max": {
       "strength": 20,
       "speed": 20,
       "endurance": 15,
-      "technique": 15,
-      "iq": 10,
-      "biq": 15,
-      "str": 20,
-      "spd": 20,
-      "end": 15,
-      "tec": 15
+      "technique": 15
     },
     "moves": [
       {
@@ -2090,7 +1917,8 @@
     "ultimate": [],
     "defensive_moves": [
       "Vin Jin Guard"
-    ]
+    ],
+    "typing": "Speedster"
   },
   "Hyungjae Lee Cheongliang": {
     "emoji": "⚪",
@@ -2116,25 +1944,13 @@
       "strength": 10,
       "speed": 10,
       "endurance": 10,
-      "technique": 10,
-      "iq": 10,
-      "biq": 10,
-      "str": 10,
-      "spd": 10,
-      "end": 10,
-      "tec": 10
+      "technique": 10
     },
     "stats_max": {
       "strength": 15,
       "speed": 15,
       "endurance": 15,
-      "technique": 15,
-      "iq": 15,
-      "biq": 15,
-      "str": 15,
-      "spd": 15,
-      "end": 15,
-      "tec": 15
+      "technique": 15
     },
     "moves": [
       {
@@ -2184,7 +2000,8 @@
     "ultimate": [],
     "defensive_moves": [
       "Hyungjae Guard"
-    ]
+    ],
+    "typing": "Tank"
   },
   "Jaewoo Park Cheongliang": {
     "emoji": "⚪",
@@ -2210,25 +2027,13 @@
       "strength": 10,
       "speed": 10,
       "endurance": 10,
-      "technique": 10,
-      "iq": 10,
-      "biq": 10,
-      "str": 10,
-      "spd": 10,
-      "end": 10,
-      "tec": 10
+      "technique": 10
     },
     "stats_max": {
       "strength": 15,
       "speed": 15,
       "endurance": 15,
-      "technique": 15,
-      "iq": 15,
-      "biq": 15,
-      "str": 15,
-      "spd": 15,
-      "end": 15,
-      "tec": 15
+      "technique": 15
     },
     "moves": [
       {
@@ -2278,7 +2083,8 @@
     "ultimate": [],
     "defensive_moves": [
       "Jaewoo Guard"
-    ]
+    ],
+    "typing": "Tank"
   },
   "Wooseok Choi Cheongliang": {
     "emoji": "⚪",
@@ -2304,25 +2110,13 @@
       "strength": 10,
       "speed": 10,
       "endurance": 10,
-      "technique": 10,
-      "iq": 10,
-      "biq": 10,
-      "str": 10,
-      "spd": 10,
-      "end": 10,
-      "tec": 10
+      "technique": 10
     },
     "stats_max": {
       "strength": 15,
       "speed": 15,
       "endurance": 15,
-      "technique": 15,
-      "iq": 15,
-      "biq": 15,
-      "str": 15,
-      "spd": 15,
-      "end": 15,
-      "tec": 15
+      "technique": 15
     },
     "moves": [
       {
@@ -2372,7 +2166,8 @@
     "ultimate": [],
     "defensive_moves": [
       "Wooseok Guard"
-    ]
+    ],
+    "typing": "Tank"
   },
   "Kid Seonji Cheongliang": {
     "emoji": "⚪",
@@ -2398,25 +2193,13 @@
       "strength": 5,
       "speed": 5,
       "endurance": 5,
-      "technique": 5,
-      "iq": 5,
-      "biq": 5,
-      "str": 5,
-      "spd": 5,
-      "end": 5,
-      "tec": 5
+      "technique": 5
     },
     "stats_max": {
       "strength": 10,
       "speed": 10,
       "endurance": 10,
-      "technique": 10,
-      "iq": 10,
-      "biq": 10,
-      "str": 10,
-      "spd": 10,
-      "end": 10,
-      "tec": 10
+      "technique": 10
     },
     "moves": [
       {
@@ -2466,7 +2249,8 @@
     "ultimate": [],
     "defensive_moves": [
       "Kid Guard"
-    ]
+    ],
+    "typing": "Tank"
   },
   "Cheongliang Fam Cheongliang": {
     "emoji": "🟡",
@@ -2492,25 +2276,13 @@
       "strength": 15,
       "speed": 15,
       "endurance": 15,
-      "technique": 15,
-      "iq": 15,
-      "biq": 15,
-      "str": 15,
-      "spd": 15,
-      "end": 15,
-      "tec": 15
+      "technique": 15
     },
     "stats_max": {
       "strength": 20,
       "speed": 20,
       "endurance": 20,
-      "technique": 20,
-      "iq": 20,
-      "biq": 20,
-      "str": 20,
-      "spd": 20,
-      "end": 20,
-      "tec": 20
+      "technique": 20
     },
     "moves": [
       {
@@ -2543,7 +2315,8 @@
     "ultimate": [],
     "defensive_moves": [
       "Fam Guard"
-    ]
+    ],
+    "typing": "Tank"
   },
   "Vin Jin Rage Cheongliang": {
     "emoji": "🟡",
@@ -2569,25 +2342,13 @@
       "strength": 20,
       "speed": 15,
       "endurance": 15,
-      "technique": 15,
-      "iq": 10,
-      "biq": 15,
-      "str": 20,
-      "spd": 15,
-      "end": 15,
-      "tec": 15
+      "technique": 15
     },
     "stats_max": {
       "strength": 25,
       "speed": 20,
       "endurance": 20,
-      "technique": 20,
-      "iq": 15,
-      "biq": 20,
-      "str": 25,
-      "spd": 20,
-      "end": 20,
-      "tec": 20
+      "technique": 20
     },
     "moves": [
       {
@@ -2653,7 +2414,8 @@
     "ultimate": [],
     "defensive_moves": [
       "Rage Guard"
-    ]
+    ],
+    "typing": "Fighter"
   },
   "Goo Kim Cheongliang": {
     "emoji": "🟠",
@@ -2679,25 +2441,13 @@
       "strength": 65,
       "speed": 65,
       "endurance": 65,
-      "technique": 70,
-      "iq": 60,
-      "biq": 70,
-      "str": 65,
-      "spd": 65,
-      "end": 65,
-      "tec": 70
+      "technique": 70
     },
     "stats_max": {
       "strength": 70,
       "speed": 70,
       "endurance": 70,
-      "technique": 75,
-      "iq": 65,
-      "biq": 75,
-      "str": 70,
-      "spd": 70,
-      "end": 70,
-      "tec": 75
+      "technique": 75
     },
     "moves": [
       {
@@ -2780,7 +2530,8 @@
     ],
     "defensive_moves": [
       "Blade Guard"
-    ]
+    ],
+    "typing": "Tank"
   },
   "Jinyong Go Cheongliang": {
     "emoji": "🟡",
@@ -2806,25 +2557,13 @@
       "strength": 25,
       "speed": 25,
       "endurance": 25,
-      "technique": 20,
-      "iq": 10,
-      "biq": 25,
-      "str": 25,
-      "spd": 25,
-      "end": 25,
-      "tec": 20
+      "technique": 20
     },
     "stats_max": {
       "strength": 30,
       "speed": 30,
       "endurance": 30,
-      "technique": 25,
-      "iq": 15,
-      "biq": 30,
-      "str": 30,
-      "spd": 30,
-      "end": 30,
-      "tec": 25
+      "technique": 25
     },
     "moves": [
       {
@@ -2907,7 +2646,8 @@
     ],
     "defensive_moves": [
       "Jinyong Guard"
-    ]
+    ],
+    "typing": "Tank"
   },
   "Doksu Heo Cheongliang": {
     "emoji": "🟡",
@@ -2933,25 +2673,13 @@
       "strength": 25,
       "speed": 25,
       "endurance": 25,
-      "technique": 20,
-      "iq": 10,
-      "biq": 25,
-      "str": 25,
-      "spd": 25,
-      "end": 25,
-      "tec": 20
+      "technique": 20
     },
     "stats_max": {
       "strength": 30,
       "speed": 30,
       "endurance": 30,
-      "technique": 25,
-      "iq": 15,
-      "biq": 30,
-      "str": 30,
-      "spd": 30,
-      "end": 30,
-      "tec": 25
+      "technique": 25
     },
     "moves": [
       {
@@ -3034,6 +2762,7 @@
     ],
     "defensive_moves": [
       "Doksu Guard"
-    ]
+    ],
+    "typing": "Tank"
   }
 }
