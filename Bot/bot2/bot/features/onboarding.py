@@ -211,6 +211,9 @@ class TermsGateView(discord.ui.View):
             return data
 
         self.bot.storage.with_lock(mutate)
+        # Warm the bot-level terms cache so subsequent commands skip storage.load()
+        if hasattr(self.bot, "mark_terms_accepted"):
+            self.bot.mark_terms_accepted(interaction.user.id)
         if interaction.response.is_done():
             await interaction.followup.send("Terms accepted successfully.")
         else:
@@ -403,6 +406,9 @@ class OnboardingCog(commands.Cog):
             return data
 
         self.bot.storage.with_lock(mutate)
+        # Warm the bot-level terms cache so subsequent commands skip storage.load()
+        if hasattr(self.bot, "mark_terms_accepted"):
+            self.bot.mark_terms_accepted(interaction.user.id)
         data = self.bot.storage.load()
         granted = bool(data.pop("_newbie_granted", False))
         if granted:
