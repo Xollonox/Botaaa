@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class LeaderboardPanel(discord.ui.View):
-    def __init__(self, cog: "LeaderboardsCog", user_id: int, rows: list[dict], title: str, icon: str) -> None:
+    def __init__(self, cog: "LeaderboardsCog", user_id: int, rows: list[dict], title: str, icon: str, data: dict | None = None) -> None:
         super().__init__(timeout=120)
         self.cog = cog
         self.user_id = user_id
@@ -29,6 +29,7 @@ class LeaderboardPanel(discord.ui.View):
         self.page = 1
         self.page_size = 10
         self.message: discord.Message | None = None
+        self._data = data if data is not None else cog.bot.storage.load()
         self._sync()
 
     def _sync(self) -> None:
@@ -76,14 +77,14 @@ class LeaderboardPanel(discord.ui.View):
     async def prev_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         self.page -= 1
         self._sync()
-        data = self.cog.bot.storage.load()
+        data = self._data
         await interaction.response.edit_message(embed=self.build_embed(data), view=self)
 
     @discord.ui.button(label="Next ▶", style=discord.ButtonStyle.primary, row=0)
     async def next_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         self.page += 1
         self._sync()
-        data = self.cog.bot.storage.load()
+        data = self._data
         await interaction.response.edit_message(embed=self.build_embed(data), view=self)
 
 
@@ -115,7 +116,7 @@ class LeaderboardsCog(commands.Cog):
         return out
 
     async def _send_player_page(self, interaction: discord.Interaction, data: dict[str, Any], rows: list[dict[str, Any]], title: str, page: int) -> None:
-        panel = LeaderboardPanel(self, interaction.user.id, rows, title, e("leaderboard", data))
+        panel = LeaderboardPanel(self, interaction.user.id, rows, title, e("leaderboard", data), data)
         panel.page = max(1, min(int(page), panel.total_pages))
         panel._sync()
         if not rows:
@@ -133,7 +134,7 @@ class LeaderboardsCog(commands.Cog):
         icon: str,
         page: int,
     ) -> None:
-        panel = LeaderboardPanel(self, interaction.user.id, rows, title, icon)
+        panel = LeaderboardPanel(self, interaction.user.id, rows, title, icon, data)
         panel.page = max(1, min(int(page), panel.total_pages))
         panel._sync()
         if not rows:

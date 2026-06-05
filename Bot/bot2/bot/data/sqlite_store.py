@@ -47,6 +47,8 @@ class SQLiteMarketRepository:
     def _init_db(self) -> None:
         Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as conn:
+            conn.execute("PRAGMA journal_mode=WAL")
+            conn.execute("PRAGMA synchronous=NORMAL")
             _ensure_migration_table(conn)
             conn.execute(
                 """
@@ -342,6 +344,8 @@ class SQLiteTradeRepository:
     def _init_db(self) -> None:
         Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as conn:
+            conn.execute("PRAGMA journal_mode=WAL")
+            conn.execute("PRAGMA synchronous=NORMAL")
             _ensure_migration_table(conn)
             conn.execute(
                 """
@@ -503,6 +507,8 @@ class SQLiteBattleRepository:
     def _init_db(self) -> None:
         Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as conn:
+            conn.execute("PRAGMA journal_mode=WAL")
+            conn.execute("PRAGMA synchronous=NORMAL")
             _ensure_migration_table(conn)
             conn.execute(
                 """
