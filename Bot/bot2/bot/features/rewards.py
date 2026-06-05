@@ -16,6 +16,7 @@ from bot.utils.economy_logic import cooldown_remaining, fmt_duration
 from bot.utils.interaction_visibility import error_reply
 from bot.utils.timeutil import now_ts
 from bot.utils.ui import make_embed
+from bot.features.tutorial import advance_tutorial
 
 REWARD_COOLDOWNS = {
     "hourly": 3600,
@@ -351,6 +352,8 @@ class RewardsCog(commands.Cog):
                 new_balance += coin_amount
                 user["balance"] = new_balance
                 cooldowns[reward_type] = now
+                if reward_type == "daily":
+                    advance_tutorial(user, "claim_daily")
                 return True, 0, None, None, "", new_balance, True, coin_amount, streak, multiplier
 
             rarity = _weighted_rarity(rates)
@@ -360,6 +363,8 @@ class RewardsCog(commands.Cog):
                 new_balance += coin_amount
                 user["balance"] = new_balance
                 cooldowns[reward_type] = now
+                if reward_type == "daily":
+                    advance_tutorial(user, "claim_daily")
                 return True, 0, None, None, "", new_balance, True, coin_amount, streak, multiplier
 
             card_instance = build_card_instance(card_def, acquired_at=now, stars=0)
@@ -369,6 +374,8 @@ class RewardsCog(commands.Cog):
                 user["inventory"] = inventory
             inventory.append(card_instance)
             cooldowns[reward_type] = now
+            if reward_type == "daily":
+                advance_tutorial(user, "claim_daily")
             return True, 0, card_def, card_instance, rarity, new_balance, False, 0, streak, multiplier
 
         (
