@@ -1044,6 +1044,13 @@ def end_battle(data: dict[str, Any], battle_id: str, winner_id: str, loser_id: s
         if cpu_id:
             human_id = next((str(pid) for pid in players.keys() if str(pid) != cpu_id), "")
             _resolve_cpu_outcome(state, data, human_id, winner_id)
+            # Tutorial: track first win
+            if str(winner_id) == human_id:
+                winner_player = get_player(data, winner_id)
+                winner_user = winner_player.get("user", {}) if isinstance(winner_player, dict) else {}
+                if isinstance(winner_user, dict):
+                    from bot.features.tutorial import advance_tutorial
+                    advance_tutorial(winner_user, "win_battle")
         else:
             is_draw = _resolve_pvp_outcome(state, data, players, winner_id, reason, no_contest)
 

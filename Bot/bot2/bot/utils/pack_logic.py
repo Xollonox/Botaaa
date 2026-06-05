@@ -7,6 +7,18 @@ from typing import Any
 
 from bot.utils.cards_logic import RARITIES, build_card_instance
 
+# Guaranteed rarity after N packs without pulling it (highest triggered wins).
+PITY_THRESHOLDS: dict[str, dict[str, int]] = {
+    "veteran_pack":     {"Infernal": 50, "Mythical": 30, "Legendary": 15},
+    "experienced_pack": {"Mythical": 40, "Legendary": 20},
+    "intermediate_pack":{"Legendary": 30, "Epic": 15},
+    "basic_pack":       {"Epic": 20},
+    "amateur_pack":     {"Rare": 15},
+}
+
+# Rarities ordered highest-to-lowest for pity priority resolution.
+_RARITY_ORDER = ["Abyssal", "Infernal", "Mythical", "Legendary", "Epic", "Rare", "Common"]
+
 
 def normalize_pack_key(name: str) -> str:
     """Normalize a pack name to a storage key."""
@@ -157,10 +169,54 @@ def open_pack_roll(
         inventory = []
         user["inventory"] = inventory
 
+    pack_key = str(pack_def.get("key", ""))
+    thresholds = PITY_THRESHOLDS.get(pack_key, {})
+    pity_all: dict[str, dict[str, int]] = user.setdefault("pity", {})
+    if not isinstance(pity_all, dict):
+        pity_all = {}
+        user["pity"] = pity_all
+    pity: dict[str, int] = pity_all.setdefault(pack_key, {})
+    if not isinstance(pity, dict):
+        pity = {}
+        pity_all[pack_key] = pity
+
     instances = []
     cards_data = []
     for _ in range(cards_per_pack):
-        card_name, card_def = random.choice(pool)
+        # Check pity: find the highest-priority rarity whose counter has hit threshold.
+        forced_rarity: str | None = None
+        if thresholds:
+            for rarity in _RARITY_ORDER:
+                threshold = thresholds.get(rarity)
+                if threshold is None:
+                    continue
+                counter_key = f"pulls_since_{rarity.lower()}"
+                if pity.get(counter_key, 0) >= threshold:
+                    forced_rarity = rarity
+                    break
+
+        if forced_rarity is not None:
+            forced_pool = [
+                (name, card) for name, card in catalog.items()
+                if isinstance(card, dict) and str(card.get("rarity", "")) == forced_rarity
+            ]
+            if forced_pool:
+                card_name, card_def = random.choice(forced_pool)
+            else:
+                card_name, card_def = random.choice(pool)
+        else:
+            card_name, card_def = random.choice(pool)
+
+        pulled_rarity = str(card_def.get("rarity", ""))
+
+        # Update pity counters: reset pulled rarity, increment all others tracked for this pack.
+        for rarity in thresholds:
+            counter_key = f"pulls_since_{rarity.lower()}"
+            if rarity == pulled_rarity:
+                pity[counter_key] = 0
+            else:
+                pity[counter_key] = pity.get(counter_key, 0) + 1
+
         instance = build_card_instance(card_def, acquired_at=now)
         inventory.append(instance)
         instances.append(instance)

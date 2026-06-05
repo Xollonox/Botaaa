@@ -13,7 +13,7 @@ from bot.data.defaults import build_default_player
 from bot.features.help_index import HELP_CATEGORIES
 from bot.utils.timeutil import now_ts
 from bot.utils.ui import e, make_embed, skin_embed
-from bot.features.packs import grant_newbie_packs
+from bot.features.packs import grant_newbie_packs, grant_pending_milestone_packs
 from bot.utils.interaction_visibility import smart_reply, error_reply
 
 TERMS_COLOR = 0xE11D48
@@ -405,6 +405,8 @@ class OnboardingCog(commands.Cog):
         def mutate(data: dict[str, Any]) -> dict[str, Any]:
             _player, granted = ensure_started_player(data, user_id, username, accept_terms=True)
             result["granted"] = granted
+            # Grant any pending milestone packs queued from level-ups
+            grant_pending_milestone_packs(data, user_id)
             return data
 
         self.bot.storage.with_lock(mutate)
