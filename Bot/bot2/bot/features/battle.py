@@ -256,6 +256,7 @@ class BattleCog(commands.Cog):
         self.bot = bot
         self.turn_tasks: dict[str, asyncio.Task[Any]] = {}
         self.battle_stall_tasks: dict[str, asyncio.Task[Any]] = {}
+        self.timer_tasks: dict[str, asyncio.Task[Any]] = {}
         self.queue_cpu_tasks: dict[str, asyncio.Task[Any]] = {}
         self.friendly_cpu_tasks: dict[str, asyncio.Task[Any]] = {}
         # cpu_win_timestamps moved to player data (persistent) in battle_state.end_battle
@@ -290,10 +291,35 @@ class BattleCog(commands.Cog):
 
     def _cancel_battle_runtime_tasks(self, battle_id: str) -> None:
         current_task = asyncio.current_task()
-        for bucket in (self.turn_tasks, self.battle_stall_tasks):
+        for bucket in (self.turn_tasks, self.battle_stall_tasks, self.timer_tasks):
             task = bucket.pop(str(battle_id), None)
             if task and task is not current_task and not task.done():
                 task.cancel()
+
+    async def _tick_timer(self, battle_id: str, total: int) -> None:
+        """E. Live turn timer — edit battle message every 10 seconds with updated countdown."""
+        for remaining in range(total - 10, 0, -10):
+            await asyncio.sleep(10)
+            data = self.bot.storage.load()
+            battle = self._battle_root(data).get("active", {}).get(battle_id)
+            if not isinstance(battle, dict) or bool(battle.get("ended", False)):
+                return
+            channel_id = int(str(battle.get("message_channel_id", 0)) or 0)
+            message_id = int(str(battle.get("message_id", 0)) or 0)
+            if not channel_id or not message_id:
+                return
+            channel = self.bot.get_channel(channel_id)
+            if channel is None or not hasattr(channel, "fetch_message"):
+                return
+            try:
+                msg = await channel.fetch_message(message_id)
+            except Exception:
+                return
+            embed_a_img, embed_a, embed_b_img, embed_b, embed_c, _view = self._build_embed_view(data, battle_id)
+            try:
+                await msg.edit(embeds=[emb for emb in (embed_a_img, embed_a, embed_b_img, embed_b, embed_c) if emb is not None])
+            except Exception:
+                logger.debug("[TIMER_TICK] edit failed battle_id=%s remaining=%s", battle_id, remaining)
 
     async def _apply_battle_message_update(self, interaction: discord.Interaction, *, embeds: list[discord.Embed], view: discord.ui.View | None) -> None:
         if view is not None:
@@ -745,16 +771,16 @@ class BattleCog(commands.Cog):
             lines.append(f"{row.get('name')}:{uses}")
         return "\n".join(lines) if lines else "-"
 
-    def _build_embed_view(self, data: dict[str, Any], battle_id: str) -> tuple[discord.Embed | None, discord.Embed | None, discord.Embed | None, TurnView | None]:
+    def _build_embed_view(self, data: dict[str, Any], battle_id: str, display_hp_override: dict[str, int] | None = None) -> tuple[discord.Embed | None, discord.Embed | None, discord.Embed | None, discord.Embed | None, discord.Embed | None, TurnView | None]:
         try:
             battle = self._lookup_battle(data, battle_id)
             if not isinstance(battle, dict):
-                return make_embed(data, "Battle Missing", "State not found."), None, None, None
+                return make_embed(data, "Battle Missing", "State not found."), None, None, None, None, None
 
             players = battle.get("players", {}) if isinstance(battle.get("players", {}), dict) else {}
             pids = list(players.keys())
             if len(pids) != 2:
-                return make_embed(data, "Battle Invalid", "Invalid participants."), None, None, None
+                return make_embed(data, "Battle Invalid", "Invalid participants."), None, None, None, None, None
 
             a_id, b_id = str(pids[0]), str(pids[1])
             a = players.get(a_id, {}) if isinstance(players.get(a_id), dict) else {}
@@ -784,7 +810,7 @@ class BattleCog(commands.Cog):
                 stats_map = pstate.get("stats", {}) if isinstance(pstate.get("stats"), dict) else {}
                 card_name, cdef = fighter_bundle(uid, pstate)
                 rarity = str(cdef.get("rarity", "")).strip()
-                cur_hp = max(0, int(hp.get(uid, 0)))
+                cur_hp = max(0, int(display_hp_override.get(uid, hp.get(uid, 0)) if display_hp_override else hp.get(uid, 0)))
                 max_hp = max(1, int(hp_max.get(uid, 1)))
                 cur_hp = min(cur_hp, max_hp)
                 pct = int(round((cur_hp / max_hp) * 100))
@@ -993,8 +1019,18 @@ class BattleCog(commands.Cog):
             )
 
             header = f"{mode_label} DUEL — Round {round_no} — Turn: {turn_label} — {timer}s"
-            embed_a = make_embed(None, header, desc_a, color=0x2b2d31, image_url=a_img)
-            embed_b = make_embed(None, "", desc_b, color=0x2b2d31, image_url=b_img)
+            # Side A: image-first embed (renders huge at top), then text embed
+            embed_a_img = None
+            if a_img:
+                embed_a_img = discord.Embed(color=0x2b2d31)
+                embed_a_img.set_image(url=a_img)
+            embed_a = make_embed(None, header, desc_a, color=0x2b2d31)
+            # Side B: same pattern
+            embed_b_img = None
+            if b_img:
+                embed_b_img = discord.Embed(color=0x2b2d31)
+                embed_b_img.set_image(url=b_img)
+            embed_b = make_embed(None, "", desc_b, color=0x2b2d31)
             # ── Log embed ─────────────────────────────────────
             log_display = log_text[:1024] if log_text else "—"
             embed_c = make_embed(None, f"{e('list', data)} Battle Log", log_display, color=0x2b2d31, footer=f"Round {round_no}")
@@ -1008,7 +1044,7 @@ class BattleCog(commands.Cog):
                 await self.forfeit_internal(i, str(i.user.id))
             fallback_btn.callback = fb_cb
             fallback_view.add_item(fallback_btn)
-            return make_embed(data, "Battle Error", "battle state error"), None, None, fallback_view
+            return make_embed(data, "Battle Error", "battle state error"), None, None, None, None, fallback_view
 
         if bool(battle.get("ended", False)):
             end_reason = str(battle.get("reason", ""))
@@ -1020,7 +1056,7 @@ class BattleCog(commands.Cog):
                 ]
                 embed_a.description = "─" * 32 + "\n" + "\n".join(result_lines) + "\n" + "─" * 32 + "\n\n" + (embed_a.description or "")
                 embed_c_log = make_embed(None, f"{e('list', data)} Battle Log — Ended", log_text[:1024] if log_text else "—", color=0x2b2d31)
-                return embed_a, embed_b, embed_c_log, None
+                return embed_a_img, embed_a, embed_b_img, embed_b, embed_c_log, None
 
             if end_reason == "draw":
                 result_lines = [
@@ -1029,7 +1065,7 @@ class BattleCog(commands.Cog):
                 ]
                 embed_a.description = "─" * 32 + "\n" + "\n".join(result_lines) + "\n" + "─" * 32 + "\n\n" + (embed_a.description or "")
                 embed_c_log = make_embed(None, "Battle Log — Ended", log_text[:1024] if log_text else "—", color=0x2b2d31)
-                return embed_a, embed_b, embed_c_log, None
+                return embed_a_img, embed_a, embed_b_img, embed_b, embed_c_log, None
 
             winner = str(battle.get("winner_id", ""))
             loser = b_id if winner == a_id else a_id
@@ -1057,7 +1093,7 @@ class BattleCog(commands.Cog):
 
             embed_a.description = "─" * 32 + "\n" + "\n".join(result_lines) + "\n" + "─" * 32 + "\n\n" + (embed_a.description or "")
             embed_c_log = make_embed(None, "Battle Log \u2014 Ended", log_text[:1024] if log_text else "\u2014", color=0x2b2d31)
-            return embed_a, embed_b, embed_c_log, None
+            return embed_a_img, embed_a, embed_b_img, embed_b, embed_c_log, None
 
         offensive, defensive = self._fighter_attack_rows(data, battle_id, turn_user)
         switch_opts = self._switch_options(data, battle_id, turn_user)
@@ -1099,7 +1135,7 @@ class BattleCog(commands.Cog):
         if isinstance(turn_state, dict) and bool(turn_state.get("is_cpu", False)):
             for item in view.children:
                 item.disabled = True
-        return embed_a, embed_b, embed_c, view
+        return embed_a_img, embed_a, embed_b_img, embed_b, embed_c, view
 
     def _active_turn_card_image(self, data: dict[str, Any], battle_id: str) -> tuple[str | None, str | None]:
         battle = self._battle_root(data).get("active", {}).get(battle_id)
@@ -1153,11 +1189,11 @@ class BattleCog(commands.Cog):
             logger.exception("[BATTLE_REFRESH] failed to fetch message battle_id=%s channel=%s message=%s", battle_id, channel_id, message_id)
             return
 
-        embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
+        embed_a_img, embed_a, embed_b_img, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
         if view is not None:
             style_view(view, data)
         try:
-            await msg.edit(embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None], view=view, attachments=[])
+            await msg.edit(embeds=[e for e in (embed_a_img, embed_a, embed_b_img, embed_b, embed_c) if e is not None], view=view, attachments=[])
         except Exception:
             logger.exception("[BATTLE_REFRESH] failed to edit message battle_id=%s channel=%s message=%s", battle_id, channel_id, message_id)
 
@@ -1260,6 +1296,16 @@ class BattleCog(commands.Cog):
         battle = self._battle_root(data).get("active", {}).get(battle_id)
         turn_user = str(battle.get("turn_user_id", "")) if isinstance(battle, dict) else ""
         logger.info("[TURN_TIMEOUT] scheduled battle_id=%s turn_user=%s timeout=%ss", battle_id, turn_user, TURN_TIMEOUT_SECONDS)
+        # E. Live turn timer: cancel any existing timer task and start a fresh one
+        old_timer = self.timer_tasks.pop(str(battle_id), None)
+        if old_timer and not old_timer.done():
+            old_timer.cancel()
+        self._track_background_task(
+            self.timer_tasks,
+            battle_id,
+            asyncio.create_task(self._tick_timer(battle_id, TURN_TIMEOUT_SECONDS)),
+            "turn_timer",
+        )
         self._schedule_cpu_stall_watchdog(battle_id)
 
     def _schedule_cpu_stall_watchdog(self, battle_id: str) -> None:
@@ -1315,11 +1361,11 @@ class BattleCog(commands.Cog):
 
     async def _start_battle(self, channel: discord.abc.Messageable, battle_id: str) -> None:
         data = self.bot.storage.load()
-        embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
+        embed_a_img, embed_a, embed_b_img, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
         try:
             if view is not None:
                 style_view(view, data)
-            msg = await channel.send(embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None], view=view)
+            msg = await channel.send(embeds=[e for e in (embed_a_img, embed_a, embed_b_img, embed_b, embed_c) if e is not None], view=view)
             if view is not None and hasattr(view, "message"):
                 view.message = msg
         except Exception:
@@ -1857,18 +1903,18 @@ class BattleCog(commands.Cog):
 
     async def open_attack_picker(self, interaction: discord.Interaction, battle_id: str, actor_id: str, category: str | None = None) -> None:
         data = self.bot.storage.load()
-        embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
-        await self._apply_battle_message_update(interaction, embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None], view=view)
+        embed_a_img, embed_a, embed_b_img, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
+        await self._apply_battle_message_update(interaction, embeds=[e for e in (embed_a_img, embed_a, embed_b_img, embed_b, embed_c) if e is not None], view=view)
 
     async def open_defense_picker(self, interaction: discord.Interaction, battle_id: str, actor_id: str) -> None:
         data = self.bot.storage.load()
-        embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
-        await self._apply_battle_message_update(interaction, embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None], view=view)
+        embed_a_img, embed_a, embed_b_img, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
+        await self._apply_battle_message_update(interaction, embeds=[e for e in (embed_a_img, embed_a, embed_b_img, embed_b, embed_c) if e is not None], view=view)
 
     async def open_switch_picker(self, interaction: discord.Interaction, battle_id: str, actor_id: str) -> None:
         data = self.bot.storage.load()
-        embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
-        await self._apply_battle_message_update(interaction, embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None], view=view)
+        embed_a_img, embed_a, embed_b_img, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
+        await self._apply_battle_message_update(interaction, embeds=[e for e in (embed_a_img, embed_a, embed_b_img, embed_b, embed_c) if e is not None], view=view)
 
     async def _post_action_update(self, interaction: discord.Interaction, battle_id: str) -> None:
         data = self.bot.storage.load()
@@ -1876,8 +1922,80 @@ class BattleCog(commands.Cog):
         ended = isinstance(battle, dict) and bool(battle.get("ended", False))
         # Sync active_by_user so user can queue again after battle ends.
         await self.bot.battle_service.sync_active_by_user_from_data(data)
-        embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
-        await self._apply_battle_message_update(interaction, embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None], view=view)
+
+        # ── Parse last log entry for damage/attacker info (used for animations) ──
+        last_damage = 0
+        attacker_display = "fighter"
+        hp_override_mid: dict[str, int] = {}
+        if not ended and isinstance(battle, dict):
+            logs = battle.get("log", [])
+            if logs:
+                last_entry = str(logs[-1])
+                parts = last_entry.split(":", 2)
+                if len(parts) == 3:
+                    pid_raw, _move_raw, dmg_raw = parts[0].strip(), parts[1].strip(), parts[2].strip()
+                    try:
+                        last_damage = int(dmg_raw)
+                    except (ValueError, TypeError):
+                        last_damage = 0
+                    # Build attacker display label
+                    if pid_raw.isdigit():
+                        attacker_display = f"<@{pid_raw}>"
+                    elif pid_raw:
+                        attacker_display = pid_raw
+                    # Compute mid-HP for damaged side (opponent of attacker)
+                    if last_damage > 0:
+                        players_map = battle.get("players", {}) if isinstance(battle.get("players"), dict) else {}
+                        for other_pid, other_state in players_map.items():
+                            if str(other_pid) != pid_raw and isinstance(other_state, dict):
+                                other_uid = self._current_uid(other_state)
+                                if other_uid:
+                                    hp_map = other_state.get("hp", {}) if isinstance(other_state.get("hp"), dict) else {}
+                                    cur = int(hp_map.get(other_uid, 0))
+                                    mid = cur + last_damage // 2
+                                    hp_override_mid[other_uid] = mid
+
+        # Build final embeds (with real HP values)
+        embed_a_img, embed_a, embed_b_img, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
+
+        # ── Battle animations (only for ongoing battles with a live message) ──
+        msg = getattr(interaction, "message", None)
+        if not ended and msg is not None:
+            # B. Turn transition: show "winds up..." before the result
+            try:
+                transition_embed = make_embed(None, f"{e('list', data)} Battle Log", f"> {attacker_display} winds up...", color=0x2b2d31)
+                pre_embeds = [emb for emb in (embed_a_img, embed_a, embed_b_img, embed_b, transition_embed) if emb is not None]
+                await msg.edit(embeds=pre_embeds)
+                await asyncio.sleep(0.7)
+            except Exception:
+                pass
+
+            # D. Hit flash: briefly turn embed color red when damage was dealt
+            if last_damage > 0:
+                try:
+                    for emb in [embed_a, embed_b]:
+                        if emb is not None:
+                            emb.color = discord.Color(0xe53935)
+                    flash_embeds = [emb for emb in (embed_a_img, embed_a, embed_b_img, embed_b, transition_embed) if emb is not None]
+                    await msg.edit(embeds=flash_embeds)
+                    await asyncio.sleep(0.6)
+                    for emb in [embed_a, embed_b]:
+                        if emb is not None:
+                            emb.color = discord.Color(0x2b2d31)
+                except Exception:
+                    pass
+
+            # C. HP drain animation: show mid-HP step before final HP
+            if last_damage > 0 and hp_override_mid:
+                try:
+                    embed_a_img_mid, embed_a_mid, embed_b_img_mid, embed_b_mid, embed_c_mid, _ = self._build_embed_view(data, battle_id, display_hp_override=hp_override_mid)
+                    mid_embeds = [emb for emb in (embed_a_img_mid, embed_a_mid, embed_b_img_mid, embed_b_mid, embed_c_mid) if emb is not None]
+                    await msg.edit(embeds=mid_embeds)
+                    await asyncio.sleep(0.5)
+                except Exception:
+                    pass
+
+        await self._apply_battle_message_update(interaction, embeds=[e for e in (embed_a_img, embed_a, embed_b_img, embed_b, embed_c) if e is not None], view=view)
         if ended:
             logger.info("[TURN_FLOW] battle ended battle_id=%s reason=%s", battle_id, battle.get("reason", "unknown") if isinstance(battle, dict) else "unknown")
             self._cancel_battle_runtime_tasks(battle_id)
@@ -1995,15 +2113,22 @@ class BattleCog(commands.Cog):
 
             return result, {"type": normalized, "name": str(chosen.get("name", ""))}
 
-        result, _detail = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        # A. Typing indicator during damage calculation
+        _channel = getattr(interaction, "channel", None)
+        if _channel is not None:
+            async with _channel.typing():
+                result, _detail = self.bot.storage.with_lock(mutate)
+                data = self.bot.storage.load()
+        else:
+            result, _detail = self.bot.storage.with_lock(mutate)
+            data = self.bot.storage.load()
         if not result.get("ok"):
             await battle_warn(interaction, make_embed(data, f"{e('warning', data)} Move Failed", battle_error_text(result.get("error", "unknown"))))
             # Try to refresh - but if view is None, keep existing buttons
             try:
-                embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
+                embed_a_img, embed_a, embed_b_img, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
                 if view is not None:
-                    await self._apply_battle_message_update(interaction, embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None], view=view)
+                    await self._apply_battle_message_update(interaction, embeds=[e for e in (embed_a_img, embed_a, embed_b_img, embed_b, embed_c) if e is not None], view=view)
             except Exception:
                 logger.exception("Failed to refresh battle embed after action")
             return
@@ -2044,15 +2169,22 @@ class BattleCog(commands.Cog):
                 json_safe_battle_state(updated)
             return result
 
-        result = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        # A. Typing indicator during damage calculation
+        _channel_mv = getattr(interaction, "channel", None)
+        if _channel_mv is not None:
+            async with _channel_mv.typing():
+                result = self.bot.storage.with_lock(mutate)
+                data = self.bot.storage.load()
+        else:
+            result = self.bot.storage.with_lock(mutate)
+            data = self.bot.storage.load()
         if not result.get("ok"):
             await battle_warn(interaction, make_embed(data, f"{e('warning', data)} Move Failed", battle_error_text(result.get("error", "unknown"))))
             # Try to refresh - but if view is None, keep existing buttons
             try:
-                embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
+                embed_a_img, embed_a, embed_b_img, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
                 if view is not None:
-                    await self._apply_battle_message_update(interaction, embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None], view=view)
+                    await self._apply_battle_message_update(interaction, embeds=[e for e in (embed_a_img, embed_a, embed_b_img, embed_b, embed_c) if e is not None], view=view)
             except Exception:
                 logger.exception("Failed to refresh battle embed after action")
             return
