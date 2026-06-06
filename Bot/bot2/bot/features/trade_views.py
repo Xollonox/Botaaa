@@ -327,7 +327,7 @@ class TradePanel(discord.ui.View):
             t["pending"].pop(self.a_id, None)
             t["pending"].pop(self.b_id, None)
         self.cog.bot.storage.with_lock(mutate)
-        self.cog.bot.trade_service.remove_pending_pair(self.a_id, self.b_id, mirror_json=False)
+        await self.cog.bot.trade_service.remove_pending_pair(self.a_id, self.b_id, mirror_json=False)
         self.cog.unregister_panel(self)
         if self.message:
             try:
@@ -435,7 +435,7 @@ class TradePanel(discord.ui.View):
             t["pending"].pop(self.a_id, None)
             t["pending"].pop(self.b_id, None)
         self.cog.bot.storage.with_lock(mutate)
-        self.cog.bot.trade_service.remove_pending_pair(self.a_id, self.b_id, mirror_json=False)
+        await self.cog.bot.trade_service.remove_pending_pair(self.a_id, self.b_id, mirror_json=False)
         self.cog.unregister_panel(self)
         self.stop()
         e = make_embed(None, "LOOKISM HXCC • TRADE", f"╭─ 🚫 Trade Cancelled\n│ Cancelled by @{interaction.user.name}\n╰────────────────", color=0xE74C3C)
@@ -530,12 +530,12 @@ class ConfirmView(discord.ui.View):
 
         ok, reason = self.cog.bot.storage.with_lock(mutate)
         if ok:
-            self.cog.bot.trade_service.append_history({
+            await self.cog.bot.trade_service.append_history({
                 **s,
                 "status": "accepted",
                 "resolved_at": now_ts(),
             })
-            self.cog.bot.trade_service.remove_pending_pair(a_id, b_id, mirror_json=False)
+            await self.cog.bot.trade_service.remove_pending_pair(a_id, b_id, mirror_json=False)
             self.cog.unregister_panel(self.panel)
         self.stop()
 
@@ -588,7 +588,7 @@ class ConfirmView(discord.ui.View):
             t["pending"].pop(self.panel.a_id, None)
             t["pending"].pop(self.panel.b_id, None)
         self.cog.bot.storage.with_lock(mutate)
-        self.cog.bot.trade_service.remove_pending_pair(self.panel.a_id, self.panel.b_id, mirror_json=False)
+        await self.cog.bot.trade_service.remove_pending_pair(self.panel.a_id, self.panel.b_id, mirror_json=False)
         self.cog.unregister_panel(self.panel)
         self.stop()
         e = make_embed(None, "LOOKISM HXCC • TRADE", f"╭─ 🚫 Trade Cancelled\n│ Cancelled by @{interaction.user.name}\n╰────────────────", color=0xE74C3C)

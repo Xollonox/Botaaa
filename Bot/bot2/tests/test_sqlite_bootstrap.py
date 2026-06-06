@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
 from bot.data.sqlite_store import SQLiteBattleRepository, SQLiteMarketRepository, SQLiteTradeRepository
@@ -33,7 +34,7 @@ def test_market_bootstrap_does_not_overwrite_existing_sqlite_state(tmp_path) -> 
             }
         ),
     )
-    service.bootstrap_from_json()
+    asyncio.run(service.bootstrap_from_json())
 
     stale_storage = FakeStorage(
         {
@@ -45,27 +46,27 @@ def test_market_bootstrap_does_not_overwrite_existing_sqlite_state(tmp_path) -> 
             },
         }
     )
-    MarketService(repo, stale_storage).bootstrap_from_json()
+    asyncio.run(MarketService(repo, stale_storage).bootstrap_from_json())
 
-    assert repo.list_store_items()["Card A"] == {"price": 10, "stock": 1, "enabled": True}
-    assert "listing-a" in repo.list_active_listings()
-    assert repo.get_settings()["fee_percent"] == 5
-    assert repo.json_bootstrap_completed()
+    assert asyncio.run(repo.list_store_items())["Card A"] == {"price": 10, "stock": 1, "enabled": True}
+    assert "listing-a" in asyncio.run(repo.list_active_listings())
+    assert asyncio.run(repo.get_settings())["fee_percent"] == 5
+    assert asyncio.run(repo.json_bootstrap_completed())
 
 
 def test_trade_bootstrap_does_not_clear_existing_sqlite_state(tmp_path) -> None:
     repo = SQLiteTradeRepository(str(tmp_path / "trades.sqlite3"))
-    TradeService(repo, FakeStorage({"trades": {"pending": {"1": True}, "history": []}})).bootstrap_from_json()
+    asyncio.run(TradeService(repo, FakeStorage({"trades": {"pending": {"1": True}, "history": []}})).bootstrap_from_json())
 
-    TradeService(repo, FakeStorage({"trades": {"pending": {}, "history": []}})).bootstrap_from_json()
+    asyncio.run(TradeService(repo, FakeStorage({"trades": {"pending": {}, "history": []}})).bootstrap_from_json())
 
-    assert repo.is_pending("1")
-    assert repo.json_bootstrap_completed()
+    assert asyncio.run(repo.is_pending("1"))
+    assert asyncio.run(repo.json_bootstrap_completed())
 
 
 def test_battle_bootstrap_does_not_clear_existing_sqlite_state(tmp_path) -> None:
     repo = SQLiteBattleRepository(str(tmp_path / "battle.sqlite3"))
-    BattleService(
+    asyncio.run(BattleService(
         repo,
         FakeStorage(
             {
@@ -77,12 +78,12 @@ def test_battle_bootstrap_does_not_clear_existing_sqlite_state(tmp_path) -> None
                 }
             }
         ),
-    ).bootstrap_from_json()
+    ).bootstrap_from_json())
 
-    BattleService(
+    asyncio.run(BattleService(
         repo,
         FakeStorage({"battle": {"queue": [], "pending_friendly": {}, "active": {}, "active_by_user": {}}}),
-    ).bootstrap_from_json()
+    ).bootstrap_from_json())
 
-    assert repo.list_queue(0) == [{"user_id": "1", "joined_at": 1, "expires_at": 4_102_444_800}]
-    assert repo.json_bootstrap_completed()
+    assert asyncio.run(repo.list_queue(0)) == [{"user_id": "1", "joined_at": 1, "expires_at": 4_102_444_800}]
+    assert asyncio.run(repo.json_bootstrap_completed())

@@ -78,18 +78,18 @@ class FakeBattleService:
         self.removed_pending_targets: list[str] = []
         self.synced_payloads: list[dict] = []
 
-    def hydrate_json_state(self, data: dict) -> dict:
+    async def hydrate_json_state(self, data: dict) -> dict:
         return data
 
-    def remove_queue_user(self, user_id: str) -> bool:
+    async def remove_queue_user(self, user_id: str) -> bool:
         self.removed_queue_users.append(str(user_id))
         return False
 
-    def remove_pending_friendly(self, target_id: str) -> bool:
+    async def remove_pending_friendly(self, target_id: str) -> bool:
         self.removed_pending_targets.append(str(target_id))
         return False
 
-    def sync_active_by_user_from_data(self, data: dict) -> None:
+    async def sync_active_by_user_from_data(self, data: dict) -> None:
         self.synced_payloads.append(data)
 
 
@@ -123,7 +123,7 @@ def test_remove_ranked_queue_state_clears_json_and_task_even_if_sqlite_is_stale(
     task = FakeTask()
     cog.queue_cpu_tasks["u1"] = task  # type: ignore[assignment]
 
-    result = cog._remove_ranked_queue_state("u1")
+    result = asyncio.run(cog._remove_ranked_queue_state("u1"))
 
     assert result == {"removed_json": True, "removed_sqlite": False, "removed": True}
     assert data["battle"]["queue"] == []
@@ -144,7 +144,7 @@ def test_remove_pending_friendly_state_clears_json_sqlite_and_task() -> None:
     task = FakeTask()
     cog.friendly_cpu_tasks["u2"] = task  # type: ignore[assignment]
 
-    result = cog._remove_pending_friendly_state("u2", cancel_task=True)
+    result = asyncio.run(cog._remove_pending_friendly_state("u2", cancel_task=True))
 
     assert result == {"removed_json": True, "removed_sqlite": False, "removed": True}
     assert data["battle"]["pending_friendly"] == {}
@@ -160,7 +160,11 @@ def test_recover_active_battles_after_restart_ends_battles_and_syncs_active_user
 
     summary = asyncio.run(cog.recover_active_battles_after_restart())
 
-    battle = data["battle"]["active"][battle_id]
+    # After Fix 5, ended battles are moved out of active into recently_ended
+    assert battle_id not in data["battle"]["active"]
+    recently_ended = data["battle"].get("recently_ended", [])
+    battle = next((e for e in recently_ended if isinstance(e, dict) and e.get("battle_id") == battle_id), None)
+    assert battle is not None, "ended battle not found in recently_ended"
     assert summary == {"ended": 1, "cleared": 0, "active_by_user": 0, "affected_users": 2}
     assert battle["ended"] is True
     assert battle["reason"] == "abandoned"

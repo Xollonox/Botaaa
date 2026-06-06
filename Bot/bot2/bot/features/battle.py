@@ -316,9 +316,20 @@ class BattleCog(commands.Cog):
         root.setdefault("active_by_user", {})
         return root
 
-    def _load_battle_data(self) -> dict[str, Any]:
+    def _lookup_battle(self, data: dict[str, Any], battle_id: str) -> dict[str, Any] | None:
+        """Look up a battle by ID, checking active first then recently_ended."""
+        root = self._battle_root(data)
+        state = root.get("active", {}).get(battle_id)
+        if isinstance(state, dict):
+            return state
+        for entry in root.get("recently_ended", []):
+            if isinstance(entry, dict) and str(entry.get("battle_id", "")) == battle_id:
+                return entry
+        return None
+
+    async def _load_battle_data(self) -> dict[str, Any]:
         data = self.bot.storage.load()
-        return self.bot.battle_service.hydrate_json_state(data)
+        return await self.bot.battle_service.hydrate_json_state(data)
 
     def _cleanup_expired(self, data: dict[str, Any]) -> None:
         now = now_ts()
@@ -736,7 +747,7 @@ class BattleCog(commands.Cog):
 
     def _build_embed_view(self, data: dict[str, Any], battle_id: str) -> tuple[discord.Embed | None, discord.Embed | None, discord.Embed | None, TurnView | None]:
         try:
-            battle = self._battle_root(data).get("active", {}).get(battle_id)
+            battle = self._lookup_battle(data, battle_id)
             if not isinstance(battle, dict):
                 return make_embed(data, "Battle Missing", "State not found."), None, None, None
 
@@ -778,7 +789,9 @@ class BattleCog(commands.Cog):
                 cur_hp = min(cur_hp, max_hp)
                 pct = int(round((cur_hp / max_hp) * 100))
                 stats = stats_map.get(uid, {}) if isinstance(stats_map.get(uid, {}), dict) else {}
-                s = lambda k: int(stats.get(k, 0))
+
+                def s(k: str) -> int:
+                    return int(stats.get(k, 0))
 
                 lines = [
                     f"**{label} — {display_name(pid, pstate)}**",
@@ -1123,7 +1136,7 @@ class BattleCog(commands.Cog):
 
     async def _refresh_battle_message(self, battle_id: str) -> None:
         data = self.bot.storage.load()
-        battle = self._battle_root(data).get("active", {}).get(battle_id)
+        battle = self._lookup_battle(data, battle_id)
         if not isinstance(battle, dict):
             return
         channel_id = int(str(battle.get("message_channel_id", "0")) or 0)
@@ -1150,7 +1163,14 @@ class BattleCog(commands.Cog):
 
         # Send stats summary once when the battle is freshly over
         if bool(battle.get("ended", False)) and not bool(battle.get("stats_sent", False)):
-            battle["stats_sent"] = True
+            def _mark_stats_sent(data: dict) -> None:
+                b = self._battle_root(data).get("recently_ended")
+                if isinstance(b, list):
+                    for entry in b:
+                        if isinstance(entry, dict) and str(entry.get("battle_id", "")) == battle_id:
+                            entry["stats_sent"] = True
+                            return
+            self.bot.storage.with_lock(_mark_stats_sent)
             await self._send_battle_stats_embed(channel, battle)
 
     def _schedule_timeout(self, battle_id: str) -> None:
@@ -1220,7 +1240,7 @@ class BattleCog(commands.Cog):
 
             result = self.bot.storage.with_lock(mutate)
             if result.get("ok"):
-                self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
+                await self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
                 await self._refresh_battle_message(battle_id)
                 if result.get("battle_over"):
                     logger.info("[TURN_TIMEOUT] ended battle_id=%s reason=%s", battle_id, result.get("reason", "unknown"))
@@ -1281,7 +1301,7 @@ class BattleCog(commands.Cog):
 
             result = self.bot.storage.with_lock(mutate)
             if result.get("ok"):
-                self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
+                await self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
                 await self._refresh_battle_message(battle_id)
                 logger.info("[CPU_STALL] ended battle_id=%s reason=%s", battle_id, result.get("reason", "unknown"))
                 self._cancel_battle_runtime_tasks(battle_id)
@@ -1823,7 +1843,7 @@ class BattleCog(commands.Cog):
 
         result = self.bot.storage.with_lock(mutate)
         if result.get("ok"):
-            self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
+            await self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
             await self._refresh_battle_message(battle_id)
             if result.get("battle_over"):
                 logger.info("[AI_TURN] ended battle_id=%s reason=%s", battle_id, result.get("reason", "unknown"))
@@ -1852,10 +1872,10 @@ class BattleCog(commands.Cog):
 
     async def _post_action_update(self, interaction: discord.Interaction, battle_id: str) -> None:
         data = self.bot.storage.load()
-        battle = self._battle_root(data).get("active", {}).get(battle_id)
+        battle = self._lookup_battle(data, battle_id)
         ended = isinstance(battle, dict) and bool(battle.get("ended", False))
         # Sync active_by_user so user can queue again after battle ends.
-        self.bot.battle_service.sync_active_by_user_from_data(data)
+        await self.bot.battle_service.sync_active_by_user_from_data(data)
         embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
         await self._apply_battle_message_update(interaction, embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None], view=view)
         if ended:
@@ -1863,7 +1883,12 @@ class BattleCog(commands.Cog):
             self._cancel_battle_runtime_tasks(battle_id)
             # Send the battle stats summary if not already sent
             if isinstance(battle, dict) and not bool(battle.get("stats_sent", False)):
-                battle["stats_sent"] = True
+                def _mark_stats_sent_post(d: dict) -> None:
+                    for entry in d.get("battle", {}).get("recently_ended", []):
+                        if isinstance(entry, dict) and str(entry.get("battle_id", "")) == battle_id:
+                            entry["stats_sent"] = True
+                            return
+                self.bot.storage.with_lock(_mark_stats_sent_post)
                 channel = getattr(interaction, "channel", None)
                 if channel is None:
                     try:
@@ -2108,10 +2133,10 @@ class BattleCog(commands.Cog):
         battle_id = str(created.get("battle_id", ""))
         if not battle_id:
             return False, "missing_data"
-        self.bot.battle_service.remove_queue_users([str(challenger_id), str(opponent_id)])
+        await self.bot.battle_service.remove_queue_users([str(challenger_id), str(opponent_id)])
         if clear_pending_target_id:
-            self.bot.battle_service.remove_pending_friendly(str(clear_pending_target_id))
-        self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
+            await self.bot.battle_service.remove_pending_friendly(str(clear_pending_target_id))
+        await self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
 
         try:
             if interaction.channel is None:
@@ -2131,7 +2156,7 @@ class BattleCog(commands.Cog):
                         pending.pop(str(clear_pending_target_id), None)
 
             self.bot.storage.with_lock(mutate_rollback)
-            self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
+            await self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
             return False, f"start_failed: {type(exc).__name__}"
 
     async def _try_match(self, interaction: discord.Interaction, user_id: str) -> bool:
@@ -2181,7 +2206,7 @@ class BattleCog(commands.Cog):
         ok, reason = await self.start_battle_or_fail(interaction, str(user_id), opp_id, "ranked")
         if not ok:
             logger.warning("[RANKED_MATCH_START] failed user=%s opp=%s reason=%s", user_id, opp_id, reason)
-            data = self._load_battle_data()
+            data = await self._load_battle_data()
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Failed", str(reason)), ephemeral=True)
             return False
         for qid in (str(user_id), str(opp_id)):
@@ -2204,10 +2229,10 @@ class BattleCog(commands.Cog):
         if task and not task.done():
             task.cancel()
 
-    def _remove_ranked_queue_state(self, user_id: str) -> dict[str, bool]:
+    async def _remove_ranked_queue_state(self, user_id: str) -> dict[str, bool]:
         uid = str(user_id)
         removed_json = self.bot.storage.with_lock(lambda data: self._remove_queue_entry(data, uid))
-        removed_sqlite = self.bot.battle_service.remove_queue_user(uid)
+        removed_sqlite = await self.bot.battle_service.remove_queue_user(uid)
         self._cancel_ranked_queue_task(uid)
         return {
             "removed_json": bool(removed_json),
@@ -2215,7 +2240,7 @@ class BattleCog(commands.Cog):
             "removed": bool(removed_json or removed_sqlite),
         }
 
-    def _remove_pending_friendly_state(self, target_id: str, *, cancel_task: bool = False) -> dict[str, bool]:
+    async def _remove_pending_friendly_state(self, target_id: str, *, cancel_task: bool = False) -> dict[str, bool]:
         tid = str(target_id)
 
         def mutate(data: dict[str, Any]) -> bool:
@@ -2227,7 +2252,7 @@ class BattleCog(commands.Cog):
             return before
 
         removed_json = self.bot.storage.with_lock(mutate)
-        removed_sqlite = self.bot.battle_service.remove_pending_friendly(tid)
+        removed_sqlite = await self.bot.battle_service.remove_pending_friendly(tid)
         if cancel_task:
             task = self.friendly_cpu_tasks.pop(tid, None)
             if task and not task.done():
@@ -2298,8 +2323,8 @@ class BattleCog(commands.Cog):
             }
 
         summary = self.bot.storage.with_lock(mutate)
-        refreshed = self._load_battle_data()
-        self.bot.battle_service.sync_active_by_user_from_data(refreshed)
+        refreshed = await self._load_battle_data()
+        await self.bot.battle_service.sync_active_by_user_from_data(refreshed)
         if summary["ended"] or summary["cleared"] or summary["affected_users"]:
             logger.warning(
                 "[BATTLE_STARTUP_RECOVERY] ended=%s cleared=%s affected_users=%s active_by_user=%s",
@@ -2313,8 +2338,8 @@ class BattleCog(commands.Cog):
         return summary
 
     async def _leave_ranked_queue(self, interaction: discord.Interaction, user_id: str, *, message: str = "You've been removed from the ranked queue.") -> bool:
-        removed = self._remove_ranked_queue_state(user_id)["removed"]
-        data = self._load_battle_data()
+        removed = (await self._remove_ranked_queue_state(user_id))["removed"]
+        data = await self._load_battle_data()
         if not removed:
             await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)
             return False
@@ -2335,13 +2360,13 @@ class BattleCog(commands.Cog):
 
         popped = self.bot.storage.with_lock(mutate)
         if not popped.get("ok"):
-            data = self._load_battle_data()
+            data = await self._load_battle_data()
             await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)
             return False
 
-        self.bot.battle_service.remove_queue_user(str(user_id))
+        await self.bot.battle_service.remove_queue_user(str(user_id))
         self._cancel_ranked_queue_task(user_id)
-        data = self._load_battle_data()
+        data = await self._load_battle_data()
         cpu = self._make_cpu_participant(data, self._player_trophies(data, user_id))
         ok, reason = await self.start_battle_or_fail(interaction, str(user_id), cpu["cpu_key"], "ranked", cpu_opponent=cpu)
         if not ok:
@@ -2354,7 +2379,7 @@ class BattleCog(commands.Cog):
     async def battle(self, interaction: discord.Interaction) -> None:
         ok_route, reason, route_channel_id = check_battle_channel_allowed(interaction)
         if not ok_route:
-            data = self._load_battle_data()
+            data = await self._load_battle_data()
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Channel", f"{reason or 'not_allowed'}: Use <#{route_channel_id}>" if route_channel_id else str(reason or 'not_allowed')), ephemeral=True)
             return
         if not await ensure_registered(interaction, self.bot.storage):
@@ -2389,8 +2414,8 @@ class BattleCog(commands.Cog):
         ok, status = self.bot.storage.with_lock(mutate)
         if ok:
             joined = now_ts()
-            self.bot.battle_service.add_queue_entry(uid, joined, joined + RANKED_QUEUE_TIMEOUT_SECONDS)
-        data = self._load_battle_data()
+            await self.bot.battle_service.add_queue_entry(uid, joined, joined + RANKED_QUEUE_TIMEOUT_SECONDS)
+        data = await self._load_battle_data()
         if not ok:
             msg = {
                 "already_battle": "You're already in an active battle. Use `/forfeit` to exit.",
@@ -2433,12 +2458,12 @@ class BattleCog(commands.Cog):
     async def battle_cancel(self, interaction: discord.Interaction) -> None:
         ok_route, reason, route_channel_id = check_battle_channel_allowed(interaction)
         if not ok_route:
-            data = self._load_battle_data()
+            data = await self._load_battle_data()
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Channel", f"{reason or 'not_allowed'}: Use <#{route_channel_id}>" if route_channel_id else str(reason or 'not_allowed')), ephemeral=True)
             return
         uid = str(interaction.user.id)
-        removed = self._remove_ranked_queue_state(uid)["removed"]
-        data = self._load_battle_data()
+        removed = (await self._remove_ranked_queue_state(uid))["removed"]
+        data = await self._load_battle_data()
         if not removed:
             await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)
             return
@@ -2456,7 +2481,7 @@ class BattleCog(commands.Cog):
     async def friendly(self, interaction: discord.Interaction, opponent: discord.User) -> None:
         ok_route, reason, route_channel_id = check_battle_channel_allowed(interaction)
         if not ok_route:
-            data = self._load_battle_data()
+            data = await self._load_battle_data()
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Channel", f"{reason or 'not_allowed'}: Use <#{route_channel_id}>" if route_channel_id else str(reason or 'not_allowed')), ephemeral=True)
             return
         if not await ensure_registered(interaction, self.bot.storage):
@@ -2483,11 +2508,11 @@ class BattleCog(commands.Cog):
 
         ok, status = self.bot.storage.with_lock(mutate)
         if ok:
-            self.bot.battle_service.upsert_pending_friendly(
+            await self.bot.battle_service.upsert_pending_friendly(
                 tid,
                 {"challenger_id": cid, "target_id": tid, "created_at": now_ts(), "expires_at": now_ts() + 60, "message_id": ""},
             )
-        data = self._load_battle_data()
+        data = await self._load_battle_data()
         if not ok:
             msg = {
                 "self": "You can't challenge yourself to a friendly match.",
@@ -2514,7 +2539,7 @@ class BattleCog(commands.Cog):
                 view=view,
             )
             self.bot.storage.with_lock(lambda d: self._set_pending_message(d, tid, str(msg.id)))
-            self.bot.battle_service.upsert_pending_friendly(
+            await self.bot.battle_service.upsert_pending_friendly(
                 tid,
                 {"challenger_id": cid, "target_id": tid, "created_at": now_ts(), "expires_at": now_ts() + 60, "message_id": str(msg.id)},
             )
@@ -2556,19 +2581,19 @@ class BattleCog(commands.Cog):
                 return {"ok": True}
 
             expired = self.bot.storage.with_lock(expire_pending)
-            self.bot.battle_service.remove_pending_friendly(target)
+            await self.bot.battle_service.remove_pending_friendly(target)
             if not expired.get("ok"):
                 logger.info("[FRIENDLY_TIMEOUT] skipped challenger=%s target=%s reason=%s", challenger, target, expired.get("error", "unknown"))
                 return
 
-            data = self._load_battle_data()
+            data = await self._load_battle_data()
             cpu = self._make_cpu_participant(data, self._player_trophies(data, challenger))
             ok, reason = await self.start_battle_or_fail(interaction, challenger, cpu["cpu_key"], "friendly", cpu_opponent=cpu)
             if not ok:
                 logger.warning("[FRIENDLY_TIMEOUT_CPU_START] failed challenger=%s target=%s reason=%s", challenger, target, reason)
                 return
             if interaction.channel is not None:
-                data = self._load_battle_data()
+                data = await self._load_battle_data()
                 await interaction.channel.send(
                     embed=make_embed(
                         data,
@@ -2588,7 +2613,7 @@ class BattleCog(commands.Cog):
         now = now_ts()
 
         if acceptor != target:
-            data = self._load_battle_data()
+            data = await self._load_battle_data()
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Failed", "invalid_participants"), ephemeral=True)
             return
 
@@ -2619,13 +2644,13 @@ class BattleCog(commands.Cog):
         if not valid:
             logger.warning("[FRIENDLY_ACCEPT] validation failed challenger=%s target=%s reason=%s", challenger, target, reason)
             if reason in {"expired", "missing_data", "invalid_participants"}:
-                self.bot.battle_service.remove_pending_friendly(target)
-            data = self._load_battle_data()
+                await self.bot.battle_service.remove_pending_friendly(target)
+            data = await self._load_battle_data()
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Failed", str(reason)), ephemeral=True)
             return
 
         ok, reason = await self.start_battle_or_fail(interaction, challenger, target, "friendly", clear_pending_target_id=target)
-        data = self._load_battle_data()
+        data = await self._load_battle_data()
         if not ok:
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Failed", str(reason)), ephemeral=True)
             return
@@ -2636,7 +2661,7 @@ class BattleCog(commands.Cog):
     async def friendly_cancel(self, interaction: discord.Interaction) -> None:
         ok_route, reason, route_channel_id = check_battle_channel_allowed(interaction)
         if not ok_route:
-            data = self._load_battle_data()
+            data = await self._load_battle_data()
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Channel", f"{reason or 'not_allowed'}: Use <#{route_channel_id}>" if route_channel_id else str(reason or 'not_allowed')), ephemeral=True)
             return
         uid = str(interaction.user.id)
@@ -2654,12 +2679,12 @@ class BattleCog(commands.Cog):
 
         removed = self.bot.storage.with_lock(mutate)
         if removed:
-            self.bot.battle_service.clear_outgoing_pending(uid)
+            await self.bot.battle_service.clear_outgoing_pending(uid)
         for tid, task in list(self.friendly_cpu_tasks.items()):
             if tid == uid and task and not task.done():
                 task.cancel()
                 self.friendly_cpu_tasks.pop(tid, None)
-        data = self._load_battle_data()
+        data = await self._load_battle_data()
         if not removed:
             await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} No Active Challenge", "You don't have any outgoing friendly challenges to cancel."), ephemeral=True)
             return
@@ -2668,7 +2693,7 @@ class BattleCog(commands.Cog):
     @app_commands.command(name="o_battle_unstuck", description="Owner: clear stuck battle/pending state for a user.")
     @app_commands.guilds(OWNER_GUILD)
     async def o_battle_unstuck(self, interaction: discord.Interaction, target: discord.User | None = None) -> None:
-        data = self._load_battle_data()
+        data = await self._load_battle_data()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "You are not allowed to use this command."), ephemeral=True)
             return
@@ -2705,11 +2730,11 @@ class BattleCog(commands.Cog):
 
         removed_active, removed_pending = self.bot.storage.with_lock(mutate)
         if removed_active or removed_pending:
-            self.bot.battle_service.clear_outgoing_pending(uid)
-            self.bot.battle_service.remove_queue_user(uid)
-            self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
+            await self.bot.battle_service.clear_outgoing_pending(uid)
+            await self.bot.battle_service.remove_queue_user(uid)
+            await self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
         logger.warning("[BATTLE_UNSTUCK] user=%s removed_active=%s removed_pending=%s", uid, removed_active, removed_pending)
-        data = self._load_battle_data()
+        data = await self._load_battle_data()
         await smart_reply(
             interaction,
             embed=make_embed(
@@ -2752,7 +2777,7 @@ class BattleCog(commands.Cog):
             return
 
         # Sync SQLite so user can battle again immediately
-        self.bot.battle_service.sync_active_by_user_from_data(data)
+        await self.bot.battle_service.sync_active_by_user_from_data(data)
 
         await self._refresh_battle_message(str(result.get("battle_id", "")))
         if interaction.response.is_done():

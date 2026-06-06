@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import sqlite3
 import time
@@ -91,16 +92,20 @@ class SQLiteMarketRepository:
             )
             conn.commit()
 
-    def json_bootstrap_completed(self) -> bool:
+    # ------------------------------------------------------------------
+    # Sync implementations (private)
+    # ------------------------------------------------------------------
+
+    def _sync_json_bootstrap_completed(self) -> bool:
         with self._connect() as conn:
             return _migration_done(conn, self.JSON_BOOTSTRAP_KEY)
 
-    def mark_json_bootstrap_completed(self) -> None:
+    def _sync_mark_json_bootstrap_completed(self) -> None:
         with self._connect() as conn:
             _mark_migration_done(conn, self.JSON_BOOTSTRAP_KEY)
             conn.commit()
 
-    def has_persisted_state(self) -> bool:
+    def _sync_has_persisted_state(self) -> bool:
         """Return True once SQLite has state that should not be overwritten from JSON."""
         with self._connect() as conn:
             settings = conn.execute(
@@ -125,7 +130,7 @@ class SQLiteMarketRepository:
             or str(settings["price_band_json"] or "{}") != "{}"
         )
 
-    def seed_from_json_market(self, market: dict[str, Any]) -> None:
+    def _sync_seed_from_json_market(self, market: dict[str, Any]) -> None:
         settings = market.get("settings", {}) if isinstance(market, dict) else {}
         if not isinstance(settings, dict):
             settings = {}
@@ -170,7 +175,7 @@ class SQLiteMarketRepository:
                 )
             conn.commit()
 
-    def get_settings(self) -> dict[str, Any]:
+    def _sync_get_settings(self) -> dict[str, Any]:
         with self._connect() as conn:
             row = conn.execute("SELECT * FROM market_settings WHERE id = 1").fetchone()
         if row is None:
@@ -189,7 +194,7 @@ class SQLiteMarketRepository:
             "price_band": json.loads(row["price_band_json"] or "{}"),
         }
 
-    def update_setting(self, key: str, value: Any) -> None:
+    def _sync_update_setting(self, key: str, value: Any) -> None:
         column_map = {
             "enabled": "enabled",
             "fee_percent": "fee_percent",
@@ -203,7 +208,7 @@ class SQLiteMarketRepository:
             conn.execute(f"UPDATE market_settings SET {col} = ? WHERE id = 1", (val,))
             conn.commit()
 
-    def replace_json_settings(self, quick_sell_values: dict[str, Any], price_band: dict[str, Any]) -> None:
+    def _sync_replace_json_settings(self, quick_sell_values: dict[str, Any], price_band: dict[str, Any]) -> None:
         with self._connect() as conn:
             conn.execute(
                 """
@@ -215,7 +220,7 @@ class SQLiteMarketRepository:
             )
             conn.commit()
 
-    def set_store_item(self, card_name: str, price: int, stock: int, enabled: bool = True) -> None:
+    def _sync_set_store_item(self, card_name: str, price: int, stock: int, enabled: bool = True) -> None:
         with self._connect() as conn:
             conn.execute(
                 """
@@ -226,12 +231,12 @@ class SQLiteMarketRepository:
             )
             conn.commit()
 
-    def remove_store_item(self, card_name: str) -> None:
+    def _sync_remove_store_item(self, card_name: str) -> None:
         with self._connect() as conn:
             conn.execute("DELETE FROM market_store_items WHERE card_name = ?", (card_name,))
             conn.commit()
 
-    def toggle_store_item(self, card_name: str, enabled: bool) -> bool:
+    def _sync_toggle_store_item(self, card_name: str, enabled: bool) -> bool:
         with self._connect() as conn:
             cur = conn.execute(
                 "UPDATE market_store_items SET enabled = ? WHERE card_name = ?",
@@ -240,7 +245,7 @@ class SQLiteMarketRepository:
             conn.commit()
             return cur.rowcount > 0
 
-    def list_store_items(self) -> dict[str, dict[str, Any]]:
+    def _sync_list_store_items(self) -> dict[str, dict[str, Any]]:
         with self._connect() as conn:
             rows = conn.execute(
                 "SELECT card_name, price, stock, enabled FROM market_store_items ORDER BY card_name ASC"
@@ -254,7 +259,7 @@ class SQLiteMarketRepository:
             }
         return out
 
-    def seed_listings_from_json(self, listings: dict[str, Any]) -> None:
+    def _sync_seed_listings_from_json(self, listings: dict[str, Any]) -> None:
         if not isinstance(listings, dict):
             return
         with self._connect() as conn:
@@ -276,7 +281,7 @@ class SQLiteMarketRepository:
                 )
             conn.commit()
 
-    def upsert_listing(self, listing_id: str, payload: dict[str, Any]) -> None:
+    def _sync_upsert_listing(self, listing_id: str, payload: dict[str, Any]) -> None:
         with self._connect() as conn:
             conn.execute(
                 """
@@ -292,13 +297,13 @@ class SQLiteMarketRepository:
             )
             conn.commit()
 
-    def delete_listing(self, listing_id: str) -> bool:
+    def _sync_delete_listing(self, listing_id: str) -> bool:
         with self._connect() as conn:
             cur = conn.execute("DELETE FROM market_listings WHERE id = ?", (str(listing_id),))
             conn.commit()
             return cur.rowcount > 0
 
-    def get_listing(self, listing_id: str) -> dict[str, Any] | None:
+    def _sync_get_listing(self, listing_id: str) -> dict[str, Any] | None:
         with self._connect() as conn:
             row = conn.execute(
                 "SELECT payload_json FROM market_listings WHERE id = ?",
@@ -312,7 +317,7 @@ class SQLiteMarketRepository:
             return None
         return payload if isinstance(payload, dict) else None
 
-    def list_active_listings(self, limit: int = 200) -> dict[str, dict[str, Any]]:
+    def _sync_list_active_listings(self, limit: int = 200) -> dict[str, dict[str, Any]]:
         with self._connect() as conn:
             rows = conn.execute(
                 "SELECT id, payload_json FROM market_listings WHERE sold = 0 ORDER BY listed_at DESC LIMIT ?",
@@ -327,6 +332,74 @@ class SQLiteMarketRepository:
             if isinstance(payload, dict):
                 out[str(row["id"])] = payload
         return out
+
+    # ------------------------------------------------------------------
+    # Async public API
+    # ------------------------------------------------------------------
+
+    async def json_bootstrap_completed(self) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_json_bootstrap_completed)
+
+    async def mark_json_bootstrap_completed(self) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_mark_json_bootstrap_completed)
+
+    async def has_persisted_state(self) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_has_persisted_state)
+
+    async def seed_from_json_market(self, market: dict[str, Any]) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_seed_from_json_market, market)
+
+    async def get_settings(self) -> dict[str, Any]:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_get_settings)
+
+    async def update_setting(self, key: str, value: Any) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_update_setting, key, value)
+
+    async def replace_json_settings(self, quick_sell_values: dict[str, Any], price_band: dict[str, Any]) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_replace_json_settings, quick_sell_values, price_band)
+
+    async def set_store_item(self, card_name: str, price: int, stock: int, enabled: bool = True) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_set_store_item, card_name, price, stock, enabled)
+
+    async def remove_store_item(self, card_name: str) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_remove_store_item, card_name)
+
+    async def toggle_store_item(self, card_name: str, enabled: bool) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_toggle_store_item, card_name, enabled)
+
+    async def list_store_items(self) -> dict[str, dict[str, Any]]:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_list_store_items)
+
+    async def seed_listings_from_json(self, listings: dict[str, Any]) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_seed_listings_from_json, listings)
+
+    async def upsert_listing(self, listing_id: str, payload: dict[str, Any]) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_upsert_listing, listing_id, payload)
+
+    async def delete_listing(self, listing_id: str) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_delete_listing, listing_id)
+
+    async def get_listing(self, listing_id: str) -> dict[str, Any] | None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_get_listing, listing_id)
+
+    async def list_active_listings(self, limit: int = 200) -> dict[str, dict[str, Any]]:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_list_active_listings, limit)
 
 
 class SQLiteTradeRepository:
@@ -382,23 +455,27 @@ class SQLiteTradeRepository:
             )
             conn.commit()
 
-    def json_bootstrap_completed(self) -> bool:
+    # ------------------------------------------------------------------
+    # Sync implementations (private)
+    # ------------------------------------------------------------------
+
+    def _sync_json_bootstrap_completed(self) -> bool:
         with self._connect() as conn:
             return _migration_done(conn, self.JSON_BOOTSTRAP_KEY)
 
-    def mark_json_bootstrap_completed(self) -> None:
+    def _sync_mark_json_bootstrap_completed(self) -> None:
         with self._connect() as conn:
             _mark_migration_done(conn, self.JSON_BOOTSTRAP_KEY)
             conn.commit()
 
-    def has_persisted_state(self) -> bool:
+    def _sync_has_persisted_state(self) -> bool:
         """Return True once trade rows exist in SQLite."""
         with self._connect() as conn:
             pending_count = conn.execute("SELECT COUNT(*) FROM trade_pending").fetchone()[0]
             history_count = conn.execute("SELECT COUNT(*) FROM trade_history").fetchone()[0]
         return int(pending_count) > 0 or int(history_count) > 0
 
-    def seed_from_json_trades(self, trades: dict[str, Any]) -> None:
+    def _sync_seed_from_json_trades(self, trades: dict[str, Any]) -> None:
         pending = trades.get("pending", {}) if isinstance(trades, dict) else {}
         history = trades.get("history", []) if isinstance(trades, dict) else []
         if not isinstance(pending, dict):
@@ -431,35 +508,50 @@ class SQLiteTradeRepository:
                 )
             conn.commit()
 
-    def is_pending(self, user_id: str) -> bool:
+    def _sync_is_pending(self, user_id: str) -> bool:
         with self._connect() as conn:
             row = conn.execute("SELECT 1 FROM trade_pending WHERE user_id = ?", (str(user_id),)).fetchone()
         return row is not None
 
-    def add_pending_pair(self, a_id: str, b_id: str) -> None:
-        with self._connect() as conn:
-            conn.execute("INSERT OR REPLACE INTO trade_pending (user_id) VALUES (?)", (str(a_id),))
-            conn.execute("INSERT OR REPLACE INTO trade_pending (user_id) VALUES (?)", (str(b_id),))
-            conn.commit()
+    def _sync_add_pending_pair(self, a_id: str, b_id: str) -> bool:
+        """Insert both users atomically using INSERT OR IGNORE.
 
-    def remove_pending(self, user_id: str) -> bool:
+        Returns True only if *both* rows were newly inserted (rowcount == 1 for
+        each).  Returns False if either user was already pending, rolling back
+        the transaction so neither row is added.
+        """
+        with self._connect() as conn:
+            cur_a = conn.execute(
+                "INSERT OR IGNORE INTO trade_pending (user_id) VALUES (?)", (str(a_id),)
+            )
+            cur_b = conn.execute(
+                "INSERT OR IGNORE INTO trade_pending (user_id) VALUES (?)", (str(b_id),)
+            )
+            if cur_a.rowcount == 1 and cur_b.rowcount == 1:
+                conn.commit()
+                return True
+            # At least one user was already pending — roll back both inserts
+            conn.rollback()
+            return False
+
+    def _sync_remove_pending(self, user_id: str) -> bool:
         with self._connect() as conn:
             cur = conn.execute("DELETE FROM trade_pending WHERE user_id = ?", (str(user_id),))
             conn.commit()
             return cur.rowcount > 0
 
-    def remove_pending_pair(self, a_id: str, b_id: str) -> None:
+    def _sync_remove_pending_pair(self, a_id: str, b_id: str) -> None:
         with self._connect() as conn:
             conn.execute("DELETE FROM trade_pending WHERE user_id = ?", (str(a_id),))
             conn.execute("DELETE FROM trade_pending WHERE user_id = ?", (str(b_id),))
             conn.commit()
 
-    def list_pending(self) -> dict[str, bool]:
+    def _sync_list_pending(self) -> dict[str, bool]:
         with self._connect() as conn:
             rows = conn.execute("SELECT user_id FROM trade_pending").fetchall()
         return {str(r["user_id"]): True for r in rows}
 
-    def append_history(self, row: dict[str, Any]) -> None:
+    def _sync_append_history(self, row: dict[str, Any]) -> None:
         with self._connect() as conn:
             conn.execute(
                 """
@@ -484,7 +576,7 @@ class SQLiteTradeRepository:
             )
             conn.commit()
 
-    def recent_history_for_user(self, user_id: str, limit: int = 50) -> list[dict[str, Any]]:
+    def _sync_recent_history_for_user(self, user_id: str, limit: int = 50) -> list[dict[str, Any]]:
         with self._connect() as conn:
             rows = conn.execute(
                 """
@@ -506,7 +598,7 @@ class SQLiteTradeRepository:
                 out.append(payload)
         return out
 
-    def post_offer(self, offer_id: str, poster_id: str, poster_name: str, have_card: str, want_card: str, item_uid: str, created_at: int, expires_at: int) -> None:
+    def _sync_post_offer(self, offer_id: str, poster_id: str, poster_name: str, have_card: str, want_card: str, item_uid: str, created_at: int, expires_at: int) -> None:
         with self._connect() as conn:
             conn.execute(
                 """
@@ -517,7 +609,7 @@ class SQLiteTradeRepository:
             )
             conn.commit()
 
-    def get_open_offers(self, limit: int = 10) -> list[dict[str, Any]]:
+    def _sync_get_open_offers(self, limit: int = 10) -> list[dict[str, Any]]:
         with self._connect() as conn:
             now = int(time.time())
             rows = conn.execute(
@@ -532,7 +624,7 @@ class SQLiteTradeRepository:
             ).fetchall()
         return [dict(r) for r in rows]
 
-    def cancel_offer(self, offer_id: str, poster_id: str) -> bool:
+    def _sync_cancel_offer(self, offer_id: str, poster_id: str) -> bool:
         with self._connect() as conn:
             cur = conn.execute(
                 "UPDATE trade_offer_board SET status = 'cancelled' WHERE id = ? AND poster_id = ?",
@@ -541,17 +633,84 @@ class SQLiteTradeRepository:
             conn.commit()
         return cur.rowcount > 0
 
-    def accept_offer(self, offer_id: str) -> dict[str, Any] | None:
+    def _sync_accept_offer(self, offer_id: str) -> dict[str, Any] | None:
         with self._connect() as conn:
+            cursor = conn.execute(
+                "UPDATE trade_offer_board SET status = 'accepted' WHERE id = ? AND status = 'open'",
+                (offer_id,),
+            )
+            conn.commit()
+            if cursor.rowcount == 0:
+                return None  # already accepted, cancelled, or doesn't exist
             row = conn.execute(
-                "SELECT * FROM trade_offer_board WHERE id = ? AND status = 'open'",
+                "SELECT * FROM trade_offer_board WHERE id = ?",
                 (offer_id,),
             ).fetchone()
-            if row is None:
-                return None
-            conn.execute("UPDATE trade_offer_board SET status = 'accepted' WHERE id = ?", (offer_id,))
-            conn.commit()
         return dict(row) if row else None
+
+    # ------------------------------------------------------------------
+    # Async public API
+    # ------------------------------------------------------------------
+
+    async def json_bootstrap_completed(self) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_json_bootstrap_completed)
+
+    async def mark_json_bootstrap_completed(self) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_mark_json_bootstrap_completed)
+
+    async def has_persisted_state(self) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_has_persisted_state)
+
+    async def seed_from_json_trades(self, trades: dict[str, Any]) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_seed_from_json_trades, trades)
+
+    async def is_pending(self, user_id: str) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_is_pending, user_id)
+
+    async def add_pending_pair(self, a_id: str, b_id: str) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_add_pending_pair, a_id, b_id)
+
+    async def remove_pending(self, user_id: str) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_remove_pending, user_id)
+
+    async def remove_pending_pair(self, a_id: str, b_id: str) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_remove_pending_pair, a_id, b_id)
+
+    async def list_pending(self) -> dict[str, bool]:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_list_pending)
+
+    async def append_history(self, row: dict[str, Any]) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_append_history, row)
+
+    async def recent_history_for_user(self, user_id: str, limit: int = 50) -> list[dict[str, Any]]:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_recent_history_for_user, user_id, limit)
+
+    async def post_offer(self, offer_id: str, poster_id: str, poster_name: str, have_card: str, want_card: str, item_uid: str, created_at: int, expires_at: int) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_post_offer, offer_id, poster_id, poster_name, have_card, want_card, item_uid, created_at, expires_at)
+
+    async def get_open_offers(self, limit: int = 10) -> list[dict[str, Any]]:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_get_open_offers, limit)
+
+    async def cancel_offer(self, offer_id: str, poster_id: str) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_cancel_offer, offer_id, poster_id)
+
+    async def accept_offer(self, offer_id: str) -> dict[str, Any] | None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_accept_offer, offer_id)
 
 
 class SQLiteBattleRepository:
@@ -600,16 +759,20 @@ class SQLiteBattleRepository:
             )
             conn.commit()
 
-    def json_bootstrap_completed(self) -> bool:
+    # ------------------------------------------------------------------
+    # Sync implementations (private)
+    # ------------------------------------------------------------------
+
+    def _sync_json_bootstrap_completed(self) -> bool:
         with self._connect() as conn:
             return _migration_done(conn, self.JSON_BOOTSTRAP_KEY)
 
-    def mark_json_bootstrap_completed(self) -> None:
+    def _sync_mark_json_bootstrap_completed(self) -> None:
         with self._connect() as conn:
             _mark_migration_done(conn, self.JSON_BOOTSTRAP_KEY)
             conn.commit()
 
-    def has_persisted_state(self) -> bool:
+    def _sync_has_persisted_state(self) -> bool:
         """Return True once battle rows exist in SQLite."""
         with self._connect() as conn:
             queue_count = conn.execute("SELECT COUNT(*) FROM battle_queue").fetchone()[0]
@@ -617,7 +780,7 @@ class SQLiteBattleRepository:
             active_count = conn.execute("SELECT COUNT(*) FROM battle_active_by_user").fetchone()[0]
         return int(queue_count) > 0 or int(pending_count) > 0 or int(active_count) > 0
 
-    def seed_from_json_battle(self, battle: dict[str, Any]) -> None:
+    def _sync_seed_from_json_battle(self, battle: dict[str, Any]) -> None:
         queue = battle.get("queue", []) if isinstance(battle, dict) else []
         pending = battle.get("pending_friendly", {}) if isinstance(battle, dict) else {}
         active_by_user = battle.get("active_by_user", {}) if isinstance(battle, dict) else {}
@@ -655,7 +818,7 @@ class SQLiteBattleRepository:
                 )
             conn.commit()
 
-    def list_queue(self, now_ts: int) -> list[dict[str, Any]]:
+    def _sync_list_queue(self, now_ts: int) -> list[dict[str, Any]]:
         with self._connect() as conn:
             conn.execute("DELETE FROM battle_queue WHERE expires_at <= ?", (int(now_ts),))
             rows = conn.execute(
@@ -667,7 +830,7 @@ class SQLiteBattleRepository:
             for r in rows
         ]
 
-    def upsert_queue_entry(self, user_id: str, joined_at: int, expires_at: int) -> None:
+    def _sync_upsert_queue_entry(self, user_id: str, joined_at: int, expires_at: int) -> None:
         with self._connect() as conn:
             conn.execute(
                 "INSERT OR REPLACE INTO battle_queue (user_id, joined_at, expires_at) VALUES (?, ?, ?)",
@@ -675,20 +838,20 @@ class SQLiteBattleRepository:
             )
             conn.commit()
 
-    def remove_queue_user(self, user_id: str) -> bool:
+    def _sync_remove_queue_user(self, user_id: str) -> bool:
         with self._connect() as conn:
             cur = conn.execute("DELETE FROM battle_queue WHERE user_id = ?", (str(user_id),))
             conn.commit()
             return cur.rowcount > 0
 
-    def remove_queue_users(self, user_ids: list[str]) -> None:
+    def _sync_remove_queue_users(self, user_ids: list[str]) -> None:
         if not user_ids:
             return
         with self._connect() as conn:
             conn.executemany("DELETE FROM battle_queue WHERE user_id = ?", [(str(uid),) for uid in user_ids])
             conn.commit()
 
-    def list_pending_friendly(self, now_ts: int) -> dict[str, dict[str, Any]]:
+    def _sync_list_pending_friendly(self, now_ts: int) -> dict[str, dict[str, Any]]:
         with self._connect() as conn:
             conn.execute("DELETE FROM battle_pending_friendly WHERE expires_at <= ?", (int(now_ts),))
             rows = conn.execute("SELECT target_id, payload_json FROM battle_pending_friendly").fetchall()
@@ -703,7 +866,7 @@ class SQLiteBattleRepository:
                 out[str(r["target_id"])] = payload
         return out
 
-    def upsert_pending_friendly(self, target_id: str, payload: dict[str, Any]) -> None:
+    def _sync_upsert_pending_friendly(self, target_id: str, payload: dict[str, Any]) -> None:
         with self._connect() as conn:
             conn.execute(
                 "INSERT OR REPLACE INTO battle_pending_friendly (target_id, payload_json, expires_at) VALUES (?, ?, ?)",
@@ -711,18 +874,18 @@ class SQLiteBattleRepository:
             )
             conn.commit()
 
-    def remove_pending_friendly(self, target_id: str) -> bool:
+    def _sync_remove_pending_friendly(self, target_id: str) -> bool:
         with self._connect() as conn:
             cur = conn.execute("DELETE FROM battle_pending_friendly WHERE target_id = ?", (str(target_id),))
             conn.commit()
             return cur.rowcount > 0
 
-    def list_active_by_user(self) -> dict[str, str]:
+    def _sync_list_active_by_user(self) -> dict[str, str]:
         with self._connect() as conn:
             rows = conn.execute("SELECT user_id, battle_id FROM battle_active_by_user").fetchall()
         return {str(r["user_id"]): str(r["battle_id"]) for r in rows}
 
-    def set_active_by_user(self, mapping: dict[str, str]) -> None:
+    def _sync_set_active_by_user(self, mapping: dict[str, str]) -> None:
         with self._connect() as conn:
             conn.execute("DELETE FROM battle_active_by_user")
             for uid, bid in mapping.items():
@@ -731,3 +894,59 @@ class SQLiteBattleRepository:
                     (str(uid), str(bid)),
                 )
             conn.commit()
+
+    # ------------------------------------------------------------------
+    # Async public API
+    # ------------------------------------------------------------------
+
+    async def json_bootstrap_completed(self) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_json_bootstrap_completed)
+
+    async def mark_json_bootstrap_completed(self) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_mark_json_bootstrap_completed)
+
+    async def has_persisted_state(self) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_has_persisted_state)
+
+    async def seed_from_json_battle(self, battle: dict[str, Any]) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_seed_from_json_battle, battle)
+
+    async def list_queue(self, now_ts: int) -> list[dict[str, Any]]:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_list_queue, now_ts)
+
+    async def upsert_queue_entry(self, user_id: str, joined_at: int, expires_at: int) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_upsert_queue_entry, user_id, joined_at, expires_at)
+
+    async def remove_queue_user(self, user_id: str) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_remove_queue_user, user_id)
+
+    async def remove_queue_users(self, user_ids: list[str]) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_remove_queue_users, user_ids)
+
+    async def list_pending_friendly(self, now_ts: int) -> dict[str, dict[str, Any]]:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_list_pending_friendly, now_ts)
+
+    async def upsert_pending_friendly(self, target_id: str, payload: dict[str, Any]) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_upsert_pending_friendly, target_id, payload)
+
+    async def remove_pending_friendly(self, target_id: str) -> bool:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_remove_pending_friendly, target_id)
+
+    async def list_active_by_user(self) -> dict[str, str]:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_list_active_by_user)
+
+    async def set_active_by_user(self, mapping: dict[str, str]) -> None:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._sync_set_active_by_user, mapping)

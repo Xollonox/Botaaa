@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -269,7 +270,6 @@ DEFAULT_CONFIG = {
             "stats":        "📈",
             # ── Misc ──────────────────────────────────────────────
             "grant":        "➕",
-            "fee":          "💸",
             "start":        "🪪",
         },
     },
@@ -600,8 +600,7 @@ def build_default_data() -> dict[str, Any]:
         return deepcopy(_cached_default_data)
     data = deepcopy(DEFAULT_DATA)
     data["cards"] = deepcopy(_load_card_catalog())
-    import time as _time
-    _now = int(_time.time())
+    _now = int(time.time())
     season = data.get("season", {})
     if isinstance(season, dict) and season.get("start_time", 0) < 1700000000:
         season["start_time"] = _now - 604800
