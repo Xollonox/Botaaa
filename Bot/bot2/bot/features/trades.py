@@ -338,13 +338,20 @@ class TradeGroup(app_commands.Group):
         )
         await smart_reply(interaction, embed=embed, ephemeral=True)
 
-    @app_commands.command(name="cancel", description="Cancel your open trade offer.")
+    @app_commands.command(name="cancel_offer", description="Cancel your open trade offer.")
     @app_commands.describe(offer_id="Your offer ID to cancel")
     async def cancel_offer(self, interaction: discord.Interaction, offer_id: str) -> None:
         if not await ensure_registered(interaction, self.cog.bot.storage):
             return
 
         user_id = str(interaction.user.id)
+        offers = await self.cog.bot.trade_service.get_open_offers(limit=1000)
+        item_uid = None
+        for offer in offers:
+            if offer.get("id") == offer_id and str(offer.get("poster_id", "")) == user_id:
+                item_uid = offer.get("item_uid")
+                break
+
         cancelled = await self.cog.bot.trade_service.cancel_offer(offer_id, user_id)
 
         if not cancelled:
@@ -354,13 +361,6 @@ class TradeGroup(app_commands.Group):
                 ephemeral=True,
             )
             return
-
-        offer = await self.cog.bot.trade_service.get_open_offers(limit=1000)
-        item_uid = None
-        for o in offer:
-            if o.get("id") == offer_id:
-                item_uid = o.get("item_uid")
-                break
 
         def unlock_card(data: dict[str, Any]) -> None:
             player = get_player(data, user_id)
