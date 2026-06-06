@@ -28,9 +28,9 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-def _market_settings(cog: "MarketCog") -> dict[str, Any]:
+async def _market_settings(cog: "MarketCog") -> dict[str, Any]:
     try:
-        return cog.bot.market_service.get_settings()
+        return await cog.bot.market_service.get_settings()
     except (TypeError, ValueError, AttributeError):
         logger.exception("Failed to load market settings")
         return {}
@@ -54,6 +54,9 @@ class BuyConfirmView(discord.ui.View):
     @discord.ui.button(label="🛒 Confirm Buy", style=discord.ButtonStyle.success, row=0)
     async def confirm(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         user_id = self.buyer_id
+        # Pre-fetch async data before entering the sync with_lock closure
+        prefetched_listing = await self.cog.bot.market_service.get_listing(self.listing_id)
+        mkt_settings = await _market_settings(self.cog)
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str, bool]:
             m        = market_root(data)
@@ -78,7 +81,7 @@ class BuyConfirmView(discord.ui.View):
                 is_special = True
 
             if not listing:
-                listing = self.cog.bot.market_service.get_listing(self.listing_id)
+                listing = prefetched_listing
                 if not isinstance(listing, dict):
                     listing = listings.get(self.listing_id) if isinstance(listings, dict) else None
             if not isinstance(listing, dict):
@@ -127,7 +130,7 @@ class BuyConfirmView(discord.ui.View):
 
                 moved_card["market_locked"] = False
                 buyer_user["balance"] = bal - price
-                fee_percent = fee_percent_for_settings(_market_settings(self.cog))
+                fee_percent = fee_percent_for_settings(mkt_settings)
                 payout = max(0, price - int(round(price * (fee_percent / 100.0))))
                 seller_user["balance"] = int(seller_user.get("balance", 0)) + payout
                 buyer_inv.append(moved_card)
@@ -166,7 +169,7 @@ class BuyConfirmView(discord.ui.View):
 
         ok, reason, delete_player_listing = self.cog.bot.storage.with_lock(mutate)
         if ok and delete_player_listing:
-            self.cog.bot.market_service.delete_listing(self.listing_id)
+            await self.cog.bot.market_service.delete_listing(self.listing_id)
 
         if not ok:
             msgs = {
@@ -204,7 +207,7 @@ class BuyConfirmView(discord.ui.View):
 
 
 class MarketPanel(discord.ui.View):
-    def __init__(self, cog: "MarketCog", invoker_id: int) -> None:
+    def __init__(self, cog: "MarketCog", invoker_id: int, initial_data: dict[str, Any] | None = None) -> None:
         super().__init__(timeout=180)
         self.cog         = cog
         self.invoker_id  = invoker_id
@@ -212,9 +215,9 @@ class MarketPanel(discord.ui.View):
         self.sort_key    = "latest"
         self.selected_id: str | None = None
         self.message: discord.Message | None = None
-        self._rebuild()
+        self._rebuild(initial_data)
 
-    def _rebuild(self) -> None:
+    def _rebuild(self, data: dict[str, Any] | None = None) -> None:
         for child in list(self.children):
             if isinstance(child, (discord.ui.Select, discord.ui.Button)):
                 self.remove_item(child)
@@ -228,7 +231,8 @@ class MarketPanel(discord.ui.View):
         sort_select.callback = self._on_sort
         self.add_item(sort_select)
 
-        data = self.cog._load_market_data()
+        if data is None:
+            data = {}
         all_listings = apply_sort(get_active_listings(data), self.sort_key)
         page_items   = all_listings[self.page * PAGE_SIZE:(self.page + 1) * PAGE_SIZE]
         m            = market_root(data)
@@ -302,8 +306,8 @@ class MarketPanel(discord.ui.View):
                 logger.exception("Failed to disable market panel after timeout")
 
     async def _refresh(self, interaction: discord.Interaction) -> None:
-        data = self.cog._load_market_data()
-        self._rebuild()
+        data = await self.cog._load_market_data()
+        self._rebuild(data)
         embed, _ = build_market_embed(data, self.page, self.sort_key, self.selected_id)
         await interaction.response.edit_message(embed=embed, view=self)
 
@@ -323,7 +327,7 @@ class MarketPanel(discord.ui.View):
         await self._refresh(interaction)
 
     async def _on_next(self, interaction: discord.Interaction) -> None:
-        data = self.cog._load_market_data()
+        data = await self.cog._load_market_data()
         total = max(1, (len(get_active_listings(data)) + PAGE_SIZE - 1) // PAGE_SIZE)
         self.page = min(total - 1, self.page + 1)
         self.selected_id = None
@@ -333,7 +337,7 @@ class MarketPanel(discord.ui.View):
         if not self.selected_id:
             await interaction.response.send_message("Select a listing first.", ephemeral=True)
             return
-        data = self.cog._load_market_data()
+        data = await self.cog._load_market_data()
         m    = market_root(data)
 
         listing: dict[str, Any] | None = None
@@ -342,7 +346,7 @@ class MarketPanel(discord.ui.View):
                 listing = src
                 break
         if not listing:
-            listing = self.cog.bot.market_service.get_listing(self.selected_id)
+            listing = await self.cog.bot.market_service.get_listing(self.selected_id)
             if not isinstance(listing, dict):
                 listings = m.get("listings", {})
                 if isinstance(listings, dict):

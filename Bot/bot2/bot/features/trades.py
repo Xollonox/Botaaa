@@ -36,9 +36,9 @@ class TradesCog(commands.Cog):
     async def cog_unload(self) -> None:
         self.bot.tree.remove_command(self.trade_group.name, type=self.trade_group.type)
 
-    def _load_trade_data(self) -> dict[str, Any]:
+    async def _load_trade_data(self) -> dict[str, Any]:
         data = self.bot.storage.load()
-        return self.bot.trade_service.hydrate_json_trade_state(data)
+        return await self.bot.trade_service.hydrate_json_trade_state(data)
 
     def register_panel(self, panel: TradePanel) -> None:
         self.active_trade_panels[panel.a_id] = panel
@@ -67,27 +67,37 @@ class TradeGroup(app_commands.Group):
             await smart_reply(interaction, embed=make_embed(None, "❌ Invalid", "You can't trade with yourself."), ephemeral=True)
             return
 
-        data = self.cog._load_trade_data()
+        data = await self.cog._load_trade_data()
         b_player = get_player(data, b_id)
         if not isinstance(b_player, dict):
             await smart_reply(interaction, embed=make_embed(None, "❌ Not Registered", f"{user.mention} hasn't registered yet."), ephemeral=True)
             return
 
-        def _reserve_trade_pair(data: dict[str, Any]) -> tuple[bool, str]:
-            pending = _trade_root(data).setdefault("pending", {})
-            if self.cog.bot.trade_service.is_pending(a_id):
-                return False, "You already have an active trade. Use `/trade cancel` first."
-            if self.cog.bot.trade_service.is_pending(b_id):
-                return False, f"{user.mention} already has an active trade."
-            pending[a_id] = True
-            pending[b_id] = True
-            self.cog.bot.trade_service.add_pending_pair(a_id, b_id, mirror_json=False)
-            return True, "ok"
-
-        ok, msg = self.cog.bot.storage.with_lock(_reserve_trade_pair)
-        if not ok:
+        # Attempt the SQLite insert atomically first (INSERT OR IGNORE).
+        # add_pending_pair returns False if either user is already pending,
+        # preventing a TOCTOU race between the is_pending check and the write.
+        inserted = await self.cog.bot.trade_service.add_pending_pair(a_id, b_id, mirror_json=False)
+        if not inserted:
+            # Determine which user is already pending for a useful error message.
+            if await self.cog.bot.trade_service.is_pending(a_id):
+                msg = "You already have an active trade. Use `/trade cancel` first."
+            else:
+                msg = f"{user.mention} already has an active trade."
             await smart_reply(interaction, embed=make_embed(None, "❌ Trade Active", msg), ephemeral=True)
             return
+
+        # SQLite insert succeeded — now mirror into JSON under the storage lock.
+        def _mirror_pending(data: dict[str, Any]) -> None:
+            pending = _trade_root(data).setdefault("pending", {})
+            pending[a_id] = True
+            pending[b_id] = True
+
+        try:
+            self.cog.bot.storage.with_lock(_mirror_pending)
+        except Exception:
+            # JSON mutation failed — roll back the SQLite insert so state is consistent.
+            await self.cog.bot.trade_service.remove_pending_pair(a_id, b_id, mirror_json=False)
+            raise
 
         a_name = str(interaction.user.display_name)
         b_name = str(user.display_name)
@@ -126,7 +136,7 @@ class TradeGroup(app_commands.Group):
                 pending.pop(panel.b_id, None)
 
             self.cog.bot.storage.with_lock(mutate)
-            self.cog.bot.trade_service.remove_pending_pair(panel.a_id, panel.b_id, mirror_json=False)
+            await self.cog.bot.trade_service.remove_pending_pair(panel.a_id, panel.b_id, mirror_json=False)
             self.cog.unregister_panel(panel)
             panel.stop()
             if panel.message:
@@ -138,7 +148,7 @@ class TradeGroup(app_commands.Group):
             await smart_reply(interaction, embed=make_embed(None, "✅ Cancelled", "Your trade session has been cancelled."), ephemeral=True)
             return
 
-        ok = self.cog.bot.trade_service.remove_pending(user_id)
+        ok = await self.cog.bot.trade_service.remove_pending(user_id)
         if not ok:
             await smart_reply(interaction, embed=make_embed(None, "❌ No Trade", "You don't have an active trade."), ephemeral=True)
             return
@@ -148,7 +158,7 @@ class TradeGroup(app_commands.Group):
     async def history(self, interaction: discord.Interaction) -> None:
         if not await ensure_registered(interaction, self.cog.bot.storage):
             return
-        rows = self.cog.bot.trade_service.history_for_user(str(interaction.user.id), limit=20)
+        rows = await self.cog.bot.trade_service.history_for_user(str(interaction.user.id), limit=20)
         embed = _history_embed_rows(str(interaction.user.id), str(interaction.user.display_name), rows)
         await smart_reply(interaction, embed=embed, ephemeral=True)
 
@@ -159,7 +169,7 @@ class TradeGroup(app_commands.Group):
             return
 
         user_id = str(interaction.user.id)
-        data = self.cog._load_trade_data()
+        data = await self.cog._load_trade_data()
         player = get_player(data, user_id)
         if not isinstance(player, dict):
             await smart_reply(interaction, embed=make_embed(None, "❌ Error", "Player data not found."), ephemeral=True)
@@ -199,7 +209,7 @@ class TradeGroup(app_commands.Group):
                             break
 
         self.cog.bot.storage.with_lock(lock_card)
-        self.cog.bot.trade_service.post_offer(offer_id, user_id, str(interaction.user.display_name), have_card, want_card, item_uid, now, expires_at)
+        await self.cog.bot.trade_service.post_offer(offer_id, user_id, str(interaction.user.display_name), have_card, want_card, item_uid, now, expires_at)
 
         embed = make_embed(
             None,
@@ -214,7 +224,7 @@ class TradeGroup(app_commands.Group):
         if not await ensure_registered(interaction, self.cog.bot.storage):
             return
 
-        offers = self.cog.bot.trade_service.get_open_offers(limit=10)
+        offers = await self.cog.bot.trade_service.get_open_offers(limit=10)
         if not offers:
             await smart_reply(interaction, embed=make_embed(None, "📋 Trade Board", "No open offers at the moment."), ephemeral=True)
             return
@@ -239,7 +249,7 @@ class TradeGroup(app_commands.Group):
             return
 
         acceptor_id = str(interaction.user.id)
-        offer = self.cog.bot.trade_service.accept_offer(offer_id)
+        offer = await self.cog.bot.trade_service.accept_offer(offer_id)
         if not offer:
             await smart_reply(
                 interaction,
@@ -252,7 +262,7 @@ class TradeGroup(app_commands.Group):
         have_card = offer.get("have_card", "")
         want_card = offer.get("want_card", "")
 
-        data = self.cog._load_trade_data()
+        data = await self.cog._load_trade_data()
         acceptor = get_player(data, acceptor_id)
         if not isinstance(acceptor, dict):
             await smart_reply(interaction, embed=make_embed(None, "❌ Error", "Your player data not found."), ephemeral=True)
@@ -335,7 +345,7 @@ class TradeGroup(app_commands.Group):
             return
 
         user_id = str(interaction.user.id)
-        cancelled = self.cog.bot.trade_service.cancel_offer(offer_id, user_id)
+        cancelled = await self.cog.bot.trade_service.cancel_offer(offer_id, user_id)
 
         if not cancelled:
             await smart_reply(
@@ -345,7 +355,7 @@ class TradeGroup(app_commands.Group):
             )
             return
 
-        offer = self.cog.bot.trade_service.get_open_offers(limit=1000)
+        offer = await self.cog.bot.trade_service.get_open_offers(limit=1000)
         item_uid = None
         for o in offer:
             if o.get("id") == offer_id:

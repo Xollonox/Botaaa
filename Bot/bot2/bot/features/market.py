@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import uuid
 from typing import Any
 
 import discord
@@ -50,20 +51,20 @@ def _card_name_choices(data: dict[str, Any], current: str) -> list[app_commands.
     return out
 
 
-def _market_settings(cog: "MarketCog") -> dict[str, Any]:
+async def _market_settings(cog: "MarketCog") -> dict[str, Any]:
     try:
-        return cog.bot.market_service.get_settings()
+        return await cog.bot.market_service.get_settings()
     except (TypeError, ValueError, AttributeError):
         logger.exception("Failed to load market settings")
         return {}
 
 
-def _price_range_for(cog: "MarketCog", rarity: str) -> tuple[int, int]:
-    return price_range_for_settings(_market_settings(cog), rarity)
+async def _price_range_for(cog: "MarketCog", rarity: str) -> tuple[int, int]:
+    return price_range_for_settings(await _market_settings(cog), rarity)
 
 
-def _fee_percent_for(cog: "MarketCog") -> int:
-    return fee_percent_for_settings(_market_settings(cog))
+async def _fee_percent_for(cog: "MarketCog") -> int:
+    return fee_percent_for_settings(await _market_settings(cog))
 
 
 class MarketCog(commands.Cog):
@@ -75,9 +76,9 @@ class MarketCog(commands.Cog):
     async def cog_unload(self) -> None:
         self.bot.tree.remove_command(self.market_group.name, type=self.market_group.type)
 
-    def _load_market_data(self) -> dict[str, Any]:
+    async def _load_market_data(self) -> dict[str, Any]:
         data = self.bot.storage.load()
-        return self.bot.market_service.hydrate_json_market_listings(data)
+        return await self.bot.market_service.hydrate_json_market_listings(data)
 
     @app_commands.command(name="o_feature_card", description="Owner: set the featured card of the day.")
     @app_commands.guilds(OWNER_GUILD)
@@ -103,9 +104,8 @@ class MarketCog(commands.Cog):
             image_url = str(card_def.get("image_url", "")).strip() if isinstance(card_def, dict) else ""
             rarity    = str(card_def.get("rarity", "")).strip() if isinstance(card_def, dict) else ""
             card_arc  = str(arc).strip() or str(card_def.get("arc", "—")).strip() if isinstance(card_def, dict) else str(arc).strip()
-            import uuid as _uuid
             m["featured"] = {
-                "id":          str(_uuid.uuid4()),
+                "id":          str(uuid.uuid4()),
                 "card_name":   card_name,
                 "rarity":      rarity,
                 "price":       int(price),
@@ -133,7 +133,7 @@ class MarketCog(commands.Cog):
 
     @o_feature_card.autocomplete("card_name")
     async def o_feature_card_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        return _card_name_choices(self._load_market_data(), current)
+        return _card_name_choices(await self._load_market_data(), current)
 
     @app_commands.command(name="o_special_offer", description="Owner: post a special offer.")
     @app_commands.guilds(OWNER_GUILD)
@@ -159,9 +159,8 @@ class MarketCog(commands.Cog):
             image_url = str(card_def.get("image_url", "")).strip() if isinstance(card_def, dict) else ""
             rarity    = str(card_def.get("rarity", "")).strip() if isinstance(card_def, dict) else ""
             card_arc  = str(arc).strip() or str(card_def.get("arc", "—")).strip() if isinstance(card_def, dict) else str(arc).strip()
-            import uuid as _uuid
             m["special_offer"] = {
-                "id":          str(_uuid.uuid4()),
+                "id":          str(uuid.uuid4()),
                 "card_name":   card_name,
                 "rarity":      rarity,
                 "price":       int(price),
@@ -189,7 +188,7 @@ class MarketCog(commands.Cog):
 
     @o_special_offer.autocomplete("card_name")
     async def o_special_offer_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        return _card_name_choices(self._load_market_data(), current)
+        return _card_name_choices(await self._load_market_data(), current)
 
     @app_commands.command(name="o_market_remove", description="Owner: force remove any listing.")
     @app_commands.guilds(OWNER_GUILD)
@@ -198,11 +197,13 @@ class MarketCog(commands.Cog):
             await smart_reply(interaction, embed=make_embed(None, "❌ Owner Only", "Not allowed."), ephemeral=True)
             return
 
+        active_listings = await self.bot.market_service.get_active_listings()
+
         def mutate(data: dict[str, Any]) -> tuple[bool, bool]:
-            data = self.bot.market_service.hydrate_json_market_listings(data)
             m = market_root(data)
-            listings = m.get("listings", {})
-            if isinstance(listings, dict) and listing_id in listings:
+            listings = m.setdefault("listings", {})
+            listings.update(active_listings)
+            if listing_id in listings:
                 listing   = listings.pop(listing_id)
                 seller_id = str(listing.get("seller_id", ""))
                 card_uid  = str(listing.get("card_uid", ""))
@@ -219,7 +220,7 @@ class MarketCog(commands.Cog):
 
         ok, should_delete_sqlite = self.bot.storage.with_lock(mutate)
         if ok and should_delete_sqlite:
-            self.bot.market_service.delete_listing(listing_id)
+            await self.bot.market_service.delete_listing(listing_id)
         msg = "✅ Listing removed." if ok else "❌ Listing not found."
         await smart_reply(interaction, embed=make_embed(None, "Market", msg), ephemeral=True)
 
@@ -235,7 +236,7 @@ class MarketCog(commands.Cog):
             await smart_reply(interaction, embed=make_embed(None, "❌ Owner Only", "Not allowed."), ephemeral=True)
             return
 
-        self.bot.market_service.set_quick_sell_value(str(rarity), int(value))
+        await self.bot.market_service.set_quick_sell_value(str(rarity), int(value))
         await smart_reply(interaction, embed=make_embed(None, "✅ Updated", f"{rarity} quick sell → {value:,} coins"), ephemeral=True)
 
 
@@ -248,8 +249,8 @@ class MarketGroup(app_commands.Group):
     async def browse(self, interaction: discord.Interaction) -> None:
         if not await ensure_registered(interaction, self.cog.bot.storage):
             return
-        data = self.cog._load_market_data()
-        panel = MarketPanel(self.cog, interaction.user.id)
+        data = await self.cog._load_market_data()
+        panel = MarketPanel(self.cog, interaction.user.id, data)
         embed, _ = build_market_embed(data, 0, "latest", None)
         await interaction.response.send_message(embed=embed, view=panel)
         panel.message = await interaction.original_response()
@@ -266,6 +267,8 @@ class MarketGroup(app_commands.Group):
             return
 
         user_id = str(interaction.user.id)
+        # Pre-fetch settings so the sync with_lock closure doesn't call async code
+        mkt_settings = await _market_settings(self.cog)
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str, str, dict[str, Any] | None]:
             player = get_player(data, user_id)
@@ -287,7 +290,7 @@ class MarketGroup(app_commands.Group):
                 return False, "card_not_found", "", None
 
             rarity = str(card.get("rarity", "Common"))
-            lo, hi = _price_range_for(self.cog, rarity)
+            lo, hi = price_range_for_settings(mkt_settings, rarity)
             if not (lo <= price <= hi):
                 return False, f"price_range:{rarity}:{lo}:{hi}", "", None
 
@@ -321,7 +324,7 @@ class MarketGroup(app_commands.Group):
 
         ok, result, listing_id, listing_payload = self.cog.bot.storage.with_lock(mutate)
         if ok and listing_payload is not None:
-            self.cog.bot.market_service.upsert_listing(listing_id, listing_payload)
+            await self.cog.bot.market_service.upsert_listing(listing_id, listing_payload)
         if not ok:
             msgs = {
                 "not_registered": "You are not registered.",
@@ -348,7 +351,8 @@ class MarketGroup(app_commands.Group):
     @add.autocomplete("card_name")
     async def add_card_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         user_id = str(interaction.user.id)
-        data = self.cog._load_market_data()
+        data = await self.cog._load_market_data()
+        mkt_settings = await _market_settings(self.cog)
         player  = get_player(data, user_id)
         if not isinstance(player, dict):
             return []
@@ -370,7 +374,7 @@ class MarketGroup(app_commands.Group):
             if token and token not in name.lower():
                 continue
             seen.add(name)
-            lo, hi = _price_range_for(self.cog, rarity)
+            lo, hi = price_range_for_settings(mkt_settings, rarity)
             out.append(app_commands.Choice(
                 name=f"{_ri(rarity)} {name}  [{rarity}]  ({lo:,}–{hi:,})"[:100],
                 value=name,
@@ -385,10 +389,13 @@ class MarketGroup(app_commands.Group):
             return
         user_id = str(interaction.user.id)
 
+        # Pre-fetch active listings so the sync with_lock closure doesn't call async code
+        active_listings = await self.cog.bot.market_service.get_active_listings()
+
         def mutate(data: dict[str, Any]) -> tuple[bool, str, str]:
-            data = self.cog.bot.market_service.hydrate_json_market_listings(data)
             m        = market_root(data)
-            listings = m.get("listings", {})
+            listings = m.setdefault("listings", {})
+            listings.update(active_listings)
             if not isinstance(listings, dict):
                 return False, "no_listings", ""
             listing = next(
@@ -415,7 +422,7 @@ class MarketGroup(app_commands.Group):
 
         ok, result, removed_lid = self.cog.bot.storage.with_lock(mutate)
         if ok and removed_lid:
-            self.cog.bot.market_service.delete_listing(removed_lid)
+            await self.cog.bot.market_service.delete_listing(removed_lid)
         if not ok:
             await smart_reply(interaction, embed=make_embed(None, "❌ Not Found", f"No active listing found for **{card_name}**."), ephemeral=True)
             return
@@ -424,7 +431,7 @@ class MarketGroup(app_commands.Group):
     @remove.autocomplete("card_name")
     async def remove_card_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         user_id = str(interaction.user.id)
-        data = self.cog._load_market_data()
+        data = await self.cog._load_market_data()
         m        = market_root(data)
         listings = m.get("listings", {})
         if not isinstance(listings, dict):

@@ -42,7 +42,7 @@ class MarketOwnerCog(commands.Cog):
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
-        self.bot.market_service.set_enabled(bool(enabled))
+        await self.bot.market_service.set_enabled(bool(enabled))
         data = self.bot.storage.load()
         await smart_reply(interaction, embed=make_embed(data, f"{e('ok', data)} Market Updated", f"Enabled: {enabled}"), ephemeral=True)
 
@@ -53,7 +53,7 @@ class MarketOwnerCog(commands.Cog):
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
-        self.bot.market_service.set_fee_percent(int(fee_percent))
+        await self.bot.market_service.set_fee_percent(int(fee_percent))
         data = self.bot.storage.load()
         await smart_reply(interaction, embed=make_embed(data, f"{e('fee', data)} Fee Updated", f"Fee: {fee_percent}%"), ephemeral=True)
 
@@ -64,7 +64,7 @@ class MarketOwnerCog(commands.Cog):
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
-        self.bot.market_service.set_max_listings(int(max))
+        await self.bot.market_service.set_max_listings(int(max))
         data = self.bot.storage.load()
         await smart_reply(interaction, embed=make_embed(data, f"{e('ok', data)} Max Listings Updated", f"Max: {max}"), ephemeral=True)
 
@@ -82,7 +82,7 @@ class MarketOwnerCog(commands.Cog):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
 
-        ok, reason = self.bot.market_service.upsert_store_item(
+        ok, reason = await self.bot.market_service.upsert_store_item(
             card_name=card_name,
             stock=int(stock),
             price_override=int(price_override) if price_override is not None else None,
@@ -105,7 +105,7 @@ class MarketOwnerCog(commands.Cog):
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
-        self.bot.market_service.remove_store_item(card_name)
+        await self.bot.market_service.remove_store_item(card_name)
         data = self.bot.storage.load()
         await smart_reply(interaction, embed=make_embed(data, f"{e('delete', data)} Store Item Removed", card_name), ephemeral=True)
 
@@ -124,7 +124,7 @@ class MarketOwnerCog(commands.Cog):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
 
-        ok, reason = self.bot.market_service.toggle_store_item(card_name, bool(enabled))
+        ok, reason = await self.bot.market_service.toggle_store_item(card_name, bool(enabled))
         data = self.bot.storage.load()
         if not ok:
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Store Toggle Failed", reason), ephemeral=True)

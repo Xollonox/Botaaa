@@ -7,6 +7,7 @@ formula smoke tests and non-runtime callers.
 
 from __future__ import annotations
 
+import random
 from typing import Any
 
 from bot.utils.attacks_logic import ATTACK_TYPES, DEFENSE_TYPES
@@ -58,8 +59,11 @@ def calc_damage(
     return max(1, int(round(raw * (1.0 - reduction))))
 
 
-def calc_defense_reduction(defense_type: str, damage: int) -> int:
-    """Compatibility defense estimate for tests; runtime uses battle_state."""
+def calc_defense_reduction(defense_type: str, damage: int, *, _rng: random.Random | None = None) -> int:
+    """Compatibility defense estimate for tests; runtime uses battle_state.
+
+    Pass a seeded ``_rng`` in tests to make the dodge branch deterministic.
+    """
     base = max(0, int(damage or 0))
     defense = normalize_attack_type(defense_type)
     if defense == "block":
@@ -69,7 +73,6 @@ def calc_defense_reduction(defense_type: str, damage: int) -> int:
     if defense == "revert":
         return max(0, int(base * 0.6))
     if defense == "dodge":
-        import random
-
-        return 0 if random.random() < 0.5 else base
+        rng = _rng or random
+        return 0 if rng.random() < 0.5 else base
     return base

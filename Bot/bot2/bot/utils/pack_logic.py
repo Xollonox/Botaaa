@@ -139,20 +139,16 @@ def open_pack_roll(
     cards_per_pack = int(pack_def.get("cards_per_pack", 5))
     cards_per_pack = max(1, min(20, cards_per_pack))
 
-    # Build weighted pool
-    pool: list[tuple[str, dict[str, Any]]] = []
+    # Build rarity pool for weighted selection
+    rarity_pool: list[str] = []
+    rarity_weights: list[int] = []
     for rarity, weight in rates.items():
         w = int(weight or 0)
-        if w <= 0:
-            continue
-        matching = [
-            (name, card)
-            for name, card in catalog.items()
-            if isinstance(card, dict) and str(card.get("rarity", "")) == rarity
-        ]
-        pool.extend(matching * w)
+        if w > 0:
+            rarity_pool.append(rarity)
+            rarity_weights.append(w)
 
-    if not pool:
+    if not rarity_pool:
         return {"success": False, "reason": "no_pool"}
 
     players = data.setdefault("players", {})
@@ -196,16 +192,31 @@ def open_pack_roll(
                     break
 
         if forced_rarity is not None:
-            forced_pool = [
+            # Use forced rarity instead of weighted selection
+            forced_cards = [
                 (name, card) for name, card in catalog.items()
                 if isinstance(card, dict) and str(card.get("rarity", "")) == forced_rarity
             ]
-            if forced_pool:
-                card_name, card_def = random.choice(forced_pool)
+            if forced_cards:
+                card_name, card_def = random.choice(forced_cards)
             else:
-                card_name, card_def = random.choice(pool)
+                # Fallback: select from weighted rarity pool
+                selected_rarity = random.choices(rarity_pool, weights=rarity_weights, k=1)[0]
+                cards_of_rarity = [
+                    (name, card) for name, card in catalog.items()
+                    if isinstance(card, dict) and str(card.get("rarity", "")) == selected_rarity
+                ]
+                card_name, card_def = random.choice(cards_of_rarity) if cards_of_rarity else (None, None)
+                if card_name is None:
+                    continue
         else:
-            card_name, card_def = random.choice(pool)
+            # Select rarity using weighted random.choices
+            selected_rarity = random.choices(rarity_pool, weights=rarity_weights, k=1)[0]
+            cards_of_rarity = [
+                (name, card) for name, card in catalog.items()
+                if isinstance(card, dict) and str(card.get("rarity", "")) == selected_rarity
+            ]
+            card_name, card_def = random.choice(cards_of_rarity)
 
         pulled_rarity = str(card_def.get("rarity", ""))
 

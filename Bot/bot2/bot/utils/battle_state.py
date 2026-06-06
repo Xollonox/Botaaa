@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 import uuid
 import random
 from typing import Any
@@ -192,8 +193,7 @@ def _build_cpu_side(data: dict[str, Any], team_size: int = 4, min_rarity: str = 
     if not pool:
         return _build_player_side(data, "", [])
 
-    import random as _random
-    selected_names = _random.sample(pool, min(team_size, len(pool)))
+    selected_names = random.sample(pool, min(team_size, len(pool)))
 
     # Build team_uids as synthetic IDs so the battle system can track them
     team_uids: list[str] = []
@@ -221,7 +221,7 @@ def _build_cpu_side(data: dict[str, Any], team_size: int = 4, min_rarity: str = 
             star_range = (2, 4)
         else:
             star_range = (3, 5)
-        stars = _random.randint(*star_range)
+        stars = random.randint(*star_range)
         scaled = compute_scaled_stats(card_def, stars) if isinstance(card_def, dict) else {}
         mastery_raw = card_def.get("mastery", [])
         if isinstance(mastery_raw, list):
@@ -727,6 +727,7 @@ def _apply_damage_and_check_elim(
     state.setdefault("last_move_group_by_char_uid", {})[my_uid] = group if me.get("team_uids") else group
     state.setdefault("last_move_group_by_side", {})[actor] = group
     state.setdefault("log", []).append(f"{actor}:{move_norm}:{damage}")
+    state["log"] = state["log"][-50:]
 
     # Pass turn
     state["turn_user_id"] = enemy_id
@@ -979,12 +980,16 @@ def _grant_battle_rewards(data: dict, state: dict, winner_id: str, loser_id: str
     from bot.utils.pack_logic import grant_pending_milestone_packs
 
     if not is_draw and not no_contest:
-        w_xp, w_cp = grant_battle_xp_cp(data, winner_id, f"{battle_type}_win")
-        l_xp, l_cp = grant_battle_xp_cp(data, loser_id,  f"{battle_type}_loss")
+        w_xp, w_cp, w_milestones = grant_battle_xp_cp(data, winner_id, f"{battle_type}_win")
+        l_xp, l_cp, l_milestones = grant_battle_xp_cp(data, loser_id,  f"{battle_type}_loss")
         state["winner_xp"] = w_xp
         state["loser_xp"]  = l_xp
         state["winner_cp"] = w_cp
         state["loser_cp"]  = l_cp
+        if w_milestones:
+            state["winner_level_milestones"] = w_milestones
+        if l_milestones:
+            state["loser_level_milestones"] = l_milestones
 
         # Grant pending milestone packs for both players
         w_packs = grant_pending_milestone_packs(data, winner_id)
@@ -1205,6 +1210,16 @@ def end_battle(data: dict[str, Any], battle_id: str, winner_id: str, loser_id: s
 
     # Ranked stats + achievement triggers
     _update_ranked_stats_and_achievements(data, state, winner_id, loser_id, battle_type, is_draw, no_contest)
+
+    # Move ended battle out of active into a capped recently_ended list
+    battle_root = data.get("battle", {})
+    if isinstance(battle_root, dict):
+        recently_ended = battle_root.setdefault("recently_ended", [])
+        recently_ended.append({**state, "_ended_at": int(time.time())})
+        battle_root["recently_ended"] = recently_ended[-100:]
+        active_map = battle_root.get("active", {})
+        if isinstance(active_map, dict):
+            active_map.pop(str(battle_id), None)
 
     return {
         "ok": True, "success": True, "battle_over": True,

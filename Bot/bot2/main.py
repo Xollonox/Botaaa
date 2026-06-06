@@ -92,13 +92,10 @@ class LookismBot(commands.Bot):
         self._terms_cache: set[int] = set()
         self.market_repo = SQLiteMarketRepository(SQLITE_PATH)
         self.market_service = MarketService(self.market_repo, self.storage)
-        self.market_service.bootstrap_from_json()
         self.trade_repo = SQLiteTradeRepository(SQLITE_PATH)
         self.trade_service = TradeService(self.trade_repo, self.storage)
-        self.trade_service.bootstrap_from_json()
         self.battle_repo = SQLiteBattleRepository(SQLITE_PATH)
         self.battle_service = BattleService(self.battle_repo, self.storage)
-        self.battle_service.bootstrap_from_json()
 
     def mark_terms_accepted(self, user_id: int) -> None:
         """Called by onboarding code when a user accepts the ToS."""
@@ -165,6 +162,11 @@ class LookismBot(commands.Bot):
 
     async def setup_hook(self) -> None:
         """Load all cogs and sync slash commands."""
+        # Bootstrap SQLite repos from JSON (must run before cogs start handling commands)
+        await self.market_service.bootstrap_from_json()
+        await self.trade_service.bootstrap_from_json()
+        await self.battle_service.bootstrap_from_json()
+
         failed: list[str] = []
         for ext in EXTENSIONS:
             try:
