@@ -5,7 +5,7 @@ from __future__ import annotations
 import discord
 from discord import app_commands
 from discord.ext import commands, tasks
-from datetime import datetime, timedelta
+from datetime import datetime
 import random
 
 from bot.config import OWNER_GUILD_ID
@@ -210,41 +210,6 @@ class AnnounceOwnerCog(commands.Cog):
             ),
             ephemeral=True,
         )
-
-    @app_commands.command(name="cotd", description="View today's Card of the Day buff.")
-    async def cotd(self, interaction: discord.Interaction) -> None:
-        """Show the current Card of the Day."""
-        data = self.bot.storage.load()
-        cotd = data.get("cotd", {})
-
-        if not cotd.get("card_name"):
-            await smart_reply(
-                interaction,
-                embed=make_embed(data, "⚡ Card of the Day", "No card is featured today yet."),
-                ephemeral=True,
-            )
-            return
-
-        card_name = cotd.get("card_name", "")
-        buff_pct = cotd.get("buff_pct", 15)
-        date_str = cotd.get("date", "today")
-
-        # Calculate time until next rotation (next UTC midnight)
-        now = datetime.utcnow()
-        next_rotation = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
-        time_left = next_rotation - now
-        hours_left = int(time_left.total_seconds() // 3600)
-        mins_left = int((time_left.total_seconds() % 3600) // 60)
-
-        embed = make_embed(
-            data,
-            "⚡ CARD OF THE DAY",
-            f"**{card_name}** gets **+{buff_pct}% damage** boost!\n\n"
-            f"Rotation: {date_str}\n"
-            f"Next rotation: {hours_left}h {mins_left}m",
-        )
-        embed.set_footer(text="Buff applies to all battles")
-        await smart_reply(interaction, embed=embed, ephemeral=True)
 
     @app_commands.command(name="o_event", description="Owner: activate double XP/coins event.")
     @app_commands.guilds(OWNER_GUILD)

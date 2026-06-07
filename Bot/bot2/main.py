@@ -53,7 +53,6 @@ EXTENSIONS = [
     "bot.features.tutorial",
     "bot.features.tournament",
     "bot.features.leaderboards",
-    "bot.features.league_overview",
     "bot.features.achievements",
     "bot.features.season",
     "bot.features.alliance",
@@ -65,7 +64,6 @@ EXTENSIONS = [
     "bot.features.packs_panel",
     "bot.features.emoji_panel",
     "bot.features.gang_war",
-    "bot.features.stats_guide",
 ]
 
 

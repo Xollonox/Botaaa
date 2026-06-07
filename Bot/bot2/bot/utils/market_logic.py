@@ -266,6 +266,15 @@ def build_market_embed(
         if not image_url:
             image_url = str(special.get("image_url", "")).strip() or None
 
+    cotd = data.get("cotd", {})
+    if isinstance(cotd, dict) and cotd.get("card_name"):
+        buff_pct = int(cotd.get("buff_pct", 15))
+        blocks.append(
+            f"╭─ ⚡ Card of the Day\n"
+            f"│ **{cotd['card_name']}** · +{buff_pct}% damage in battles\n"
+            "╰────────────────"
+        )
+
     total_pages = max(1, (len(sorted_listings) + PAGE_SIZE - 1) // PAGE_SIZE)
     page = max(0, min(page, total_pages - 1))
     page_items = sorted_listings[page * PAGE_SIZE:(page + 1) * PAGE_SIZE]

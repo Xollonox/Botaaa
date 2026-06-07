@@ -24,7 +24,7 @@ HELP_CATEGORIES = [
         "name": "Profile & Collection",
         "emoji_key": "profile",
         "items": [
-            ("/profile", "Displays a premium profile card for you or another user, showing player identity, progression, economy visibility, featured card, cosmetics, and public stats."),
+            ("/profile", "Displays your premium profile card including stats, featured card, and rival info. Use on another user to view their profile."),
             ("/collection", "Opens your owned card collection browser, letting you inspect inventory pages and review cards you can use for squads, trading, or market listings."),
             ("/card_info", "Looks up a global catalog card by name and shows its rarity, stats, power, mastery/path/skill data, image, and core fighter information."),
             ("/card_lock", "Locks one of your owned card instances so it is protected from accidental sale, trade, or other destructive inventory actions."),
@@ -53,7 +53,7 @@ HELP_CATEGORIES = [
         "name": "Market",
         "emoji_key": "market",
         "items": [
-            ("/market browse", "Opens the player market browser so you can view active listings, compare cards and prices, and find listing IDs for purchases."),
+            ("/market browse", "Opens the player market browser. Also shows the Card of the Day buff and featured/special offers."),
             ("/market add", "Lists one of your unlocked owned card instance on the market for a chosen price, making it available for other players to buy."),
             ("/market remove", "Cancels one of your active market listings and returns the listed card back to your normal inventory state."),
         ],
@@ -80,8 +80,7 @@ HELP_CATEGORIES = [
         "name": "Tournament",
         "emoji_key": "tournament",
         "items": [
-            ("/tournament", "Displays the active tournament overview and leaderboard, including participation state and competitive standings for the current event."),
-            ("/tournament_join", "Joins the active tournament if registration is open, charging the configured entry fee when required and adding you to participants."),
+            ("/tournament", "Displays the active tournament overview and leaderboard. Use the Join button inside to enter, or the Battle button to fight a participant."),
             ("/tournament_battle", "Starts a tournament battle against another participant, using tournament rules and recording progress toward event results."),
         ],
     },
@@ -89,9 +88,7 @@ HELP_CATEGORIES = [
         "name": "Season",
         "emoji_key": "season",
         "items": [
-            ("/season", "Shows current season details, active status, season name, timing, leaderboard information, and the main progression context."),
-            ("/season_pass", "Opens your season pass progress, showing your pass XP, level, available rewards, and claimable tier rewards."),
-            ("/season_missions", "Lists daily, weekly, monthly, and seasonal missions so you can see objectives that award season CP or progression."),
+            ("/season", "Opens the season hub with tabs for Season Info, Season Pass rewards, and Missions — all in one command."),
         ],
     },
     {
@@ -116,8 +113,8 @@ HELP_CATEGORIES = [
         "name": "Owner Cards",
         "emoji_key": "owner",
         "items": [
-            ("/o add_card", "Owner command that creates a new fighter in the global catalog with stats, rarity, image, bio, mastery, path, and skill metadata."),
-            ("/o edit_card", "Owner command that edits only the provided fields on an existing catalog fighter."),
+            ("/o add_card", "Owner command that creates a new fighter in the global catalog with stats, rarity, image, bio, mastery, path, skill metadata, and optional typing (type1/type2)."),
+            ("/o edit_card", "Owner command that edits only the provided fields on an existing catalog fighter, including optional type1/type2 for typing updates."),
             ("/o delete_card", "Owner command that deletes a catalog fighter after an explicit DELETE confirmation."),
             ("/o add_attack", "Owner command that creates a new attack or defense entry in the global attack catalog."),
             ("/o edit_attack", "Owner command that edits provided fields on an existing catalog attack."),

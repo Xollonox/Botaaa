@@ -87,6 +87,41 @@ class LeaderboardPanel(discord.ui.View):
         data = self._data
         await interaction.response.edit_message(embed=self.build_embed(data), view=self)
 
+    @discord.ui.button(label="🏅 League Overview", style=discord.ButtonStyle.secondary, row=1)
+    async def league_overview_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
+        data = self._data
+        players = data.get("players", {})
+        league_order = [
+            ("Copper", "0-200"), ("Iron", "200-400"), ("Bronze", "400-800"),
+            ("Silver", "800-1200"), ("Gold", "1200-1600"), ("Diamond", "1600-2400"),
+            ("Platinum", "2400-3200"), ("Sapphire", "3200-4000"), ("Ruby", "4000+"),
+        ]
+        def _league_from_trophies(t: int) -> str:
+            if t >= 4000: return "Ruby"
+            if t >= 3200: return "Sapphire"
+            if t >= 2400: return "Platinum"
+            if t >= 1600: return "Diamond"
+            if t >= 1200: return "Gold"
+            if t >= 800:  return "Silver"
+            if t >= 400:  return "Bronze"
+            if t >= 200:  return "Iron"
+            return "Copper"
+        counts: dict[str, int] = {name: 0 for name, _ in league_order}
+        total_players = 0
+        if isinstance(players, dict):
+            for player in players.values():
+                if not isinstance(player, dict): continue
+                user = player.get("user", {})
+                if not isinstance(user, dict): continue
+                total_players += 1
+                counts[_league_from_trophies(int(user.get("trophies", 0)))] = counts.get(_league_from_trophies(int(user.get("trophies", 0))), 0) + 1
+        from bot.utils.ui import box
+        threshold_lines = [f"{e(n.lower(), data) or '•'} {n}: {band}" for n, band in league_order]
+        count_lines = [f"{e(n.lower(), data) or '•'} {n}: {counts.get(n, 0)}" for n, _ in league_order]
+        body = box("Trophy Thresholds", threshold_lines) + "\n\n" + box("League Distribution", count_lines) + "\n\n" + box("Summary", [f"👥 Total Players: {total_players}"])
+        embed = make_embed(data, f"{e('league', data)} League Overview", body)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
 
 class LeaderboardsCog(commands.Cog):
     lb = app_commands.Group(name="lb", description="Leaderboard commands")

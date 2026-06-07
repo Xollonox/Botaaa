@@ -867,10 +867,13 @@ class CardsAdminCog(commands.Cog):
         unique_skill: str | None = None,
         unique_skill_description: str | None = None,
         emoji: str | None = None,
+        type1: str | None = None,
+        type2: str | None = None,
     ) -> None:
         if not is_owner(interaction):
             await interaction.response.send_message("Owner only command.", ephemeral=True)
             return
+        typing = _norm_typing_list([type1] + ([type2] if type2 else [])) if type1 else []
         card = build_card_def(
             name=name,
             title=title or "",
@@ -895,6 +898,8 @@ class CardsAdminCog(commands.Cog):
             image_url=image_url,
             emoji=emoji,
         )
+        if typing:
+            card["typing"] = typing
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             return add_card_def(data, card)
@@ -931,6 +936,8 @@ class CardsAdminCog(commands.Cog):
         unique_skill: str | None = None,
         unique_skill_description: str | None = None,
         emoji: str | None = None,
+        type1: str | None = None,
+        type2: str | None = None,
     ) -> None:
         if not is_owner(interaction):
             await interaction.response.send_message("Owner only command.", ephemeral=True)
@@ -958,6 +965,10 @@ class CardsAdminCog(commands.Cog):
                     selected.discard(label)
             mastery = normalize_mastery_list(selected)
 
+        typing: list[str] | None = None
+        if type1:
+            typing = _norm_typing_list([type1] + ([type2] if type2 else []))
+
         updates = {
             "name": name,
             "title": title,
@@ -970,6 +981,7 @@ class CardsAdminCog(commands.Cog):
             "unique_skill_description": unique_skill_description,
             "emoji": emoji,
             "mastery": mastery,
+            "typing": typing,
             "stats": {
                 "strength": strength,
                 "speed": speed,
@@ -992,6 +1004,18 @@ class CardsAdminCog(commands.Cog):
     @edit_card.autocomplete("card_name")
     async def edit_card_name_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         return await self._card_autocomplete(interaction, current)
+
+    @edit_card.autocomplete("type1")
+    @edit_card.autocomplete("type2")
+    async def edit_card_type_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        token = str(current).lower()
+        return [app_commands.Choice(name=t, value=t) for t in TYPING_TYPES if token in t.lower()][:25]
+
+    @add_card.autocomplete("type1")
+    @add_card.autocomplete("type2")
+    async def add_card_type_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        token = str(current).lower()
+        return [app_commands.Choice(name=t, value=t) for t in TYPING_TYPES if token in t.lower()][:25]
 
     @o.command(name="delete_card", description="Owner: delete a fighter card. Confirmation must be DELETE.")
     async def delete_card(self, interaction: discord.Interaction, card_name: str, confirm: str) -> None:
@@ -1192,68 +1216,6 @@ class CardsAdminCog(commands.Cog):
     @view_card_attacks.autocomplete("card_name")
     async def view_card_attacks_name_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         return await self._card_autocomplete(interaction, current)
-
-    @app_commands.command(name="o_card_edit_typing", description="Owner: set a card's typing (1 or 2 of Tank/Fighter/Brawler/Speedster/Assassin/Mastermind).")
-    @app_commands.guilds(OWNER_GUILD)
-    async def o_card_edit_typing(self, interaction: discord.Interaction, card_name: str, type1: str, type2: str | None = None) -> None:
-        if not is_owner(interaction):
-            await interaction.response.send_message("Owner only command.", ephemeral=True)
-            return
-        new_typing = _norm_typing_list([type1] + ([type2] if type2 else []))
-        if not new_typing:
-            await interaction.response.send_message(
-                f"Invalid typing. Choose from: {', '.join(TYPING_TYPES)}.", ephemeral=True
-            )
-            return
-
-        result: dict[str, Any] = {"ok": False, "name": ""}
-
-        def mutate(data: dict[str, Any]) -> bool:
-            key = _find_key(data, card_name)
-            if key is None:
-                return False
-            card = _cards_root(data)[key]
-            if not isinstance(card, dict):
-                return False
-            card["typing"] = list(new_typing)
-            result["ok"] = True
-            result["name"] = str(card.get("name", key))
-            return True
-
-        self.bot.storage.with_lock(mutate)
-        if not result["ok"]:
-            await interaction.response.send_message(f"Card `{card_name}` not found.", ephemeral=True)
-            return
-        await interaction.response.send_message(
-            f"Typing for **{result['name']}** set to: `{' / '.join(new_typing)}`.", ephemeral=True
-        )
-
-    @o_card_edit_typing.autocomplete("card_name")
-    async def _typing_card_ac(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        data = self.bot.storage.load()
-        cards = data.get("cards", {}) if isinstance(data.get("cards", {}), dict) else {}
-        text = current.strip().lower()
-        out: list[app_commands.Choice[str]] = []
-        for key in sorted(cards.keys()):
-            if text and text not in key.lower():
-                continue
-            current_typing = _norm_typing_list(cards[key].get("typing", [])) if isinstance(cards[key], dict) else []
-            tag = f"  [{'/'.join(current_typing)}]" if current_typing else "  [—]"
-            label = (key + tag)[:100]
-            out.append(app_commands.Choice(name=label, value=key))
-            if len(out) >= 25:
-                break
-        return out
-
-    @o_card_edit_typing.autocomplete("type1")
-    @o_card_edit_typing.autocomplete("type2")
-    async def _typing_type_ac(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        text = current.strip().lower()
-        return [
-            app_commands.Choice(name=t, value=t)
-            for t in TYPING_TYPES
-            if not text or text in t.lower()
-        ][:25]
 
 
 async def setup(bot: commands.Bot) -> None:

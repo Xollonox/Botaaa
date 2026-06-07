@@ -127,13 +127,29 @@ class ProfileCog(commands.Cog):
         if not isinstance(players, dict) or target_id not in players:
             await interaction.followup.send("That user is not registered.", ephemeral=True)
             return
+        player    = players.get(target_id, {}) if isinstance(players, dict) else {}
+        user_data = player.get("user", {}) if isinstance(player, dict) else {}
+        rival     = user_data.get("rival", {}) if isinstance(user_data, dict) else {}
         view = ProfileActionView(self, interaction.user.id, target) if target.id == interaction.user.id else None
+
+        def _rival_embed() -> discord.Embed | None:
+            if not rival or not rival.get("rival_id"):
+                return None
+            rival_name = str(rival.get("rival_name", "Unknown"))
+            losses = int(rival.get("losses_to", 0))
+            wins   = int(rival.get("wins_vs", 0))
+            return make_embed(None, f"⚔️ Rival — {rival_name}",
+                f"W {wins}  ·  L {losses}  ·  {wins}W-{losses}L", footer="Rival System")
+
         try:
             file = await render_profile_card(data, target)
             embed = simple_embed("", footer="Player Profile")
             embed.set_image(url="attachment://profile_card.png")
             featured_embed = build_featured_card_embed(data, target)
             embeds = [embed, featured_embed]
+            re = _rival_embed()
+            if re:
+                embeds.append(re)
             if view:
                 await interaction.followup.send(embeds=embeds, files=[file], view=view)
             else:
@@ -143,6 +159,9 @@ class ProfileCog(commands.Cog):
             embed = build_profile_embed(data, target)
             featured_embed = build_featured_card_embed(data, target)
             embeds = [embed, featured_embed]
+            re = _rival_embed()
+            if re:
+                embeds.append(re)
             if view:
                 await interaction.followup.send(embeds=embeds, view=view)
             else:
@@ -195,38 +214,6 @@ class ProfileCog(commands.Cog):
         view  = FeaturedCardView(self.bot, uid, data, cards_sorted)
         embed = make_embed(None, "Set Featured Card", "Choose the card to showcase on your profile.", footer="Player Profile")
         await interaction.response.send_message(embed=embed, view=view)
-
-    @app_commands.command(name="rival", description="View your current rival stats.")
-    async def rival(self, interaction: discord.Interaction) -> None:
-        if not await ensure_registered(interaction, self.bot.storage):
-            return
-        await interaction.response.defer()
-        data = self.bot.storage.load()
-        uid = str(interaction.user.id)
-        players = data.get("players", {})
-        player = players.get(uid, {}) if isinstance(players, dict) else {}
-        user_data = player.get("user", {}) if isinstance(player, dict) else {}
-        rival = user_data.get("rival", {}) if isinstance(user_data, dict) else {}
-
-        if not rival or not rival.get("rival_id"):
-            embed = make_embed(None, "No Rival Yet", "You haven't lost a ranked PvP battle yet. Get one loss to set your rival!", footer="Rival System")
-            await interaction.followup.send(embed=embed)
-            return
-
-        rival_id = str(rival.get("rival_id"))
-        rival_name = str(rival.get("rival_name", "Unknown"))
-        losses = rival.get("losses_to", 0)
-        wins = rival.get("wins_vs", 0)
-
-        fields = [
-            ("Rival", rival_name, False),
-            ("Losses to them", str(losses), True),
-            ("Wins vs them", str(wins), True),
-            ("Head-to-head", f"{wins}W-{losses}L", True),
-        ]
-
-        embed = make_embed(None, f"⚔️ Your Rival: {rival_name}", f"Track your rivalry progress", fields=fields, footer="Rival System")
-        await interaction.followup.send(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:

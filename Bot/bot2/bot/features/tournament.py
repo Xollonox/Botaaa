@@ -129,12 +129,6 @@ class TournamentCog(commands.Cog):
 
     # ── /tournament join ──────────────────────────────────────────
 
-    @app_commands.command(name="tournament_join", description="Join the active tournament.")
-    async def tournament_join(self, interaction: discord.Interaction) -> None:
-        if not await ensure_registered(interaction, self.bot.storage):
-            return
-        await self._join_tournament(interaction)
-
     async def _join_tournament(self, interaction: discord.Interaction) -> None:
         from bot.data.constants import RANK_ORDER
         uid = str(interaction.user.id)

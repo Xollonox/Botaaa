@@ -560,7 +560,7 @@ class SeasonCog(commands.Cog):
         except Exception:
             pass
 
-    @app_commands.command(name="season", description="View current season info and leaderboard.")
+    @app_commands.command(name="season", description="View current season info, pass, and missions.")
     async def season(self, interaction: discord.Interaction) -> None:
         if not await ensure_registered(interaction, self.bot.storage):
             return
@@ -575,7 +575,31 @@ class SeasonCog(commands.Cog):
                 "╭─ No Active Season\n│  No season is running right now.\n│  Check back soon!\n╰────────────────────────────────"
             ))
             return
-        await smart_reply(interaction, embed=_build_season_embed(data, str(interaction.user.id)))
+        uid = str(interaction.user.id)
+
+        class SeasonNav(discord.ui.View):
+            def __init__(nav_self) -> None:
+                super().__init__(timeout=120)
+
+            @discord.ui.button(label="🌟 Season Info", style=discord.ButtonStyle.primary, row=0)
+            async def info_btn(nav_self, i: discord.Interaction, _: discord.ui.Button) -> None:
+                data2 = self.bot.storage.load()
+                await i.response.edit_message(embed=_build_season_embed(data2, uid), view=nav_self)
+
+            @discord.ui.button(label="🎫 Season Pass", style=discord.ButtonStyle.secondary, row=0)
+            async def pass_btn(nav_self, i: discord.Interaction, _: discord.ui.Button) -> None:
+                panel = PassPanel(self, uid)
+                await i.response.edit_message(embed=panel._build_embed(), view=panel)
+                panel.message = await i.original_response()
+
+            @discord.ui.button(label="📋 Missions", style=discord.ButtonStyle.secondary, row=0)
+            async def missions_btn(nav_self, i: discord.Interaction, _: discord.ui.Button) -> None:
+                data2 = self.bot.storage.load()
+                panel = MissionPanel(self, uid)
+                await i.response.edit_message(embed=panel.build_embed(data2), view=panel)
+                panel.message = await i.original_response()
+
+        await smart_reply(interaction, embed=_build_season_embed(data, uid), view=SeasonNav())
 
     @app_commands.command(name="season_pass", description="View and claim your season pass rewards.")
     async def season_pass(self, interaction: discord.Interaction) -> None:
