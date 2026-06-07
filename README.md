@@ -18,6 +18,79 @@ pip install -r requirements.txt
 python launcher.py
 ```
 
+## Startup Modes
+
+Use the mode that matches where you are running the repo.
+
+| Environment | Recommended start path | Notes |
+| --- | --- | --- |
+| Termux / local CLI | `python launcher.py` from repo root | starts `bot1` and `bot2` together |
+| Desktop terminal | `python launcher.py` or run each bot separately | same behavior as local CLI |
+| VPS / panel startup command | pull/reset repo, install deps, then `python launcher.py` | avoid dirty-worktree deploy scripts that skip pulls |
+| Debugging one bot only | `cd Bot/bot1 && python main.py` or `cd Bot/bot2 && python main.py` | best for focused logs |
+
+## Start Guide
+
+### Local CLI / Termux
+
+```bash
+cd /data/data/com.termux/files/home/Botaaa
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+python launcher.py
+```
+
+### Desktop terminal
+
+```bash
+git clone <repo-url>
+cd Botaaa
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python launcher.py
+```
+
+### Run a single bot
+
+```bash
+cd Bot/bot1
+python main.py
+```
+
+```bash
+cd Bot/bot2
+python main.py
+```
+
+### VPS / panel deploy flow
+
+Minimum safe sequence:
+
+```bash
+git fetch origin main
+git reset --hard origin/main
+pip install -U --prefix .local -r requirements.txt
+python launcher.py
+```
+
+Avoid using deploy scripts that:
+
+- skip pulls because `git status` is dirty from logs or cache folders
+- embed a live GitHub token directly in the script
+- treat tracked runtime logs as normal source files
+
+## Recent Fixes
+
+Recent repo fixes worth knowing before debugging runtime behavior:
+
+| Commit | Area | Fix |
+| --- | --- | --- |
+| `3bc739b` | `bot2` rewards / season | fixed battle reward crash from missing milestone-pack helper and fixed `/season_missions` missing `e(...)` import |
+| `b5a6296` | `bot2` battle UI | reduced live battle panel from 5 embeds to 3 embeds |
+| `dd34919` | docs | expanded repo, `bot1`, and `bot2` READMEs |
+
 ## What This Repo Contains
 
 | Path | Purpose | Status |
@@ -119,6 +192,13 @@ python3 -m py_compile launcher.py Bot/bot1/main.py Bot/bot2/main.py
 pip install -r requirements.txt
 ```
 
+### Pull latest code safely
+
+```bash
+git fetch origin main
+git reset --hard origin/main
+```
+
 ## Validation Commands
 
 Use these before pushing bot changes.
@@ -203,8 +283,16 @@ Edit one bot at a time
 -> push
 ```
 
+## Deploy Notes
+
+| Problem | Typical cause | Fast fix |
+| --- | --- | --- |
+| server still runs old code | deploy script skipped pull due to dirty git state | `git fetch origin main && git reset --hard origin/main` |
+| battle UI still shows 5 embeds | server never restarted updated `bot2` code | redeploy and restart after commit `b5a6296` or later |
+| startup script aborts on dirty repo | tracked `Bot/bot2/logs/bot.log` or generated `.local`, `.cache`, `backup` folders | reset hard and clean generated folders in deploy step |
+| deploy logs expose token | token embedded in clone or remote URL | revoke token, replace it, prefer env vars |
+
 ## Per-Bot Documentation
 
 - [`Bot/bot1/README.md`](Bot/bot1/README.md)
 - [`Bot/bot2/README.md`](Bot/bot2/README.md)
-

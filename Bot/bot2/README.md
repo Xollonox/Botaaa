@@ -37,6 +37,17 @@ python main.py
 - performs stale trade unlock on boot
 - runs active-battle recovery if the battle cog is loaded
 
+## What Changed Recently
+
+These recent fixes matter for current runtime behavior:
+
+| Commit | Area | Effect |
+| --- | --- | --- |
+| `3bc739b` | battle rewards + season UI | fixed crash when battle rewards granted pending milestone packs; fixed `/season_missions` `NameError` for missing `e(...)` |
+| `b5a6296` | battle UI | battle message now renders 3 embeds instead of 5 |
+
+If a VPS still shows the old crash stack or old 5-embed battle layout, it is usually running stale code and needs a fresh pull/reset plus restart.
+
 ## Directory Layout
 
 | Path | Purpose |
@@ -102,6 +113,10 @@ main.py
 | `Bot/bot2/lookism_data.json` | primary JSON state |
 | `Bot/bot2/lookism_data.sqlite3` | SQLite state if env override is not used |
 | `Bot/bot2/logs/bot.log` | structured log output |
+
+Important runtime note:
+
+- `Bot/bot2/logs/bot.log` is a runtime artifact, not a meaningful source file. If it is tracked on a server checkout, it can make deploy scripts think the repo has local changes and block updates.
 
 ## Extension Load Order
 
@@ -431,6 +446,16 @@ pytest -q tests/test_battle_engine.py tests/test_battle_freeze_regressions.py
 pytest -q tests/test_owner_admin_helpers.py
 pytest -q tests/test_trade_lifecycle.py tests/test_command_text_and_queue.py tests/test_sqlite_bootstrap.py
 pytest -q tests/test_storage.py tests/test_race_conditions.py
+pytest -q tests/test_onboarding_starter.py tests/test_tournament_rank_gate.py
+```
+
+### After reward or season fixes
+
+Use this focused command:
+
+```bash
+cd Bot/bot2
+pytest -q tests/test_onboarding_starter.py tests/test_battle_engine.py tests/test_battle_freeze_regressions.py tests/test_tournament_rank_gate.py
 ```
 
 ## Operator Checklist
@@ -445,6 +470,27 @@ When bot2 breaks:
 5. inspect matching feature file
 6. inspect matching utils helper
 7. inspect service/data layer if persistence is involved
+```
+
+## Deploy Checklist
+
+```text
+For VPS/panel deploys:
+
+1. fetch latest main
+2. hard reset to origin/main
+3. install requirements
+4. restart launcher
+5. if battle behavior still looks old, verify deployed commit hash
+```
+
+Recommended commands:
+
+```bash
+git fetch origin main
+git reset --hard origin/main
+pip install -U --prefix .local -r requirements.txt
+python main.py
 ```
 
 ## Maintenance Hotspots
@@ -474,4 +520,3 @@ main.py
 ```
 
 That order is usually the fastest way to understand or fix a bot2 issue without rereading the whole project.
-
