@@ -10,7 +10,7 @@ from discord.ext import commands
 
 from bot.utils.checks import ensure_registered
 from bot.utils.timeutil import now_ts
-from bot.utils.ui import make_embed
+from bot.utils.ui import e, make_embed
 from bot.utils.xp_logic import make_bar, xp_progress
 from bot.utils.interaction_visibility import smart_reply, error_reply
 from bot.config import OWNER_GUILD_ID

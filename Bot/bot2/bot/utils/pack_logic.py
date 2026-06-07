@@ -95,6 +95,38 @@ def format_rates_table(rates: dict[str, int]) -> str:
     return "\n".join(lines) if lines else "All rates are 0."
 
 
+def _add_packs_to_inventory(data: dict[str, Any], user_id: str, pack_key: str, qty: int) -> None:
+    """Store unopened packs on the user's pack inventory.
+
+    This helper lives in pack_logic so reward flows such as onboarding and
+    battle milestone grants can enqueue packs without importing feature cogs.
+    """
+    player = data.get("players", {}).get(str(user_id))
+    if not isinstance(player, dict):
+        return
+    user = player.get("user", {})
+    if not isinstance(user, dict):
+        return
+    pack_inventory = user.setdefault("pack_inventory", [])
+    if not isinstance(pack_inventory, list):
+        pack_inventory = []
+        user["pack_inventory"] = pack_inventory
+
+    ensure_packs_structure(data)
+    pack_defs = data.get("packs", {}).get("definitions", {})
+    pack_def = pack_defs.get(pack_key, {}) if isinstance(pack_defs, dict) else {}
+    pack_name = str(pack_def.get("name", pack_key)) if isinstance(pack_def, dict) else str(pack_key)
+    now = 0
+    try:
+        from bot.utils.timeutil import now_ts
+        now = int(now_ts())
+    except Exception:
+        now = 0
+
+    for _ in range(max(0, int(qty))):
+        pack_inventory.append({"key": str(pack_key), "name": pack_name, "acquired_at": now})
+
+
 def grant_pending_milestone_packs(data: dict[str, Any], user_id: str) -> list[str]:
     """Grant any packs queued in pending_milestone_packs. Returns list of granted pack keys."""
     players = data.get("players", {})
