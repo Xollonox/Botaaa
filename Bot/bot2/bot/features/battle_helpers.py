@@ -37,6 +37,7 @@ BATTLE_ERROR_TEXT = {
     "unique_path_already_used": "That path move was already used by this fighter in this battle.",
     "ultimate_limit_reached": "Your team has reached its ultimate quota for this match.",
     "ultimate_already_used_by_fighter": "That fighter already spent its one ultimate for this match.",
+    "exhausted_must_use_normal": "Fighter is exhausted! Only normal attacks are available.",
     "invalid_switch": "That switch target is invalid.",
     "fighter_fainted": "You cannot switch to a fainted fighter.",
     "switch_apply_failed": "The switch could not be applied cleanly. Try again.",

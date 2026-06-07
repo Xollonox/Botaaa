@@ -28,6 +28,20 @@ logger = logging.getLogger(__name__)
 # ── Constants ────────────────────────────────────────────────────────────────
 REJECTION_THRESHOLD: int = 30  # stat gap above which defense is rejected
 
+STAMINA_BASE: int = 100
+STAMINA_COST: dict[str, int] = {
+    "normal": 10,
+    "special": 20,
+    "ultimate": 35,
+    "unique_skill": 25,
+    "unique_path": 25,
+    "block": 15,
+    "dodge": 15,
+    "parry": 15,
+    "revert": 15,
+    "tank": 15,
+}
+
 def _rank_from_trophies(trophies: int) -> str:
     if trophies >= 4000:
         return "Ruby"
@@ -249,11 +263,14 @@ def _build_cpu_side(data: dict[str, Any], team_size: int = 4, min_rarity: str = 
         # No assigned attacks for CPU — uses card_def attacks
         assigned_by_uid[uid] = {"normal": [], "special": [], "unique_skill": [], "unique_path": []}
 
+    stamina = {uid: STAMINA_BASE for uid in team_uids}
     return {
         "team_uids": team_uids,
         "current_index": 0,
         "hp": hp,
         "hp_max": hp_max,
+        "stamina": stamina,
+        "stamina_max": STAMINA_BASE,
         "stats": stats_map,
         "fighter_names": fighter_names,
         "mastery_by_uid": mastery_by_uid,
@@ -304,11 +321,14 @@ def _build_player_side(data: dict[str, Any], user_id: str, team_uids: list[str])
             vals = assigned.get(k, []) if isinstance(assigned, dict) else []
             assigned_by_uid[uid][k] = [str(v) for v in vals] if isinstance(vals, list) else []
 
+    stamina = {uid: STAMINA_BASE for uid in team_uids}
     return {
         "team_uids": [str(x) for x in team_uids],
         "current_index": 0,
         "hp": hp,
         "hp_max": hp_max,
+        "stamina": stamina,
+        "stamina_max": STAMINA_BASE,
         "stats": stats_map,
         "fighter_names": fighter_names,
         "mastery_by_uid": mastery_by_uid,
@@ -524,6 +544,8 @@ def _handle_switch(state: dict, me: dict, enemy_id: str, my_team: list, my_uid: 
 
     me["current_index"] = my_team.index(target_uid)
     me["active_index"] = my_team.index(target_uid)
+    stamina = me.setdefault("stamina", {})
+    stamina[target_uid] = STAMINA_BASE
     state.setdefault("last_move_group_by_char_uid", {})[my_uid] = "normal_or_defensive"
     state.setdefault("last_move_group_by_side", {})[enemy_id] = "normal_or_defensive"
     state["turn_user_id"] = enemy_id
@@ -759,10 +781,19 @@ def apply_move(data: dict[str, Any], battle_id: str, actor_id: str, move_type: s
 
     # ── 4. Defense (record pending) ────────────────────────────────
     move_norm = normalize_attack_type(str(move_type or "normal"))
+
+    # ── Stamina: exhaustion check ──────────────────────────────────
+    actor_stamina = me.setdefault("stamina", {})
+    cur_stamina = int(actor_stamina.get(my_uid, STAMINA_BASE))
+    if cur_stamina <= 0 and move_norm not in {"block", "dodge", "revert", "parry", "tank", "switch"} and move_norm != "normal":
+        return {"ok": False, "success": False, "error": "exhausted_must_use_normal"}
+
     if move_norm in {"block", "dodge", "revert", "parry", "tank"}:
         result = _handle_defense_pending(state, me, my_uid, move_norm, actor)
         if not result.get("ok"):
             return result
+        # Deduct stamina for defense
+        actor_stamina[my_uid] = max(0, cur_stamina - STAMINA_COST.get(move_norm, 15))
         # Pass turn after setting up defense
         state["turn_user_id"] = enemy_id
         state["turn_started_at"] = now_ts()
@@ -774,6 +805,9 @@ def apply_move(data: dict[str, Any], battle_id: str, actor_id: str, move_type: s
     rule_error = _enforce_attack_usage_rules(state, me, my_uid, actor, move_norm, attack_key, my_team)
     if rule_error is not None:
         return {"ok": False, "success": False, "error": rule_error}
+
+    # Deduct stamina for attack
+    actor_stamina[my_uid] = max(0, cur_stamina - STAMINA_COST.get(move_norm, 10))
 
     # ── 6. Attack: compute damage ──────────────────────────────────
     damage, group = _compute_attack_damage(data, me, opp, my_uid, opp_uid, move_norm, attack_key)

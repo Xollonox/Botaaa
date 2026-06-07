@@ -58,7 +58,7 @@ OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 RANKED_QUEUE_TIMEOUT_SECONDS = 60
 
 
-def _cpu_pick_move(personality: str, available_moves: list, fighter_hp_pct: float, enemy_hp_pct: float) -> str:
+def _cpu_pick_move(personality: str, available_moves: list, fighter_hp_pct: float, enemy_hp_pct: float, fighter_stamina: int = 100) -> str:
     """Pick a move for the CPU based on personality.
 
     Args:
@@ -67,9 +67,13 @@ def _cpu_pick_move(personality: str, available_moves: list, fighter_hp_pct: floa
             (e.g. ["normal", "special", "ultimate", "block", "dodge"])
         fighter_hp_pct: current fighter's HP as 0.0-1.0
         enemy_hp_pct: enemy fighter's HP as 0.0-1.0
+        fighter_stamina: current stamina of active CPU fighter
     Returns:
         move type string to use
     """
+    if fighter_stamina <= 0:
+        return "normal"
+
     has_special = "special" in available_moves
     has_ultimate = "ultimate" in available_moves
     has_block = "block" in available_moves
@@ -656,6 +660,9 @@ class BattleCog(commands.Cog):
 
         moves = normalize_card_moves(card_def)
         uses_map = pstate.get("attack_uses", {}).get(uid, {}) if isinstance(pstate.get("attack_uses", {}), dict) else {}
+        stamina_map = pstate.get("stamina", {}) if isinstance(pstate.get("stamina"), dict) else {}
+        cur_stamina = int(stamina_map.get(uid, 100))
+        is_exhausted = cur_stamina <= 0
         used_defs_map = battle.get("used_defenses_by_char_uid", {}) if isinstance(battle.get("used_defenses_by_char_uid", {}), dict) else {}
         raw_used_defs = used_defs_map.get(uid, set())
         if isinstance(raw_used_defs, set):
@@ -692,7 +699,7 @@ class BattleCog(commands.Cog):
                 if left != 0 and norm_type not in used_defs:
                     defensive.append(row)
             else:
-                if left != 0:
+                if left != 0 and not (is_exhausted and norm_type != "normal"):
                     offensive.append(row)
 
         for mv in moves.get("normal", []):
@@ -822,9 +829,15 @@ class BattleCog(commands.Cog):
                 lines = [
                     f"**{label} — {display_name(pid, pstate)}**",
                     f"{card_name}  [{rarity}]",
-                    f"HP: {hp_bar(pct)}  {cur_hp}/{max_hp} ({pct}%)",
-                    f"STR {s('strength')} | SPD {s('speed')} | END {s('endurance')} | TEC {s('technique')} | IQ {s('iq')} | BIQ {s('biq')}",
+                    f"HP:  {hp_bar(pct)}  {cur_hp}/{max_hp} ({pct}%)",
                 ]
+                stamina_map = pstate.get("stamina", {}) if isinstance(pstate.get("stamina"), dict) else {}
+                cur_sta = max(0, int(stamina_map.get(uid, 100)))
+                sta_pct = int(round((cur_sta / 100) * 100))
+                exhausted = cur_sta <= 0
+                sta_label = " [EXHAUSTED]" if exhausted else ""
+                lines.append(f"STA: {hp_bar(sta_pct)}  {cur_sta}/100{sta_label}")
+                lines.append(f"STR {s('strength')} | SPD {s('speed')} | END {s('endurance')} | TEC {s('technique')} | IQ {s('iq')} | BIQ {s('biq')}")
                 return "\n".join(lines)
 
             def squad_block(label: str, pstate: dict[str, Any]) -> str:
