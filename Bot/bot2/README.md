@@ -43,6 +43,8 @@ These recent fixes matter for current runtime behavior:
 
 | Commit | Area | Effect |
 | --- | --- | --- |
+| `d53b810` | command cleanup | removed `/cotd`, `/rival`, `/stats_guide`, `/league overview`, `/tournament_join`, `/season_pass`, `/season_missions`, `/o_card_edit_typing` as standalone commands — all merged into existing panels or parent commands |
+| `720660c` | battle stamina | added per-battle stamina system — each fighter starts at 100 stamina, every move drains it, exhausted fighters locked to normal attacks only, stamina bar shown in battle embed |
 | `3bc739b` | battle rewards + season UI | fixed crash when battle rewards granted pending milestone packs; fixed `/season_missions` `NameError` for missing `e(...)` |
 | `b5a6296` | battle UI | battle message now renders 3 embeds instead of 5 |
 
@@ -124,13 +126,13 @@ Important runtime note:
 
 | Area | Modules |
 | --- | --- |
-| onboarding/help | `onboarding`, `tutorial`, `stats_guide` |
+| onboarding/help | `onboarding`, `tutorial` |
 | player identity/profile | `profile`, `profile_owner`, `card_tools` |
 | economy/rewards | `economy`, `rewards`, `owner_rewards`, `redeem` |
 | packs/shop | `packs`, `packs_panel`, `shop` |
 | market/trade | `market`, `market_owner`, `trades` |
 | squad/battle/tournament | `squad`, `battle`, `tournament` |
-| league/season/achievement | `leaderboards`, `league_overview`, `achievements`, `season` |
+| league/season/achievement | `leaderboards`, `achievements`, `season` |
 | gangs/alliance/war | `gangs`, `alliance`, `gang_war` |
 | settings/admin | `server_settings`, `announce_owner`, `cards_admin`, `attacks_owner`, `confirm`, `emoji_panel` |
 
@@ -141,17 +143,15 @@ Important runtime note:
 | Command | Purpose |
 | --- | --- |
 | `/start` | opens account panel / onboarding entry |
-| `/help` | browse commands by category |
+| `/help` | browse commands by category — includes ⚔️ Battle Guide button for damage pipeline and typing chart |
 | `/tutorial` | tutorial progress |
 | `/confirm` | confirm pending action by action ID |
-| `/stats_guide` | battle damage and typing guide |
 
 ### Profile, collection, squad
 
 | Command | Purpose |
 | --- | --- |
-| `/profile` | premium profile card |
-| `/rival` | current rival stats |
+| `/profile` | premium profile card — includes rival info if a rival exists |
 | `/collection` | browse owned cards |
 | `/card_info` | inspect catalog card |
 | `/card_lock` | lock owned card instance |
@@ -170,7 +170,6 @@ Important runtime note:
 | `/weekly` | claim weekly reward |
 | `/monthly` | claim monthly reward |
 | `/redeem` | redeem reward code |
-| `/cotd` | card of the day buff |
 
 ### Market and trade
 
@@ -178,7 +177,7 @@ Market:
 
 | Command | Purpose |
 | --- | --- |
-| `/browse` | browse market |
+| `/browse` | browse market — also shows Card of the Day buff |
 | `/add` | list card for sale |
 | `/remove` | remove own listing |
 
@@ -203,8 +202,7 @@ Trade:
 | `/friendly` | send friendly challenge |
 | `/friendly_cancel` | cancel outgoing friendly challenge |
 | `/forfeit` | forfeit active battle |
-| `/tournament` | active tournament leaderboard |
-| `/tournament_join` | join tournament |
+| `/tournament` | tournament overview — includes Join and Battle buttons inside the panel |
 | `/tournament_battle` | fight tournament participant |
 
 ### League, leaderboards, season, achievements
@@ -220,23 +218,15 @@ Leaderboards:
 | Command | Purpose |
 | --- | --- |
 | `/lb global` | global trophies |
-| `/lb league` | league leaderboard |
+| `/lb league` | league leaderboard — includes 🏅 League Overview button |
 | `/lb gang` | gang leaderboard |
 | `/lb alliance` | alliance leaderboard |
-
-League:
-
-| Command | Purpose |
-| --- | --- |
-| `/league overview` | thresholds and player distribution |
 
 Season:
 
 | Command | Purpose |
 | --- | --- |
-| `/season` | season info |
-| `/season_pass` | season pass rewards |
-| `/season_missions` | mission list |
+| `/season` | season hub — tabs for Season Info, Season Pass, and Missions |
 
 ### Gangs, alliances, war
 
@@ -296,8 +286,8 @@ These are under the grouped `/o ...` surface:
 
 | Command | Purpose |
 | --- | --- |
-| `/o add_card` | create fighter card |
-| `/o edit_card` | edit fighter card fields |
+| `/o add_card` | create fighter card — optional `type1`/`type2` params for typing |
+| `/o edit_card` | edit fighter card fields — optional `type1`/`type2` params to update typing |
 | `/o delete_card` | delete fighter card |
 | `/o add_attack` | create attack or defense |
 | `/o edit_attack` | edit attack fields |
@@ -311,7 +301,6 @@ These are under the grouped `/o ...` surface:
 
 | Command | Purpose |
 | --- | --- |
-| `/o_card_edit_typing` | set card typing |
 | `/o_add_balance` | add coins |
 | `/o_add_premium` | add premium |
 | `/o_pack` | pack management panel |
@@ -410,6 +399,22 @@ Important behavior to remember:
 - runtime tasks are tracked and canceled by the cog
 - active battle state is synced back into service/storage layers
 - the current UI now renders as `3` embeds, not `5`
+
+### Stamina System
+
+Each fighter enters a battle with **100 stamina**. Every action drains it:
+
+| Action | Stamina cost |
+| --- | --- |
+| Normal attack | 10 |
+| Special | 20 |
+| Ultimate | 35 |
+| Unique Skill / Unique Path | 25 |
+| Block / Dodge / Parry / Revert / Tank | 15 |
+
+When stamina hits 0 the fighter is **exhausted** — locked to normal attacks only for the rest of the battle. Switching in a fresh fighter resets their stamina to 100. Stamina bar is shown in the battle embed alongside HP.
+
+Stamina constants and deduction logic live in `bot/utils/battle_state.py` (`STAMINA_BASE`, `STAMINA_COST`). The embed rendering for the stamina bar is in `_build_embed_view` inside `bot/features/battle.py`.
 
 Battle debugging files:
 

@@ -87,6 +87,8 @@ Recent repo fixes worth knowing before debugging runtime behavior:
 
 | Commit | Area | Fix |
 | --- | --- | --- |
+| `d53b810` | `bot2` commands | command cleanup — removed redundant commands, merged UI into existing panels |
+| `720660c` | `bot2` battle | added per-battle stamina system — each fighter has 100 stamina, depletes per action, exhausted fighters locked to normal attacks |
 | `3bc739b` | `bot2` rewards / season | fixed battle reward crash from missing milestone-pack helper and fixed `/season_missions` missing `e(...)` import |
 | `b5a6296` | `bot2` battle UI | reduced live battle panel from 5 embeds to 3 embeds |
 | `dd34919` | docs | expanded repo, `bot1`, and `bot2` READMEs |
