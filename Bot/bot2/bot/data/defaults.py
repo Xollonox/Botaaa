@@ -310,6 +310,7 @@ DEFAULT_PLAYER = {
         "premium_balance": 0,
         "is_premium": False,
         "inventory": [],
+        "weapon_inventory": [],
         "trophies": 0,
         "rank": "Copper",
         "profile": {
@@ -371,6 +372,8 @@ DEFAULT_PLAYER = {
 DEFAULT_DATA = {
     "players": {},
     "cards": {},
+    "weapons": {},
+    "keystones": {},
     "battle": {
         "queue": [],
         "pending_friendly": {},

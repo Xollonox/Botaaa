@@ -64,6 +64,8 @@ EXTENSIONS = [
     "bot.features.packs_panel",
     "bot.features.emoji_panel",
     "bot.features.gang_war",
+    "bot.features.keystones",
+    "bot.features.weapons",
 ]
 
 

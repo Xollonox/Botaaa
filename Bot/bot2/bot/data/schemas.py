@@ -21,6 +21,36 @@ class Card(TypedDict, total=False):
     market_locked: bool
     trade_locked: bool
     acquired_at: int
+    weapon_uid: str
+    keystone_equipped: bool
+
+
+class WeaponInstance(TypedDict, total=False):
+    uid: str
+    weapon_name: str
+    rarity: str
+    stars: int
+    locked: bool
+    equipped_to: str
+    acquired_at: int
+
+
+class WeaponDef(TypedDict, total=False):
+    name: str
+    rarity: str
+    image_url: str
+    emoji: str
+    compatible_cards: list
+    stat_buffs: dict
+    effect: str
+    effect_active: bool
+
+
+class KeystoneDef(TypedDict, total=False):
+    name: str
+    effect: str
+    character: str
+    active: bool
 
 
 class Profile(TypedDict, total=False):
@@ -45,6 +75,7 @@ class UserData(TypedDict, total=False):
     trophies: int
     rank: str
     inventory: list[Card]
+    weapon_inventory: list[WeaponInstance]
     profile: Profile
     achievements: list[Any]
     war_points: int
@@ -120,6 +151,8 @@ class Battle(TypedDict, total=False):
 class Storage(TypedDict, total=False):
     players: dict[str, Player]
     cards: dict[str, dict[str, Any]]
+    weapons: dict[str, WeaponDef]
+    keystones: dict[str, KeystoneDef]
     market: dict[str, Any]
     trades: dict[str, Any]
     battle: dict[str, Battle]

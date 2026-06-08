@@ -280,10 +280,16 @@ def _build_cpu_side(data: dict[str, Any], team_size: int = 4, min_rarity: str = 
 
 
 def _build_player_side(data: dict[str, Any], user_id: str, team_uids: list[str]) -> dict[str, Any]:
+    from bot.utils.weapon_logic import get_weapon_buffs
+
     player = get_player(data, user_id)
-    inventory = player.get("user", {}).get("inventory", []) if isinstance(player, dict) else []
+    user_data = player.get("user", {}) if isinstance(player, dict) else {}
+    inventory = user_data.get("inventory", []) if isinstance(user_data, dict) else []
+    weapon_inventory = user_data.get("weapon_inventory", []) if isinstance(user_data, dict) else []
     inv_map = {str(it.get("uid", "")): it for it in inventory if isinstance(it, dict)} if isinstance(inventory, list) else {}
     cards = data.get("cards", {}) if isinstance(data.get("cards", {}), dict) else {}
+    weapons_catalog = data.get("weapons", {}) if isinstance(data.get("weapons", {}), dict) else {}
+    keystones_catalog = data.get("keystones", {}) if isinstance(data.get("keystones", {}), dict) else {}
 
     hp: dict[str, int] = {}
     hp_max: dict[str, int] = {}
@@ -291,6 +297,19 @@ def _build_player_side(data: dict[str, Any], user_id: str, team_uids: list[str])
     fighter_names: dict[str, str] = {}
     mastery_by_uid: dict[str, list[str]] = {}
     assigned_by_uid: dict[str, dict[str, list[str]]] = {}
+    passives_by_uid: dict[str, list[dict[str, Any]]] = {}
+
+    # Skill unlock thresholds table
+    def _skill_unlock_star(skill_key: str, card_def: dict[str, Any]) -> int:
+        skill_count = sum([
+            bool(card_def.get("unique_skill")),
+            bool(card_def.get("unique_skill_2")),
+            bool(card_def.get("unique_skill_3")),
+        ])
+        thresholds = {1: [3], 2: [3, 4], 3: [3, 4, 5]}.get(skill_count, [])
+        order = ["unique_skill", "unique_skill_2", "unique_skill_3"]
+        idx = order.index(skill_key) if skill_key in order else 0
+        return thresholds[idx] if idx < len(thresholds) else 3
 
     for uid in team_uids:
         inst = inv_map.get(uid, {})
@@ -299,6 +318,16 @@ def _build_player_side(data: dict[str, Any], user_id: str, team_uids: list[str])
         stars = int(inst.get("stars", 0))
         scaled = compute_scaled_stats(card_def, stars) if isinstance(card_def, dict) else {}
         mastery = list(card_def.get("mastery", [])) if isinstance(card_def.get("mastery", []), list) else []
+
+        # Apply weapon buffs if equipped
+        weapon_uid = inst.get("weapon_uid")
+        if weapon_uid and isinstance(weapon_inventory, list):
+            w_inst = next((w for w in weapon_inventory if isinstance(w, dict) and str(w.get("uid", "")) == weapon_uid), None)
+            if w_inst:
+                buffs = get_weapon_buffs(w_inst, weapons_catalog)
+                for stat_key, bonus in buffs.items():
+                    if stat_key in scaled:
+                        scaled[stat_key] = scaled[stat_key] + int(bonus)
 
         cur_hp = _build_hp(scaled, mastery)
         hp[uid] = cur_hp
@@ -315,14 +344,66 @@ def _build_player_side(data: dict[str, Any], user_id: str, team_uids: list[str])
         fighter_names[uid] = card_name
         mastery_by_uid[uid] = [str(m).lower() for m in mastery]
 
+        # Build passives list for this fighter
+        passives: list[dict[str, Any]] = []
+
+        # Check unique skills unlock and collect passives
+        for skill_key in ("unique_skill", "unique_skill_2", "unique_skill_3"):
+            skill_raw = card_def.get(skill_key)
+            if not skill_raw:
+                continue
+            unlock_star = _skill_unlock_star(skill_key, card_def)
+            if stars < unlock_star:
+                continue
+            if isinstance(skill_raw, dict) and not skill_raw.get("active", True):
+                passives.append({
+                    "source": skill_key,
+                    "name": str(skill_raw.get("name", skill_key)),
+                    "effect": str(skill_raw.get("description", "")),
+                })
+
+        # Path passive (unlocks at star 5)
+        path_raw = card_def.get("unique_path")
+        if path_raw and stars >= 5:
+            if isinstance(path_raw, dict) and not path_raw.get("active", True):
+                passives.append({
+                    "source": "unique_path",
+                    "name": str(path_raw.get("name", "Path")),
+                    "effect": str(path_raw.get("description", "")),
+                })
+
+        # Keystone passive
+        if inst.get("keystone_equipped", False):
+            keystone_name = card_def.get("keystone_name", "")
+            if keystone_name:
+                ks = keystones_catalog.get(str(keystone_name).lower())
+                if ks and not ks.get("active", True):
+                    passives.append({
+                        "source": "keystone",
+                        "name": str(ks.get("name", "Keystone")),
+                        "effect": str(ks.get("effect", "")),
+                    })
+
+        passives_by_uid[uid] = passives
+
         assigned = inst.get("assigned_attacks", {}) if isinstance(inst.get("assigned_attacks", {}), dict) else {}
         assigned_by_uid[uid] = {}
         for k in ("normal", "special", "unique_skill", "unique_path"):
+            # Filter unique_skill / unique_path if below unlock threshold
+            if k == "unique_skill":
+                unlock_star = _skill_unlock_star("unique_skill", card_def)
+                if stars < unlock_star:
+                    assigned_by_uid[uid][k] = []
+                    continue
+            elif k == "unique_path":
+                if stars < 5:
+                    assigned_by_uid[uid][k] = []
+                    continue
             vals = assigned.get(k, []) if isinstance(assigned, dict) else []
             assigned_by_uid[uid][k] = [str(v) for v in vals] if isinstance(vals, list) else []
 
     stamina = {uid: STAMINA_BASE for uid in team_uids}
-    return {
+    side = {
         "team_uids": [str(x) for x in team_uids],
         "current_index": 0,
         "hp": hp,
@@ -333,8 +414,34 @@ def _build_player_side(data: dict[str, Any], user_id: str, team_uids: list[str])
         "fighter_names": fighter_names,
         "mastery_by_uid": mastery_by_uid,
         "assigned_attacks_by_uid": assigned_by_uid,
+        "passives_by_uid": passives_by_uid,
         "is_cpu": False,
     }
+    # Bake passive bonuses into starting stats
+    for uid in team_uids:
+        apply_passives(side, uid)
+    return side
+
+
+def apply_passives(player_side: dict[str, Any], uid: str) -> dict[str, Any]:
+    """Apply passive skills/keystone for a fighter at the start of their turn.
+
+    Mutates player_side["stats"][uid] with a +10% bonus to each stat for
+    every passive the fighter has. Returns a dict of applied passive names.
+    """
+    passives = player_side.get("passives_by_uid", {}).get(uid, [])
+    if not passives:
+        return {}
+    stats = player_side.get("stats", {}).get(uid, {})
+    applied: dict[str, str] = {}
+    for passive in passives:
+        name = str(passive.get("name", "Passive"))
+        # Simple rule: +10% to all stats for each passive
+        for stat_key in ("strength", "speed", "endurance", "technique", "iq", "biq"):
+            current = int(stats.get(stat_key, 0))
+            stats[stat_key] = int(current * 1.10)
+        applied[name] = str(passive.get("effect", ""))
+    return applied
 
 
 def default_uses_by_type(move_type: str) -> int | None:

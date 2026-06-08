@@ -8,12 +8,22 @@ from typing import Any
 
 RARITIES: list[str] = ["Common", "Rare", "Epic", "Legendary", "Mythical", "Infernal", "Abyssal"]
 
-MASTERY_VALUES: list[str] = ["Strength", "Speed", "Endurance", "Technique"]
+MASTERY_VALUES: list[str] = ["Strength", "Speed", "Endurance", "Technique", "IQ", "BIQ"]
 
-def get_star_multiplier(stars: int) -> float:
-    """Return linear star multiplier clamped to 0..5 (0★=1.00, 5★=1.30)."""
-    s = max(0, min(5, int(stars or 0)))
-    return 1.0 + s * 0.06
+# Flat stat bonus added per star, keyed by rarity tier.
+_FLAT_BONUS: dict[str, int] = {
+    "Common": 1, "Rare": 1, "Epic": 1,
+    "Legendary": 2, "Mythical": 2, "Infernal": 2, "Abyssal": 2,
+}
+
+SPECIAL_STAT_BASE = 100
+SPECIAL_STAT_MAX  = 110
+
+
+def get_flat_stat_bonus(rarity: str, stars: int) -> int:
+    """Return the total flat bonus added to each stat at the given star level."""
+    return _FLAT_BONUS.get(rarity, 1) * max(0, min(5, int(stars or 0)))
+
 
 _RARITY_RANK_MAP: dict[str, int] = {r: i for i, r in enumerate(RARITIES)}
 
@@ -28,31 +38,36 @@ def compute_power(stats: dict[str, int]) -> int:
     return sum(int(stats.get(k, 0)) for k in ("strength", "speed", "endurance", "technique", "iq", "battle_iq"))
 
 
-_SCALED_CACHE: dict[tuple[frozenset, int], dict[str, int]] = {}
+_SCALED_CACHE: dict[tuple[frozenset, str, int], dict[str, int]] = {}
 
 def compute_scaled_stats(card: dict[str, Any], stars: int) -> dict[str, int]:
-    """Return a new stats dict scaled by the star multiplier.
+    """Return a new stats dict with flat per-star bonuses applied.
 
-    Results are cached by (stats_tuple, stars) to avoid recomputation
-    on repeated lookups (collection view, squad display, etc).
-    Clear with ``clear_scaled_cache()`` after admin card edits.
+    Bonus per star: +1 for Common/Rare/Epic, +2 for Legendary+.
+    If the card has a ``special_stat`` field, that stat is locked at 100
+    for stars 0-4 and becomes 110 at star 5 regardless of the base value.
+
+    Results are cached; clear with ``clear_scaled_cache()`` after admin edits.
     """
     base = card.get("stats", {})
     if not isinstance(base, dict):
         base = {}
-    key = (frozenset(base.items()), int(stars))
+    rarity = str(card.get("rarity", "Common"))
+    special = card.get("special_stat") or None
+    s = max(0, min(5, int(stars or 0)))
+    key = (frozenset(base.items()), rarity, s)
     cached = _SCALED_CACHE.get(key)
     if cached is not None:
         return cached
-    mult = get_star_multiplier(stars)
-    result = {
-        "strength": int(int(base.get("strength", 0)) * mult),
-        "speed": int(int(base.get("speed", 0)) * mult),
-        "endurance": int(int(base.get("endurance", 0)) * mult),
-        "technique": int(int(base.get("technique", 0)) * mult),
-        "iq": int(int(base.get("iq", 0)) * mult),
-        "battle_iq": int(int(base.get("battle_iq", base.get("biq", 0))) * mult),
-    }
+    bonus = get_flat_stat_bonus(rarity, s)
+    result: dict[str, int] = {}
+    for k in ("strength", "speed", "endurance", "technique", "iq", "battle_iq"):
+        raw_key = "biq" if k == "battle_iq" else k
+        b = int(base.get(k, base.get(raw_key, 0)))
+        if special and k == special:
+            result[k] = SPECIAL_STAT_MAX if s == 5 else SPECIAL_STAT_BASE
+        else:
+            result[k] = b + bonus
     _SCALED_CACHE[key] = result
     return result
 
@@ -77,8 +92,19 @@ def build_card_def(
     mastery_list: list[str] | None = None,
     unique_skill: str | None = None,
     unique_skill_description: str | None = None,
+    unique_skill_active: bool = True,
+    unique_skill_2: str | None = None,
+    unique_skill_2_description: str | None = None,
+    unique_skill_2_active: bool = True,
+    unique_skill_3: str | None = None,
+    unique_skill_3_description: str | None = None,
+    unique_skill_3_active: bool = True,
     unique_path: str | None = None,
     unique_path_description: str | None = None,
+    unique_path_active: bool = True,
+    weapon_user: bool = False,
+    special_stat: str | None = None,
+    keystone_name: str | None = None,
     image_url: str | None = None,
     emoji: str | None = None,
 ) -> dict[str, Any]:
@@ -102,15 +128,23 @@ def build_card_def(
         "mastery": normalize_mastery_list(mastery_list or []),
         "attacks": [],
         "image_url": str(image_url).strip() if image_url else "",
+        "weapon_user": bool(weapon_user),
     }
     if emoji:
         card["emoji"] = str(emoji).strip()
+    if special_stat and special_stat.lower() in ("strength", "speed", "endurance", "technique", "iq", "battle_iq", "biq"):
+        norm = "battle_iq" if special_stat.lower() == "biq" else special_stat.lower()
+        card["special_stat"] = norm
+    if keystone_name:
+        card["keystone_name"] = str(keystone_name).strip()
     if unique_skill:
-        card["unique_skill"] = str(unique_skill).strip()
-        card["unique_skill_description"] = str(unique_skill_description or "").strip()
+        card["unique_skill"] = {"name": str(unique_skill).strip(), "description": str(unique_skill_description or "").strip(), "active": bool(unique_skill_active)}
+    if unique_skill_2:
+        card["unique_skill_2"] = {"name": str(unique_skill_2).strip(), "description": str(unique_skill_2_description or "").strip(), "active": bool(unique_skill_2_active)}
+    if unique_skill_3:
+        card["unique_skill_3"] = {"name": str(unique_skill_3).strip(), "description": str(unique_skill_3_description or "").strip(), "active": bool(unique_skill_3_active)}
     if unique_path:
-        card["unique_path"] = str(unique_path).strip()
-        card["unique_path_description"] = str(unique_path_description or "").strip()
+        card["unique_path"] = {"name": str(unique_path).strip(), "description": str(unique_path_description or "").strip(), "active": bool(unique_path_active)}
     return card
 
 
@@ -203,9 +237,18 @@ def edit_card_def(data: dict[str, Any], card_name: str, updates: dict[str, Any])
             return False, "Another card already has that name."
         card["name"] = new_name
 
-    for field in ("title", "description", "image_url", "rarity", "unique_path", "unique_path_description", "unique_skill", "unique_skill_description", "emoji"):
+    for field in ("title", "description", "image_url", "rarity", "emoji",
+                  "unique_path", "unique_path_description",
+                  "unique_skill", "unique_skill_description",
+                  "unique_skill_2", "unique_skill_2_description",
+                  "unique_skill_3", "unique_skill_3_description",
+                  "keystone_name", "special_stat"):
         if field in updates and updates[field] is not None:
-            card[field] = str(updates[field]).strip()
+            card[field] = str(updates[field]).strip() if isinstance(updates[field], str) else updates[field]
+
+    for bool_field in ("weapon_user",):
+        if bool_field in updates and updates[bool_field] is not None:
+            card[bool_field] = bool(updates[bool_field])
 
     stat_updates = updates.get("stats")
     if isinstance(stat_updates, dict):
@@ -336,6 +379,8 @@ def build_card_instance(
         "squad_locked": False,
         "favourite": False,
         "acquired_at": int(acquired_at),
+        "weapon_uid": None,
+        "keystone_equipped": False,
     }
 
 

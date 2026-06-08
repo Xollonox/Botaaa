@@ -8,7 +8,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from bot.utils.cards_logic import compute_power, compute_scaled_stats, get_star_multiplier, normalize_mastery_list, rarity_rank
+from bot.utils.cards_logic import compute_power, compute_scaled_stats, get_flat_stat_bonus, normalize_mastery_list, rarity_rank
 from bot.utils.checks import ensure_registered
 from bot.utils.interaction_visibility import smart_reply, error_reply
 from bot.utils.ui import e, make_embed, simple_embed
@@ -716,8 +716,75 @@ class InventoryCog(commands.Cog):
         unique_skill, unique_skill_desc = _resolve_field(
             card_def.get("unique_skill"), card_def.get("unique_skill_description")
         )
+        unique_skill_2, unique_skill_2_desc = _resolve_field(card_def.get("unique_skill_2"))
+        unique_skill_3, unique_skill_3_desc = _resolve_field(card_def.get("unique_skill_3"))
         mastery_list: list[str] = normalize_mastery_list(card_def.get("mastery", []) if isinstance(card_def, dict) else [])
         mastery_str = "  ".join(f"• {m}" for m in mastery_list) if mastery_list else "—"
+
+        # Compute skill unlock thresholds
+        skill_count = sum([
+            bool(card_def.get("unique_skill")),
+            bool(card_def.get("unique_skill_2")),
+            bool(card_def.get("unique_skill_3")),
+        ])
+        _skill_thresholds = {1: [3], 2: [3, 4], 3: [3, 4, 5]}.get(skill_count, [])
+
+        def _skill_block(skill_name: str, skill_desc: str, skill_raw: Any, unlock_star: int | None) -> str:
+            kind = ""
+            if isinstance(skill_raw, dict):
+                kind = " [Active]" if skill_raw.get("active", True) else " [Passive]"
+            if unlock_star is not None and stars < unlock_star:
+                return (
+                    f"╭─ Unique Skill{kind}\n"
+                    f"│ 🔒 Unlocks at ★{unlock_star}\n"
+                    "╰────────────────\n\n"
+                )
+            return (
+                f"╭─ Unique Skill{kind}\n"
+                f"│ {skill_name}\n"
+                f"│ {skill_desc}\n"
+                "╰────────────────\n\n"
+            )
+
+        skill_blocks = ""
+        if skill_count >= 1:
+            skill_blocks += _skill_block(unique_skill, unique_skill_desc, card_def.get("unique_skill"), _skill_thresholds[0] if _skill_thresholds else None)
+        if skill_count >= 2:
+            skill_blocks += _skill_block(unique_skill_2, unique_skill_2_desc, card_def.get("unique_skill_2"), _skill_thresholds[1] if len(_skill_thresholds) > 1 else None)
+        if skill_count >= 3:
+            skill_blocks += _skill_block(unique_skill_3, unique_skill_3_desc, card_def.get("unique_skill_3"), _skill_thresholds[2] if len(_skill_thresholds) > 2 else None)
+
+        path_raw = card_def.get("unique_path")
+        path_kind = ""
+        if isinstance(path_raw, dict):
+            path_kind = " [Active]" if path_raw.get("active", True) else " [Passive]"
+        if path_raw and stars < 5:
+            path_block = (
+                f"╭─ Unique Path{path_kind}\n"
+                "│ 🔒 Unlocks at ★5\n"
+                "╰────────────────\n\n"
+            )
+        elif path_raw:
+            path_block = (
+                f"╭─ Unique Path{path_kind}\n"
+                f"│ {unique_path}\n"
+                f"│ {unique_path_desc}\n"
+                "╰────────────────\n\n"
+            )
+        else:
+            path_block = ""
+
+        # Weapon slot
+        weapon_uid = item.get("weapon_uid")
+        weapon_line = ""
+        if card_def.get("weapon_user", False):
+            if weapon_uid:
+                p = data.get("players", {}).get(user_id, {})
+                w_inv = p.get("user", {}).get("weapon_inventory", []) if isinstance(p, dict) else []
+                equipped_w = next((w for w in w_inv if isinstance(w, dict) and str(w.get("uid", "")) == weapon_uid), None)
+                weapon_line = f"⚔️ Weapon: {equipped_w.get('weapon_name', '?')} {_star_string(int(equipped_w.get('stars', 0)))}\n" if equipped_w else "⚔️ Weapon: —\n"
+            else:
+                weapon_line = "⚔️ Weapon: —\n"
 
         heading = f"{_rarity_icon(rarity)} {rarity} • {card_name}"
         if title:
@@ -740,19 +807,13 @@ class InventoryCog(commands.Cog):
             f"│ ⭐ Stars: {_star_string(stars)}\n"
             f"│ ⚡ Power: {power:,}\n"
             f"│ {'🔒 Status: Locked' if locked else '🔓 Status: Unlocked'}\n"
+            f"│ {weapon_line}"
             "╰────────────────\n\n"
             "╭─ Mastery\n"
             f"│ {mastery_str}\n"
             "╰────────────────\n\n"
-            "╭─ Unique Path\n"
-            f"│ {unique_path}\n"
-            f"│ {unique_path_desc}\n"
-            "╰────────────────\n\n"
-            "╭─ Unique Skill\n"
-            f"│ {unique_skill}\n"
-            f"│ {unique_skill_desc}\n"
-            "╰────────────────"
-        )
+            + skill_blocks + path_block
+        ).rstrip()
         embed = make_embed(None, "LOOKISM HXCC • FIGHTER", body, color=0xE11D48, image_url=image_url, footer="Card Collection")
         return embed
 
