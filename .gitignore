@@ -13,3 +13,4 @@ Bot/bot2/.claude/
 *.json.tmp
 *.json.corrupt
 Bot/bot3/*.log
+pi-session-*.html
