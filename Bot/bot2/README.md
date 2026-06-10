@@ -43,12 +43,13 @@ These recent fixes matter for current runtime behavior:
 
 | Commit | Area | Effect |
 | --- | --- | --- |
+| `dd3d8e3` | upgrade rework | replaced multiplicative star scaling with flat additive (+1/star Common–Epic, +2/star Legendary+); `/fuse` removed — 1 duplicate + coins is the only upgrade path |
+| `dd3d8e3` | card schema | added `weapon_user`, `special_stat`, `unique_skill_2/3` with active/passive flags, `keystone_name` to card definitions |
+| `dd3d8e3` | skill unlock | unique skills lock/unlock at ★3/4/5 based on how many the card has; path always requires ★5; locked skills shown in collection and blocked in battle |
+| `dd3d8e3` | keystones | new keystone system for Mythical+ cards — `/o add_keystone`, `/keystone_assign`, `/keystone_info` |
+| `dd3d8e3` | weapons | full weapon system — `/o add_weapon`, `/weapon` gallery with equip/unequip/upgrade; weapon buffs applied in battle |
 | `d53b810` | command cleanup | removed `/cotd`, `/rival`, `/stats_guide`, `/league overview`, `/tournament_join`, `/season_pass`, `/season_missions`, `/o_card_edit_typing` as standalone commands — all merged into existing panels or parent commands |
 | `720660c` | battle stamina | added per-battle stamina system — each fighter starts at 100 stamina, every move drains it, exhausted fighters locked to normal attacks only, stamina bar shown in battle embed |
-| `3bc739b` | battle rewards + season UI | fixed crash when battle rewards granted pending milestone packs; fixed `/season_missions` `NameError` for missing `e(...)` |
-| `b5a6296` | battle UI | battle message now renders 3 embeds instead of 5 |
-
-If a VPS still shows the old crash stack or old 5-embed battle layout, it is usually running stale code and needs a fresh pull/reset plus restart.
 
 ## Directory Layout
 
@@ -89,6 +90,7 @@ main.py
 |   +-- card logic
 |   +-- attack logic
 |   +-- battle state helpers
+|   +-- weapon logic
 |   +-- trade logic
 |   +-- market logic
 |   +-- reward logic
