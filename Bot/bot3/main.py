@@ -163,6 +163,7 @@ class TesterBot(commands.Bot):
         )
         self.deepseek = DeepSeekClient(DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL)
         self.bot2_id = BOT2_USER_ID
+        self.observe_bots: set[int] = set()
         self.test_results: list[dict] = []
         self.observed_responses: list[dict] = []
         self.observe_channels: set[int] = set(OBSERVE_CHANNEL_IDS)
@@ -183,10 +184,12 @@ class TesterBot(commands.Bot):
         await self.change_presence(status=discord.Status.online, activity=activity)
 
     async def on_message(self, message: discord.Message):
-        if message.author.bot and message.author.id == self.bot2_id:
-            # Capture bot2's responses in observed channels
+        if message.author.bot and message.author.id in (self.bot2_id, *self.observe_bots):
+            # Capture bot responses in observed channels
             if message.channel.id in self.observe_channels:
                 self.observed_responses.append({
+                    "bot_id": message.author.id,
+                    "bot_name": message.author.name,
                     "channel_id": message.channel.id,
                     "channel_name": message.channel.name,
                     "content": message.content or "[embed]",
@@ -207,16 +210,22 @@ class TesterCog(commands.Cog):
         self.bot = bot
 
     # ── /test ────────────────────────────────────────────────────────
-    @discord.app_commands.command(name="test", description="Run a test suite against bot2")
-    @discord.app_commands.describe(suite="Test suite to run")
+    @discord.app_commands.command(name="test", description="Run a test suite against a bot")
+    @discord.app_commands.describe(
+        suite="Test suite to run",
+        target_bot="Mention the bot to test (default: Lookism HXCC)",
+    )
     @discord.app_commands.choices(suite=[
         discord.app_commands.Choice(name=s.capitalize(), value=s)
         for s in TEST_SUITES.keys()
     ])
-    async def test(self, interaction: discord.Interaction, suite: discord.app_commands.Choice[str]):
+    async def test(self, interaction: discord.Interaction, suite: discord.app_commands.Choice[str], target_bot: discord.User | None = None):
         if self.bot.testing_in_progress:
             await interaction.response.send_message("⚠️ A test is already running. Wait for it to finish.", ephemeral=True)
             return
+
+        target_id = target_bot.id if target_bot else self.bot.bot2_id
+        target_name = target_bot.name if target_bot else "Lookism HXCC"
 
         suite_name = suite.value
         tests = TEST_SUITES.get(suite_name, [])
@@ -227,7 +236,7 @@ class TesterCog(commands.Cog):
         self.bot.testing_in_progress = True
         self.bot.test_results = []
         await interaction.response.send_message(
-            f"🧪 **Running {suite_name.upper()} test suite** ({len(tests)} tests)...\n"
+            f"🧪 **Testing {target_name}** — Suite: {suite_name.upper()} ({len(tests)} tests)\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         )
 
@@ -240,9 +249,11 @@ class TesterCog(commands.Cog):
             )
             await asyncio.sleep(1.5)
 
-            # Check if bot2 responded in observed responses
+            # Check if target bot responded in observed responses
             found = False
             for obs in reversed(self.bot.observed_responses):
+                if obs.get("bot_id") != target_id:
+                    continue
                 content_text = obs.get("content", "")
                 embed_text = ""
                 for emb in obs.get("embeds", []):
@@ -389,22 +400,28 @@ Be honest. If everything looks good, say so."""
             await interaction.followup.send(embed=embed)
 
     # ── /observe ─────────────────────────────────────────────────────
-    @discord.app_commands.command(name="observe", description="Toggle observation on a channel")
+    @discord.app_commands.command(name="observe", description="Watch a bot's responses in a channel")
     @discord.app_commands.describe(
         channel="Channel to observe",
+        target_bot="Mention the bot to watch",
         enable="Enable or disable observation",
     )
-    async def observe(self, interaction: discord.Interaction, channel: discord.TextChannel, enable: bool = True):
+    async def observe(self, interaction: discord.Interaction, channel: discord.TextChannel, target_bot: discord.User | None = None, enable: bool = True):
+        bot_id = target_bot.id if target_bot else self.bot.bot2_id
+        bot_name = target_bot.name if target_bot else "Lookism HXCC"
+
         if enable:
             self.bot.observe_channels.add(channel.id)
+            self.bot.observe_bots.add(bot_id)
             await interaction.response.send_message(
-                f"👁️ Now observing **#{channel.name}** — I'll log bot2's responses there.",
+                f"👁️ Watching **{bot_name}** in #{channel.name}",
                 ephemeral=True,
             )
         else:
             self.bot.observe_channels.discard(channel.id)
+            self.bot.observe_bots.discard(bot_id)
             await interaction.response.send_message(
-                f"👁️ Stopped observing **#{channel.name}**.",
+                f"👁️ Stopped watching **{bot_name}** in #{channel.name}",
                 ephemeral=True,
             )
 

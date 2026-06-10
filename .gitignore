@@ -10,6 +10,6 @@ lookism_data.json
 lookism_data.sqlite3
 # Local config
 Bot/bot2/.claude/
-Bot/bot3/.env
 *.json.tmp
 *.json.corrupt
+Bot/bot3/*.log
