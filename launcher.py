@@ -6,7 +6,7 @@ import subprocess
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BOT_ROOT = os.path.join(BASE_DIR, "Bot")
-BOT_DIRS = ["bot1", "bot2"]
+BOT_DIRS = ["bot1", "bot2", "bot3"]
 
 
 def start_bot(bot_name: str):
