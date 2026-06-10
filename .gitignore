@@ -8,3 +8,9 @@ bot_memory.json
 bot_settings.json
 lookism_data.json
 lookism_data.sqlite3
+# Secrets & local config
+.env
+Bot/bot1/.env
+Bot/bot2/.claude/
+*.json.tmp
+*.json.corrupt
