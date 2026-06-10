@@ -501,7 +501,13 @@ Queue → Match Found → Prep Phase (5 min)
 
 ---
 
-## 12. ⚠️ Critical Issues
+## 12. 🐛 Fixed Issues
+
+| Commit | Issue | Fix |
+|--------|-------|-----|
+| `f889cf6` | **IQ/BIQ missing from cards.json** — All 26 cards had only STR/SPD/END/TEC in their stats. IQ and BIQ defaulted to 0 everywhere (collection, battle, card_info) | Added correct `iq` and `battle_iq` values extracted from runtime `lookism_data.json` to `cards.json`. Restart required to clear stat cache. |
+
+## 13. ⚠️ Current Critical Issues
 
 | Issue | Location | Impact |
 |-------|----------|--------|

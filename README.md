@@ -471,6 +471,19 @@ User Interaction (Discord)
 
 ---
 
+## Recent Fixes
+
+| Commit | Area | Fix |
+| --- | --- | --- |
+| `f889cf6` | bot2 cards | Added missing **IQ** and **BIQ** stats to all 26 cards in `cards.json`. The source file only had STR/SPD/END/TEC — IQ/BIQ were silently defaulting to 0 in collection, squad, battle info, card_info views. Also broke battle damage pipeline (miss checks used BIQ=0, IQ scaling used 0). Values pulled from runtime `lookism_data.json`. |
+| `96b6f7e` | docs | Added 8 new detailed docs + full README rewrite. Complete architecture, battle system, deployment, security, API reference. |
+| `dd3d8e3` | upgrade rework | replaced multiplicative star scaling with flat additive (+1/star Common–Epic, +2/star Legendary+); `/fuse` removed — 1 duplicate + coins is the only upgrade path |
+| `dd3d8e3` | card schema | added `weapon_user`, `special_stat`, `unique_skill_2/3` with active/passive flags, `keystone_name` to card definitions |
+| `d53b810` | command cleanup | removed `/cotd`, `/rival`, `/stats_guide`, `/league overview`, `/tournament_join`, `/season_pass`, `/season_missions`, `/o_card_edit_typing` as standalone commands |
+| `720660c` | battle stamina | added per-battle stamina system — each fighter starts at 100 stamina, every move drains it |
+
+---
+
 ## ⚠️ Known Issues & Technical Debt
 
 1. **Hardcoded Secrets** — See [SECURITY.md](docs/SECURITY.md)

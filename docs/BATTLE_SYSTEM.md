@@ -419,6 +419,22 @@ IDLE_SKIP_LIMIT_VS_CPU = 2 (after 2 idle skips, CPU auto-forfeits)
 
 ---
 
+## ⚠️ Known Bug: Missing IQ/BIQ in cards.json (FIXED)
+
+**Commit:** `f889cf6`
+
+The `cards.json` source file was missing `iq` and `battle_iq` fields in the `stats` object for **all 26 cards**. Only `strength`, `speed`, `endurance`, and `technique` were present.
+
+**Impact on Battle:**
+- **Step 1 (Miss Check):** `effective_attacker_biq` was 0, so EVERY attack by ANY card had a chance to miss (and higher-BIQ enemies always got a miss chance)
+- **Step 5 (Attacker IQ Scaling):** `iq_bonus = 0 / 500 = 0%` — no damage bonus
+- **Step 6 (Defender IQ Mitigation):** `def_iq_reduce = 0 / 500 = 0%` — no damage reduction
+- **Mastermind passive:** +10 IQ/BIQ on top of 0 = only 10, instead of e.g. 95+10=105
+
+**Fix:** Correct IQ/BIQ values extracted from `lookism_data.json` and added to all 26 cards. Requires bot restart to clear stat cache.
+
+---
+
 ## 13. 🧪 Battle-Specific Tests
 
 ### test_battle_engine.py (73 tests)
