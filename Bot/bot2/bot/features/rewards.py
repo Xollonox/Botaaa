@@ -321,6 +321,7 @@ class RewardsCog(commands.Cog):
             # Handle daily login streak
             streak = 0
             multiplier = 1.0
+            effective_coin_amount = coin_amount
             if reward_type == "daily":
                 today = datetime.utcnow().strftime("%Y-%m-%d")
                 yesterday = datetime.utcfromtimestamp(now - 86400).strftime("%Y-%m-%d")
@@ -342,30 +343,30 @@ class RewardsCog(commands.Cog):
                 user["login_streak"] = streak
                 user["last_daily_date"] = today
                 multiplier = _streak_multiplier(streak)
-                coin_amount = int(coin_amount * multiplier)
+                effective_coin_amount = int(coin_amount * multiplier)
 
             # Coinflip: either coins-only or card-only, never both.
             coins_path = random.random() < coin_chance
             new_balance = int(user.get("balance", 0))
 
             if coins_path:
-                new_balance += coin_amount
+                new_balance += effective_coin_amount
                 user["balance"] = new_balance
                 cooldowns[reward_type] = now
                 if reward_type == "daily":
                     advance_tutorial(user, "claim_daily")
-                return True, 0, None, None, "", new_balance, True, coin_amount, streak, multiplier
+                return True, 0, None, None, "", new_balance, True, effective_coin_amount, streak, multiplier
 
             rarity = _weighted_rarity(rates)
             card_def = _pick_card_by_rarity(data, rarity) if rarity else None
             if not isinstance(card_def, dict):
                 # Card pool empty — fall back to coin path so the claim still resolves.
-                new_balance += coin_amount
+                new_balance += effective_coin_amount
                 user["balance"] = new_balance
                 cooldowns[reward_type] = now
                 if reward_type == "daily":
                     advance_tutorial(user, "claim_daily")
-                return True, 0, None, None, "", new_balance, True, coin_amount, streak, multiplier
+                return True, 0, None, None, "", new_balance, True, effective_coin_amount, streak, multiplier
 
             card_instance = build_card_instance(card_def, acquired_at=now, stars=0)
             inventory = user.setdefault("inventory", [])
