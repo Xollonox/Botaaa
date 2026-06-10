@@ -23,7 +23,9 @@
       "strength": 100,
       "speed": 90,
       "endurance": 95,
-      "technique": 80
+      "technique": 80,
+      "iq": 70,
+      "battle_iq": 85
     },
     "stats_max": {
       "strength": 110,
@@ -142,7 +144,9 @@
       "strength": 95,
       "speed": 90,
       "endurance": 95,
-      "technique": 80
+      "technique": 80,
+      "iq": 70,
+      "battle_iq": 85
     },
     "stats_max": {
       "strength": 100,
@@ -261,7 +265,9 @@
       "strength": 85,
       "speed": 100,
       "endurance": 80,
-      "technique": 90
+      "technique": 90,
+      "iq": 95,
+      "battle_iq": 95
     },
     "stats_max": {
       "strength": 90,
@@ -380,7 +386,9 @@
       "strength": 90,
       "speed": 100,
       "endurance": 80,
-      "technique": 95
+      "technique": 95,
+      "iq": 95,
+      "battle_iq": 95
     },
     "stats_max": {
       "strength": 95,
@@ -499,7 +507,9 @@
       "strength": 85,
       "speed": 100,
       "endurance": 80,
-      "technique": 90
+      "technique": 90,
+      "iq": 95,
+      "battle_iq": 95
     },
     "stats_max": {
       "strength": 90,
@@ -618,7 +628,9 @@
       "strength": 75,
       "speed": 75,
       "endurance": 65,
-      "technique": 70
+      "technique": 70,
+      "iq": 70,
+      "battle_iq": 75
     },
     "stats_max": {
       "strength": 80,
@@ -734,7 +746,9 @@
       "strength": 60,
       "speed": 75,
       "endurance": 65,
-      "technique": 65
+      "technique": 65,
+      "iq": 70,
+      "battle_iq": 70
     },
     "stats_max": {
       "strength": 65,
@@ -850,7 +864,9 @@
       "strength": 80,
       "speed": 75,
       "endurance": 75,
-      "technique": 60
+      "technique": 60,
+      "iq": 60,
+      "battle_iq": 70
     },
     "stats_max": {
       "strength": 85,
@@ -966,7 +982,9 @@
       "strength": 75,
       "speed": 65,
       "endurance": 75,
-      "technique": 60
+      "technique": 60,
+      "iq": 60,
+      "battle_iq": 70
     },
     "stats_max": {
       "strength": 80,
@@ -1082,7 +1100,9 @@
       "strength": 45,
       "speed": 35,
       "endurance": 35,
-      "technique": 30
+      "technique": 30,
+      "iq": 20,
+      "battle_iq": 25
     },
     "stats_max": {
       "strength": 50,
@@ -1198,7 +1218,9 @@
       "strength": 35,
       "speed": 45,
       "endurance": 30,
-      "technique": 35
+      "technique": 35,
+      "iq": 20,
+      "battle_iq": 25
     },
     "stats_max": {
       "strength": 40,
@@ -1314,7 +1336,9 @@
       "strength": 35,
       "speed": 35,
       "endurance": 45,
-      "technique": 30
+      "technique": 30,
+      "iq": 20,
+      "battle_iq": 25
     },
     "stats_max": {
       "strength": 40,
@@ -1430,7 +1454,9 @@
       "strength": 45,
       "speed": 45,
       "endurance": 30,
-      "technique": 40
+      "technique": 40,
+      "iq": 20,
+      "battle_iq": 30
     },
     "stats_max": {
       "strength": 50,
@@ -1546,7 +1572,9 @@
       "strength": 15,
       "speed": 10,
       "endurance": 15,
-      "technique": 5
+      "technique": 5,
+      "iq": 5,
+      "battle_iq": 10
     },
     "stats_max": {
       "strength": 20,
@@ -1662,7 +1690,9 @@
       "strength": 5,
       "speed": 5,
       "endurance": 5,
-      "technique": 5
+      "technique": 5,
+      "iq": 5,
+      "battle_iq": 5
     },
     "stats_max": {
       "strength": 10,
@@ -1778,7 +1808,9 @@
       "strength": 10,
       "speed": 10,
       "endurance": 10,
-      "technique": 10
+      "technique": 10,
+      "iq": 10,
+      "battle_iq": 10
     },
     "stats_max": {
       "strength": 15,
@@ -1861,7 +1893,9 @@
       "strength": 15,
       "speed": 15,
       "endurance": 10,
-      "technique": 10
+      "technique": 10,
+      "iq": 5,
+      "battle_iq": 10
     },
     "stats_max": {
       "strength": 20,
@@ -1944,7 +1978,9 @@
       "strength": 10,
       "speed": 10,
       "endurance": 10,
-      "technique": 10
+      "technique": 10,
+      "iq": 10,
+      "battle_iq": 10
     },
     "stats_max": {
       "strength": 15,
@@ -2027,7 +2063,9 @@
       "strength": 10,
       "speed": 10,
       "endurance": 10,
-      "technique": 10
+      "technique": 10,
+      "iq": 10,
+      "battle_iq": 10
     },
     "stats_max": {
       "strength": 15,
@@ -2110,7 +2148,9 @@
       "strength": 10,
       "speed": 10,
       "endurance": 10,
-      "technique": 10
+      "technique": 10,
+      "iq": 10,
+      "battle_iq": 10
     },
     "stats_max": {
       "strength": 15,
@@ -2193,7 +2233,9 @@
       "strength": 5,
       "speed": 5,
       "endurance": 5,
-      "technique": 5
+      "technique": 5,
+      "iq": 5,
+      "battle_iq": 5
     },
     "stats_max": {
       "strength": 10,
@@ -2276,7 +2318,9 @@
       "strength": 15,
       "speed": 15,
       "endurance": 15,
-      "technique": 15
+      "technique": 15,
+      "iq": 15,
+      "battle_iq": 15
     },
     "stats_max": {
       "strength": 20,
@@ -2342,7 +2386,9 @@
       "strength": 20,
       "speed": 15,
       "endurance": 15,
-      "technique": 15
+      "technique": 15,
+      "iq": 10,
+      "battle_iq": 15
     },
     "stats_max": {
       "strength": 25,
@@ -2441,7 +2487,9 @@
       "strength": 65,
       "speed": 65,
       "endurance": 65,
-      "technique": 70
+      "technique": 70,
+      "iq": 60,
+      "battle_iq": 70
     },
     "stats_max": {
       "strength": 70,
@@ -2557,7 +2605,9 @@
       "strength": 25,
       "speed": 25,
       "endurance": 25,
-      "technique": 20
+      "technique": 20,
+      "iq": 10,
+      "battle_iq": 25
     },
     "stats_max": {
       "strength": 30,
@@ -2673,7 +2723,9 @@
       "strength": 25,
       "speed": 25,
       "endurance": 25,
-      "technique": 20
+      "technique": 20,
+      "iq": 10,
+      "battle_iq": 25
     },
     "stats_max": {
       "strength": 30,
