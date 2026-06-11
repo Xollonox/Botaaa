@@ -430,6 +430,29 @@ class SquadPanel(discord.ui.View):
         back_view = _BackView(self.invoker_id, self, data, interaction.user, player)
         await interaction.response.edit_message(embed=_build_fighter_embed(data, inst), view=back_view)
 
+    @discord.ui.button(label="⚡ Auto Fill", style=discord.ButtonStyle.success, row=2)
+    async def auto_fill_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
+        status, filled_count = self.cog._auto_fill_squad(str(interaction.user.id))
+        data = self.cog.bot.storage.load()
+        if status == "not_enough":
+            await interaction.response.send_message(
+                embed=make_embed(data, f"{e('warning', data)} Not Enough Cards",
+                                 "You need at least 1 card in your collection to auto-fill."),
+                ephemeral=True,
+            )
+            return
+        if status != "ok":
+            await interaction.response.send_message(
+                embed=make_embed(data, f"{e('warning', data)} Auto Fill Failed",
+                                 "Could not auto-fill your squad."),
+                ephemeral=True,
+            )
+            return
+        player = get_player(data, str(interaction.user.id))
+        self.current_slot = 0
+        embed = _build_squad_embed(data, interaction.user, player, 0)
+        await interaction.response.edit_message(embed=embed, view=self)
+
     @discord.ui.button(label="🗑 Clear All", style=discord.ButtonStyle.danger, row=2)
     async def clear_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         data = self.cog.bot.storage.load()
@@ -581,6 +604,66 @@ class SquadCog(commands.Cog):
                 if str(item.get("uid", "")) in to_unlock:
                     item["squad_locked"] = False
             return "ok"
+        return self.bot.storage.with_lock(mutate)
+
+    def _auto_fill_squad(self, user_id: str) -> tuple[str, int]:
+        """Auto-fill squad with top 4 strongest cards by power."""
+        def mutate(data: dict[str, Any]) -> tuple[str, int]:
+            player = get_player(data, user_id)
+            if player is None:
+                return "not_registered", 0
+            
+            inventory = get_inventory(player)
+            if not inventory:
+                return "not_enough", 0
+            
+            # Calculate power for each card
+            cards_with_power: list[tuple[dict[str, Any], int]] = []
+            for item in inventory:
+                if not isinstance(item, dict):
+                    continue
+                card_name = str(item.get("card_name", ""))
+                card_def = (data.get("cards") or {}).get(card_name, {})
+                if not isinstance(card_def, dict):
+                    continue
+                stars = int(item.get("stars", 0))
+                scaled = compute_scaled_stats(card_def, stars)
+                power = compute_power(scaled)
+                cards_with_power.append((item, power))
+            
+            if not cards_with_power:
+                return "not_enough", 0
+            
+            # Sort by power (descending) and take top 4
+            cards_with_power.sort(key=lambda x: x[1], reverse=True)
+            top_cards = cards_with_power[:NUM_SLOTS]
+            
+            # Clear current squad
+            squad = get_squad(player)
+            old_uids = {str(u) for u in squad.get("active", []) + squad.get("backup", []) if str(u)}
+            squad["active"] = []
+            squad["backup"] = []
+            
+            # Unlock all previously squad-locked cards
+            for item in inventory:
+                item["squad_locked"] = False
+            
+            # Assign top cards to slots
+            for i, (card, power) in enumerate(top_cards):
+                uid = str(card.get("uid", ""))
+                if uid:
+                    _set_slot_uid(squad, i, uid)
+                    card["squad_locked"] = True
+            
+            _cleanup_slots(squad)
+            
+            # Advance tutorial if applicable
+            user = player.get("user", {})
+            if isinstance(user, dict):
+                advance_tutorial(user, "assign_squad")
+            
+            return "ok", len(top_cards)
+        
         return self.bot.storage.with_lock(mutate)
 
     # ── command ────────────────────────────────────────────────────────────
