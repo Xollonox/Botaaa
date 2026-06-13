@@ -9,7 +9,7 @@
 ### 1.1 Discord Bot Token (Exposed)
 **Location:** `Bot/bot2/bot/config.py:5`
 ```python
-BOT_TOKEN = "MTQ2OTM4MzI3MTgyNDQ5MDcxOQ.GJRzn8.dha4uARmFlygx6bG1_YHmkbsumNeLgoBzJ6foQ"
+BOT_TOKEN = "REDACTED — rotated, now loaded from env var"
 ```
 **Impact:** Full Discord bot account access:
 - Send messages as the bot
@@ -21,7 +21,7 @@ BOT_TOKEN = "MTQ2OTM4MzI3MTgyNDQ5MDcxOQ.GJRzn8.dha4uARmFlygx6bG1_YHmkbsumNeLgoBz
 ### 1.2 Supabase Service Role Key (Exposed)
 **Location:** `Bot/bot2/bot/data/supabase_sync.py:8`
 ```python
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZidnZsbGFwcnB0aWx4dWZzYXh2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzAzMzgxNCwiZXhwIjoyMDg4NjA5ODE0fQ.ugbaP0kCx1fuPa06bsogD8rjDw9OOoJ2TctTThDUKuI"
+SUPABASE_KEY = "REDACTED — rotated, now loaded from env var"
 ```
 **Impact:** Full Supabase database access:
 - Read/write/delete all bot data

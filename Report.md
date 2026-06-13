@@ -43,7 +43,7 @@ Botaaa is a dual-bot Discord workspace comprising:
 ### 1.1 Hardcoded Discord Bot Token — **FINDING #1** 🔴
 **File:** `Bot/bot2/bot/config.py:5`
 ```python
-BOT_TOKEN = "MTQ2OTM4MzI3MTgyNDQ5MDcxOQ.GJRzn8.dha4uARmFlygx6bG1_YHmkbsumNeLgoBzJ6foQ"
+BOT_TOKEN = "REDACTED — rotated, now loaded from env var"
 ```
 **Impact:** Full Discord bot account compromise. Attacker can:
 - Send messages as the bot in all guilds
@@ -62,8 +62,8 @@ BOT_TOKEN = "MTQ2OTM4MzI3MTgyNDQ5MDcxOQ.GJRzn8.dha4uARmFlygx6bG1_YHmkbsumNeLgoBz
 ### 1.2 Hardcoded Supabase Service Role Key — **FINDING #2** 🔴
 **File:** `Bot/bot2/bot/data/supabase_sync.py:9-10`
 ```python
-SUPABASE_URL = os.getenv("SUPABASE_URL", "https://vbvvllaprptilxufsaxv.supabase.co")
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")  # was hardcoded, now env-only
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")  # was hardcoded, rotated
 ```
 **Impact:** Service role key = **unrestricted database access**. Attacker can:
 - Read all user data, economy state, battle history
