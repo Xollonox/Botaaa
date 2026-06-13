@@ -388,7 +388,7 @@ Register (/start) → Get packs (starter/shop/rewards)
 
 | Location | Secret | Risk |
 |----------|--------|------|
-| `Bot/bot2/bot/config.py:5` | **Discord BOT_TOKEN** (MTQ2OTM4MzI3MTgyNDQ5MDcxOQ.GJRzn8.dha4uARmFlygx6bG1_YHmkbsumNeLgoBzJ6foQ) | Full bot access |
+| `Bot/bot2/bot/config.py` | Discord BOT_TOKEN (rotated — was hardcoded, now env var) | Full bot access |
 | `.env` (if committed) | Cerebras/Groq/Ollama API keys | AI API abuse |
 | `Bot/bot2/bot/data/supabase_sync.py` | Supabase URL + service role key | Database access |
 | `Bot/bot1/config.py` | Default keys (overridable by env) | Multi-provider API access |
