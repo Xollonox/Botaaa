@@ -30,27 +30,32 @@ class AnnounceOwnerCog(commands.Cog):
     @tasks.loop(hours=24)
     async def card_of_the_day(self) -> None:
         """Background task: pick and announce Card of the Day every 24 hours."""
-        data = self.bot.storage.load()
-        cards = data.get("cards", {})
-        if not isinstance(cards, dict) or not cards:
-            return
-
-        card_names = list(cards.keys())
-        if not card_names:
-            return
-
-        selected = random.choice(card_names)
         today_str = datetime.utcnow().strftime("%Y-%m-%d")
 
-        data["cotd"] = {
-            "card_name": selected,
-            "date": today_str,
-            "buff_pct": 15,
-        }
-        self.bot.storage.save(data)
+        def _mutate(data: dict):
+            cards = data.get("cards", {})
+            if not isinstance(cards, dict) or not cards:
+                return None
+            card_names = list(cards.keys())
+            if not card_names:
+                return None
+            selected_inner = random.choice(card_names)
+            data["cotd"] = {
+                "card_name": selected_inner,
+                "date": today_str,
+                "buff_pct": 15,
+            }
+            settings = data.get("server_settings", {}) if isinstance(data.get("server_settings"), dict) else {}
+            channel_id_inner = int(settings.get("announce_channel_id", 0) or 0)
+            return selected_inner, channel_id_inner
 
-        settings = data.get("server_settings", {}) if isinstance(data.get("server_settings"), dict) else {}
-        announce_channel_id = int(settings.get("announce_channel_id", 0) or 0)
+        result = self.bot.storage.with_lock(_mutate)
+        if result is None:
+            return
+        selected, announce_channel_id = result
+
+        # Re-read snapshot for embed rendering (outside the lock).
+        data = self.bot.storage.load()
 
         if announce_channel_id <= 0:
             return
@@ -84,46 +89,54 @@ class AnnounceOwnerCog(commands.Cog):
     @tasks.loop(hours=168)
     async def weekly_bounty(self) -> None:
         """Background task: pick player with highest win streak and announce bounty every 7 days."""
-        data = self.bot.storage.load()
-        players = data.get("players", {})
-        if not isinstance(players, dict):
+        def _mutate(data: dict):
+            players = data.get("players", {})
+            if not isinstance(players, dict):
+                return None
+
+            max_streak_inner = 0
+            target_id_inner = None
+            target_name_inner = "Unknown"
+
+            for uid, player in players.items():
+                if not isinstance(player, dict):
+                    continue
+                ranked_stats = player.get("ranked_stats", {})
+                if not isinstance(ranked_stats, dict):
+                    continue
+                streak = int(ranked_stats.get("streak", 0))
+                if streak >= 5 and streak > max_streak_inner:
+                    max_streak_inner = streak
+                    target_id_inner = str(uid)
+                    user = player.get("user", {})
+                    target_name_inner = str(user.get("name", "Unknown")) if isinstance(user, dict) else "Unknown"
+
+            if target_id_inner is None or max_streak_inner < 5:
+                return None
+
+            week_num = (now_ts() // 604800)
+            data["bounty"] = {
+                "target_id": target_id_inner,
+                "target_name": target_name_inner,
+                "streak": max_streak_inner,
+                "reward": 3000,
+                "week": week_num,
+            }
+
+            settings = data.get("server_settings", {}) if isinstance(data.get("server_settings"), dict) else {}
+            channel_id_inner = int(settings.get("announce_channel_id", 0) or 0)
+            return target_id_inner, target_name_inner, max_streak_inner, channel_id_inner
+
+        result = self.bot.storage.with_lock(_mutate)
+        if result is None:
             return
-
-        max_streak = 0
-        target_id = None
-        target_name = "Unknown"
-
-        for uid, player in players.items():
-            if not isinstance(player, dict):
-                continue
-            ranked_stats = player.get("ranked_stats", {})
-            if not isinstance(ranked_stats, dict):
-                continue
-            streak = int(ranked_stats.get("streak", 0))
-            if streak >= 5 and streak > max_streak:
-                max_streak = streak
-                target_id = str(uid)
-                user = player.get("user", {})
-                target_name = str(user.get("name", "Unknown")) if isinstance(user, dict) else "Unknown"
-
-        if target_id is None or max_streak < 5:
-            return
-
-        week_num = (now_ts() // 604800)
-        data["bounty"] = {
-            "target_id": target_id,
-            "target_name": target_name,
-            "streak": max_streak,
-            "reward": 3000,
-            "week": week_num,
-        }
-        self.bot.storage.save(data)
-
-        settings = data.get("server_settings", {}) if isinstance(data.get("server_settings"), dict) else {}
-        announce_channel_id = int(settings.get("announce_channel_id", 0) or 0)
+        target_id, target_name, max_streak, announce_channel_id = result
 
         if announce_channel_id <= 0:
             return
+
+        # Re-read snapshot for embed rendering (outside the lock).
+        data = self.bot.storage.load()
 
         target_channel = self.bot.get_channel(announce_channel_id)
         if target_channel is None:
@@ -241,21 +254,24 @@ class AnnounceOwnerCog(commands.Cog):
         duration_hours = max(1, min(720, int(duration_hours)))  # clamp 1-730 hours
         ends_at = now_ts() + (duration_hours * 3600)
 
-        events = data.setdefault("active_events", {})
-        if not isinstance(events, dict):
-            events = {}
-            data["active_events"] = events
+        def _mutate(data: dict):
+            events = data.setdefault("active_events", {})
+            if not isinstance(events, dict):
+                events = {}
+                data["active_events"] = events
 
-        events[event_type] = {
-            "active": True,
-            "ends_at": ends_at,
-        }
+            events[event_type] = {
+                "active": True,
+                "ends_at": ends_at,
+            }
 
-        self.bot.storage.save(data)
+            settings = data.get("server_settings", {}) if isinstance(data.get("server_settings"), dict) else {}
+            return int(settings.get("announce_channel_id", 0) or 0)
 
-        # Announce to the announcement channel
-        settings = data.get("server_settings", {}) if isinstance(data.get("server_settings"), dict) else {}
-        announce_channel_id = int(settings.get("announce_channel_id", 0) or 0)
+        announce_channel_id = self.bot.storage.with_lock(_mutate)
+
+        # Re-read snapshot for embed rendering (outside the lock).
+        data = self.bot.storage.load()
 
         announce_text = "2x XP 🚀" if event_type == "double_xp" else "1.5x CP Rewards 💰"
         embed = make_embed(

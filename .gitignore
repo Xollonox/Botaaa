@@ -1,16 +1,66 @@
-venv/
-Bot/venv/
+# Environment files with secrets
+.env
+**/.env
+*.env
+!.env.example
+!**/.env.example
+
+# Python
 __pycache__/
-*.pyc
-Bot/bot2/bot/**/__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env/
+Bot/venv/
+
+# Logs
+*.log
+logs/
+**/*.log
 Bot/bot2/logs/*.log
+Bot/bot3/*.log
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Database files (contain player data)
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+*.db
+lookism_data.sqlite3
+
+# Temp files
+*.tmp
+*.bak
+*.corrupt
+*.json.tmp
+*.json.corrupt
+pi-session-*.html
+
+# IDE
+.vscode/
+.idea/
+*.swp
+Bot/bot2/.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (just in case)
+node_modules/
+
+# Bot-specific data files
 bot_memory.json
 bot_settings.json
 lookism_data.json
-lookism_data.sqlite3
-# Local config
-Bot/bot2/.claude/
-*.json.tmp
-*.json.corrupt
-Bot/bot3/*.log
-pi-session-*.html

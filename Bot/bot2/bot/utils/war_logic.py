@@ -1,5 +1,6 @@
 """Gang War logic — matchmaking, points, rewards."""
 from __future__ import annotations
+import os
 import uuid
 from typing import Any
 from bot.utils.timeutil import now_ts
@@ -7,8 +8,8 @@ from bot.utils.timeutil import now_ts
 # ── Constants ─────────────────────────────────────────────────────
 WAR_FORMATS          = [2, 10, 20, 30]
 MAX_TROPHY_DIFF      = 100
-PREP_DURATION        = 300    # 5 min (test) — change to 86400 for prod
-BATTLE_DURATION      = 300    # 5 min (test) — change to 86400 for prod
+PREP_DURATION        = int(os.getenv("GANG_WAR_PREP_SECONDS",   "86400"))
+BATTLE_DURATION      = int(os.getenv("GANG_WAR_BATTLE_SECONDS", "86400"))
 QUEUE_TIMEOUT        = 86400   # 24h
 WAR_COOLDOWN         = 172800  # 48h after leaving gang
 

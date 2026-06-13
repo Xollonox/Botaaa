@@ -338,67 +338,67 @@ class SQLiteMarketRepository:
     # ------------------------------------------------------------------
 
     async def json_bootstrap_completed(self) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_json_bootstrap_completed)
 
     async def mark_json_bootstrap_completed(self) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_mark_json_bootstrap_completed)
 
     async def has_persisted_state(self) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_has_persisted_state)
 
     async def seed_from_json_market(self, market: dict[str, Any]) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_seed_from_json_market, market)
 
     async def get_settings(self) -> dict[str, Any]:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_get_settings)
 
     async def update_setting(self, key: str, value: Any) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_update_setting, key, value)
 
     async def replace_json_settings(self, quick_sell_values: dict[str, Any], price_band: dict[str, Any]) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_replace_json_settings, quick_sell_values, price_band)
 
     async def set_store_item(self, card_name: str, price: int, stock: int, enabled: bool = True) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_set_store_item, card_name, price, stock, enabled)
 
     async def remove_store_item(self, card_name: str) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_remove_store_item, card_name)
 
     async def toggle_store_item(self, card_name: str, enabled: bool) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_toggle_store_item, card_name, enabled)
 
     async def list_store_items(self) -> dict[str, dict[str, Any]]:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_list_store_items)
 
     async def seed_listings_from_json(self, listings: dict[str, Any]) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_seed_listings_from_json, listings)
 
     async def upsert_listing(self, listing_id: str, payload: dict[str, Any]) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_upsert_listing, listing_id, payload)
 
     async def delete_listing(self, listing_id: str) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_delete_listing, listing_id)
 
     async def get_listing(self, listing_id: str) -> dict[str, Any] | None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_get_listing, listing_id)
 
     async def list_active_listings(self, limit: int = 200) -> dict[str, dict[str, Any]]:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_list_active_listings, limit)
 
 
@@ -653,63 +653,63 @@ class SQLiteTradeRepository:
     # ------------------------------------------------------------------
 
     async def json_bootstrap_completed(self) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_json_bootstrap_completed)
 
     async def mark_json_bootstrap_completed(self) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_mark_json_bootstrap_completed)
 
     async def has_persisted_state(self) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_has_persisted_state)
 
     async def seed_from_json_trades(self, trades: dict[str, Any]) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_seed_from_json_trades, trades)
 
     async def is_pending(self, user_id: str) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_is_pending, user_id)
 
     async def add_pending_pair(self, a_id: str, b_id: str) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_add_pending_pair, a_id, b_id)
 
     async def remove_pending(self, user_id: str) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_remove_pending, user_id)
 
     async def remove_pending_pair(self, a_id: str, b_id: str) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_remove_pending_pair, a_id, b_id)
 
     async def list_pending(self) -> dict[str, bool]:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_list_pending)
 
     async def append_history(self, row: dict[str, Any]) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_append_history, row)
 
     async def recent_history_for_user(self, user_id: str, limit: int = 50) -> list[dict[str, Any]]:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_recent_history_for_user, user_id, limit)
 
     async def post_offer(self, offer_id: str, poster_id: str, poster_name: str, have_card: str, want_card: str, item_uid: str, created_at: int, expires_at: int) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_post_offer, offer_id, poster_id, poster_name, have_card, want_card, item_uid, created_at, expires_at)
 
     async def get_open_offers(self, limit: int = 10) -> list[dict[str, Any]]:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_get_open_offers, limit)
 
     async def cancel_offer(self, offer_id: str, poster_id: str) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_cancel_offer, offer_id, poster_id)
 
     async def accept_offer(self, offer_id: str) -> dict[str, Any] | None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_accept_offer, offer_id)
 
 
@@ -900,53 +900,53 @@ class SQLiteBattleRepository:
     # ------------------------------------------------------------------
 
     async def json_bootstrap_completed(self) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_json_bootstrap_completed)
 
     async def mark_json_bootstrap_completed(self) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_mark_json_bootstrap_completed)
 
     async def has_persisted_state(self) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_has_persisted_state)
 
     async def seed_from_json_battle(self, battle: dict[str, Any]) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_seed_from_json_battle, battle)
 
     async def list_queue(self, now_ts: int) -> list[dict[str, Any]]:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_list_queue, now_ts)
 
     async def upsert_queue_entry(self, user_id: str, joined_at: int, expires_at: int) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_upsert_queue_entry, user_id, joined_at, expires_at)
 
     async def remove_queue_user(self, user_id: str) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_remove_queue_user, user_id)
 
     async def remove_queue_users(self, user_ids: list[str]) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_remove_queue_users, user_ids)
 
     async def list_pending_friendly(self, now_ts: int) -> dict[str, dict[str, Any]]:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_list_pending_friendly, now_ts)
 
     async def upsert_pending_friendly(self, target_id: str, payload: dict[str, Any]) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_upsert_pending_friendly, target_id, payload)
 
     async def remove_pending_friendly(self, target_id: str) -> bool:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_remove_pending_friendly, target_id)
 
     async def list_active_by_user(self) -> dict[str, str]:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_list_active_by_user)
 
     async def set_active_by_user(self, mapping: dict[str, str]) -> None:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_set_active_by_user, mapping)

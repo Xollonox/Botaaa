@@ -1,4 +1,9 @@
-"""Syncs bot data to Supabase so the website can read it."""
+"""Syncs bot data to Supabase so the website can read it.
+
+NOTE: This module is not currently wired into the main application.
+To enable Supabase sync, call sync_async(data) after storage writes
+and set SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY environment variables.
+"""
 from __future__ import annotations
 import json
 import logging
@@ -8,13 +13,17 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.getenv("SUPABASE_URL", "https://vbvvllaprptilxufsaxv.supabase.co")
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZidnZsbGFwcnB0aWx4dWZzYXh2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzAzMzgxNCwiZXhwIjoyMDg4NjA5ODE0fQ.ugbaP0kCx1fuPa06bsogD8rjDw9OOoJ2TctTThDUKuI")
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 
 _sync_lock = threading.Lock()
 _pending   = False
 
+
 def _do_sync(data: dict[str, Any]) -> None:
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        logger.debug("Supabase sync skipped: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not configured.")
+        return
     try:
         import urllib.request
         payload = json.dumps({"id": "main", "data": data}).encode()
@@ -36,7 +45,12 @@ def _do_sync(data: dict[str, Any]) -> None:
 
 
 def sync_async(data: dict[str, Any]) -> None:
-    """Fire-and-forget sync to Supabase in background thread."""
+    """Fire-and-forget sync to Supabase in background thread.
+
+    No-op if SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY are not configured.
+    """
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return
     global _pending
     with _sync_lock:
         if _pending:

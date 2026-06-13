@@ -6,7 +6,7 @@ from copy import deepcopy
 from typing import Any
 
 LEAGUE_ORDER = [
-    "Copper", "Bronze", "Silver", "Gold", "Platinum", "Diamond", "Master", "Grandmaster", "Champion",
+    "Copper", "Iron", "Bronze", "Silver", "Gold", "Diamond", "Platinum", "Sapphire", "Ruby",
 ]
 
 XP_PER_LEVEL = 100
@@ -181,21 +181,24 @@ def apply_season_reset_to_players(
 
 
 def _rank_from_trophies(trophies: int) -> str:
-    """Return a league rank based on trophy count."""
-    if trophies >= 5000:
-        return "Champion"
-    elif trophies >= 3500:
-        return "Grandmaster"
-    elif trophies >= 2500:
-        return "Master"
-    elif trophies >= 1800:
-        return "Diamond"
-    elif trophies >= 1200:
+    """Return a league rank based on trophy count.
+
+    Must mirror bot.utils.battle_state._rank_from_trophies — the ground truth.
+    """
+    if trophies >= 4000:
+        return "Ruby"
+    if trophies >= 3200:
+        return "Sapphire"
+    if trophies >= 2400:
         return "Platinum"
-    elif trophies >= 700:
+    if trophies >= 1600:
+        return "Diamond"
+    if trophies >= 1200:
         return "Gold"
-    elif trophies >= 350:
+    if trophies >= 800:
         return "Silver"
-    elif trophies >= 100:
+    if trophies >= 400:
         return "Bronze"
+    if trophies >= 200:
+        return "Iron"
     return "Copper"
