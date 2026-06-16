@@ -31,7 +31,7 @@ def main():
             procs[name] = proc
 
     if not procs:
-        print("No bots started. Add main.py inside Bot/bot1..bot4")
+        print("No bots started. Add main.py inside Bot/bot1 or Bot/bot2")
         return
 
     try:
