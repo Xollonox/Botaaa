@@ -420,7 +420,13 @@ class EventsCog(commands.Cog):
         if backend == "pollinations":
             return await generate_free_image(prompt)
         if backend == "bluesminds":
-            return await generate_bluesminds_image(prompt)
+            result = await generate_bluesminds_image(prompt)
+            if result:
+                return result
+            logger.warning("BluesMinds failed, falling back to Cloudflare")
+            return await generate_image_bytes(
+                prompt=prompt, source_image_bytes=source_bytes
+            )
         return await generate_image_bytes(
             prompt=prompt, source_image_bytes=source_bytes
         )

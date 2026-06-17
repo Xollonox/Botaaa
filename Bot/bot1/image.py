@@ -202,29 +202,29 @@ async def generate_bluesminds_image(prompt: str) -> Optional[bytes]:
             async with session.post(url, json=body, headers=headers) as resp:
                 resp_text = await resp.text()
                 if resp.status != 200:
-                    logger.error(
-                        "BluesMinds image API failed | status=%s body=%s",
-                        resp.status, resp_text[:500],
+                    logger.warning(
+                        "BluesMinds image API failed (will fallback) | status=%s body=%s",
+                        resp.status, resp_text[:300],
                     )
                     return None
                 try:
                     data = json.loads(resp_text)
                 except json.JSONDecodeError:
-                    logger.error(
-                        "BluesMinds image API non-JSON | body=%s",
-                        resp_text[:500],
+                    logger.warning(
+                        "BluesMinds image API non-JSON (will fallback) | body=%s",
+                        resp_text[:300],
                     )
                     return None
                 b64 = data.get("data", [{}])[0].get("b64_json", "")
                 if not b64:
-                    logger.error(
-                        "BluesMinds image API missing b64_json | body=%s",
-                        resp_text[:500],
+                    logger.warning(
+                        "BluesMinds image API missing b64_json (will fallback) | body=%s",
+                        resp_text[:300],
                     )
                     return None
                 return base64.b64decode(b64)
     except Exception:
-        logger.exception("BluesMinds image generation crashed")
+        logger.warning("BluesMinds image generation crashed (will fallback)")
         return None
 
 
