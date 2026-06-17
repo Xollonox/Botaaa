@@ -11,6 +11,9 @@ import aiohttp
 import discord
 
 from config import (
+    BLUESMINDS_API_KEY,
+    BLUESMINDS_BASE_URL,
+    BLUESMINDS_IMAGE_MODEL,
     CLOUDFLARE_ACCOUNT_ID,
     CLOUDFLARE_API_TOKEN,
     CLOUDFLARE_FLUX_MODEL,
@@ -35,7 +38,7 @@ IMAGE_TRIGGER_PREFIXES = [
 
 CHAT_IMAGE_TRIGGERS = {
     "@pollo": "pollinations",
-    "@imagine": "cloudflare",
+    "@imagine": "bluesminds",
 }
 
 
@@ -173,6 +176,55 @@ async def _cf_post_multipart_flux2(
                 return base64.b64decode(b64)
     except Exception:
         logger.exception("Cloudflare Flux2 img2img request crashed")
+        return None
+
+
+async def generate_bluesminds_image(prompt: str) -> Optional[bytes]:
+    if not BLUESMINDS_API_KEY:
+        logger.warning("BluesMinds API key not configured")
+        return None
+    headers = {
+        "Authorization": f"Bearer {BLUESMINDS_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    body = {
+        "model": BLUESMINDS_IMAGE_MODEL,
+        "prompt": prompt,
+        "n": 1,
+        "size": "1024x1024",
+        "response_format": "b64_json",
+    }
+    url = f"{BLUESMINDS_BASE_URL.rstrip('/')}/images/generations"
+    try:
+        async with aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=60)
+        ) as session:
+            async with session.post(url, json=body, headers=headers) as resp:
+                resp_text = await resp.text()
+                if resp.status != 200:
+                    logger.error(
+                        "BluesMinds image API failed | status=%s body=%s",
+                        resp.status, resp_text[:500],
+                    )
+                    return None
+                try:
+                    data = json.loads(resp_text)
+                except json.JSONDecodeError:
+                    logger.error(
+                        "BluesMinds image API non-JSON | body=%s",
+                        resp_text[:500],
+                    )
+                    return None
+                b64 = data.get("data", [{}])[0].get("b64_json", "")
+                if not b64:
+                    logger.error(
+                        "BluesMinds image API missing b64_json | body=%s",
+                        resp_text[:500],
+                    )
+                    return None
+                return base64.b64decode(b64)
+    except Exception:
+        logger.exception("BluesMinds image generation crashed")
         return None
 
 

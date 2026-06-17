@@ -13,6 +13,7 @@ from image import (
     detect_chat_image_trigger,
     enhance_image_prompt,
     fetch_url_bytes,
+    generate_bluesminds_image,
     generate_free_image,
     generate_image_bytes,
     gather_image_urls,
@@ -235,7 +236,7 @@ class EventsCog(commands.Cog):
         if generated:
             buf = io.BytesIO(generated)
             buf.seek(0)
-            label = "Pollinations" if backend == "pollinations" else "Cloudflare"
+            label = "Pollinations" if backend == "pollinations" else "BluesMinds" if backend == "bluesminds" else "Cloudflare"
             sent = await send_discord_text(
                 message.channel.send,
                 f"{label} | Prompt: {enhanced}",
@@ -293,7 +294,7 @@ class EventsCog(commands.Cog):
         if generated:
             buf = io.BytesIO(generated)
             buf.seek(0)
-            label = "Pollinations" if backend == "pollinations" else "Cloudflare"
+            label = "Pollinations" if backend == "pollinations" else "BluesMinds" if backend == "bluesminds" else "Cloudflare"
             sent = await send_discord_text(
                 message.channel.send,
                 f"{label} | Improved prompt: {improved}",
@@ -418,6 +419,8 @@ class EventsCog(commands.Cog):
     ) -> Optional[bytes]:
         if backend == "pollinations":
             return await generate_free_image(prompt)
+        if backend == "bluesminds":
+            return await generate_bluesminds_image(prompt)
         return await generate_image_bytes(
             prompt=prompt, source_image_bytes=source_bytes
         )

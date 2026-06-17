@@ -47,6 +47,9 @@ CLOUDFLARE_FLUX2_DEV_IMG2IMG_MODEL: str = _str(
 CLOUDFLARE_SD15_IMG2IMG_MODEL: str = _str(
     "CLOUDFLARE_SD15_IMG2IMG_MODEL", "@cf/runwayml/stable-diffusion-v1-5-img2img"
 )
+BLUESMINDS_API_KEY: str = _str("BLUESMINDS_API_KEY")
+BLUESMINDS_BASE_URL: str = _str("BLUESMINDS_BASE_URL", "https://api.bluesminds.com/v1")
+BLUESMINDS_IMAGE_MODEL: str = _str("BLUESMINDS_IMAGE_MODEL", "grok-imagine-image-lite")
 MEMORY_FILE: str = _str("MEMORY_FILE", "bot_memory.json")
 SETTINGS_FILE: str = _str("SETTINGS_FILE", "bot_settings.json")
 LOG_LEVEL: str = _str("LOG_LEVEL", "INFO")
