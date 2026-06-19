@@ -513,10 +513,22 @@ class PacksPanel(discord.ui.View):
 
         anim_view    = _AnimView(self)
         self.skipped = False
-        await interaction.response.edit_message(
-            embed=_anim_embed(title, "⬛  ⬛  ⬛  ⬛  ⬛", "The pack is sealed..."),
-            view=anim_view,
-        )
+        try:
+            await interaction.response.edit_message(
+                embed=_anim_embed(title, "⬛  ⬛  ⬛  ⬛  ⬛", "The pack is sealed..."),
+                view=anim_view,
+            )
+        except TypeError:
+            logger.exception(
+                "[PACKS_EDIT_MSG] TypeError editing message. interaction.response=%r edit_message=%r type=%r",
+                interaction.response,
+                getattr(interaction.response, "edit_message", None),
+                type(getattr(interaction.response, "edit_message", None)),
+            )
+            raise
+        except Exception:
+            logger.exception("[PACKS_EDIT_MSG] Unexpected error editing message")
+            raise
 
         user_id = str(interaction.user.id)
 
