@@ -150,8 +150,12 @@ class PostRevealView(discord.ui.View):
         if self.message:
             try:
                 await self.message.edit(view=self)
+            except discord.NotFound:
+                pass
+            except discord.Forbidden:
+                pass
             except discord.HTTPException:
-                logger.exception("Failed to disable post-reveal view after timeout")
+                logger.warning("Failed to disable post-reveal view after timeout", exc_info=True)
 
     def _current(self) -> dict[str, str]:
         return self.rolls[self.idx]
@@ -375,8 +379,12 @@ class PacksPanel(discord.ui.View):
         if self.message:
             try:
                 await self.message.edit(view=self)
+            except discord.NotFound:
+                pass  # message was deleted
+            except discord.Forbidden:
+                pass  # bot lost access to channel
             except discord.HTTPException:
-                logger.exception("Failed to disable packs panel after timeout")
+                logger.warning("Failed to disable packs panel after timeout", exc_info=True)
 
     # Row 0 — Nav
     @discord.ui.button(label="◀ Prev", style=discord.ButtonStyle.secondary, row=0)
@@ -432,8 +440,10 @@ class PacksPanel(discord.ui.View):
             if self.skipped: return
             try:
                 await msg.edit(embed=_anim_embed(title, slots, caption, color))
+            except (discord.NotFound, discord.Forbidden):
+                return
             except discord.HTTPException:
-                logger.exception("Failed to update pack animation")
+                logger.warning("Failed to update pack animation", exc_info=True)
                 return
 
         locked: list[str] = []
@@ -449,8 +459,10 @@ class PacksPanel(discord.ui.View):
             caption     = f"🔒 {rarity_name} locked in!" if remaining > 0 else "🔄 Almost..."
             try:
                 await msg.edit(embed=_anim_embed(title, slot_row, caption))
+            except (discord.NotFound, discord.Forbidden):
+                return
             except discord.HTTPException:
-                logger.exception("Failed to update pack reveal animation")
+                logger.warning("Failed to update pack reveal animation", exc_info=True)
                 return
 
         if self.skipped: return
@@ -459,8 +471,10 @@ class PacksPanel(discord.ui.View):
         slot_row = "  ".join(locked)
         try:
             await msg.edit(embed=_anim_embed(title, slot_row, "✨  ✨  ✨  ✨  ✨"))
+        except (discord.NotFound, discord.Forbidden):
+            return
         except discord.HTTPException:
-            logger.exception("Failed to finish pack animation")
+            logger.warning("Failed to finish pack animation", exc_info=True)
             return
 
         rarest = max(rolls, key=lambda r: _rv(r.get("rarity", "common")))
@@ -472,8 +486,10 @@ class PacksPanel(discord.ui.View):
             alert = f"{sep}\n│ ⚠️  {str(rarest.get('rarity','')).upper()} DETECTED!\n│ {sep}"
             try:
                 await msg.edit(embed=_anim_embed(title, slot_row, alert, 0xF39C12))
+            except (discord.NotFound, discord.Forbidden):
+                return
             except discord.HTTPException:
-                logger.exception("Failed to show high-rarity pack alert")
+                logger.warning("Failed to show high-rarity pack alert", exc_info=True)
                 return
 
     async def _do_open(self, interaction: discord.Interaction, qty: int) -> None:
@@ -520,7 +536,12 @@ class PacksPanel(discord.ui.View):
 
         if not all_rolls:
             if interaction.message:
-                await interaction.message.edit(embed=make_embed(None, "❌ Open Failed", "Could not open packs."), view=self)
+                try:
+                    await interaction.message.edit(embed=make_embed(None, "❌ Open Failed", "Could not open packs."), view=self)
+                except (discord.NotFound, discord.Forbidden):
+                    pass
+                except discord.HTTPException:
+                    logger.warning("Failed to show open-failed message", exc_info=True)
             return
 
         if interaction.message and not self.skipped:
@@ -539,7 +560,12 @@ class PacksPanel(discord.ui.View):
         first_embed = _card_reveal_embed(all_rolls[0], 1, len(all_rolls), pack_name)
 
         if interaction.message:
-            await interaction.message.edit(embed=first_embed, view=reveal_view)
+            try:
+                await interaction.message.edit(embed=first_embed, view=reveal_view)
+            except (discord.NotFound, discord.Forbidden):
+                pass  # message gone or no access
+            except discord.HTTPException:
+                logger.warning("Failed to switch to reveal view", exc_info=True)
 
 
 # ── Cog ───────────────────────────────────────────────────────────

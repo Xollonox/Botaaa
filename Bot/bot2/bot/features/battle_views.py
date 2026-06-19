@@ -201,6 +201,7 @@ class FriendlyInviteView(discord.ui.View):
         self.cog = cog
         self.challenger_id = challenger_id
         self.target_id = target_id
+        self.message: discord.Message | None = None
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if str(interaction.user.id) != self.target_id:
@@ -213,19 +214,54 @@ class FriendlyInviteView(discord.ui.View):
             return False
         return True
 
-    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
+    async def on_timeout(self) -> None:
+        """Disable buttons and update message when the invite expires."""
+        for child in self.children:
+            if hasattr(child, "disabled"):
+                child.disabled = True
+        if self.message:
+            data = self.cog.bot.storage.load()
+            try:
+                await self.message.edit(
+                    embed=make_embed(
+                        data,
+                        f"{e('warning', data)} Challenge Expired",
+                        f"<@{self.challenger_id}>'s challenge to <@{self.target_id}> has expired.",
+                    ),
+                    view=self,
+                )
+            except discord.HTTPException:
+                pass
+
+    @discord.ui.button(label="✅ Accept", style=discord.ButtonStyle.success)
     async def accept(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
+        await defer_component_update(interaction)
         await self.cog.accept_friendly(interaction, self.challenger_id, self.target_id)
 
-    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger)
+    @discord.ui.button(label="❌ Decline", style=discord.ButtonStyle.danger)
     async def decline(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         self.cog._remove_pending_friendly_state(self.target_id, cancel_task=True)
+        for child in self.children:
+            if hasattr(child, "disabled"):
+                child.disabled = True
         data = self.cog.bot.storage.load()
         await smart_reply(
             interaction,
             embed=make_embed(data, f"{e('no', data)} Challenge Declined", "The friendly challenge has been declined."),
             ephemeral=True,
         )
+        if self.message and interaction.message:
+            try:
+                await interaction.message.edit(
+                    embed=make_embed(
+                        data,
+                        f"{e('no', data)} Challenge Declined",
+                        f"<@{self.challenger_id}>'s challenge to <@{self.target_id}> was declined.",
+                    ),
+                    view=self,
+                )
+            except discord.HTTPException:
+                pass
 
 
 class RankedQueueView(discord.ui.View):

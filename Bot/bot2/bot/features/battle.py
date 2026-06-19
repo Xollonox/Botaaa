@@ -572,13 +572,11 @@ class BattleCog(commands.Cog):
         if int(hp.get(target_uid, 0)) <= 0:
             return {"ok": False, "error": "fighter_fainted"}
 
-        # Cap voluntary swaps to 1 per battle (forced post-faint swaps go through
-        # _sync_active_fighter in battle_state.py and don't increment this counter).
-        if not bool(me.get("is_cpu", False)):
-            swaps_used = int(me.get("swaps_used", 0))
-            if swaps_used >= 1:
-                return {"ok": False, "error": "swap_used"}
-            me["swaps_used"] = swaps_used + 1
+        # Track voluntary swap count (used for both sides)
+        swaps_used = int(me.get("swaps_used", 0))
+        if swaps_used >= 2:
+            return {"ok": False, "error": "swap_used"}
+        me["swaps_used"] = swaps_used + 1
 
         me["current_index"] = target_index
         me["active_index"] = target_index
@@ -733,8 +731,8 @@ class BattleCog(commands.Cog):
         if not isinstance(pstate, dict):
             return []
 
-        # Human players get 1 voluntary swap per battle. CPU is unrestricted.
-        if not bool(pstate.get("is_cpu", False)) and int(pstate.get("swaps_used", 0)) >= 1:
+        # Both sides get up to 2 voluntary swaps per battle
+        if int(pstate.get("swaps_used", 0)) >= 2:
             return []
 
         uid = self._current_uid(pstate)
@@ -2342,8 +2340,34 @@ class BattleCog(commands.Cog):
                 task.cancel()
         return True
 
-    async def _queue_timeout(self, interaction: discord.Interaction, user_id: str) -> None:
-        await asyncio.sleep(RANKED_QUEUE_TIMEOUT_SECONDS)
+    async def _queue_loop(self, interaction: discord.Interaction, user_id: str) -> None:
+        """Periodically re-check for a match every 10s. Falls back to CPU after timeout."""
+        remaining = RANKED_QUEUE_TIMEOUT_SECONDS
+        while remaining > 0:
+            await asyncio.sleep(min(10, remaining))
+            remaining -= 10
+
+            # Try to find a match
+            try:
+                matched = await self._try_match(interaction, user_id)
+                if matched:
+                    # Battle started — task is done
+                    return
+            except Exception:
+                logger.exception("[QUEUE_LOOP_MATCH] failed user=%s", user_id)
+
+            # Check if user is still in queue (could have been removed by forfeit)
+            def still_queued(data: dict[str, Any]) -> bool:
+                queue = self._battle_root(data).get("queue", [])
+                return any(
+                    isinstance(q, dict) and str(q.get("user_id", "")) == str(user_id)
+                    for q in queue
+                )
+            if not self.bot.storage.with_lock(still_queued):
+                logger.info("[QUEUE_LOOP] user=%s no longer in queue, ending loop", user_id)
+                return
+
+        # Timeout reached — start CPU battle
         try:
             await self._start_ranked_cpu_battle(interaction, user_id)
         except Exception:
@@ -2563,7 +2587,7 @@ class BattleCog(commands.Cog):
         self._track_background_task(
             self.queue_cpu_tasks,
             uid,
-            asyncio.create_task(self._queue_timeout(interaction, uid)),
+            asyncio.create_task(self._queue_loop(interaction, uid)),
             "ranked_cpu_fallback",
         )
         view = RankedQueueView(self, uid)
@@ -2665,6 +2689,7 @@ class BattleCog(commands.Cog):
                 ),
                 view=view,
             )
+            view.message = msg
             self.bot.storage.with_lock(lambda d: self._set_pending_message(d, tid, str(msg.id)))
             await self.bot.battle_service.upsert_pending_friendly(
                 tid,
@@ -2697,18 +2722,20 @@ class BattleCog(commands.Cog):
                 root = self._battle_root(data)
                 pending = root.get("pending_friendly", {}).get(target)
                 if not isinstance(pending, dict):
-                    return {"ok": False, "error": "missing_pending"}
+                    return {"ok": False, "error": "missing_pending", "message_id": ""}
                 if str(pending.get("challenger_id", "")) != challenger:
-                    return {"ok": False, "error": "invalid_pending"}
+                    return {"ok": False, "error": "invalid_pending", "message_id": ""}
+                msg_id = str(pending.get("message_id", ""))
                 root.get("pending_friendly", {}).pop(target, None)
                 if self._active_battle_id(data, challenger):
-                    return {"ok": False, "error": "challenger_active"}
+                    return {"ok": False, "error": "challenger_active", "message_id": msg_id}
                 if not self._snapshot_team(data, challenger):
-                    return {"ok": False, "error": "missing_squad"}
-                return {"ok": True}
+                    return {"ok": False, "error": "missing_squad", "message_id": msg_id}
+                return {"ok": True, "message_id": msg_id}
 
             expired = self.bot.storage.with_lock(expire_pending)
             await self.bot.battle_service.remove_pending_friendly(target)
+            msg_id = str(expired.get("message_id", ""))
             if not expired.get("ok"):
                 logger.info("[FRIENDLY_TIMEOUT] skipped challenger=%s target=%s reason=%s", challenger, target, expired.get("error", "unknown"))
                 return
@@ -2719,6 +2746,23 @@ class BattleCog(commands.Cog):
             if not ok:
                 logger.warning("[FRIENDLY_TIMEOUT_CPU_START] failed challenger=%s target=%s reason=%s", challenger, target, reason)
                 return
+
+            # Update the original challenge message to show expired (view.on_timeout should also handle this)
+            if msg_id and msg_id.isdigit() and interaction.channel:
+                try:
+                    old_msg = await interaction.channel.fetch_message(int(msg_id))
+                    data = await self._load_battle_data()
+                    await old_msg.edit(
+                        embed=make_embed(
+                            data,
+                            f"{e('warning', data)} Challenge Expired",
+                            f"<@{target}> did not accept in time, so <@{challenger}> is now fighting a CPU opponent.",
+                        ),
+                        view=None,
+                    )
+                except (discord.NotFound, discord.Forbidden, discord.HTTPException):
+                    pass
+
             if interaction.channel is not None:
                 data = await self._load_battle_data()
                 await interaction.channel.send(
