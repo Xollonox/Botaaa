@@ -2677,24 +2677,35 @@ class BattleCog(commands.Cog):
 
         if interaction.channel:
             view = FriendlyInviteView(self, cid, tid)
-            msg = await interaction.channel.send(
-                embed=make_embed(
-                    data,
-                    f"{e('friendly', data)} Friendly Challenge!",
-                    f"<@{cid}> has challenged <@{tid}> to a friendly battle!",
-                    fields=[
-                        (f"{e('timer', data)} Expires In", "60 seconds", True),
-                        ("Type", "Friendly — No trophy change", True),
-                    ],
-                ),
-                view=view,
-            )
-            view.message = msg
-            self.bot.storage.with_lock(lambda d: self._set_pending_message(d, tid, str(msg.id)))
-            await self.bot.battle_service.upsert_pending_friendly(
-                tid,
-                {"challenger_id": cid, "target_id": tid, "created_at": now_ts(), "expires_at": now_ts() + 60, "message_id": str(msg.id)},
-            )
+            try:
+                msg = await interaction.channel.send(
+                    embed=make_embed(
+                        data,
+                        f"{e('friendly', data)} Friendly Challenge!",
+                        f"<@{cid}> has challenged <@{tid}> to a friendly battle!",
+                        fields=[
+                            (f"{e('timer', data)} Expires In", "60 seconds", True),
+                            ("Type", "Friendly — No trophy change", True),
+                        ],
+                    ),
+                    view=view,
+                )
+                view.message = msg
+                self.bot.storage.with_lock(lambda d: self._set_pending_message(d, tid, str(msg.id)))
+                await self.bot.battle_service.upsert_pending_friendly(
+                    tid,
+                    {"challenger_id": cid, "target_id": tid, "created_at": now_ts(), "expires_at": now_ts() + 60, "message_id": str(msg.id)},
+                )
+            except discord.Forbidden:
+                # Clean up the pending challenge that was already created
+                self.bot.storage.with_lock(lambda d: self._battle_root(d).get("pending_friendly", {}).pop(tid, None))
+                await self.bot.battle_service.remove_pending_friendly(tid)
+                await smart_reply(
+                    interaction,
+                    embed=make_embed(data, f"{e('warning', data)} Cannot Send", f"I don't have permission to send messages in this channel."),
+                    ephemeral=True,
+                )
+                return
 
         old = self.friendly_cpu_tasks.get(tid)
         if old and not old.done():
