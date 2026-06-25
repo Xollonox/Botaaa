@@ -36,6 +36,19 @@ async def ensure_registered(
     data = storage.load()
 
     if is_registered(data, user_id):
+        # Block banned users from all bot commands
+        player = data.get("players", {}).get(user_id, {})
+        user_row = player.get("user", {}) if isinstance(player, dict) else {}
+        if isinstance(user_row, dict) and bool(user_row.get("is_banned", False)):
+            from bot.utils.ui import e, make_embed
+            ban_reason = str(user_row.get("ban_reason", "No reason provided."))
+            embed = make_embed(
+                data,
+                f"{e('no', data)} You Are Banned",
+                f"You have been banned from using this bot.\n**Reason:** {ban_reason}",
+            )
+            await smart_reply(interaction, embed=embed, ephemeral=True)
+            return False
         return True
 
     embed = make_embed(

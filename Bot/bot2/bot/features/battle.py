@@ -1002,7 +1002,6 @@ class BattleCog(commands.Cog):
             turn_state = players.get(turn_user, {}) if isinstance(players.get(turn_user), dict) else {}
             round_no = int(battle.get("round", 1))
 
-            timer = max(0, TURN_TIMEOUT_SECONDS - max(0, now_ts() - int(battle.get("turn_started_at", 0))))
             turn_label = "CPU" if bool((turn_state or {}).get("is_cpu", False)) else f"<@{turn_user}>"
             mode_label = str(battle.get("type", "ranked")).upper()
 
@@ -1022,7 +1021,7 @@ class BattleCog(commands.Cog):
                 f"{squad_block('Squad', b)}"
             )
 
-            header = f"{mode_label} DUEL — Round {round_no} — Turn: {turn_label} — {timer}s"
+            header = f"{mode_label} DUEL — Round {round_no} — Turn: {turn_label}"
             embed_a = make_embed(None, header, desc_a, color=0x2b2d31, image_url=a_img)
             embed_b = make_embed(None, "", desc_b, color=0x2b2d31, image_url=b_img)
             log_display = log_text[:1024] if log_text else "—"
@@ -1203,102 +1202,6 @@ class BattleCog(commands.Cog):
             await self._send_battle_stats_embed(channel, battle)
 
     def _schedule_timeout(self, battle_id: str) -> None:
-        old = self.turn_tasks.get(battle_id)
-        current_task = asyncio.current_task()
-        if old and old is not current_task and not old.done():
-            old.cancel()
-
-        async def waiter() -> None:
-            await asyncio.sleep(TURN_TIMEOUT_SECONDS)
-
-            def mutate(data: dict[str, Any]) -> dict[str, Any]:
-                battle = self._battle_root(data).get("active", {}).get(battle_id)
-                if not isinstance(battle, dict) or bool(battle.get("ended", False)):
-                    return {"ok": False}
-                ts = int(battle.get("turn_started_at", 0))
-                if now_ts() - ts < TURN_TIMEOUT_SECONDS:
-                    return {"ok": False}
-                # Auto-attack with normal or defensive instead of skipping
-                actor = str(battle.get("turn_user_id", ""))
-                if not actor:
-                    return {"ok": False}
-                players = battle.get("players", {}) if isinstance(battle.get("players"), dict) else {}
-                pstate = players.get(actor)
-                if isinstance(pstate, dict) and bool(pstate.get("is_cpu", False)):
-                    return {"ok": False}  # CPU handles its own turns
-                enemy_id = next((str(pid) for pid in players.keys() if str(pid) != actor), "")
-                if not enemy_id:
-                    return {"ok": False}
-
-                # Auto-execute a normal attack only (no defense)
-                offensive, _defensive = self._fighter_attack_rows(data, battle_id, actor)
-                auto_move = None
-                auto_value = None
-                for row in offensive:
-                    if normalize_attack_type(str(row.get("type", "normal"))) == "normal" and int(row.get("left", -1)) != 0:
-                        auto_move = "normal"
-                        auto_value = str(row.get("key", "normal"))
-                        break
-
-                if auto_move and auto_value:
-                    result = apply_move(data, battle_id, actor, auto_move, auto_value)
-                    if result.get("ok"):
-                        battle.setdefault("log", []).append(f"⏱ {actor} auto-{auto_move.upper()}")
-                        return result
-
-                # Fallback: just skip turn
-                has_cpu = any(isinstance(ps, dict) and bool(ps.get("is_cpu", False)) for ps in players.values())
-                idle_skips = battle.setdefault("idle_skip_counts", {})
-                if not isinstance(idle_skips, dict):
-                    idle_skips = {}
-                    battle["idle_skip_counts"] = idle_skips
-                actor_idle_count = int(idle_skips.get(actor, 0) or 0) + 1
-                idle_skips[actor] = actor_idle_count
-                idle_skips[enemy_id] = 0
-
-                battle.setdefault("log", []).append(f"⏭ {actor} skipped their turn")
-
-                if has_cpu and actor_idle_count >= IDLE_SKIP_LIMIT_VS_CPU:
-                    battle.setdefault("log", []).append("Battle ended due to player inactivity.")
-                    return end_battle(data, battle_id, "", "", "timeout_abandoned")
-
-                battle["turn_user_id"] = enemy_id
-                battle["turn_started_at"] = now_ts()
-                battle["round"] = int(battle.get("round", 1)) + 1
-                return {"ok": True, "skipped": True}
-
-            result = self.bot.storage.with_lock(mutate)
-            if result.get("ok"):
-                await self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
-                await self._refresh_battle_message(battle_id)
-                if result.get("battle_over"):
-                    logger.info("[TURN_TIMEOUT] ended battle_id=%s reason=%s", battle_id, result.get("reason", "unknown"))
-                    self._cancel_battle_runtime_tasks(battle_id)
-                    return
-                logger.info("[TURN_TIMEOUT] advanced battle_id=%s skipped=%s", battle_id, bool(result.get("skipped", False)))
-                self._schedule_timeout(battle_id)
-                await self._maybe_run_cpu_turn(battle_id)
-
-        self._track_background_task(
-            self.turn_tasks,
-            battle_id,
-            asyncio.create_task(waiter()),
-            "turn_timeout",
-        )
-        data = self.bot.storage.load()
-        battle = self._battle_root(data).get("active", {}).get(battle_id)
-        turn_user = str(battle.get("turn_user_id", "")) if isinstance(battle, dict) else ""
-        logger.info("[TURN_TIMEOUT] scheduled battle_id=%s turn_user=%s timeout=%ss", battle_id, turn_user, TURN_TIMEOUT_SECONDS)
-        # E. Live turn timer: cancel any existing timer task and start a fresh one
-        old_timer = self.timer_tasks.pop(str(battle_id), None)
-        if old_timer and not old_timer.done():
-            old_timer.cancel()
-        self._track_background_task(
-            self.timer_tasks,
-            battle_id,
-            asyncio.create_task(self._tick_timer(battle_id, TURN_TIMEOUT_SECONDS)),
-            "turn_timer",
-        )
         self._schedule_cpu_stall_watchdog(battle_id)
 
     def _schedule_cpu_stall_watchdog(self, battle_id: str) -> None:

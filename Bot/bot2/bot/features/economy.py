@@ -122,6 +122,60 @@ class EconomyCog(commands.Cog):
         embed.set_footer(text="Admin Control")
         await smart_reply(interaction, embed=embed, ephemeral=True)
 
+    @app_commands.command(name="o_remove_balance", description="Owner: remove coin balance from a registered user.")
+    @app_commands.guilds(OWNER_GUILD)
+    async def o_remove_balance(
+        self,
+        interaction: discord.Interaction,
+        target: discord.User,
+        amount: app_commands.Range[int, 1, None],
+    ) -> None:
+        if not is_owner(interaction):
+            data = self.bot.storage.load()
+            embed = make_embed(
+                data,
+                f"{e('no', data)} Access Denied",
+                "This command is restricted to bot owners only.",
+            )
+            await smart_reply(interaction, embed=embed, ephemeral=True)
+            return
+
+        target_id = str(target.id)
+
+        def mutate(data: dict[str, Any]) -> tuple[bool, int, int]:
+            if not is_registered(data, target_id):
+                return False, 0, 0
+            user = data["players"][target_id]["user"]
+            before = int(user.get("balance", 0))
+            after = max(0, before - amount)
+            user["balance"] = after
+            return True, before, after
+
+        ok, before, after = self.bot.storage.with_lock(mutate)
+        data = self.bot.storage.load()
+
+        if not ok:
+            embed = make_embed(
+                data,
+                f"{e('warning', data)} User Not Registered",
+                f"{target.mention} must run `/start` before balance adjustments.",
+            )
+            await smart_reply(interaction, embed=embed, ephemeral=True)
+            return
+
+        embed = make_embed(
+            data,
+            f"{e('ok', data)} Balance Updated",
+            f"{e('coin', data)} Coins have been removed successfully.",
+            fields=[
+                ("Recipient", f"{target.mention}\n`{target.id}`", True),
+                (f"{e('coin', data)} Amount Removed", f"**-{amount:,}**", True),
+                (f"{e('coin', data)} Before → After", f"{before:,} → **{after:,}**", True),
+            ],
+        )
+        embed.set_footer(text="Admin Control")
+        await smart_reply(interaction, embed=embed, ephemeral=True)
+
     @app_commands.command(name="o_add_premium", description="Owner: add premium currency to a registered user.")
     @app_commands.guilds(OWNER_GUILD)
     async def o_add_premium(
