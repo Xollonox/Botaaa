@@ -43,7 +43,7 @@ async def _save_json_file_async(path: str, data: dict) -> None:
 BOT_MEMORY: dict = _load_json_file(MEMORY_FILE, {"users": {}, "channels": {}})
 BOT_SETTINGS: dict = _load_json_file(
     SETTINGS_FILE,
-    {"max_user_memory_items": 80, "max_channel_memory_items": 20, "summary_every": 10},
+    {"max_user_memory_items": 150, "max_channel_memory_items": 30, "summary_every": 10},
 )
 
 
@@ -176,7 +176,7 @@ def add_memory_to_prompt(
         trimmed = get_relevant_memories(
             lines,
             user_text,
-            max_items=_memory_limit("max_user_memory_items", 80),
+            max_items=30,
         )
         if trimmed:
             context_parts.append(
@@ -189,7 +189,7 @@ def add_memory_to_prompt(
 def get_relevant_memories(
     all_memories: list,
     current_message: str,
-    max_items: int = 10,
+    max_items: int = 30,
 ) -> list:
     if not all_memories:
         return []
