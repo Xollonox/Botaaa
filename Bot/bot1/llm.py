@@ -64,7 +64,7 @@ class OpenAICompatClient:
         messages: List[dict],
         model_override: Optional[str] = None,
         temperature: float = 0.7,
-        max_tokens: int = 500,
+        max_tokens: int = 400,
     ) -> str:
         url = f"{self.base_url}/chat/completions"
         payload = {
