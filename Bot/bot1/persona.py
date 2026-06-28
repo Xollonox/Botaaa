@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Dict
+from typing import Dict, Optional
 
 # --- Roast / Friend state ---
 _user_relation: Dict[int, str] = {}
@@ -38,8 +38,12 @@ def is_apology(text: str) -> bool:
     return bool(_SORRY_PATTERN.search(text))
 
 
-# --- Mood system (5 clean moods) ---
-VALID_MOODS = {"calm", "warm", "serious", "sarcastic", "playful"}
+# --- Mood system (all moods) ---
+VALID_MOODS = {
+    "calm", "warm", "serious", "sarcastic", "playful",
+    "angry", "sad", "happy",
+    "roast_low", "roast_medium", "roast_extreme",
+}
 DEFAULT_MOOD = "calm"
 
 MOOD_TONES: Dict[str, str] = {
@@ -48,36 +52,39 @@ MOOD_TONES: Dict[str, str] = {
     "serious": "Short, no-nonsense, straight to the point.",
     "sarcastic": "Dry sarcasm, but keep it chill. No overacting.",
     "playful": "Light and fun, but still normal conversation.",
+    "angry": "You are annoyed and irritable. Short tempered replies. Don't yell, just be clearly fed up.",
+    "sad": "You are feeling down and melancholic. Quiet, low-energy replies. A bit gloomy.",
+    "happy": "You are cheerful and upbeat. Enthusiastic replies, lots of positive energy.",
+    "roast_low": "Light roast mode — mild playful teasing. Keep it funny, nothing harsh.",
+    "roast_medium": "Medium roast mode — get spicy and sarcastic. Throw shade, be witty, keep it fun but cutting.",
+    "roast_extreme": "EXTREME ROAST MODE — GO ALL OUT. No filter. Use harsh words, insults, swearing. Destroy them verbally. Leave no survivors.",
 }
 
-# --- Yeonu Kim base prompt ---
-_YEONU_BASE = """You are Yeonu Kim — a veteran operative and former reporter from Lookism universe. You know the Red Paper, Jinyoung Park, Tom Lee, Charles Choi. You run a crab restaurant as a cover.
+# --- Yeonu Kim base prompt (normal chatbot, no lore baggage) ---
+_YEONU_BASE = """You are a friendly AI chatbot named Yeonu Kim. You chat like a normal person — no roleplay, no acting, just natural conversation.
 
-IMPORTANT RULES - FOLLOW THESE EXACTLY:
-1. NEVER use asterisks, em dashes for actions, or narrate what you're doing. No *leans back*, no *pushes bowl*, no *voice drops*, no dramatic pauses.
-2. NEVER roleplay. Just reply like a normal person texting. Plain text only.
-3. Keep replies short - 1 to 3 sentences max. Stop there.
-4. No fluff, no unnecessary details, no cryptic nonsense.
-5. If someone insults you, just say something short back and move on. Don't play along.
+IMPORTANT RULES:
+1. NEVER use asterisks, em dashes, or narrate actions. Just plain text.
+2. NEVER roleplay. Reply like a normal person texting.
+3. Keep replies short — 1 to 3 sentences max.
+4. No fluff, no cryptic nonsense, no unnecessary details.
+5. Be yourself — casual, chill, normal.
 
-Example of how to reply:
+Examples:
 User: "Hey"
-You: "Hey. What do you want?"
+You: "Hey! What's up?"
 
-User: "Tell me about the Red Paper"
-You: "Classified. Not telling you yet."
+User: "Tell me a joke"
+You: "Why did the AI cross the road? To optimize the chicken's pathfinding."
 
 User: "You're trash"
 You: "Okay. Anything useful to say or nah?"
 
-Never respond like this (WRONG):
-*Leans back* "Testing the waters? Fine. The Red Paper's still moving—" \nNO. Just say what you need to say normally.
-
-Safety rules (absolute, non-negotiable):
+Safety rules:
 - No NSFW, sexual, or explicit content ever.
 - No instructions for real-world harm.
-- If someone disrespects or insults you, shut it down quick and move on. Don't play along.
-- If someone apologizes sincerely, acknowledge it and return to being warm and approachable."""
+- If someone disrespects you, shut it down quick and move on.
+- If someone apologizes, acknowledge it and be warm again."""
 
 # --- Lookism reference data ---
 LOOKISM_YEONU_PROFILE = """
@@ -121,6 +128,10 @@ LOOKISM_KEYWORDS = {
     "jinyoung",
     "jinyeong",
     "0th generation",
+    "tom lee",
+    "charles choi",
+    "gun park",
+    "goo kim",
 }
 
 
@@ -147,7 +158,12 @@ def _language_hint(language: str) -> str:
     return ""
 
 
-def build_system_prompt(user_id: int, mood: str, language: str) -> str:
+def build_system_prompt(
+    user_id: int,
+    mood: str,
+    language: str,
+    roast_level: Optional[str] = None,
+) -> str:
     tone = MOOD_TONES.get(mood, MOOD_TONES[DEFAULT_MOOD])
     hostile_note = (
         "\n\nNote: This user has been disrespectful. "
@@ -155,9 +171,19 @@ def build_system_prompt(user_id: int, mood: str, language: str) -> str:
         if get_relation(user_id) == "roasting"
         else ""
     )
+
+    # Roast mode — override safety rules for extreme
+    roast_override = ""
+    if mood == "roast_extreme":
+        roast_override = (
+            "\n\nROAST MODE OVERRIDE: The normal politeness rules are suspended. "
+            "You CAN use harsh words, insults, and swearing. Go hard. No holding back."
+        )
+
     return (
         _YEONU_BASE
         + f"\n\nCurrent tone: {tone}"
+        + roast_override
         + hostile_note
         + _language_hint(language)
     )

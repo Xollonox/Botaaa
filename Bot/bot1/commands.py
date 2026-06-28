@@ -501,6 +501,59 @@ class CommandsCog(commands.Cog):
         set_mood(ctx.channel.id, mood.value)
         await ctx.send(f"Miss Kim mood set to **{mood.name}** in this channel.")
 
+    # ── /roast ────────────────────────────────────────────────────────────────
+    @app_commands.command(name="roast", description="Set Miss Kim to roast mode")
+    @app_commands.describe(level="Roast intensity")
+    @app_commands.choices(
+        level=[
+            app_commands.Choice(name="🔥 Low — mild teasing", value="roast_low"),
+            app_commands.Choice(name="🔥🔥 Medium — spicy shade", value="roast_medium"),
+            app_commands.Choice(name="🔥🔥🔥 Extreme — no filter, all out", value="roast_extreme"),
+        ]
+    )
+    async def roast(
+        self, ctx: commands.Context, level: app_commands.Choice[str]
+    ) -> None:
+        if ctx.interaction and not ctx.interaction.response.is_done():
+            await ctx.interaction.response.defer(ephemeral=True)
+        if not is_power_user(ctx.author):
+            await ctx.send("You do not have permission.")
+            return
+        set_mood(ctx.channel.id, level.value)
+        emoji = {"roast_low": "🔥", "roast_medium": "🔥🔥", "roast_extreme": "🔥🔥🔥"}
+        msg = (
+            f"{emoji.get(level.value, '🔥')} Roast mode set to **{level.name}**. "
+            + ("Let em have it." if level.value == "roast_extreme" else "Go easy... kinda.")
+        )
+        await ctx.send(msg)
+
+    # ── /angry ────────────────────────────────────────────────────────────────
+    @app_commands.command(name="angry", description="Set Miss Kim mood to angry")
+    async def angry(self, interaction: discord.Interaction) -> None:
+        if not is_power_user(interaction.user):
+            await interaction.response.send_message("No permission.", ephemeral=True)
+            return
+        set_mood(interaction.channel_id, "angry")
+        await interaction.response.send_message("😤 Mood set to **Angry**. Watch your mouth.")
+
+    # ── /sad ──────────────────────────────────────────────────────────────────
+    @app_commands.command(name="sad", description="Set Miss Kim mood to sad")
+    async def sad(self, interaction: discord.Interaction) -> None:
+        if not is_power_user(interaction.user):
+            await interaction.response.send_message("No permission.", ephemeral=True)
+            return
+        set_mood(interaction.channel_id, "sad")
+        await interaction.response.send_message("😢 Mood set to **Sad**. Feeling down today...")
+
+    # ── /happy ────────────────────────────────────────────────────────────────
+    @app_commands.command(name="happy", description="Set Miss Kim mood to happy")
+    async def happy(self, interaction: discord.Interaction) -> None:
+        if not is_power_user(interaction.user):
+            await interaction.response.send_message("No permission.", ephemeral=True)
+            return
+        set_mood(interaction.channel_id, "happy")
+        await interaction.response.send_message("😊 Mood set to **Happy**! Let's have some fun!")
+
     # ── /purge ────────────────────────────────────────────────────────────────
     @commands.command(name="purge")
     async def purge(self, ctx: commands.Context, amount: int = 10) -> None:
