@@ -24,6 +24,7 @@ from memory import (
     clear_user_memory,
     get_language_setting,
     get_mood,
+    remember_channel_line,
     remember_line,
     set_language_setting,
     set_mood,
@@ -195,6 +196,15 @@ class CommandsCog(commands.Cog):
         await remember_line(
             ctx.author.id, "U", question, guild_id=guild_id, channel_id=channel_id
         )
+        # Store in channel-level memory
+        if guild_id is not None:
+            await remember_channel_line(
+                channel_id,
+                speaker_name=ctx.author.display_name,
+                prefix="U",
+                line=question,
+                guild_id=guild_id,
+            )
         reply = await chat_with_fallback(
             system_prompt=system,
             user_prompt=_build_full_user_prompt(
@@ -205,6 +215,16 @@ class CommandsCog(commands.Cog):
         await remember_line(
             ctx.author.id, "B", reply, guild_id=guild_id, channel_id=channel_id
         )
+        # Store bot reply in channel-level memory
+        if guild_id is not None:
+            bot_name = self.bot.user.display_name if self.bot.user else "Miss Kim"
+            await remember_channel_line(
+                channel_id,
+                speaker_name=bot_name,
+                prefix="B",
+                line=reply,
+                guild_id=guild_id,
+            )
         if _should_summarize(ctx.author.id, guild_id=guild_id, channel_id=channel_id):
             await update_conversation_summary(
                 ctx.author.id, guild_id=guild_id, channel_id=channel_id
@@ -230,6 +250,15 @@ class CommandsCog(commands.Cog):
         await remember_line(
             ctx.author.id, "U", prompt, guild_id=guild_id, channel_id=channel_id
         )
+        # Store in channel-level memory
+        if guild_id is not None:
+            await remember_channel_line(
+                channel_id,
+                speaker_name=ctx.author.display_name,
+                prefix="U",
+                line=prompt,
+                guild_id=guild_id,
+            )
         reply = await chat_with_fallback(
             system_prompt=system,
             user_prompt=_build_full_user_prompt(
@@ -240,6 +269,16 @@ class CommandsCog(commands.Cog):
         await remember_line(
             ctx.author.id, "B", reply, guild_id=guild_id, channel_id=channel_id
         )
+        # Store bot reply in channel-level memory
+        if guild_id is not None:
+            bot_name = self.bot.user.display_name if self.bot.user else "Miss Kim"
+            await remember_channel_line(
+                channel_id,
+                speaker_name=bot_name,
+                prefix="B",
+                line=reply,
+                guild_id=guild_id,
+            )
         if _should_summarize(ctx.author.id, guild_id=guild_id, channel_id=channel_id):
             await update_conversation_summary(
                 ctx.author.id, guild_id=guild_id, channel_id=channel_id

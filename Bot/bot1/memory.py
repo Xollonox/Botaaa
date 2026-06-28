@@ -10,6 +10,38 @@ logger = logging.getLogger("misskim")
 
 _memory_lock = asyncio.Lock()
 
+# ── Shared (channel-level) conversation memory ────────────────────────
+
+async def remember_channel_line(
+    channel_id: int,
+    speaker_name: str,
+    prefix: str,
+    line: str,
+    guild_id: Optional[int] = None,
+) -> None:
+    """
+    Store a channel-wide message visible to ALL users in that channel.
+    This lets User B see context from User A's conversation with the bot.
+    """
+    cleaned = line.strip()[:300]
+    channels = BOT_MEMORY.setdefault("channels", {})
+    chan_data = channels.setdefault(str(channel_id), {})
+    chan_lines = chan_data.setdefault("conversation", [])
+    chan_lines.append(f"{speaker_name} ({prefix}): {cleaned}")
+    max_chan = _memory_limit("max_channel_memory_items", 30)
+    chan_data["conversation"] = chan_lines[-max_chan:]
+    await _save_json_file_async(MEMORY_FILE, BOT_MEMORY)
+
+
+def get_channel_context(channel_id: int) -> str:
+    """Return recent channel conversation across all users."""
+    channels = BOT_MEMORY.get("channels", {})
+    chan_data = channels.get(str(channel_id), {})
+    lines = chan_data.get("conversation", [])
+    if not lines:
+        return ""
+    return "\n".join(lines)
+
 
 def _load_json_file(path: str, default: dict) -> dict:
     try:
@@ -168,6 +200,15 @@ def add_memory_to_prompt(
     topic = state.get("topic", "")
 
     context_parts = []
+
+    # Channel-level context — lets other users see what the channel conversation is about
+    if guild_id is not None and channel_id is not None:
+        channel_ctx = get_channel_context(channel_id)
+        if channel_ctx:
+            context_parts.append(
+                "[Channel conversation (all users):\n" + channel_ctx + "]"
+            )
+
     if summary:
         context_parts.append(f"[Conversation so far: {summary}]")
     if topic:

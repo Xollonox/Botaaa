@@ -24,7 +24,9 @@ from image import (
 from llm import chat_with_fallback
 from memory import (
     _should_summarize,
+    get_channel_context,
     get_mood,
+    remember_channel_line,
     remember_line,
     update_conversation_summary,
 )
@@ -369,6 +371,15 @@ class EventsCog(commands.Cog):
         await remember_line(
             user_id, "U", content_raw, guild_id=guild_id, channel_id=channel_id
         )
+        # Store in channel-level memory so other users see the context
+        if guild_id is not None:
+            await remember_channel_line(
+                channel_id,
+                speaker_name=message.author.display_name,
+                prefix="U",
+                line=content_raw,
+                guild_id=guild_id,
+            )
 
         image_reply = await vision_reply_for_message(message, mood=mood)
         if image_reply:
@@ -391,6 +402,16 @@ class EventsCog(commands.Cog):
         await remember_line(
             user_id, "B", reply, guild_id=guild_id, channel_id=channel_id
         )
+        # Also store bot reply in channel-level memory
+        if guild_id is not None:
+            bot_name = self.bot.user.display_name if self.bot.user else "Miss Kim"
+            await remember_channel_line(
+                channel_id,
+                speaker_name=bot_name,
+                prefix="B",
+                line=reply,
+                guild_id=guild_id,
+            )
         if _should_summarize(user_id, guild_id=guild_id, channel_id=channel_id):
             await update_conversation_summary(
                 user_id, guild_id=guild_id, channel_id=channel_id
