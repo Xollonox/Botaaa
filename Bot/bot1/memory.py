@@ -75,7 +75,7 @@ async def _save_json_file_async(path: str, data: dict) -> None:
 BOT_MEMORY: dict = _load_json_file(MEMORY_FILE, {"users": {}, "channels": {}})
 BOT_SETTINGS: dict = _load_json_file(
     SETTINGS_FILE,
-    {"max_user_memory_items": 250, "max_channel_memory_items": 50, "summary_every": 10},
+    {"max_user_memory_items": 150, "max_channel_memory_items": 80, "summary_every": 10},
 )
 
 
@@ -126,7 +126,7 @@ def user_memory_text(
     lines = state.get("lines", [])
     if not lines:
         return ""
-    trimmed = lines[-_memory_limit("max_user_memory_items", 250):]
+    trimmed = lines[-_memory_limit("max_user_memory_items", 150):]
     return "\n".join(trimmed)
 
 
@@ -145,7 +145,7 @@ async def remember_line(
     state = _scope_state(user_id, guild_id, channel_id)
     lines = state["lines"]
     lines.append(f"{prefix}: {cleaned[:300]}")
-    state["lines"] = lines[-_memory_limit("max_user_memory_items", 250):]
+    state["lines"] = lines[-_memory_limit("max_user_memory_items", 150):]
     state["msg_count"] = state.get("msg_count", 0) + 1
     topic = _detect_topic(lines[-10:])
     if topic:
