@@ -514,8 +514,6 @@ class CommandsCog(commands.Cog):
     async def roast(
         self, interaction: discord.Interaction, level: app_commands.Choice[str]
     ) -> None:
-        if not interaction.response.is_done():
-            await interaction.response.defer(ephemeral=True)
         if not is_power_user(interaction.user):
             await interaction.response.send_message("No permission.", ephemeral=True)
             return
