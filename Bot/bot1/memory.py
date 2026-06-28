@@ -56,15 +56,11 @@ def _memory_limit(key: str, fallback: int) -> int:
 
 def _memory_scope_key(
     user_id: int,
-    guild_id: Optional[int],
+    guild_id: Optional[int] = None,
     channel_id: Optional[int] = None,
 ) -> str:
     user_prefix = "special" if user_id == SPECIAL_USER_ID else "user"
-    if guild_id is None:
-        return f"{user_prefix}:{user_id}:dm"
-    if channel_id is not None:
-        return f"{user_prefix}:{user_id}:guild:{guild_id}:chan:{channel_id}"
-    return f"{user_prefix}:{user_id}:guild:{guild_id}"
+    return f"{user_prefix}:{user_id}"
 
 
 def _scope_state(
@@ -246,9 +242,7 @@ def clear_user_memory(
     channel_id: Optional[int] = None,
 ) -> None:
     users = BOT_MEMORY.setdefault("users", {})
-    users.pop(_memory_scope_key(user_id, guild_id, channel_id), None)
-    if guild_id is None:
-        users.pop(str(user_id), None)
+    users.pop(_memory_scope_key(user_id), None)
     _save_json_file(MEMORY_FILE, BOT_MEMORY)
 
 
