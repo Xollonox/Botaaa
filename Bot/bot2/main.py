@@ -17,13 +17,14 @@ from discord.ext import commands
 # ---------------------------------------------------------------------------
 sys.path.insert(0, os.path.dirname(__file__))
 
-from bot.config import BOT_TOKEN, DATA_PATH, GUILD_IDS, OWNER_GUILD_ID, OWNER_IDS, SQLITE_PATH
+from bot.config import BOT_TOKEN, DATA_PATH, GUILD_IDS, OWNER_GUILD_ID, SQLITE_PATH
 from bot.features.onboarding import TermsGateView, build_terms_embed, has_user_accepted_terms
 from bot.data.storage import Storage
 from bot.data.sqlite_store import SQLiteBattleRepository, SQLiteMarketRepository, SQLiteTradeRepository
 from bot.services.battle_service import BattleService
 from bot.services.market_service import MarketService
 from bot.services.trade_service import TradeService
+from bot.utils.checks import effective_owner_ids
 from bot.utils.logging_setup import setup_logging
 
 setup_logging()
@@ -82,7 +83,7 @@ class LookismBot(commands.Bot):
         super().__init__(
             command_prefix="!",
             intents=intents,
-            owner_ids=OWNER_IDS,
+            owner_ids=effective_owner_ids(),
             help_command=None,
             tree_cls=LookismCommandTree,
         )
@@ -179,8 +180,7 @@ class LookismBot(commands.Bot):
 
         if failed:
             logger.warning("[BOOT] %d extension(s) failed to load: %s", len(failed), failed)
-            # Keep the bot alive even if non-critical cogs fail — operators can
-            # inspect logs and hot-reload the broken extension once the issue is fixed.
+            raise RuntimeError(f"Failed to load required extension(s): {failed}")
 
         # Sync slash commands
         owner_guild = discord.Object(id=OWNER_GUILD_ID)
@@ -259,7 +259,40 @@ class LookismCommandTree(app_commands.CommandTree["LookismBot"]):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if not isinstance(self.client, LookismBot):
             return True
-        return await self.client._global_terms_gate(interaction)
+        if not await self.client._global_terms_gate(interaction):
+            return False
+
+        if interaction.type is discord.InteractionType.autocomplete:
+            return True
+
+        from bot.utils.server_rules import check_single_mode_allowed, is_admin
+        from bot.utils.ui import e, make_embed
+
+        command = getattr(interaction, "command", None)
+        command_name = str(getattr(command, "name", "") or "")
+        if command_name.startswith(("o_", "server_")) or command_name in {"help", "start"}:
+            return True
+        if is_admin(interaction):
+            return True
+
+        allowed, _mode, locked_channel_id = check_single_mode_allowed(interaction)
+        if allowed:
+            return True
+
+        data = self.client.storage.load()
+        embed = make_embed(
+            data,
+            f"{e('warning', data)} Wrong Channel",
+            f"Use <#{locked_channel_id}> for bot commands.",
+        )
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send(embed=embed, ephemeral=True)
+            else:
+                await interaction.response.send_message(embed=embed, ephemeral=True)
+        except discord.HTTPException:
+            pass
+        return False
 
     async def on_error(
         self,

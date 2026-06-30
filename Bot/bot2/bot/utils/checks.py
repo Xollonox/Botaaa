@@ -2,18 +2,43 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
 import discord
 from discord.ext import commands
 
-from bot.config import OWNER_IDS
 from bot.utils.interaction_visibility import smart_reply
+
+
+def _parse_owner_ids(raw: str) -> set[int]:
+    ids: set[int] = set()
+    for part in raw.replace(";", ",").split(","):
+        value = part.strip()
+        if not value:
+            continue
+        try:
+            ids.add(int(value))
+        except ValueError:
+            continue
+    return ids
+
+
+def effective_owner_ids() -> set[int]:
+    """Return configured bot owner IDs.
+
+    Deployments must configure this through LOOKISM_OWNER_IDS, BOT_OWNER_IDS,
+    or OWNER_IDS. If none are configured, owner checks fail closed.
+    """
+    raw = os.getenv("LOOKISM_OWNER_IDS") or os.getenv("BOT_OWNER_IDS") or os.getenv("OWNER_IDS")
+    if raw is not None:
+        return _parse_owner_ids(raw)
+    return set()
 
 
 def is_owner(interaction: discord.Interaction) -> bool:
     """Return True if the interaction user is a bot owner."""
-    return interaction.user.id in OWNER_IDS
+    return interaction.user.id in effective_owner_ids()
 
 
 def is_registered(data: dict[str, Any], user_id: str) -> bool:

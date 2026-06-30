@@ -8,7 +8,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from bot.config import OWNER_IDS
+from bot.utils.checks import effective_owner_ids
 from bot.data.defaults import build_default_player
 from bot.features.help_index import HELP_CATEGORIES
 from bot.utils.timeutil import now_ts
@@ -314,7 +314,7 @@ class HelpPaginatorView(discord.ui.View):
         self.invoker_id = invoker_id
         self.data = data
         self.page = 0
-        is_owner_user = int(invoker_id) in OWNER_IDS
+        is_owner_user = int(invoker_id) in effective_owner_ids()
         self.categories = [c for c in HELP_CATEGORIES if is_owner_user or not _is_owner_category(c)]
         self.total = len(self.categories)
         self.message: discord.Message | None = None

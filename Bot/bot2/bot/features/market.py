@@ -324,7 +324,32 @@ class MarketGroup(app_commands.Group):
 
         ok, result, listing_id, listing_payload = self.cog.bot.storage.with_lock(mutate)
         if ok and listing_payload is not None:
-            await self.cog.bot.market_service.upsert_listing(listing_id, listing_payload)
+            try:
+                await self.cog.bot.market_service.upsert_listing(listing_id, listing_payload)
+            except Exception:
+                logger.exception("Failed to persist market listing %s to SQLite; rolling back JSON state", listing_id)
+
+                def rollback(data: dict[str, Any]) -> None:
+                    m = market_root(data)
+                    m.get("listings", {}).pop(listing_id, None)
+                    player = get_player(data, user_id)
+                    user = player.get("user", {}) if isinstance(player, dict) else {}
+                    inv = user.get("inventory", []) if isinstance(user, dict) else []
+                    if not isinstance(inv, list):
+                        return
+                    card_uid = str(listing_payload.get("card_uid", ""))
+                    for item in inv:
+                        if isinstance(item, dict) and str(item.get("uid", "")) == card_uid:
+                            item["market_locked"] = False
+                            break
+
+                self.cog.bot.storage.with_lock(rollback)
+                await smart_reply(
+                    interaction,
+                    embed=make_embed(None, "❌ Listing Failed", "Market storage failed. Your card was not listed."),
+                    ephemeral=True,
+                )
+                return
         if not ok:
             msgs = {
                 "not_registered": "You are not registered.",

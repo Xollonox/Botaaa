@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import os
+import tempfile
 from typing import Optional
 
 from config import MEMORY_FILE, SETTINGS_FILE, SPECIAL_USER_ID
@@ -56,20 +57,33 @@ def _load_json_file(path: str, default: dict) -> dict:
 
 
 def _save_json_file(path: str, data: dict) -> None:
+    directory = os.path.dirname(os.path.abspath(path)) or "."
+    os.makedirs(directory, exist_ok=True)
+    tmp_name = ""
     try:
-        with open(path, "w", encoding="utf-8") as f:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            dir=directory,
+            delete=False,
+        ) as f:
+            tmp_name = f.name
             json.dump(data, f, ensure_ascii=False, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_name, path)
     except Exception:
         logger.exception("Failed to save JSON file: %s", path)
+        if tmp_name:
+            try:
+                os.unlink(tmp_name)
+            except OSError:
+                pass
 
 
 async def _save_json_file_async(path: str, data: dict) -> None:
     async with _memory_lock:
-        try:
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-        except Exception:
-            logger.exception("Failed to save JSON file: %s", path)
+        _save_json_file(path, data)
 
 
 BOT_MEMORY: dict = _load_json_file(MEMORY_FILE, {"users": {}, "channels": {}})
