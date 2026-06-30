@@ -37,13 +37,9 @@ from persona import (
     detect_language,
     is_lookism_query,
 )
+import stats
 
 logger = logging.getLogger("misskim")
-
-# Bot-level stats shared with events.py
-_bot_start_time = datetime.now(timezone.utc)
-_messages_processed: int = 0
-_active_users_today: set = set()
 
 
 def is_power_user(user: discord.abc.User) -> bool:
@@ -574,7 +570,7 @@ class CommandsCog(commands.Cog):
     # ── /stats ────────────────────────────────────────────────────────────────
     @app_commands.command(name="stats", description="Show bot statistics")
     async def stats(self, interaction: discord.Interaction) -> None:
-        uptime = datetime.now(timezone.utc) - _bot_start_time
+        uptime = datetime.now(timezone.utc) - stats.bot_start_time
         uptime_str = (
             f"{uptime.days}d "
             f"{uptime.seconds // 3600}h "
@@ -585,7 +581,7 @@ class CommandsCog(commands.Cog):
             for state in BOT_MEMORY.get("users", {}).values()
         )
         current_mood = get_mood(interaction.channel_id)
-        active_count = len(_active_users_today)
+        active_count = len(stats.active_users_today)
 
         embed = discord.Embed(
             title="Miss Kim Bot Statistics",
@@ -594,7 +590,7 @@ class CommandsCog(commands.Cog):
         )
         embed.add_field(name="Uptime", value=uptime_str, inline=True)
         embed.add_field(
-            name="Messages Processed", value=str(_messages_processed), inline=True
+            name="Messages Processed", value=str(stats.messages_processed), inline=True
         )
         embed.add_field(
             name="Memory Entries", value=str(memory_entries), inline=True

@@ -7,7 +7,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from commands import _active_users_today, _messages_processed, send_discord_text
+from commands import send_discord_text
 from image import (
     build_img2img_edit_prompt,
     detect_chat_image_trigger,
@@ -134,13 +134,13 @@ class EventsCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
-        global _messages_processed
-
         if message.author.bot:
             return
 
-        _messages_processed += 1
-        _active_users_today.add(message.author.id)
+        import stats
+
+        stats.messages_processed += 1
+        stats.active_users_today.add(message.author.id)
 
         if _is_rate_limited(message.author.id):
             return

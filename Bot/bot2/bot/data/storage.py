@@ -97,11 +97,9 @@ class Storage:
         copy that the caller wants to persist).  The method sanitises the payload,
         writes it atomically, and then stores the reference in ``self._cache``.
 
-        The cache is updated before the atomic write. The write stays
+        The cache is updated after the atomic write succeeds. The write stays
         synchronous so two consecutive saves cannot reach disk out of order.
         """
-        self._cache = data  # cache updated instantly — no I/O
-
         def _write() -> None:
             sanitized = _sanitize_for_json(data)
             self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -113,16 +111,23 @@ class Storage:
             os.replace(tmp_path, self.path)
 
         _write()
+        self._cache = data
+        try:
+            from .supabase_sync import sync_async
+
+            sync_async(deepcopy(self._cache))
+        except Exception:
+            logger.exception("Failed to schedule Supabase sync for %s", self.path)
 
     def with_lock(self, fn: Callable[[dict[str, Any]], T]) -> T:
         """Execute *fn* with exclusive access to the storage.
 
-        ``fn`` receives the live data dict, may modify it, and its return value is
-        propagated back to the caller.  The lock guarantees that only one task
-        writes to the file at a time, while the cache stays consistent.
+        ``fn`` receives a writable snapshot, may modify it, and its return value
+        is propagated back to the caller.  The cache is replaced only after the
+        atomic write succeeds, so failed writes do not expose unpersisted state.
         """
         with self.lock:
-            data = self._live_data()
+            data = deepcopy(self._live_data())
             result = fn(data)
             self.save(data)
             return result

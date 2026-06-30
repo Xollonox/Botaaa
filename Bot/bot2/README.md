@@ -103,7 +103,7 @@ main.py
 | Name | Purpose |
 | --- | --- |
 | `BOT_TOKEN` | Discord token |
-| `OWNER_IDS` | owner user IDs |
+| `LOOKISM_OWNER_IDS` | comma-separated owner user IDs |
 | `BASE_DIR` | bot2 base directory |
 | `DATA_PATH` | JSON runtime state file |
 | `SQLITE_PATH` | SQLite runtime state file, overridable by `LOOKISM_SQLITE_PATH` |

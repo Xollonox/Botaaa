@@ -41,7 +41,9 @@ python launcher.py
 
 | Variable | Required | Used By |
 |----------|:--------:|---------|
-| `DISCORD_TOKEN` | Yes | Both bots |
+| `DISCORD_TOKEN` | Yes | bot1 |
+| `BOT_TOKEN` | Yes | bot2 |
+| `LOOKISM_OWNER_IDS` | Yes | bot2 owner commands |
 | `CEREBRAS_API_KEY` | No | bot1 |
 | `GROQ_API_KEY` | No | bot1 |
 | `OLLAMA_API_KEY` | No | bot1 (up to 5 keys) |
@@ -124,7 +126,7 @@ Full-featured gacha card game bot with 80+ slash commands.
 | **Squad** | Squad management, defensive setup, weapon equipping, keystone system |
 | **Admin** | Visual card editor, owner economy controls, emoji customizer, server settings |
 
-**Storage:** Dual JSON + SQLite architecture with atomic writes and Supabase sync for web integration.
+**Storage:** Dual JSON + SQLite architecture with atomic writes and optional Supabase sync for web integration when `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are configured.
 
 ---
 
