@@ -6,12 +6,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1487426363337212034/Picsart_26-03-28_17-50-48-911.jpg?ex=6a2bf9c0&is=6a2aa840&hm=14d0795ef0ae6e7adcc7761f8ca13d40459aa17afc50b5f0ca139f60e31d50a0&",
     "stats": {
-      "strength": 4,
-      "speed": 2,
-      "endurance": 5,
-      "technique": 14,
-      "iq": 10,
-      "battle_iq": 14
+      "strength": 2,
+      "speed": 1,
+      "endurance": 2,
+      "technique": 6,
+      "iq": 4,
+      "battle_iq": 5
     },
     "moves": [
       {
@@ -94,10 +94,10 @@
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1507749445931106454/17E08B2F-4C77-4BEE-B4B1-B851CE82DBA4.jpeg?ex=6a2c1518&is=6a2ac398&hm=da0c3b40f90271267d7097ead2559feed1510b31a1fac873c93d5de62fe3c067&",
     "stats": {
       "strength": 1,
-      "speed": 2,
-      "endurance": 5,
+      "speed": 1,
+      "endurance": 2,
       "technique": 1,
-      "iq": 12,
+      "iq": 5,
       "battle_iq": 0
     },
     "moves": [
@@ -180,12 +180,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1507749541409984705/332B4F26-2DE8-4F14-B468-5F84B289CE8B.jpeg?ex=6a2c152f&is=6a2ac3af&hm=806d19e2ff9182392e7019e44191ed4e176e51b1ed918aa8fe898bbb70edab7a&",
     "stats": {
-      "strength": 3,
-      "speed": 3,
-      "endurance": 4,
-      "technique": 3,
-      "iq": 14,
-      "battle_iq": 5
+      "strength": 1,
+      "speed": 1,
+      "endurance": 2,
+      "technique": 1,
+      "iq": 6,
+      "battle_iq": 2
     },
     "moves": [
       {
@@ -267,12 +267,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1507820779117609070/206598B5-819B-438A-87F9-C54AFDD3CFF9.jpeg?ex=6a2baec7&is=6a2a5d47&hm=c3a12f09f55074b0f0c855694e5b51296557d8aca0456e3fd3de7979d97a97bf&",
     "stats": {
-      "strength": 2,
-      "speed": 6,
-      "endurance": 3,
-      "technique": 8,
-      "iq": 15,
-      "battle_iq": 15
+      "strength": 1,
+      "speed": 2,
+      "endurance": 1,
+      "technique": 3,
+      "iq": 6,
+      "battle_iq": 6
     },
     "moves": [
       {
@@ -354,12 +354,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1507827338736566412/5AEF4FC5-6353-4AC5-AE10-CEB36D6C6BA2.jpeg?ex=6a2bb4e3&is=6a2a6363&hm=91be4433334aa6909323a64e06e7184021347377276229be8f267feaef01a356&",
     "stats": {
-      "strength": 7,
-      "speed": 8,
-      "endurance": 7,
-      "technique": 10,
-      "iq": 5,
-      "battle_iq": 8
+      "strength": 3,
+      "speed": 3,
+      "endurance": 3,
+      "technique": 4,
+      "iq": 2,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -441,12 +441,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513848887125868564/Picsart_26-06-09_15-44-03-970.png?ex=6a2bdc24&is=6a2a8aa4&hm=9128c11a0ef641759db84d56faf022bcf566ba030b975069d71fa6954ce48a5a&",
     "stats": {
-      "strength": 4,
-      "speed": 6,
-      "endurance": 5,
-      "technique": 8,
-      "iq": 14,
-      "battle_iq": 9
+      "strength": 2,
+      "speed": 2,
+      "endurance": 2,
+      "technique": 3,
+      "iq": 6,
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -528,12 +528,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513849056152260708/Picsart_26-06-09_15-45-29-653.png?ex=6a2bdc4c&is=6a2a8acc&hm=2cb38b2f7bf9a6a15ffceb696b447ae950ff025729baf9e3e833e381128faedf&",
     "stats": {
-      "strength": 10,
-      "speed": 8,
-      "endurance": 10,
-      "technique": 9,
-      "iq": 5,
-      "battle_iq": 7
+      "strength": 4,
+      "speed": 3,
+      "endurance": 4,
+      "technique": 4,
+      "iq": 2,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -615,12 +615,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513849527562534942/Picsart_26-06-09_15-47-16-325.png?ex=6a2bdcbd&is=6a2a8b3d&hm=766b94e6601e2dcb59d354831449947c54b1f74d8a35c79c558f8fcd2506929c&",
     "stats": {
-      "strength": 11,
-      "speed": 7,
-      "endurance": 10,
-      "technique": 8,
-      "iq": 4,
-      "battle_iq": 8
+      "strength": 4,
+      "speed": 3,
+      "endurance": 4,
+      "technique": 3,
+      "iq": 2,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -702,12 +702,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513850403949772921/Picsart_26-06-09_15-50-50-157.png?ex=6a2bdd8e&is=6a2a8c0e&hm=35c4e61eae011aa7f1532500ee5eeb9b3ca7a91b77a07dd257ff6a236ea9b059&",
     "stats": {
-      "strength": 2,
-      "speed": 2,
-      "endurance": 14,
+      "strength": 1,
+      "speed": 1,
+      "endurance": 6,
       "technique": 1,
-      "iq": 12,
-      "battle_iq": 6
+      "iq": 5,
+      "battle_iq": 2
     },
     "moves": [
       {
@@ -789,12 +789,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513851695489224754/Picsart_26-06-09_15-55-19-147.png?ex=6a2bdec2&is=6a2a8d42&hm=0f3b40a22d2f67795c67fa69058ac8cb09a5d947925881e075f2d0de31076c68&",
     "stats": {
-      "strength": 8,
-      "speed": 6,
-      "endurance": 9,
-      "technique": 7,
-      "iq": 3,
-      "battle_iq": 7
+      "strength": 3,
+      "speed": 2,
+      "endurance": 4,
+      "technique": 3,
+      "iq": 1,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -876,12 +876,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513851707032076308/Picsart_26-06-09_15-55-47-420.png?ex=6a2bdec4&is=6a2a8d44&hm=410aa2dd5a527c6f2ccb329671fc73669b84eb6a3ba391916abe37e6111bb17b&",
     "stats": {
-      "strength": 7,
-      "speed": 9,
-      "endurance": 8,
-      "technique": 10,
-      "iq": 5,
-      "battle_iq": 9
+      "strength": 3,
+      "speed": 4,
+      "endurance": 3,
+      "technique": 4,
+      "iq": 2,
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -963,12 +963,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513852207945224282/Picsart_26-06-09_15-57-59-941.png?ex=6a2bdf3c&is=6a2a8dbc&hm=21966d38b7af84db603c49360d47bb23e3e46975f8ab70ecd9195f181559faca&",
     "stats": {
-      "strength": 8,
-      "speed": 7,
-      "endurance": 11,
-      "technique": 5,
-      "iq": 7,
-      "battle_iq": 10
+      "strength": 3,
+      "speed": 3,
+      "endurance": 5,
+      "technique": 2,
+      "iq": 3,
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -1050,12 +1050,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513853035644977273/Picsart_26-06-09_15-59-28-664.png?ex=6a2be001&is=6a2a8e81&hm=af138d96b2d1bbb8315f4ab14d4e731a7488676649f59b7d00d312f4658be526&",
     "stats": {
-      "strength": 4,
-      "speed": 4,
-      "endurance": 5,
-      "technique": 3,
-      "iq": 2,
-      "battle_iq": 3
+      "strength": 2,
+      "speed": 2,
+      "endurance": 2,
+      "technique": 1,
+      "iq": 1,
+      "battle_iq": 1
     },
     "moves": [
       {
@@ -1137,12 +1137,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513853047204220928/Picsart_26-06-09_15-59-47-958.png?ex=6a2be004&is=6a2a8e84&hm=8140b707b77a8955945dc640e48dfef947e23d8dfac699144abb586daba738d9&",
     "stats": {
-      "strength": 5,
-      "speed": 3,
-      "endurance": 6,
-      "technique": 3,
-      "iq": 2,
-      "battle_iq": 3
+      "strength": 2,
+      "speed": 1,
+      "endurance": 3,
+      "technique": 1,
+      "iq": 1,
+      "battle_iq": 1
     },
     "moves": [
       {
@@ -1224,12 +1224,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513853071263010886/Picsart_26-06-09_16-00-30-623.png?ex=6a2be00a&is=6a2a8e8a&hm=3c3acacc4f9e50d18c3c204f882c2ef84518378bbf93296653d8f21610f956e4&",
     "stats": {
-      "strength": 4,
-      "speed": 7,
-      "endurance": 5,
-      "technique": 8,
-      "iq": 9,
-      "battle_iq": 8
+      "strength": 2,
+      "speed": 3,
+      "endurance": 2,
+      "technique": 3,
+      "iq": 4,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -1311,12 +1311,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513804607246045265/Picsart_26-06-09_12-48-26-120.png?ex=6a2bb2e7&is=6a2a6167&hm=dd5fb48214f0a312fb4e40e349ed056f3b6834325b87a56da64e484cd655cc77&",
     "stats": {
-      "strength": 29,
-      "speed": 17,
-      "endurance": 23,
-      "technique": 28,
-      "iq": 9,
-      "battle_iq": 18
+      "strength": 23,
+      "speed": 13,
+      "endurance": 18,
+      "technique": 22,
+      "iq": 7,
+      "battle_iq": 14
     },
     "moves": [
       {
@@ -1398,12 +1398,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513912045005705378/JOSE_ALVAREZ_2A.jpeg?ex=6a2c16f6&is=6a2ac576&hm=086c82117777c23fad6a034228c3b0f407065a648d3f1a4daef9d9060c49dddb&",
     "stats": {
-      "strength": 7,
-      "speed": 6,
-      "endurance": 8,
-      "technique": 6,
-      "iq": 4,
-      "battle_iq": 7
+      "strength": 3,
+      "speed": 2,
+      "endurance": 3,
+      "technique": 2,
+      "iq": 2,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -1485,12 +1485,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513912095031300227/RAPHAEL_GRACEY_2A.jpeg?ex=6a2c1702&is=6a2ac582&hm=b7d6304c3cefca5c6f761f005efc2a4bfd9cd2b4d4e93e51626ae2cbe752637c&",
     "stats": {
-      "strength": 5,
-      "speed": 8,
-      "endurance": 5,
-      "technique": 8,
-      "iq": 5,
-      "battle_iq": 8
+      "strength": 2,
+      "speed": 3,
+      "endurance": 2,
+      "technique": 3,
+      "iq": 2,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -1572,12 +1572,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513912148269596762/PAT_TONEY_2A.jpeg?ex=6a2c170f&is=6a2ac58f&hm=e1e472902897094e873d5f3b9b2219fe5b8fb63a9276bf1786bdd2166f71351a&",
     "stats": {
-      "strength": 9,
-      "speed": 4,
-      "endurance": 10,
-      "technique": 4,
-      "iq": 3,
-      "battle_iq": 7
+      "strength": 4,
+      "speed": 2,
+      "endurance": 4,
+      "technique": 2,
+      "iq": 1,
+      "battle_iq": 2
     },
     "moves": [
       {
@@ -1659,12 +1659,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513912209195929780/LI_CHAO_2A.jpeg?ex=6a2c171d&is=6a2ac59d&hm=a3bd4f1bf2d47044d49c2aa8c6645346a25fbe6764c69b59ab9f513a5e9a723a&",
     "stats": {
-      "strength": 5,
-      "speed": 5,
-      "endurance": 6,
-      "technique": 3,
-      "iq": 8,
-      "battle_iq": 6
+      "strength": 2,
+      "speed": 2,
+      "endurance": 3,
+      "technique": 1,
+      "iq": 4,
+      "battle_iq": 2
     },
     "moves": [
       {
@@ -1746,12 +1746,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513924214715973712/RANDOM_BULLY_2A.jpeg?ex=6a2c224c&is=6a2ad0cc&hm=5ba23789345608a7b3d33f3242d651fca82f9da8b31772f5a9958ea232d766e1&",
     "stats": {
-      "strength": 6,
-      "speed": 4,
-      "endurance": 5,
-      "technique": 2,
-      "iq": 2,
-      "battle_iq": 3
+      "strength": 2,
+      "speed": 2,
+      "endurance": 2,
+      "technique": 1,
+      "iq": 1,
+      "battle_iq": 1
     },
     "moves": [
       {
@@ -1833,12 +1833,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1514655628243767356/DOSOO_LEE_HOH.jpeg?ex=6a2c287a&is=6a2ad6fa&hm=eb21107dfddf7c93361810a9f285f1872b41bc8c806338d9d6b4b484ef43053f&",
     "stats": {
-      "strength": 10,
-      "speed": 6,
-      "endurance": 10,
-      "technique": 8,
-      "iq": 3,
-      "battle_iq": 8
+      "strength": 4,
+      "speed": 2,
+      "endurance": 4,
+      "technique": 3,
+      "iq": 1,
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -1920,12 +1920,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1514687226691457215/SUWON_CREW_HEAD_HOH.jpeg?ex=6a2c45e8&is=6a2af468&hm=5b43af0c7572b4f02ae76d8c660a5e4c94ded393a221f007f325759b51cf63ed&",
     "stats": {
-      "strength": 7,
-      "speed": 6,
-      "endurance": 7,
-      "technique": 6,
-      "iq": 5,
-      "battle_iq": 7
+      "strength": 3,
+      "speed": 2,
+      "endurance": 3,
+      "technique": 2,
+      "iq": 2,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -2007,12 +2007,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1514693246805082265/BYEONGGUN_HEO_HOH.jpeg?ex=6a2c4b83&is=6a2afa03&hm=1762bcfc0a5e6b917e28e188491128d5a1af9a8d79b3b33dfb44ea73eca10531&",
     "stats": {
-      "strength": 9,
-      "speed": 8,
-      "endurance": 8,
-      "technique": 8,
-      "iq": 4,
-      "battle_iq": 9
+      "strength": 4,
+      "speed": 3,
+      "endurance": 3,
+      "technique": 3,
+      "iq": 2,
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -2094,12 +2094,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1514693420009132094/BYEONGGWANG_HEO_HOH.jpeg?ex=6a2c4bac&is=6a2afa2c&hm=1f280dd22234245d221f7e42d310a6ad8c7efe81c2909b98951cbf7078ee8c64&",
     "stats": {
-      "strength": 7,
-      "speed": 8,
-      "endurance": 7,
-      "technique": 10,
-      "iq": 5,
-      "battle_iq": 9
+      "strength": 3,
+      "speed": 3,
+      "endurance": 3,
+      "technique": 4,
+      "iq": 2,
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -2181,12 +2181,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513854435917303961/Picsart_26-06-09_16-05-23-381.png?ex=6a2be14f&is=6a2a8fcf&hm=109658d1594b5342fa969346d46fba4ffcca870c14cdb1c57929d0cc1a4aa509&",
     "stats": {
-      "strength": 6,
-      "speed": 7,
-      "endurance": 6,
-      "technique": 7,
-      "iq": 5,
-      "battle_iq": 8
+      "strength": 2,
+      "speed": 3,
+      "endurance": 2,
+      "technique": 3,
+      "iq": 2,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -2268,12 +2268,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513854448072527903/Picsart_26-06-09_16-05-48-341.png?ex=6a2be152&is=6a2a8fd2&hm=c9cb209477f3c082fc15b74814e7647d6c5b5ab57a1d2aaf7ef90dc96e26910b&",
     "stats": {
-      "strength": 5,
-      "speed": 6,
-      "endurance": 6,
-      "technique": 6,
-      "iq": 5,
-      "battle_iq": 7
+      "strength": 2,
+      "speed": 2,
+      "endurance": 2,
+      "technique": 2,
+      "iq": 2,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -2355,12 +2355,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513854456574251019/Picsart_26-06-09_16-06-12-294.png?ex=6a2be154&is=6a2a8fd4&hm=7e1cf2c9a7e893ee6678358e65c8aa20ca91b11256ba05473987b6c7283be5da&",
     "stats": {
-      "strength": 6,
-      "speed": 7,
-      "endurance": 6,
-      "technique": 7,
-      "iq": 5,
-      "battle_iq": 8
+      "strength": 2,
+      "speed": 3,
+      "endurance": 2,
+      "technique": 3,
+      "iq": 2,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -2442,12 +2442,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1513854464325586944/Picsart_26-06-09_16-06-50-013.png?ex=6a2be156&is=6a2a8fd6&hm=932683467d001822289441b1b3fe202ccee69a118e5187e41d028626e9f2e744&",
     "stats": {
-      "strength": 8,
-      "speed": 6,
-      "endurance": 8,
-      "technique": 6,
-      "iq": 4,
-      "battle_iq": 8
+      "strength": 3,
+      "speed": 2,
+      "endurance": 3,
+      "technique": 2,
+      "iq": 2,
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -2529,12 +2529,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1487438360858460301/Picsart_26-03-28_18-29-37-344.jpg?ex=6a2c04ec&is=6a2ab36c&hm=79c267368d58e16f68c018e30d2f5069cde0f3aaa55edbc8117b7466c01eb7a0&",
     "stats": {
-      "strength": 18,
-      "speed": 25,
-      "endurance": 18,
-      "technique": 32,
-      "iq": 14,
-      "battle_iq": 19
+      "strength": 14,
+      "speed": 20,
+      "endurance": 14,
+      "technique": 26,
+      "iq": 11,
+      "battle_iq": 15
     },
     "moves": [
       {
@@ -2616,12 +2616,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1507745603973545984/ABDE49C3-A6E6-41E0-91E2-D781F5932C35.jpeg?ex=6a2c1184&is=6a2ac004&hm=8d5c5b98c589581477f785833a03120fff6aa7641fa6c2d4690436e686a12395&",
     "stats": {
-      "strength": 17,
-      "speed": 25,
-      "endurance": 18,
-      "technique": 24,
-      "iq": 12,
-      "battle_iq": 20
+      "strength": 13,
+      "speed": 20,
+      "endurance": 14,
+      "technique": 19,
+      "iq": 9,
+      "battle_iq": 16
     },
     "moves": [
       {
@@ -2703,12 +2703,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1507745667630497903/4808AA91-6883-46EB-A82C-D2EB37312DBE.jpeg?ex=6a2c1193&is=6a2ac013&hm=65d7ebebf0b6407e6a73f54a37e38fb24e3ba88f3&",
     "stats": {
-      "strength": 25,
-      "speed": 18,
-      "endurance": 24,
-      "technique": 21,
-      "iq": 12,
-      "battle_iq": 23
+      "strength": 20,
+      "speed": 14,
+      "endurance": 19,
+      "technique": 17,
+      "iq": 9,
+      "battle_iq": 18
     },
     "moves": [
       {
@@ -2790,12 +2790,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1508016361224274021/7782CF35-D87A-496E-A4CB-735F481E8CCA.jpeg?ex=6a2bbc2e&is=6a2a6aae&hm=391dbe27d49f50dabb2dc4920a40ccb9e10a34f088060946e5162c1564801790&",
     "stats": {
-      "strength": 23,
-      "speed": 17,
-      "endurance": 27,
-      "technique": 19,
-      "iq": 11,
-      "battle_iq": 24
+      "strength": 18,
+      "speed": 13,
+      "endurance": 21,
+      "technique": 15,
+      "iq": 8,
+      "battle_iq": 19
     },
     "moves": [
       {
@@ -2877,12 +2877,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1508016375707205704/1E817218-60ED-4930-B6E8-E9D3CCF3C273.jpeg?ex=6a2bbc31&is=6a2a6ab1&hm=cec7e72c89e074318c320d89c874bce041fe8c428f6059f16d13b1c8ded6b7fe&",
     "stats": {
-      "strength": 21,
-      "speed": 27,
-      "endurance": 22,
-      "technique": 25,
-      "iq": 12,
-      "battle_iq": 20
+      "strength": 17,
+      "speed": 21,
+      "endurance": 17,
+      "technique": 20,
+      "iq": 9,
+      "battle_iq": 16
     },
     "moves": [
       {
@@ -2964,12 +2964,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1508020771950297098/0CBAB1B4-0BB1-47BA-A8A1-F95D5D491A3B.jpeg?ex=6a2bc049&is=6a2a6ec9&hm=93466f4e9b57af57d58696ee53a70d203c34da063ba7c6bff7a50995da27326a&",
     "stats": {
-      "strength": 19,
-      "speed": 28,
-      "endurance": 24,
-      "technique": 31,
-      "iq": 10,
-      "battle_iq": 17
+      "strength": 15,
+      "speed": 22,
+      "endurance": 19,
+      "technique": 25,
+      "iq": 8,
+      "battle_iq": 14
     },
     "moves": [
       {
@@ -3051,12 +3051,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513802714587336784/Picsart_26-06-09_12-41-12-149.png?ex=6a2bb124&is=6a2a5fa4&hm=8645b17616b8451d4785d4b9aeeb91b41213d6c634786c8865cba6f255b6b776&",
     "stats": {
-      "strength": 18,
-      "speed": 19,
-      "endurance": 21,
-      "technique": 17,
-      "iq": 14,
-      "battle_iq": 24
+      "strength": 14,
+      "speed": 15,
+      "endurance": 17,
+      "technique": 13,
+      "iq": 11,
+      "battle_iq": 19
     },
     "moves": [
       {
@@ -3138,12 +3138,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1514705630894624848/SHAMEN_GUARDS_.png?ex=6a2c570c&is=6a2b058c&hm=15169b9c72239e6875edb5b3b2b4fd068f7c7134f32f88677e2dedbb05aa319a&",
     "stats": {
-      "strength": 8,
-      "speed": 6,
-      "endurance": 9,
-      "technique": 8,
-      "iq": 4,
-      "battle_iq": 8
+      "strength": 3,
+      "speed": 2,
+      "endurance": 4,
+      "technique": 3,
+      "iq": 2,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -3225,12 +3225,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1514701344093769848/CHANGYOUNG_JI_HOH.jpeg?ex=6a2c530e&is=6a2b018e&hm=b2fbe80afbfdc14945af49ec05c138b88e565a601f23fd50df26d5aaa8b259bb&",
     "stats": {
-      "strength": 8,
-      "speed": 8,
-      "endurance": 8,
-      "technique": 10,
-      "iq": 5,
-      "battle_iq": 10
+      "strength": 3,
+      "speed": 3,
+      "endurance": 3,
+      "technique": 4,
+      "iq": 2,
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -3312,12 +3312,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513804630717501511/Picsart_26-06-09_12-46-56-929.png?ex=6a2bb2ed&is=6a2a616d&hm=14717dcf5753e5564fc962f6b01fb685ad60fbb61cadb1622b413eefb5b02c58&",
     "stats": {
-      "strength": 23,
-      "speed": 21,
-      "endurance": 26,
-      "technique": 30,
-      "iq": 13,
-      "battle_iq": 21
+      "strength": 18,
+      "speed": 16,
+      "endurance": 20,
+      "technique": 24,
+      "iq": 10,
+      "battle_iq": 16
     },
     "moves": [
       {
@@ -3399,12 +3399,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513804647305838672/Picsart_26-06-09_12-45-59-131.png?ex=6a2bb2f1&is=6a2a6171&hm=97811621ce0989ad195169dca8a6536a8835c9971d00b7d7d84bff804ddfed09&",
     "stats": {
-      "strength": 22,
-      "speed": 23,
-      "endurance": 24,
-      "technique": 21,
-      "iq": 13,
-      "battle_iq": 23
+      "strength": 17,
+      "speed": 18,
+      "endurance": 19,
+      "technique": 16,
+      "iq": 10,
+      "battle_iq": 18
     },
     "moves": [
       {
@@ -3486,12 +3486,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513804658110365727/Picsart_26-06-09_12-45-13-560.png?ex=6a2bb2f3&is=6a2a6173&hm=eec1c3fafc28afcb537ab14595710b45c529a55e5a04d925543dc0ec21a94114&",
     "stats": {
-      "strength": 25,
-      "speed": 22,
-      "endurance": 27,
-      "technique": 29,
-      "iq": 12,
-      "battle_iq": 21
+      "strength": 20,
+      "speed": 17,
+      "endurance": 21,
+      "technique": 23,
+      "iq": 9,
+      "battle_iq": 17
     },
     "moves": [
       {
@@ -3573,12 +3573,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513804671360434248/Picsart_26-06-09_12-42-52-808.png?ex=6a2bb2f6&is=6a2a6176&hm=52c32d8820e000d2576ea12406df0204c2ac286c5e0c6dc0397fec243b7c3e7a&",
     "stats": {
-      "strength": 27,
-      "speed": 17,
-      "endurance": 26,
-      "technique": 19,
-      "iq": 11,
-      "battle_iq": 21
+      "strength": 21,
+      "speed": 13,
+      "endurance": 20,
+      "technique": 15,
+      "iq": 8,
+      "battle_iq": 16
     },
     "moves": [
       {
@@ -3660,12 +3660,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513804821797404752/Picsart_26-06-09_12-49-43-934.png?ex=6a2bb31a&is=6a2a619a&hm=6b715d698f476cc12bf07283cdd558f6c6b0857eb32694bfd03cdebbb1ef88db&",
     "stats": {
-      "strength": 20,
-      "speed": 18,
-      "endurance": 22,
-      "technique": 23,
-      "iq": 17,
-      "battle_iq": 19
+      "strength": 15,
+      "speed": 14,
+      "endurance": 17,
+      "technique": 18,
+      "iq": 13,
+      "battle_iq": 15
     },
     "moves": [
       {
@@ -3747,12 +3747,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513805665661882461/Picsart_26-06-09_12-51-02-737.png?ex=6a2bb3e3&is=6a2a6263&hm=22e612e0edef7451ce594719efd74c0aa160295affee47222affe5f7e49ebc05&",
     "stats": {
-      "strength": 29,
-      "speed": 14,
-      "endurance": 32,
-      "technique": 16,
-      "iq": 12,
-      "battle_iq": 25
+      "strength": 23,
+      "speed": 10,
+      "endurance": 25,
+      "technique": 12,
+      "iq": 9,
+      "battle_iq": 19
     },
     "moves": [
       {
@@ -3834,12 +3834,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513805688177037395/Picsart_26-06-09_12-51-41-837.png?ex=6a2bb3e9&is=6a2a6269&hm=f622775bf9aaf9eed4d9c982e3a47acf0f2709ab4dc735fe296cae5c2b3c14ce&",
     "stats": {
-      "strength": 20,
-      "speed": 30,
-      "endurance": 21,
-      "technique": 36,
-      "iq": 16,
-      "battle_iq": 14
+      "strength": 15,
+      "speed": 23,
+      "endurance": 16,
+      "technique": 28,
+      "iq": 12,
+      "battle_iq": 11
     },
     "moves": [
       {
@@ -3921,12 +3921,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513805700298702989/Picsart_26-06-09_12-52-35-081.png?ex=6a2bb3ec&is=6a2a626c&hm=f185b8282ab0154032dd6bf100b41b66c48d31ac01e2a1fb0734ef16a5be7311&",
     "stats": {
-      "strength": 27,
-      "speed": 18,
-      "endurance": 26,
-      "technique": 22,
-      "iq": 11,
-      "battle_iq": 20
+      "strength": 21,
+      "speed": 14,
+      "endurance": 20,
+      "technique": 17,
+      "iq": 8,
+      "battle_iq": 16
     },
     "moves": [
       {
@@ -4008,12 +4008,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513806383164948550/Picsart_26-06-09_12-55-24-654.png?ex=6a2bb48e&is=6a2a630e&hm=90c96b0500695debe039ae22e27848e0c346268b3314c4524fe9d8c94f530336&",
     "stats": {
-      "strength": 34,
-      "speed": 21,
-      "endurance": 29,
-      "technique": 35,
-      "iq": 10,
-      "battle_iq": 13
+      "strength": 27,
+      "speed": 16,
+      "endurance": 22,
+      "technique": 28,
+      "iq": 8,
+      "battle_iq": 10
     },
     "moves": [
       {
@@ -4095,12 +4095,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513806392501342258/Picsart_26-06-09_12-55-53-390.png?ex=6a2bb491&is=6a2a6311&hm=23f7f76225776c17e68afcfed951541047933726432aa492583717500139dc84&",
     "stats": {
-      "strength": 24,
-      "speed": 27,
-      "endurance": 23,
-      "technique": 30,
-      "iq": 13,
-      "battle_iq": 15
+      "strength": 19,
+      "speed": 21,
+      "endurance": 18,
+      "technique": 24,
+      "iq": 10,
+      "battle_iq": 12
     },
     "moves": [
       {
@@ -4182,12 +4182,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513905992042025073/BIG_SAMUEL_2A.jpeg?ex=6a486993&is=6a471813&hm=4fb6a369fea17cfbc2cd3db273d8ffb93de83f48a8ab5fe6121ffe4ce900fc30&",
     "stats": {
-      "strength": 30,
-      "speed": 18,
-      "endurance": 31,
-      "technique": 16,
-      "iq": 14,
-      "battle_iq": 24
+      "strength": 24,
+      "speed": 14,
+      "endurance": 25,
+      "technique": 12,
+      "iq": 11,
+      "battle_iq": 19
     },
     "moves": [
       {
@@ -4269,12 +4269,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513906054252204193/MARCUS_2A.jpeg?ex=6a2c1162&is=6a2abfe2&hm=3b7177ab27ac10446d8b6e5df73d1303f67d358174a1a3e77ffb9b31ac62ee46&",
     "stats": {
-      "strength": 28,
-      "speed": 16,
-      "endurance": 30,
-      "technique": 15,
-      "iq": 10,
-      "battle_iq": 28
+      "strength": 22,
+      "speed": 12,
+      "endurance": 24,
+      "technique": 11,
+      "iq": 8,
+      "battle_iq": 22
     },
     "moves": [
       {
@@ -4356,12 +4356,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513908956140015676/KATSUZAWA_AKIRA.jpeg?ex=6a2c1416&is=6a2ac296&hm=e42a74a1e77da978fe0e00a60bbb1e2e7693651bd573f2f11c60fd32abbcb197&",
     "stats": {
-      "strength": 23,
-      "speed": 27,
-      "endurance": 21,
-      "technique": 28,
-      "iq": 11,
-      "battle_iq": 18
+      "strength": 18,
+      "speed": 21,
+      "endurance": 16,
+      "technique": 22,
+      "iq": 8,
+      "battle_iq": 14
     },
     "moves": [
       {
@@ -4443,12 +4443,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1513974865617752225/KENTA_MAGAMI_2A.jpeg?ex=6a2ba8b8&is=6a2a5738&hm=4281a444e935879474b150285a38060b3e502c536cf2fcdccbf18f1fb37b75ae&",
     "stats": {
-      "strength": 22,
-      "speed": 29,
-      "endurance": 25,
-      "technique": 32,
-      "iq": 9,
-      "battle_iq": 15
+      "strength": 17,
+      "speed": 23,
+      "endurance": 19,
+      "technique": 25,
+      "iq": 7,
+      "battle_iq": 12
     },
     "moves": [
       {
@@ -6547,12 +6547,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1514893693264334848/LINEMAN_HFBD.jpeg?ex=6a480cf1&is=6a46bb71&hm=5fc988f181a6e1418d7c5e0a8edbdcc0052f0b031f2f66956f475f17f4a505b4&",
     "stats": {
-      "strength": 5,
-      "speed": 5,
-      "endurance": 11,
-      "technique": 4,
-      "iq": 5,
-      "battle_iq": 8
+      "strength": 2,
+      "speed": 2,
+      "endurance": 5,
+      "technique": 2,
+      "iq": 2,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -6610,12 +6610,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1514897579425398966/DOO_LEE_2A.jpeg?ex=6a481090&is=6a46bf10&hm=aa77d3d9cb6693a6f790c54833c061742f8adc315a7c1825f89a5b9643dfc7ab&",
     "stats": {
-      "strength": 2,
-      "speed": 4,
-      "endurance": 5,
-      "technique": 2,
-      "iq": 15,
-      "battle_iq": 6
+      "strength": 1,
+      "speed": 2,
+      "endurance": 2,
+      "technique": 1,
+      "iq": 6,
+      "battle_iq": 2
     },
     "moves": [
       {
@@ -6673,12 +6673,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1521936569190318150/GURYOUNG_HIGH_SCHOOL_JK.jpeg?ex=6a47f6e2&is=6a46a562&hm=fa446222ebaa531848623f90b1a29d8143aeffb7f7348cf543afe21097fd6a3c&",
     "stats": {
-      "strength": 7,
-      "speed": 6,
-      "endurance": 7,
-      "technique": 5,
-      "iq": 4,
-      "battle_iq": 7
+      "strength": 3,
+      "speed": 2,
+      "endurance": 3,
+      "technique": 2,
+      "iq": 2,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -6736,12 +6736,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1521938344211255466/BLACK_BEAR_GANG_JK.jpeg?ex=6a47f889&is=6a46a709&hm=39a27b33e8fc4d9c2642087e209baedc1a46dedf604f3ebf868fe438cc72e42d&",
     "stats": {
-      "strength": 8,
-      "speed": 7,
-      "endurance": 8,
-      "technique": 6,
-      "iq": 4,
-      "battle_iq": 8
+      "strength": 3,
+      "speed": 3,
+      "endurance": 3,
+      "technique": 2,
+      "iq": 2,
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -6799,12 +6799,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1521939348667498677/ROBERT_CHOI_JK.jpeg?ex=6a47f978&is=6a46a7f8&hm=a1e6191005692cc463c38240dd59e6a0f7717883a9764ef331dc3f1f0d51ef71&",
     "stats": {
-      "strength": 9,
-      "speed": 8,
-      "endurance": 8,
-      "technique": 7,
-      "iq": 5,
-      "battle_iq": 9
+      "strength": 4,
+      "speed": 3,
+      "endurance": 3,
+      "technique": 3,
+      "iq": 2,
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -6862,12 +6862,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1521947738705494107/GANGSEO_SCHOOL_HEAD_JK.jpeg?ex=6a480149&is=6a46afc9&hm=cec463cadfd16c448d8a44e56fd646d938c870670424fa96394b3b01560f2a4a&",
     "stats": {
-      "strength": 6,
-      "speed": 6,
-      "endurance": 6,
-      "technique": 5,
-      "iq": 4,
-      "battle_iq": 7
+      "strength": 2,
+      "speed": 2,
+      "endurance": 2,
+      "technique": 2,
+      "iq": 2,
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -6925,12 +6925,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1521951358037790881/old_face_jk.jpeg?ex=6a4804a8&is=6a46b328&hm=5292bba7dddaff549150a99704f6c7ba78a56183c5d9704380242f6a327c141a&",
     "stats": {
-      "strength": 8,
-      "speed": 7,
-      "endurance": 8,
-      "technique": 7,
-      "iq": 6,
-      "battle_iq": 8
+      "strength": 3,
+      "speed": 3,
+      "endurance": 3,
+      "technique": 3,
+      "iq": 2,
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -6988,12 +6988,12 @@
     "rarity": "Common",
     "image_url": "https://cdn.discordapp.com/attachments/1482377862576345249/1521953159826636861/OLLY_WANG_HEPPY_JK.jpeg?ex=6a480655&is=6a46b4d5&hm=b15b386dd1d1a787d9982777b48cf6987f787468330c1ec8c2a05980bc01a177&",
     "stats": {
-      "strength": 4,
-      "speed": 4,
-      "endurance": 18,
-      "technique": 3,
-      "iq": 4,
-      "battle_iq": 5
+      "strength": 2,
+      "speed": 2,
+      "endurance": 8,
+      "technique": 1,
+      "iq": 2,
+      "battle_iq": 2
     },
     "moves": [
       {
@@ -7048,12 +7048,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1514885943566536864/RYUUJO_MAGAMI_2A.jpeg?ex=6a4805ba&is=6a46b43a&hm=f4782ecb33f14aeef1dc7f22c41879f04954fc0ed461d8ad22a54891ca2cf543&",
     "stats": {
-      "strength": 24,
-      "speed": 26,
-      "endurance": 27,
-      "technique": 34,
-      "iq": 11,
-      "battle_iq": 12
+      "strength": 19,
+      "speed": 20,
+      "endurance": 21,
+      "technique": 27,
+      "iq": 9,
+      "battle_iq": 9
     },
     "moves": [
       {
@@ -7111,12 +7111,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1514918465129943040/ONNE_EYED_YAMAZAKI_HFBD.jpeg?ex=6a482403&is=6a46d283&hm=f54a94b82232a3a6307ccabe0260e744906b124b6a66f6d2f08001c004ea51d1&",
     "stats": {
-      "strength": 26,
-      "speed": 29,
-      "endurance": 25,
-      "technique": 33,
-      "iq": 17,
-      "battle_iq": 17
+      "strength": 21,
+      "speed": 23,
+      "endurance": 20,
+      "technique": 26,
+      "iq": 14,
+      "battle_iq": 14
     },
     "moves": [
       {
@@ -7174,12 +7174,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1514918465129943040/ONNE_EYED_YAMAZAKI_HFBD.jpeg?ex=6a482403&is=6a46d283&hm=f54a94b82232a3a6307ccabe0260e744906b124b6a66f6d2f08001c004ea51d1&",
     "stats": {
-      "strength": 29,
-      "speed": 25,
-      "endurance": 30,
-      "technique": 29,
-      "iq": 16,
-      "battle_iq": 17
+      "strength": 23,
+      "speed": 20,
+      "endurance": 24,
+      "technique": 23,
+      "iq": 13,
+      "battle_iq": 14
     },
     "moves": [
       {
@@ -7237,12 +7237,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1515783358989340863/SATO_KAZUMA_2A.jpeg?ex=6a47fdc2&is=6a46ac42&hm=1836630270ceb4ac04eb4a7a7614a5cbb801d7147b3939002fa056e772b33e38&",
     "stats": {
-      "strength": 24,
-      "speed": 21,
-      "endurance": 25,
-      "technique": 18,
-      "iq": 12,
-      "battle_iq": 24
+      "strength": 19,
+      "speed": 16,
+      "endurance": 20,
+      "technique": 14,
+      "iq": 9,
+      "battle_iq": 19
     },
     "moves": [
       {
@@ -7300,12 +7300,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1521529674889433158/VASCO_LEE_JK.jpeg?ex=6a48762f&is=6a4724af&hm=23b0def9c7343f8f679767d231b38f8c6ef7bbc99e0c380676a53b69301612aa&",
     "stats": {
-      "strength": 35,
-      "speed": 19,
-      "endurance": 34,
-      "technique": 23,
-      "iq": 10,
-      "battle_iq": 23
+      "strength": 26,
+      "speed": 13,
+      "endurance": 25,
+      "technique": 16,
+      "iq": 8,
+      "battle_iq": 16
     },
     "moves": [
       {
@@ -7363,12 +7363,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1521531541262696580/TAEGON_WI_3A.jpeg?ex=6a4877ec&is=6a47266c&hm=0a4fc9ddf4e93f60b3d1341ece4bde5b9a942984f84b6d4e3ff3a46a3006b941&",
     "stats": {
-      "strength": 20,
-      "speed": 30,
-      "endurance": 21,
-      "technique": 28,
-      "iq": 13,
-      "battle_iq": 18
+      "strength": 16,
+      "speed": 24,
+      "endurance": 16,
+      "technique": 22,
+      "iq": 10,
+      "battle_iq": 14
     },
     "moves": [
       {
@@ -7393,7 +7393,7 @@
         "miss_dialogue": ""
       },
       {
-        "name": "3A Rush",
+        "name": "Rush",
         "type": "Special",
         "dialogue": "He rushes forward with Workers 3A pressure.",
         "crit_dialogue": "",
@@ -7426,12 +7426,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1521531541262696580/TAEGON_WI_3A.jpeg?ex=6a4877ec&is=6a47266c&hm=0a4fc9ddf4e93f60b3d1341ece4bde5b9a942984f84b6d4e3ff3a46a3006b941&",
     "stats": {
-      "strength": 34,
-      "speed": 15,
-      "endurance": 35,
-      "technique": 17,
-      "iq": 11,
-      "battle_iq": 25
+      "strength": 27,
+      "speed": 12,
+      "endurance": 28,
+      "technique": 13,
+      "iq": 8,
+      "battle_iq": 20
     },
     "moves": [
       {
@@ -7489,12 +7489,12 @@
     "rarity": "Rare",
     "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1521932685344510103/BRAD_LEE_JK.jpeg?ex=6a489c04&is=6a474a84&hm=c01682640c97ca23ecdcf2e0809e2c0917ae176eb2a1f0cb54e07b2d56e9df7c&",
     "stats": {
-      "strength": 22,
-      "speed": 14,
-      "endurance": 28,
-      "technique": 15,
-      "iq": 10,
-      "battle_iq": 25
+      "strength": 17,
+      "speed": 11,
+      "endurance": 22,
+      "technique": 12,
+      "iq": 8,
+      "battle_iq": 20
     },
     "moves": [
       {
@@ -7541,6 +7541,321 @@
     "special": [
       "Charge",
       "Push"
+    ],
+    "ultimate": [],
+    "defensive_moves": []
+  },
+  "Vasco Lee 3A": {
+    "name": "Vasco Lee",
+    "title": "Workers 3A",
+    "description": "A Workers 3A version of Vasco Lee with improved strength, endurance, and trained combat pressure.",
+    "rarity": "Rare",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1522545919009226804/VASCO_LEE_3A.jpeg?ex=6a48dce2&is=6a478b62&hm=64d77422c34128e572100ff9b5279828d6203d2416f7fb03b4228b09f8ab0db3&",
+    "stats": {
+      "strength": 30,
+      "speed": 16,
+      "endurance": 29,
+      "technique": 20,
+      "iq": 8,
+      "battle_iq": 16
+    },
+    "moves": [
+      {
+        "name": "Heavy Punch",
+        "type": "Normal",
+        "dialogue": "Vasco throws a heavy direct punch.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Low Kick",
+        "type": "Normal",
+        "dialogue": "Vasco attacks with a strong low kick.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Body Blow",
+        "type": "Normal",
+        "dialogue": "Vasco drives a powerful strike into the body.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Rush",
+        "type": "Special",
+        "dialogue": "Vasco charges forward with overwhelming Workers 3A pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Strike",
+        "type": "Special",
+        "dialogue": "Vasco attacks with raw conviction and heavy force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Heavy Punch",
+      "Low Kick",
+      "Body Blow"
+    ],
+    "special": [
+      "Rush",
+      "Heavy Strike"
+    ],
+    "ultimate": [],
+    "defensive_moves": []
+  },
+  "OG Daniel Park 3A": {
+    "name": "OG Daniel Park",
+    "title": "Worker's 3A",
+    "description": "An early Workers 3A version of Daniel Park with good intelligence and Systema basics, but weaker physical ability and combat experience than Taegon Wi at this point.",
+    "rarity": "Rare",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1522554497052840087/OG_DANIEL_3A.jpeg?ex=6a48e4df&is=6a47935f&hm=9c0537ba24fe47570d0df3b0c0bd608c154c0979fdbf5c20301a850f90c2dca4&",
+    "stats": {
+      "strength": 12,
+      "speed": 18,
+      "endurance": 13,
+      "technique": 17,
+      "iq": 14,
+      "battle_iq": 14
+    },
+    "moves": [
+      {
+        "name": "Systema Jab",
+        "type": "Normal",
+        "dialogue": "Daniel throws a quick Systema-style jab.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Systema Low Kick",
+        "type": "Normal",
+        "dialogue": "Daniel attacks with a sharp low kick.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Systema Palm Strike",
+        "type": "Normal",
+        "dialogue": "Daniel uses a compact palm strike.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Systema Move",
+        "type": "Special",
+        "dialogue": "Daniel adjusts his rhythm and attacks with Systema movement.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Systema Counter",
+        "type": "Special",
+        "dialogue": "Daniel redirects the pressure and counters.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Systema Jab",
+      "Systema Low Kick",
+      "Systema Palm Strike"
+    ],
+    "special": [
+      "Systema Move",
+      "Systema Counter"
+    ],
+    "ultimate": [],
+    "defensive_moves": []
+  },
+  "Zack Lee Heat Mode": {
+    "name": "Zack Lee",
+    "title": "Heat Mode",
+    "description": "A Heat Mode version of Zack Lee who fights with dirty boxing, speed, endurance, and reckless pressure.",
+    "rarity": "Rare",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1522545971383238789/ZACK_LEE_3A.jpeg?ex=6a48dcef&is=6a478b6f&hm=ff6490f95bbdf4f28852ff5ea278a1a700f37f4530b8c6d0b566d2ce188253f2&",
+    "stats": {
+      "strength": 18,
+      "speed": 26,
+      "endurance": 24,
+      "technique": 20,
+      "iq": 7,
+      "battle_iq": 15
+    },
+    "moves": [
+      {
+        "name": "Dirty Jab",
+        "type": "Normal",
+        "dialogue": "Zack throws a quick dirty jab.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Rough Hook",
+        "type": "Normal",
+        "dialogue": "Zack swings a rough boxing hook.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Body Shot",
+        "type": "Normal",
+        "dialogue": "Zack drives a punch into the body.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Rush",
+        "type": "Special",
+        "dialogue": "Zack rushes in with wild Heat Mode pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Dirty Counter",
+        "type": "Special",
+        "dialogue": "Zack takes the hit and fires back with a dirty counter.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Dirty Jab",
+      "Rough Hook",
+      "Body Shot"
+    ],
+    "special": [
+      "Rush",
+      "Dirty Counter"
+    ],
+    "ultimate": [],
+    "defensive_moves": []
+  },
+  "Logan Lee 3A": {
+    "name": "Logan Lee",
+    "title": "Goo's Friend",
+    "description": "A slow but durable brawler with strong combat instincts, dirty fighting experience, and a connection to Goo Kim.",
+    "rarity": "Rare",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1522562909165719563/LOGAN_LEE_3A.jpeg?ex=6a48ecb5&is=6a479b35&hm=fbbc392238b1e7d8e6ada873669138a1eea644e8624fb2f92d3fc78abe553b0e&",
+    "stats": {
+      "strength": 18,
+      "speed": 10,
+      "endurance": 24,
+      "technique": 15,
+      "iq": 11,
+      "battle_iq": 28
+    },
+    "moves": [
+      {
+        "name": "Heavy Grab",
+        "type": "Normal",
+        "dialogue": "Logan grabs with rough force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Body Slam",
+        "type": "Normal",
+        "dialogue": "Logan throws his weight into a brutal slam.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Dirty Punch",
+        "type": "Normal",
+        "dialogue": "Logan lands a rough dirty punch.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Grapple",
+        "type": "Special",
+        "dialogue": "Logan closes the distance and overwhelms with grappling pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Street Counter",
+        "type": "Special",
+        "dialogue": "Logan reads the attack and counters with dirty street fighting.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Heavy Grab",
+      "Body Slam",
+      "Dirty Punch"
+    ],
+    "special": [
+      "Grapple",
+      "Street Counter"
+    ],
+    "ultimate": [],
+    "defensive_moves": []
+  },
+  "Channing Choi": {
+    "name": "Channing Choi",
+    "title": "Ansan Public No.2",
+    "description": "The No.2 of Ansan Public, a cruel tattooist fighter who uses rough street pressure, intimidation, and painful strikes to break opponents.",
+    "rarity": "Rare",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377823212535970/1522571169813889155/CHANNING_CHOI_JL.jpeg?ex=6a48f466&is=6a47a2e6&hm=fe8a44a62109aa9de599cc40543906686807ac5a85eaa14e94878b441698ae41&",
+    "stats": {
+      "strength": 22,
+      "speed": 15,
+      "endurance": 23,
+      "technique": 16,
+      "iq": 9,
+      "battle_iq": 20
+    },
+    "moves": [
+      {
+        "name": "Tattoo Jab",
+        "type": "Normal",
+        "dialogue": "Channing throws a sharp jab like he is marking his target.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Rough Kick",
+        "type": "Normal",
+        "dialogue": "Channing attacks with a rough street kick.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Pain Mark",
+        "type": "Normal",
+        "dialogue": "Channing strikes to leave pain behind.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Trauma Tattoo",
+        "type": "Special",
+        "dialogue": "Channing attacks with cruel pressure, like carving trauma into the fight.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Ansan No.2 Beatdown",
+        "type": "Special",
+        "dialogue": "Channing overwhelms his opponent with Ansan Public's No.2 brutality.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Tattoo Jab",
+      "Rough Kick",
+      "Pain Mark"
+    ],
+    "special": [
+      "Trauma Tattoo",
+      "Ansan No.2 Beatdown"
     ],
     "ultimate": [],
     "defensive_moves": []
