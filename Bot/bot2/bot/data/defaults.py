@@ -23,6 +23,22 @@ def _load_card_catalog() -> dict[str, Any]:
         return {}
 
 
+def _sync_catalog_cards(existing_cards: Any, catalog: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Refresh known catalog cards while preserving runtime-only admin cards."""
+    if not isinstance(existing_cards, dict) or not existing_cards:
+        return deepcopy(catalog if catalog is not None else _load_card_catalog())
+
+    catalog_cards = catalog if catalog is not None else _load_card_catalog()
+    if not catalog_cards:
+        return existing_cards
+
+    synced = deepcopy(existing_cards)
+    for card_name, card_def in catalog_cards.items():
+        if isinstance(card_def, dict):
+            synced[card_name] = deepcopy(card_def)
+    return synced
+
+
 DEFAULT_PACK_DEFINITIONS = {
     "newbie_pack": {
         "key": "newbie_pack",
@@ -670,11 +686,7 @@ def ensure_structure(data: Any) -> dict[str, Any]:
                 packs_profile.setdefault("opened", 0)
                 packs_profile.setdefault("spent", 0)
 
-    # Only seed cards from JSON if the data has NO cards at all.
-    # This preserves cards added at runtime by admin commands.
-    existing_cards = data.get("cards")
-    if not isinstance(existing_cards, dict) or not existing_cards:
-        data["cards"] = deepcopy(_load_card_catalog())
+    data["cards"] = _sync_catalog_cards(data.get("cards"))
     for _, card in data["cards"].items():
         if isinstance(card, dict):
             card.setdefault("emoji", "🃏")

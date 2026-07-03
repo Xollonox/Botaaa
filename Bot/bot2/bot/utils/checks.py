@@ -8,6 +8,7 @@ from typing import Any
 import discord
 from discord.ext import commands
 
+from bot.config import OWNER_IDS as CONFIG_OWNER_IDS
 from bot.utils.interaction_visibility import smart_reply
 
 
@@ -27,13 +28,15 @@ def _parse_owner_ids(raw: str) -> set[int]:
 def effective_owner_ids() -> set[int]:
     """Return configured bot owner IDs.
 
-    Deployments must configure this through LOOKISM_OWNER_IDS, BOT_OWNER_IDS,
-    or OWNER_IDS. If none are configured, owner checks fail closed.
+    Prefer environment configuration, but fall back to the legacy config
+    constant so existing deployments continue to work without extra env vars.
     """
     raw = os.getenv("LOOKISM_OWNER_IDS") or os.getenv("BOT_OWNER_IDS") or os.getenv("OWNER_IDS")
     if raw is not None:
-        return _parse_owner_ids(raw)
-    return set()
+        parsed = _parse_owner_ids(raw)
+        if parsed:
+            return parsed
+    return {int(owner_id) for owner_id in CONFIG_OWNER_IDS}
 
 
 def is_owner(interaction: discord.Interaction) -> bool:

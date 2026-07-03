@@ -11,7 +11,6 @@ REQUIRED_ENV = {
     "bot1": ("DISCORD_TOKEN",),
     "bot2": ("BOT_TOKEN",),
 }
-OWNER_ENV_KEYS = ("LOOKISM_OWNER_IDS", "BOT_OWNER_IDS", "OWNER_IDS")
 
 
 def _load_env_file(path: str) -> dict[str, str]:
@@ -42,32 +41,7 @@ def _env_for_bot(bot_name: str) -> dict[str, str]:
 
 
 def _missing_required_env(bot_name: str, env: dict[str, str]) -> list[str]:
-    missing = [key for key in REQUIRED_ENV.get(bot_name, ()) if not env.get(key)]
-    if bot_name == "bot2" and not any(env.get(key) for key in OWNER_ENV_KEYS):
-        missing.append("one of LOOKISM_OWNER_IDS, BOT_OWNER_IDS, OWNER_IDS")
-    return missing
-
-
-def _parse_id_list(raw: str) -> list[int]:
-    ids = []
-    for part in raw.replace(";", ",").split(","):
-        value = part.strip()
-        if not value:
-            continue
-        try:
-            ids.append(int(value))
-        except ValueError:
-            return []
-    return ids
-
-
-def _invalid_env(bot_name: str, env: dict[str, str]) -> list[str]:
-    invalid = []
-    if bot_name == "bot2":
-        raw = next((env[key] for key in OWNER_ENV_KEYS if env.get(key)), "")
-        if not _parse_id_list(raw):
-            invalid.append("owner IDs must contain at least one numeric Discord user ID")
-    return invalid
+    return [key for key in REQUIRED_ENV.get(bot_name, ()) if not env.get(key)]
 
 
 def start_bot(bot_name: str):
@@ -82,11 +56,6 @@ def start_bot(bot_name: str):
     if missing:
         print(f"[SKIP] {bot_name}: missing required env {', '.join(missing)}")
         return None
-    invalid = _invalid_env(bot_name, env)
-    if invalid:
-        print(f"[SKIP] {bot_name}: invalid env {'; '.join(invalid)}")
-        return None
-
     cmd = [sys.executable, script_path]
     proc = subprocess.Popen(cmd, cwd=bot_dir, env=env)
     print(f"[STARTED] {bot_name} (pid={proc.pid})")
