@@ -27,6 +27,7 @@ HELP_CATEGORIES = [
             ("/profile", "Displays your premium profile card including stats, featured card, and rival info. Use on another user to view their profile."),
             ("/collection", "Opens your owned card collection browser, letting you inspect inventory pages and review cards you can use for squads, trading, or market listings."),
             ("/card_info", "Looks up a global catalog card by name and shows its rarity, stats, power, mastery/path/skill data, image, and core fighter information."),
+            ("/stats load", "Loads the card stat reference from STATS.md in a paginated preview with section jumping and navigation controls."),
             ("/card_lock", "Locks one of your owned card instances so it is protected from accidental sale, trade, or other destructive inventory actions."),
         ],
     },

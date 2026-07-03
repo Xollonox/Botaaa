@@ -42,6 +42,7 @@ EXTENSIONS = [
     "bot.features.packs",
     "bot.features.cards_admin",
     "bot.features.card_tools",
+    "bot.features.stats_preview",
     "bot.features.market",
     "bot.features.market_owner",
     "bot.features.trades",
