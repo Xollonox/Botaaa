@@ -673,7 +673,7 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Crushing Charge",
+        "name": "Heavy Charge",
         "type": "Special",
         "dialogue": "Strong technique.",
         "crit_dialogue": "",
@@ -690,7 +690,7 @@
     "special": [
       "Ground Shake",
       "Heavy Stomp",
-      "Crushing Charge"
+      "Heavy Charge"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -2065,7 +2065,7 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Synchronized Charge",
+        "name": "Twin Charge",
         "type": "Special",
         "dialogue": "Strong technique.",
         "crit_dialogue": "",
@@ -2082,7 +2082,7 @@
     "special": [
       "Dual Advance",
       "Mirror Strike",
-      "Synchronized Charge"
+      "Twin Charge"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -4530,12 +4530,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1500770465571012668/Picsart_26-05-04_13-35-39-187.jpg?ex=6a2bbde9&is=6a2a6c69&hm=1e69f1f71f53362b1c6d59a6f1d49840b7686e602ce92fea544bcad474caa568&",
     "stats": {
-      "strength": 42,
-      "speed": 38,
-      "endurance": 40,
-      "technique": 37,
-      "iq": 35,
-      "battle_iq": 38
+      "strength": 54,
+      "speed": 20,
+      "endurance": 35,
+      "technique": 31,
+      "iq": 22,
+      "battle_iq": 22
     },
     "moves": [
       {
@@ -4617,12 +4617,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1506209197057114202/5187AA05-7DE6-42CE-AAA0-26A5F0CE8E9F.jpeg?ex=6a2bc0a0&is=6a2a6f20&hm=2127615679d094e9d9feaaa3ba47810812697ebc6b4beb97435f374936503dc8&",
     "stats": {
-      "strength": 43,
-      "speed": 40,
-      "endurance": 39,
-      "technique": 38,
-      "iq": 36,
-      "battle_iq": 39
+      "strength": 39,
+      "speed": 43,
+      "endurance": 34,
+      "technique": 45,
+      "iq": 22,
+      "battle_iq": 24
     },
     "moves": [
       {
@@ -4704,12 +4704,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1508324658590515200/42081F5C-69CC-4295-AC5E-93E06F8FEDAB.jpeg?ex=6a2c328d&is=6a2ae10d&hm=45478725e7e14237c111c0f4a9d592071368b08f2aac9ec5904f4900d92d090b&",
     "stats": {
-      "strength": 41,
-      "speed": 39,
-      "endurance": 40,
-      "technique": 38,
-      "iq": 37,
-      "battle_iq": 40
+      "strength": 28,
+      "speed": 31,
+      "endurance": 27,
+      "technique": 47,
+      "iq": 17,
+      "battle_iq": 30
     },
     "moves": [
       {
@@ -4791,11 +4791,11 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1508393809841754192/DEF54F16-A5CF-4806-A126-A1CFB298997D.jpeg?ex=6a2bca34&is=6a2a78b4&hm=eda4aebed833a29957afd1d7e856ee6997a0c371d5d79deabda02fbc85d47361&",
     "stats": {
-      "strength": 44,
-      "speed": 39,
-      "endurance": 41,
-      "technique": 37,
-      "iq": 35,
+      "strength": 43,
+      "speed": 24,
+      "endurance": 43,
+      "technique": 24,
+      "iq": 15,
       "battle_iq": 39
     },
     "moves": [
@@ -4879,12 +4879,12 @@
     "mastery": "Speed",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1508412491556720760/CB415CB0-7BAD-4913-8E19-56ADF10871BB.jpeg?ex=6a2bdb9a&is=6a2a8a1a&hm=cfc15a34a8423e89e006ab5d777f87c06520980f42fd33ade700bbdc5ea5b50a&",
     "stats": {
-      "strength": 42,
-      "speed": 45,
-      "endurance": 38,
-      "technique": 39,
-      "iq": 36,
-      "battle_iq": 40
+      "strength": 35,
+      "speed": 50,
+      "endurance": 37,
+      "technique": 43,
+      "iq": 16,
+      "battle_iq": 25
     },
     "moves": [
       {
@@ -4977,12 +4977,12 @@
     "mastery": "Endurance",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1508549646837088286/9FF554CA-5AB9-4C3C-BD7C-DDE02950999F.jpeg?ex=6a2bb297&is=6a2a6117&hm=e7b9c0f1409c6ca12b36a55cd76d083e05f5d65eb9e8b15ea3d34df6b6e26be0&",
     "stats": {
-      "strength": 44,
-      "speed": 38,
-      "endurance": 43,
-      "technique": 37,
-      "iq": 35,
-      "battle_iq": 38
+      "strength": 36,
+      "speed": 37,
+      "endurance": 41,
+      "technique": 35,
+      "iq": 18,
+      "battle_iq": 22
     },
     "moves": [
       {
@@ -5064,12 +5064,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1508742640818978946/9F922296-76AA-46AF-9B92-DFA05985BE08.jpeg?ex=6a2bbd94&is=6a2a6c14&hm=9dbe976a41820dfebbb0a3673e72fdf28f4990c952cc0f09e9c39c8f9e8a7b72&",
     "stats": {
-      "strength": 43,
-      "speed": 40,
-      "endurance": 39,
-      "technique": 38,
-      "iq": 36,
-      "battle_iq": 39
+      "strength": 42,
+      "speed": 35,
+      "endurance": 40,
+      "technique": 28,
+      "iq": 23,
+      "battle_iq": 34
     },
     "moves": [
       {
@@ -5151,12 +5151,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1512479933266661688/6422ECCA-E569-4049-9D26-375DB3B8BD92.jpeg?ex=6a2c2734&is=6a2ad5b4&hm=45f08a84c7bcc18d9d154456a3f4f7e8e754b9bd2dcfe700ef463ca9d17a0cb3&",
     "stats": {
-      "strength": 41,
-      "speed": 39,
-      "endurance": 40,
+      "strength": 40,
+      "speed": 34,
+      "endurance": 39,
       "technique": 39,
-      "iq": 37,
-      "battle_iq": 39
+      "iq": 23,
+      "battle_iq": 30
     },
     "moves": [
       {
@@ -5238,12 +5238,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1512513818767528198/JAESU_NOH_CHEONGLIANG.jpeg?ex=6a2c46c3&is=6a2af543&hm=94510751ce431bcfebd2458d685ca22ddab99123680e28b6c12c90bba30c0b45&",
     "stats": {
-      "strength": 42,
-      "speed": 40,
-      "endurance": 39,
-      "technique": 38,
-      "iq": 37,
-      "battle_iq": 39
+      "strength": 40,
+      "speed": 27,
+      "endurance": 38,
+      "technique": 31,
+      "iq": 24,
+      "battle_iq": 32
     },
     "moves": [
       {
@@ -5325,12 +5325,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1512520828284043285/GWANG_YU_CHEONGLIANG.jpeg?ex=6a2c4d4a&is=6a2afbca&hm=e98a4c37811016938294151b7a8de1cbe6f00dedfc0596ed5a6fe28df6ca6e8b&",
     "stats": {
-      "strength": 43,
-      "speed": 39,
-      "endurance": 40,
-      "technique": 39,
-      "iq": 36,
-      "battle_iq": 38
+      "strength": 39,
+      "speed": 30,
+      "endurance": 38,
+      "technique": 38,
+      "iq": 23,
+      "battle_iq": 26
     },
     "moves": [
       {
@@ -5412,12 +5412,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1512523151253311629/BEOLGU_LEE_CHEONGLIANG.jpeg?ex=6a2c4f74&is=6a2afdf4&hm=2be1a4e3a9c7d60fcc0e362a8a7d696b59a48910fd16811553d735025b236287&",
     "stats": {
-      "strength": 41,
-      "speed": 40,
-      "endurance": 39,
-      "technique": 40,
-      "iq": 36,
-      "battle_iq": 39
+      "strength": 40,
+      "speed": 28,
+      "endurance": 37,
+      "technique": 30,
+      "iq": 24,
+      "battle_iq": 32
     },
     "moves": [
       {
@@ -5499,12 +5499,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1512818593782566912/SAMUEL_SEO_1A.jpg?ex=6a2c111b&is=6a2abf9b&hm=a93849a03223581c594b75e75936f5f8d01435b8f3d6c46015e3cf9188abc561&",
     "stats": {
-      "strength": 44,
-      "speed": 39,
-      "endurance": 38,
-      "technique": 40,
-      "iq": 37,
-      "battle_iq": 37
+      "strength": 41,
+      "speed": 36,
+      "endurance": 42,
+      "technique": 35,
+      "iq": 21,
+      "battle_iq": 25
     },
     "moves": [
       {
@@ -5590,12 +5590,12 @@
     ],
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1513501180490289273/Picsart_26-06-08_16-39-05-951.png?ex=6a2be9d0&is=6a2a9850&hm=96755dcb0cf9fa88913a8486ec02245720b8190a8c5929a166a5aaab2606461a&",
     "stats": {
-      "strength": 42,
-      "speed": 41,
-      "endurance": 42,
-      "technique": 38,
-      "iq": 36,
-      "battle_iq": 38
+      "strength": 38,
+      "speed": 42,
+      "endurance": 46,
+      "technique": 47,
+      "iq": 13,
+      "battle_iq": 19
     },
     "moves": [
       {
@@ -5677,12 +5677,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1513502474047197304/Picsart_26-06-08_16-48-07-356.jpg?ex=6a2beb05&is=6a2a9985&hm=1fafa35eeca4c22c999876e9d8f48f762ef11bf675cc52d7c637e9263fe4dec2&",
     "stats": {
-      "strength": 43,
-      "speed": 39,
-      "endurance": 40,
-      "technique": 38,
-      "iq": 36,
-      "battle_iq": 39
+      "strength": 52,
+      "speed": 26,
+      "endurance": 39,
+      "technique": 36,
+      "iq": 21,
+      "battle_iq": 29
     },
     "moves": [
       {
@@ -5764,12 +5764,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1513505609826435195/Picsart_26-06-08_17-00-35-608.jpg?ex=6a2bedf0&is=6a2a9c70&hm=0433d45081193a6bf4274e303f82963af392ea8c0ce53ad611d74a2e2c994a97&",
     "stats": {
-      "strength": 44,
-      "speed": 38,
-      "endurance": 41,
-      "technique": 37,
-      "iq": 36,
-      "battle_iq": 39
+      "strength": 49,
+      "speed": 34,
+      "endurance": 45,
+      "technique": 38,
+      "iq": 14,
+      "battle_iq": 24
     },
     "moves": [
       {
@@ -5851,12 +5851,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1513505625722716242/Picsart_26-06-08_16-53-20-796.png?ex=6a2bedf4&is=6a2a9c74&hm=fb285737a91c100431a8e6b13297077a4e7dff886bc8effe497c7c5868b4af30&",
     "stats": {
-      "strength": 44,
-      "speed": 40,
-      "endurance": 39,
-      "technique": 38,
-      "iq": 37,
-      "battle_iq": 37
+      "strength": 39,
+      "speed": 43,
+      "endurance": 34,
+      "technique": 45,
+      "iq": 24,
+      "battle_iq": 26
     },
     "moves": [
       {
@@ -5938,12 +5938,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1513505637462442044/Picsart_26-06-08_16-51-15-911.jpg?ex=6a2bedf7&is=6a2a9c77&hm=b410a794d64e31cacc4b808d34cc5de906eb65494f509572da057d745a96123b&",
     "stats": {
-      "strength": 42,
-      "speed": 39,
-      "endurance": 40,
-      "technique": 39,
-      "iq": 37,
-      "battle_iq": 38
+      "strength": 43,
+      "speed": 34,
+      "endurance": 41,
+      "technique": 36,
+      "iq": 19,
+      "battle_iq": 30
     },
     "moves": [
       {
@@ -6025,12 +6025,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1513506021778259990/Picsart_26-06-08_17-02-14-316.png?ex=6a2bee53&is=6a2a9cd3&hm=8a1a71f8216a4eb5f9282f7a9b79214a28bc3a4ce7bba98d1b62b0850089e6a8&",
     "stats": {
-      "strength": 43,
-      "speed": 38,
-      "endurance": 41,
-      "technique": 38,
-      "iq": 37,
-      "battle_iq": 38
+      "strength": 35,
+      "speed": 37,
+      "endurance": 34,
+      "technique": 44,
+      "iq": 19,
+      "battle_iq": 27
     },
     "moves": [
       {
@@ -6112,12 +6112,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1513507409317068840/Picsart_26-06-08_17-07-34-072.png?ex=6a2bef9d&is=6a2a9e1d&hm=aa31a5365bc8322722ba5c6fde0946eddc287d0b51d9ed61b6f794ff657b5aa1&",
     "stats": {
-      "strength": 42,
-      "speed": 39,
-      "endurance": 40,
-      "technique": 39,
-      "iq": 37,
-      "battle_iq": 38
+      "strength": 35,
+      "speed": 41,
+      "endurance": 34,
+      "technique": 43,
+      "iq": 20,
+      "battle_iq": 26
     },
     "moves": [
       {
@@ -6199,11 +6199,11 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1513507727844966420/Picsart_26-06-08_17-09-07-251.png?ex=6a2befe9&is=6a2a9e69&hm=2f0bd9d2c10695622a28f7c3983de39013103e42237b19f9632045f26f514784&",
     "stats": {
-      "strength": 43,
-      "speed": 39,
-      "endurance": 40,
-      "technique": 38,
-      "iq": 37,
+      "strength": 45,
+      "speed": 26,
+      "endurance": 46,
+      "technique": 25,
+      "iq": 16,
       "battle_iq": 38
     },
     "moves": [
@@ -6286,12 +6286,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1513509021359800380/Picsart_26-06-08_17-13-52-979.png?ex=6a2bf11e&is=6a2a9f9e&hm=054a0ac21b02f933dc136a5e4f40e6646e130089c31dbf7d5fe08b414decb711&",
     "stats": {
-      "strength": 44,
-      "speed": 39,
-      "endurance": 40,
-      "technique": 38,
-      "iq": 37,
-      "battle_iq": 37
+      "strength": 40,
+      "speed": 36,
+      "endurance": 38,
+      "technique": 37,
+      "iq": 22,
+      "battle_iq": 28
     },
     "moves": [
       {
@@ -6373,11 +6373,11 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1513909004437295224/MINSIK_CHOI_2A.jpeg?ex=6a2c1421&is=6a2ac2a1&hm=c7b422f1c123cd29daee2ce06e21472141f05adcc7f231f3f4a19c6ffde277df&",
     "stats": {
-      "strength": 43,
-      "speed": 38,
-      "endurance": 40,
-      "technique": 39,
-      "iq": 37,
+      "strength": 39,
+      "speed": 23,
+      "endurance": 38,
+      "technique": 21,
+      "iq": 13,
       "battle_iq": 38
     },
     "moves": [
@@ -6460,12 +6460,12 @@
     "rarity": "Epic",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1514648471162851449/BIG_DANIEL_2A.jpeg?ex=6a2c21d0&is=6a2ad050&hm=519e03142af1c8d64f1901e1e9714fd654985e5dbd7e8ac0dbbc23504e83004e&",
     "stats": {
-      "strength": 45,
-      "speed": 39,
-      "endurance": 40,
-      "technique": 38,
-      "iq": 36,
-      "battle_iq": 37
+      "strength": 30,
+      "speed": 33,
+      "endurance": 39,
+      "technique": 46,
+      "iq": 17,
+      "battle_iq": 21
     },
     "moves": [
       {
@@ -6773,7 +6773,7 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Beatdown",
+        "name": "Heavy Hit",
         "type": "Special",
         "dialogue": "They overwhelm the enemy with force.",
         "crit_dialogue": "",
@@ -6787,7 +6787,7 @@
     ],
     "special": [
       "Group Attack",
-      "Beatdown"
+      "Heavy Hit"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -7413,7 +7413,7 @@
       "Fast Hit"
     ],
     "special": [
-      "3A Rush",
+      "Rush",
       "Sharp Combo"
     ],
     "ultimate": [],
@@ -7834,14 +7834,14 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Trauma Tattoo",
+        "name": "Pain Mark",
         "type": "Special",
         "dialogue": "Channing attacks with cruel pressure, like carving trauma into the fight.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       },
       {
-        "name": "Ansan No.2 Beatdown",
+        "name": "Ansan Pressure",
         "type": "Special",
         "dialogue": "Channing overwhelms his opponent with Ansan Public's No.2 brutality.",
         "crit_dialogue": "",
@@ -7854,10 +7854,2004 @@
       "Pain Mark"
     ],
     "special": [
-      "Trauma Tattoo",
-      "Ansan No.2 Beatdown"
+      "Pain Mark",
+      "Ansan Pressure"
     ],
     "ultimate": [],
+    "defensive_moves": []
+  },
+  "Vin Jin Workers 2A": {
+    "name": "Vin Jin",
+    "title": "Workers 2A",
+    "description": "A Workers 2A version of Vin Jin with murder intent, rough Kudo, strong hardware, and dangerous close-range pressure.",
+    "rarity": "Epic",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1515446688121360384/VIN_JIN_2A.jpeg?ex=6a48be76&is=6a476cf6&hm=ba6fe37a70bc8a6e810a2e76fee1101116a0836d926683eac9430e94c8db9a5b&",
+    "stats": {
+      "strength": 39,
+      "speed": 30,
+      "endurance": 34,
+      "technique": 33,
+      "iq": 17,
+      "battle_iq": 24
+    },
+    "moves": [
+      {
+        "name": "Kudo Grip",
+        "type": "Normal",
+        "dialogue": "Vin Jin grabs with rough Kudo pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Punch",
+        "type": "Normal",
+        "dialogue": "Vin Jin throws a heavy punch with focused intent.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Shoulder Throw",
+        "type": "Normal",
+        "dialogue": "Vin Jin uses raw force to throw his opponent.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Kudo Rush",
+        "type": "Special",
+        "dialogue": "Vin Jin closes the distance with heavy Kudo pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Kudo Slam",
+        "type": "Special",
+        "dialogue": "Vin Jin drives his opponent down with a Kudo slam.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Kudo Grip",
+      "Heavy Punch",
+      "Shoulder Throw"
+    ],
+    "special": [
+      "Kudo Rush",
+      "Kudo Slam"
+    ],
+    "ultimate": [],
+    "defensive_moves": []
+  },
+  "Shiba Inu Workers 2A": {
+    "name": "Shiba Inu",
+    "title": "Workers 2A",
+    "description": "The brainwashed Sinu Han of Workers 2A, a dangerous fighter who overwhelmed Jake and the others before his memories began returning.",
+    "rarity": "Epic",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1515789345175638076/SHIBA_INU_2A.jpeg?ex=6a48ac15&is=6a475a95&hm=611bd791a9bf6c49009b5ee0f47c9fa6f03c7fac36b642c0aa4107cc1ceff556&",
+    "stats": {
+      "strength": 39,
+      "speed": 37,
+      "endurance": 38,
+      "technique": 39,
+      "iq": 18,
+      "battle_iq": 20
+    },
+    "moves": [
+      {
+        "name": "Fast Strike",
+        "type": "Normal",
+        "dialogue": "Shiba Inu attacks with a fast direct strike.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Sharp Kick",
+        "type": "Normal",
+        "dialogue": "Shiba Inu throws a sharp kick with controlled force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Body Shot",
+        "type": "Normal",
+        "dialogue": "Shiba Inu drives a quick strike into the body.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Controlled Rush",
+        "type": "Special",
+        "dialogue": "Shiba Inu attacks with controlled Workers 2A pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Memory Strike",
+        "type": "Special",
+        "dialogue": "Shiba Inu fights through a memory flash and strikes back.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Fast Strike",
+      "Sharp Kick",
+      "Body Shot"
+    ],
+    "special": [
+      "Controlled Rush",
+      "Memory Strike"
+    ],
+    "ultimate": [],
+    "defensive_moves": []
+  },
+  "Samuel Seo Workers 2A": {
+    "name": "Samuel Seo",
+    "title": "Workers 2A",
+    "description": "A Workers 2A version of Samuel Seo with strong endurance, ruthless pressure, and manipulative fighting instincts before his Crazy Mode version.",
+    "rarity": "Epic",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1516058013645930667/SAMUEL_SEO_2A.jpeg?ex=6a48fd8d&is=6a47ac0d&hm=f0e506a83620b405b1bf8cb3a507c43a17351dc951a8f8a2589783be860fe8c3&",
+    "stats": {
+      "strength": 39,
+      "speed": 31,
+      "endurance": 41,
+      "technique": 31,
+      "iq": 20,
+      "battle_iq": 24
+    },
+    "moves": [
+      {
+        "name": "Heavy Punch",
+        "type": "Normal",
+        "dialogue": "Samuel throws a heavy direct punch.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Knee Strike",
+        "type": "Normal",
+        "dialogue": "Samuel drives a knee into his opponent.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Body Slam",
+        "type": "Normal",
+        "dialogue": "Samuel uses rough force to slam his opponent.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Pressure",
+        "type": "Special",
+        "dialogue": "Samuel overwhelms his opponent with Workers 2A pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Counter",
+        "type": "Special",
+        "dialogue": "Samuel takes the opening and counters with force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Heavy Punch",
+      "Knee Strike",
+      "Body Slam"
+    ],
+    "special": [
+      "Pressure",
+      "Counter"
+    ],
+    "ultimate": [],
+    "defensive_moves": []
+  },
+  "Ryuhei Kuroda Workers 2A": {
+    "name": "Ryuhei Kuroda",
+    "title": "Workers 2A",
+    "description": "A Workers 2A version of Ryuhei Kuroda with strong leadership, biker-gang combat experience, and dangerous fighting spirit.",
+    "rarity": "Epic",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1516111058497048706/KURODA_RYUHEI_2A.jpeg?ex=6a492ef4&is=6a47dd74&hm=a122e1987876e4d05fe7563d97a8616111a443021144e284f6af92f1e4a2097a&",
+    "stats": {
+      "strength": 40,
+      "speed": 31,
+      "endurance": 37,
+      "technique": 29,
+      "iq": 22,
+      "battle_iq": 28
+    },
+    "moves": [
+      {
+        "name": "Biker Punch",
+        "type": "Normal",
+        "dialogue": "Ryuhei throws a rough biker-style punch.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Kick",
+        "type": "Normal",
+        "dialogue": "Ryuhei attacks with a heavy kick.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Wild Swing",
+        "type": "Normal",
+        "dialogue": "Ryuhei swings with aggressive force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Biker Rush",
+        "type": "Special",
+        "dialogue": "Ryuhei advances with biker-gang pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Fighting Spirit",
+        "type": "Special",
+        "dialogue": "Ryuhei pushes forward with relentless fighting spirit.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Biker Punch",
+      "Heavy Kick",
+      "Wild Swing"
+    ],
+    "special": [
+      "Biker Rush",
+      "Fighting Spirit"
+    ],
+    "ultimate": [],
+    "defensive_moves": []
+  },
+  "Warren Chae Workers 2A": {
+    "name": "Warren Chae",
+    "title": "Workers 2A",
+    "description": "A Workers 2A version of Warren Chae with early CQC, sharp movement, and growing combat intelligence.",
+    "rarity": "Epic",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1516173040990425088/WARREN_CHAE_2A.jpeg?ex=6a48bfee&is=6a476e6e&hm=22b9fe47dc428569f0f15f009e6234fd9669412ebf6568d8cef75e4870e7e100&",
+    "stats": {
+      "strength": 32,
+      "speed": 34,
+      "endurance": 31,
+      "technique": 42,
+      "iq": 18,
+      "battle_iq": 22
+    },
+    "moves": [
+      {
+        "name": "CQC Jab",
+        "type": "Normal",
+        "dialogue": "Warren attacks with a short CQC jab.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "CQC Elbow",
+        "type": "Normal",
+        "dialogue": "Warren closes the gap with a compact elbow strike.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Low Strike",
+        "type": "Normal",
+        "dialogue": "Warren strikes low with controlled precision.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "CQC Rush",
+        "type": "Special",
+        "dialogue": "Warren rushes forward using early CQC pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Gangdong Counter",
+        "type": "Special",
+        "dialogue": "Warren reads the attack and counters with Gangdong fighting sense.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "CQC Jab",
+      "CQC Elbow",
+      "Low Strike"
+    ],
+    "special": [
+      "CQC Rush",
+      "Gangdong Counter"
+    ],
+    "ultimate": [],
+    "defensive_moves": []
+  },
+  "Jake Kim Workers 2A": {
+    "name": "Jake Kim",
+    "title": "Workers 2A",
+    "description": "A Workers 2A version of Jake Kim who fought under pressure against brainwashed Sinu Han while Sinu suffered memory headaches.",
+    "rarity": "Epic",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1516499551052234823/JAKE_KIM_2A.jpeg?ex=6a494744&is=6a47f5c4&hm=7371c5322aa05315e45b5ade244fe0541f79fa79e4e0cdd0a98b5ff8ba1defc2&",
+    "stats": {
+      "strength": 38,
+      "speed": 35,
+      "endurance": 36,
+      "technique": 36,
+      "iq": 20,
+      "battle_iq": 24
+    },
+    "moves": [
+      {
+        "name": "Big Deal Punch",
+        "type": "Normal",
+        "dialogue": "Jake throws a strong Big Deal punch.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Street Kick",
+        "type": "Normal",
+        "dialogue": "Jake attacks with a sharp street kick.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Body Blow",
+        "type": "Normal",
+        "dialogue": "Jake drives a heavy strike into the body.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Resolve",
+        "type": "Special",
+        "dialogue": "Jake pushes forward with Big Deal resolve.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Counter",
+        "type": "Special",
+        "dialogue": "Jake reads the pressure and counters under Workers 2A chaos.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Big Deal Punch",
+      "Street Kick",
+      "Body Blow"
+    ],
+    "special": [
+      "Resolve",
+      "Counter"
+    ],
+    "ultimate": [],
+    "defensive_moves": []
+  },
+  "Yamazaki Gun Cheonliang Arc": {
+    "name": "Yamazaki Gun",
+    "title": "Cheonliang Arc",
+    "description": "A younger Gun Park during the Cheonliang period, already terrifying through Yamazaki combat, overwhelming strength, and elite battle sense.",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377674059026616/1482382057232666624/Picsart_26-02-22_02-51-08-709.jpg?ex=6a4915df&is=6a47c45f&hm=bfca9a49df47ef5c1e6b825be36214cd7eab5281ba3277003435c1691862d1a6&",
+    "masteries": [
+      "Strength Mastery"
+    ],
+    "unique_skills": [
+      "Yamazaki Karate",
+      "Power Threshold",
+      "Oni Pressure"
+    ],
+    "stats": {
+      "strength": 72,
+      "speed": 60,
+      "endurance": 67,
+      "technique": 66,
+      "iq": 45,
+      "battle_iq": 57
+    },
+    "moves": [
+      {
+        "name": "Yamazaki Straight",
+        "type": "Normal",
+        "dialogue": "Gun drives forward with a sharp Yamazaki-style straight.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Iron Low Kick",
+        "type": "Normal",
+        "dialogue": "Gun attacks the base with a heavy low kick.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Body Strike",
+        "type": "Normal",
+        "dialogue": "Gun crushes the body with controlled force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Power Threshold",
+        "type": "Special",
+        "dialogue": "Gun releases overwhelming strength through a precise strike.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Yamazaki Counter",
+        "type": "Special",
+        "dialogue": "Gun reads the attack and counters with brutal timing.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Yamazaki Impact",
+        "type": "Ultimate",
+        "dialogue": "Gun closes the distance and lands a decisive Yamazaki finishing blow.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Yamazaki Straight",
+      "Iron Low Kick",
+      "Body Strike"
+    ],
+    "special": [
+      "Power Threshold",
+      "Yamazaki Counter"
+    ],
+    "ultimate": [
+      "Yamazaki Impact"
+    ],
+    "defensive_moves": []
+  },
+  "James Lee 2T Cheonliang Arc": {
+    "name": "James Lee",
+    "title": "Cheonliang Arc",
+    "description": "A two-threshold James Lee during the Cheonliang period, already defined by elite speed, technical precision, and early invisible-strike pressure.",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377674059026616/1488920893714596003/Picsart_26-04-01_20-47-58-239.png?ex=6a4924a3&is=6a47d323&hm=a2715ac15c65e6ece3775fc256364fce4a79d154d4276d33ea9dad49a25210a4&",
+    "masteries": [
+      "Speed Mastery",
+      "Technique Mastery"
+    ],
+    "unique_skills": [
+      "Speed Threshold",
+      "Technique Threshold",
+      "Blindspot Pressure"
+    ],
+    "stats": {
+      "strength": 56,
+      "speed": 81,
+      "endurance": 55,
+      "technique": 80,
+      "iq": 42,
+      "battle_iq": 50
+    },
+    "moves": [
+      {
+        "name": "Silent Step",
+        "type": "Normal",
+        "dialogue": "James shifts position with clean footwork.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Precision Kick",
+        "type": "Normal",
+        "dialogue": "James lands a sharp kick at a weak point.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Angle Feint",
+        "type": "Normal",
+        "dialogue": "James creates an opening with a subtle angle change.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Speed Threshold",
+        "type": "Special",
+        "dialogue": "James attacks from the opponent's blind spot with overwhelming speed.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Technique Threshold",
+        "type": "Special",
+        "dialogue": "James dismantles the guard with refined technique.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Threshold Finish",
+        "type": "Ultimate",
+        "dialogue": "James combines speed and technique into a clean finishing sequence.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Silent Step",
+      "Precision Kick",
+      "Angle Feint"
+    ],
+    "special": [
+      "Speed Threshold",
+      "Technique Threshold"
+    ],
+    "ultimate": [
+      "Threshold Finish"
+    ],
+    "defensive_moves": []
+  },
+  "Jichang Kwak Holiday Arc": {
+    "name": "Jichang Kwak",
+    "title": "Holiday Arc",
+    "description": "The former King of Seoul and King of Chungcheong, a tactical fighter with overwhelming hand-blade pressure and dual mastery.",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377674059026616/1506276382269898752/CD09E3C1-9F24-4DC0-8080-D89442065D73.jpeg?ex=6a490032&is=6a47aeb2&hm=9d3461f8c29a64203b8633b077cb3083de517c53b6964dea2c686aeefbe0fcb0&",
+    "masteries": [
+      "Strength Mastery",
+      "Speed Mastery"
+    ],
+    "unique_skills": [
+      "Hand-Blade Style",
+      "King's Analysis",
+      "Dual Threshold"
+    ],
+    "stats": {
+      "strength": 73,
+      "speed": 73,
+      "endurance": 59,
+      "technique": 60,
+      "iq": 44,
+      "battle_iq": 47
+    },
+    "moves": [
+      {
+        "name": "Hand-Blade Strike",
+        "type": "Normal",
+        "dialogue": "Jichang cuts through the guard with a precise hand-blade.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "King's Step",
+        "type": "Normal",
+        "dialogue": "Jichang closes distance with composed movement.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Tactical Feint",
+        "type": "Normal",
+        "dialogue": "Jichang tests the opponent's reaction with a calculated feint.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Seoul Strike",
+        "type": "Special",
+        "dialogue": "Jichang strikes with the force of a former Seoul King.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Threshold Counter",
+        "type": "Special",
+        "dialogue": "Jichang uses strength and speed to counter cleanly.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "King's Hand-Blade",
+        "type": "Ultimate",
+        "dialogue": "Jichang delivers a decisive hand-blade strike with complete control.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Hand-Blade Strike",
+      "King's Step",
+      "Tactical Feint"
+    ],
+    "special": [
+      "Seoul Strike",
+      "Threshold Counter"
+    ],
+    "ultimate": [
+      "King's Hand-Blade"
+    ],
+    "defensive_moves": []
+  },
+  "UI OG Daniel Holiday Arc": {
+    "name": "UI OG Daniel",
+    "title": "Holiday Arc",
+    "description": "Original-body Daniel in Ultra Instinct, fighting through automatic combat response and copied techniques without any mastery.",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377674059026616/1506363014251544818/60754AE5-A021-4EC8-B935-DA4917599566.jpeg?ex=6a4950e1&is=6a47ff61&hm=effcad8a4e2d122b0c1ae97aa58d9c3b5eb07269063f9e422d2966264383701f&",
+    "masteries": [],
+    "unique_skills": [
+      "Ultra Instinct",
+      "Copy Response",
+      "Automatic Combat"
+    ],
+    "stats": {
+      "strength": 66,
+      "speed": 76,
+      "endurance": 69,
+      "technique": 78,
+      "iq": 9,
+      "battle_iq": 70
+    },
+    "moves": [
+      {
+        "name": "Automatic Strike",
+        "type": "Normal",
+        "dialogue": "Daniel attacks without hesitation through instinctive movement.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Copied Step",
+        "type": "Normal",
+        "dialogue": "Daniel mirrors a refined step and closes the gap.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Instinctive Kick",
+        "type": "Normal",
+        "dialogue": "Daniel throws a clean kick without conscious delay.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Copy Response",
+        "type": "Special",
+        "dialogue": "Daniel instantly responds with a copied technique.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "UI Counter",
+        "type": "Special",
+        "dialogue": "Daniel counters the attack through automatic combat reaction.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "UI Sequence",
+        "type": "Ultimate",
+        "dialogue": "Daniel chains copied movements into a precise finishing sequence.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Automatic Strike",
+      "Copied Step",
+      "Instinctive Kick"
+    ],
+    "special": [
+      "Copy Response",
+      "UI Counter"
+    ],
+    "ultimate": [
+      "UI Sequence"
+    ],
+    "defensive_moves": []
+  },
+  "Charles Choi Holiday Arc": {
+    "name": "Charles Choi",
+    "title": "Holiday Arc",
+    "description": "The weakest shown version of Charles Choi, aged and one-armed, but still carrying all four masteries and elite combat intelligence.",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377674059026616/1506576414466637834/9B911A56-B93D-4CBF-A553-AEDCEF6755CF.jpeg?ex=6a48c620&is=6a4774a0&hm=697365874b4e57b41cd4161c9d46efe53d414b1113f9e457a9fac22042fca84d&",
+    "masteries": [
+      "Strength Mastery",
+      "Speed Mastery",
+      "Endurance Mastery",
+      "Technique Mastery"
+    ],
+    "unique_skills": [
+      "Four Masteries",
+      "One-Handed Control",
+      "Elite Combat Reading"
+    ],
+    "stats": {
+      "strength": 68,
+      "speed": 60,
+      "endurance": 58,
+      "technique": 69,
+      "iq": 49,
+      "battle_iq": 53
+    },
+    "moves": [
+      {
+        "name": "One-Handed Strike",
+        "type": "Normal",
+        "dialogue": "Charles attacks with precise one-handed force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Controlled Step",
+        "type": "Normal",
+        "dialogue": "Charles shifts his stance with veteran control.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Pressure Jab",
+        "type": "Normal",
+        "dialogue": "Charles probes the defense with a sharp jab.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Mastery Counter",
+        "type": "Special",
+        "dialogue": "Charles counters using complete mastery control.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Elite Intercept",
+        "type": "Special",
+        "dialogue": "Charles reads the attack and intercepts before it fully forms.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Chairman Strike",
+        "type": "Ultimate",
+        "dialogue": "Charles ends the exchange with cold and precise execution.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "One-Handed Strike",
+      "Controlled Step",
+      "Pressure Jab"
+    ],
+    "special": [
+      "Mastery Counter",
+      "Elite Intercept"
+    ],
+    "ultimate": [
+      "Chairman Strike"
+    ],
+    "defensive_moves": []
+  },
+  "Goo Kim Cheonliang Arc": {
+    "name": "Goo Kim",
+    "title": "Cheonliang Arc",
+    "description": "A Cheonliang-era Goo Kim, dangerous through improvisation, weapon handling, and unpredictable combat rhythm without confirmed mastery.",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377674059026616/1513809614750351410/Picsart_26-06-09_13-08-41-103.jpg?ex=6a48b891&is=6a476711&hm=e1f158831d17120251974a7f9b3aae143b507cd300747b422fb929a8e426300a&",
+    "masteries": [],
+    "unique_skills": [
+      "Weapon Handling",
+      "Improvised Blade",
+      "Unpredictable Rhythm"
+    ],
+    "stats": {
+      "strength": 68,
+      "speed": 69,
+      "endurance": 61,
+      "technique": 82,
+      "iq": 41,
+      "battle_iq": 48
+    },
+    "moves": [
+      {
+        "name": "Improvised Cut",
+        "type": "Normal",
+        "dialogue": "Goo turns a simple opening into a weaponized slash.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Quick Draw",
+        "type": "Normal",
+        "dialogue": "Goo strikes with sudden weapon movement.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Pivot Slash",
+        "type": "Normal",
+        "dialogue": "Goo changes angle and cuts through the guard.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Weapon Shift",
+        "type": "Special",
+        "dialogue": "Goo adapts his weapon path mid-combat.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Edge Counter",
+        "type": "Special",
+        "dialogue": "Goo attacks from an awkward angle with perfect timing.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Blade Finish",
+        "type": "Ultimate",
+        "dialogue": "Goo finishes with a clean weapon sequence that leaves no safe angle.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Improvised Cut",
+      "Quick Draw",
+      "Pivot Slash"
+    ],
+    "special": [
+      "Weapon Shift",
+      "Edge Counter"
+    ],
+    "ultimate": [
+      "Blade Finish"
+    ],
+    "defensive_moves": []
+  },
+  "Seongji Yuk 2T": {
+    "name": "Seongji Yuk",
+    "title": "King of Cheonliang",
+    "description": "Two-threshold Seongji Yuk, focused on overwhelming strength, extreme endurance, and disciplined Cheonliang grappling.",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377674059026616/1513811168664354907/Picsart_26-06-09_13-14-56-893.jpg?ex=6a48ba03&is=6a476883&hm=f83adb3cfd1ee925e979f8eff41c3cbcff931da900c37b67f619d82247c8504c&",
+    "masteries": [
+      "Strength Mastery",
+      "Endurance Mastery"
+    ],
+    "unique_skills": [
+      "Cheonliang Grip",
+      "Power Threshold",
+      "Endurance Threshold"
+    ],
+    "stats": {
+      "strength": 75,
+      "speed": 51,
+      "endurance": 74,
+      "technique": 61,
+      "iq": 46,
+      "battle_iq": 55
+    },
+    "moves": [
+      {
+        "name": "Cheonliang Grip",
+        "type": "Normal",
+        "dialogue": "Seongji seizes control with a crushing grip.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Throw",
+        "type": "Normal",
+        "dialogue": "Seongji throws the opponent with raw power.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Iron Clinch",
+        "type": "Normal",
+        "dialogue": "Seongji locks the opponent down with heavy pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Power Threshold",
+        "type": "Special",
+        "dialogue": "Seongji releases overwhelming strength through a direct attack.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Endurance Threshold",
+        "type": "Special",
+        "dialogue": "Seongji absorbs pressure and drives forward.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "King's Throw",
+        "type": "Ultimate",
+        "dialogue": "Seongji ends the exchange with a crushing Cheonliang throw.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Cheonliang Grip",
+      "Heavy Throw",
+      "Iron Clinch"
+    ],
+    "special": [
+      "Power Threshold",
+      "Endurance Threshold"
+    ],
+    "ultimate": [
+      "King's Throw"
+    ],
+    "defensive_moves": []
+  },
+  "The Thing Workers 1A": {
+    "name": "The Thing",
+    "title": "Workers 1A No.1",
+    "description": "A massive Workers 1A brute with overwhelming strength and endurance, but low intelligence and crude technique.",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377674059026616/1513811553231700159/Picsart_26-06-09_13-16-27-283.jpg?ex=6a48ba5f&is=6a4768df&hm=25a16c135bc48075df3533359a4ac08932e8a55ee382d4f51f0c8ae22a0abf9b&",
+    "masteries": [
+      "Strength Mastery",
+      "Endurance Mastery"
+    ],
+    "unique_skills": [
+      "Brute Force",
+      "Iron Body",
+      "Relentless Pressure"
+    ],
+    "stats": {
+      "strength": 84,
+      "speed": 50,
+      "endurance": 84,
+      "technique": 42,
+      "iq": 8,
+      "battle_iq": 70
+    },
+    "moves": [
+      {
+        "name": "Heavy Grab",
+        "type": "Normal",
+        "dialogue": "The Thing grabs with overwhelming force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Shoulder Crash",
+        "type": "Normal",
+        "dialogue": "The Thing crashes forward with his massive body.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Ground Pound",
+        "type": "Normal",
+        "dialogue": "The Thing slams down with brute force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Iron Body Charge",
+        "type": "Special",
+        "dialogue": "The Thing tanks the pressure and drives forward.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Hold",
+        "type": "Special",
+        "dialogue": "The Thing traps the opponent in a brutal hold.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Impact",
+        "type": "Ultimate",
+        "dialogue": "The Thing delivers a raw finishing blow with monstrous force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Heavy Grab",
+      "Shoulder Crash",
+      "Ground Pound"
+    ],
+    "special": [
+      "Iron Body Charge",
+      "Heavy Hold"
+    ],
+    "ultimate": [
+      "Heavy Impact"
+    ],
+    "defensive_moves": []
+  },
+  "Johan Seong Workers 1A": {
+    "name": "Johan Seong",
+    "title": "Workers 1A",
+    "description": "A Workers 1A Johan Seong with dangerous Copy ability, elite technique, and high speed, limited by unstable eyesight and weaker hardware.",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377674059026616/1513811762015637645/Picsart_26-06-09_13-17-18-471.jpg?ex=6a48ba91&is=6a476911&hm=f7801385ee3714ee72aa0b340d5303666cd750c3d8b3815431fe424261a6e847&,",
+    "masteries": [],
+    "unique_skills": [
+      "Copy",
+      "Accelerated Imitation",
+      "Blindspot Adaptation"
+    ],
+    "stats": {
+      "strength": 58,
+      "speed": 69,
+      "endurance": 52,
+      "technique": 79,
+      "iq": 30,
+      "battle_iq": 47
+    },
+    "moves": [
+      {
+        "name": "Copied Jab",
+        "type": "Normal",
+        "dialogue": "Johan copies a clean jab and fires it back.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Quick Step",
+        "type": "Normal",
+        "dialogue": "Johan moves in with sharp speed.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Imitation Kick",
+        "type": "Normal",
+        "dialogue": "Johan mirrors a refined kick from memory.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Accelerated Copy",
+        "type": "Special",
+        "dialogue": "Johan copies the opponent's rhythm and attacks immediately.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Blindspot Adaptation",
+        "type": "Special",
+        "dialogue": "Johan adjusts his timing despite unstable vision.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Imitation Burst",
+        "type": "Ultimate",
+        "dialogue": "Johan compresses copied techniques into a fast finishing burst.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Copied Jab",
+      "Quick Step",
+      "Imitation Kick"
+    ],
+    "special": [
+      "Accelerated Copy",
+      "Blindspot Adaptation"
+    ],
+    "ultimate": [
+      "Imitation Burst"
+    ],
+    "defensive_moves": []
+  },
+  "Seokdu Wang": {
+    "name": "Seokdu Wang",
+    "title": "King of Suwon",
+    "description": "The King of Suwon, a powerful and durable fighter known for direct pressure, headbutts, and simple but dangerous combat.",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377674059026616/1516744012256645130/SEOKDU_WANG_HOH.jpeg?ex=6a48d970&is=6a4787f0&hm=35ea4c04324fec83c97e1e6ef8f18fb33abe90638cfb1f9c4b0517f402d4f633&",
+    "masteries": [
+      "Strength Mastery"
+    ],
+    "unique_skills": [
+      "Suwon Headbutt",
+      "King's Pressure",
+      "Heavy Frame"
+    ],
+    "stats": {
+      "strength": 79,
+      "speed": 43,
+      "endurance": 74,
+      "technique": 50,
+      "iq": 17,
+      "battle_iq": 62
+    },
+    "moves": [
+      {
+        "name": "Suwon Headbutt",
+        "type": "Normal",
+        "dialogue": "Seokdu attacks with his signature headbutt.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Swing",
+        "type": "Normal",
+        "dialogue": "Seokdu throws a heavy direct swing.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Body Drive",
+        "type": "Normal",
+        "dialogue": "Seokdu pushes forward with his full frame.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "King's Pressure",
+        "type": "Special",
+        "dialogue": "Seokdu overwhelms the opponent with Suwon's pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Counter",
+        "type": "Special",
+        "dialogue": "Seokdu absorbs the hit and counters with raw force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Suwon Crash",
+        "type": "Ultimate",
+        "dialogue": "Seokdu lands a full-force headbutt that shakes the opponent.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Suwon Headbutt",
+      "Heavy Swing",
+      "Body Drive"
+    ],
+    "special": [
+      "King's Pressure",
+      "Heavy Counter"
+    ],
+    "ultimate": [
+      "Suwon Crash"
+    ],
+    "defensive_moves": []
+  },
+  "Taesoo Ma": {
+    "name": "Taesoo Ma",
+    "title": "King of Ansan",
+    "description": "The King of Ansan, a strength-focused fighter whose right fist remains one of the most dangerous weapons among the Kings.",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377674059026616/1519331882385412117/TAESOO_MA_GEN_2.jpeg?ex=6a490914&is=6a47b794&hm=f760081c9443695839d27136c46323653fad75145fdb4f3700dc3f21c256ccb5&",
+    "masteries": [
+      "Strength Mastery"
+    ],
+    "unique_skills": [
+      "Ansan Fist",
+      "Power Threshold",
+      "Single-Fist Resolve"
+    ],
+    "stats": {
+      "strength": 87,
+      "speed": 45,
+      "endurance": 68,
+      "technique": 46,
+      "iq": 22,
+      "battle_iq": 62
+    },
+    "moves": [
+      {
+        "name": "Ansan Fist",
+        "type": "Normal",
+        "dialogue": "Taesoo throws a direct power punch.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Guard Break",
+        "type": "Normal",
+        "dialogue": "Taesoo attacks through the opponent's guard.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Right-Hand Feint",
+        "type": "Normal",
+        "dialogue": "Taesoo threatens with his dominant fist.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Power Threshold",
+        "type": "Special",
+        "dialogue": "Taesoo releases the full force of his strength mastery.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "King's Right Hand",
+        "type": "Special",
+        "dialogue": "Taesoo commits to a devastating right-hand strike.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "King's Fist",
+        "type": "Ultimate",
+        "dialogue": "Taesoo lands a crushing blow from the fist that defines Ansan.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Ansan Fist",
+      "Guard Break",
+      "Right-Hand Feint"
+    ],
+    "special": [
+      "Power Threshold",
+      "King's Right Hand"
+    ],
+    "ultimate": [
+      "King's Fist"
+    ],
+    "defensive_moves": []
+  },
+  "Jinyoung Park Medicine Genius": {
+    "name": "Jinyoung Park",
+    "title": "Medicine Genius",
+    "description": "Jinyoung Park as the Medicine Genius, a complete master with elite intelligence, medical precision, and all four masteries.",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377674059026616/1513810049171062855/Picsart_26-06-09_13-10-29-620.jpg?ex=6a48b8f8&is=6a476778&hm=d5226fd92eb5cbb4e722a2b59febaa44e406ae43fca39f9c190893ff632dee38&",
+    "masteries": [
+      "Strength Mastery",
+      "Speed Mastery",
+      "Endurance Mastery",
+      "Technique Mastery"
+    ],
+    "unique_skills": [
+      "Medical Precision",
+      "Four Masteries",
+      "Copy Analysis"
+    ],
+    "stats": {
+      "strength": 69,
+      "speed": 73,
+      "endurance": 67,
+      "technique": 80,
+      "iq": 50,
+      "battle_iq": 47
+    },
+    "moves": [
+      {
+        "name": "Precision Jab",
+        "type": "Normal",
+        "dialogue": "Jinyoung strikes with medical precision.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Nerve Check",
+        "type": "Normal",
+        "dialogue": "Jinyoung targets a vulnerable point with a controlled hit.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Copy Step",
+        "type": "Normal",
+        "dialogue": "Jinyoung mirrors the opponent's movement and shifts position.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Medical Precision",
+        "type": "Special",
+        "dialogue": "Jinyoung attacks a weak point with surgical accuracy.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Mastery Flow",
+        "type": "Special",
+        "dialogue": "Jinyoung links all four masteries into a controlled sequence.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Precision Sequence",
+        "type": "Ultimate",
+        "dialogue": "Jinyoung reads the body and finishes with a precise technical chain.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Precision Jab",
+      "Nerve Check",
+      "Copy Step"
+    ],
+    "special": [
+      "Medical Precision",
+      "Mastery Flow"
+    ],
+    "ultimate": [
+      "Precision Sequence"
+    ],
+    "defensive_moves": []
+  },
+  "Goo Kim 1st Moonlight Technique": {
+    "name": "Goo Kim",
+    "title": "1st Moonlight Technique",
+    "description": "Goo Kim using the first Moonlight Technique, a weapon-focused style with terrifying precision and overwhelming blade control.",
+    "rarity": "Legendary",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377674059026616/1513810545487380640/Picsart_26-06-09_13-12-30-531.jpg?ex=6a48b96f&is=6a4767ef&hm=89f09ad722a475556923375f6e257e82e119ec95d44452b113732e6021f0afeb&",
+    "masteries": [],
+    "unique_skills": [
+      "Moonlight Technique",
+      "Blade Control",
+      "Weapon Genius"
+    ],
+    "stats": {
+      "strength": 67,
+      "speed": 74,
+      "endurance": 58,
+      "technique": 94,
+      "iq": 38,
+      "battle_iq": 57
+    },
+    "moves": [
+      {
+        "name": "Moonlight Cut",
+        "type": "Normal",
+        "dialogue": "Goo cuts with a clean Moonlight path.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Blade Step",
+        "type": "Normal",
+        "dialogue": "Goo shifts with his weapon already in motion.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Guard Split",
+        "type": "Normal",
+        "dialogue": "Goo slices through the opponent's guard angle.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Moonlight Technique",
+        "type": "Special",
+        "dialogue": "Goo releases a precise Moonlight sword sequence.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Weapon Control",
+        "type": "Special",
+        "dialogue": "Goo turns the weapon angle into an unavoidable threat.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Moonlight Arc",
+        "type": "Ultimate",
+        "dialogue": "Goo completes the first Moonlight Technique with a decisive blade arc.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Moonlight Cut",
+      "Blade Step",
+      "Guard Split"
+    ],
+    "special": [
+      "Moonlight Technique",
+      "Weapon Control"
+    ],
+    "ultimate": [
+      "Moonlight Arc"
+    ],
+    "defensive_moves": []
+  },
+  "Gun Park Shiro Oni": {
+    "name": "Gun Park",
+    "title": "Shiro Oni",
+    "description": "Gun Park as Shiro Oni, a peak Mythical-level monster defined by overwhelming strength, endurance, and Yamazaki combat.",
+    "rarity": "Mythical",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377631125995664/1508763504889430057/4FC77446-4BB2-411C-A40B-D8186ACA4A0B.jpeg?ex=6a48d203&is=6a478083&hm=136d8c27b2a7c31729026e3af7ed33b6d89b1650e89eb0659a8945336613faff&",
+    "masteries": [
+      "Strength Mastery",
+      "Endurance Mastery"
+    ],
+    "unique_skills": [
+      "Shiro Oni",
+      "Yamazaki Combat",
+      "Iron Pressure"
+    ],
+    "stats": {
+      "strength": 95,
+      "speed": 66,
+      "endurance": 92,
+      "technique": 74,
+      "iq": 48,
+      "battle_iq": 65
+    },
+    "moves": [
+      {
+        "name": "Yamazaki Straight",
+        "type": "Normal",
+        "dialogue": "Gun drives forward with a devastating straight.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Iron Roundhouse",
+        "type": "Normal",
+        "dialogue": "Gun attacks with a heavy Yamazaki roundhouse.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Bone Crush",
+        "type": "Normal",
+        "dialogue": "Gun breaks through the opponent's defense with raw force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Iron Pressure",
+        "type": "Special",
+        "dialogue": "Gun overwhelms the field with demonic pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Endurance Threshold",
+        "type": "Special",
+        "dialogue": "Gun absorbs damage and answers with heavier force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Yamazaki Break",
+        "type": "Ultimate",
+        "dialogue": "Gun finishes with the full weight of Shiro Oni power.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Yamazaki Straight",
+      "Iron Roundhouse",
+      "Bone Crush"
+    ],
+    "special": [
+      "Iron Pressure",
+      "Endurance Threshold"
+    ],
+    "ultimate": [
+      "Yamazaki Break"
+    ],
+    "defensive_moves": []
+  },
+  "Tom Lee Beggar King": {
+    "name": "Tom Lee",
+    "title": "Beggar King",
+    "description": "Tom Lee as the Beggar King, a complete monster with all four masteries, ruthless combat habits, and overwhelming fighting experience.",
+    "rarity": "Mythical",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377631125995664/1513516987039486033/TOM_LEE_1A.jpeg?ex=6a48f989&is=6a47a809&hm=a51783f84359706e89d2335124997f0fa2df39cfd5179ca278132ae052c61cc7&",
+    "masteries": [
+      "Strength Mastery",
+      "Speed Mastery",
+      "Endurance Mastery",
+      "Technique Mastery"
+    ],
+    "unique_skills": [
+      "Fighting Genius",
+      "Wild Intercept",
+      "Four Masteries"
+    ],
+    "stats": {
+      "strength": 88,
+      "speed": 68,
+      "endurance": 84,
+      "technique": 79,
+      "iq": 48,
+      "battle_iq": 64
+    },
+    "moves": [
+      {
+        "name": "Wild Grab",
+        "type": "Normal",
+        "dialogue": "Tom closes in with a brutal grab.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Stomp",
+        "type": "Normal",
+        "dialogue": "Tom stomps down with ruthless force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Dirty Feint",
+        "type": "Normal",
+        "dialogue": "Tom tricks the opponent with an ugly but effective feint.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Combat Read",
+        "type": "Special",
+        "dialogue": "Tom reads the exchange and attacks from an unexpected angle.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Wild Intercept",
+        "type": "Special",
+        "dialogue": "Tom interrupts the opponent before they can complete their action.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Full-Body Assault",
+        "type": "Ultimate",
+        "dialogue": "Tom ends the fight with a ruthless full-body assault.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Wild Grab",
+      "Heavy Stomp",
+      "Dirty Feint"
+    ],
+    "special": [
+      "Combat Read",
+      "Wild Intercept"
+    ],
+    "ultimate": [
+      "Full-Body Assault"
+    ],
+    "defensive_moves": []
+  },
+  "James Lee 3T Cheonliang Arc": {
+    "name": "James Lee",
+    "title": "Cheonliang Arc",
+    "description": "Three-threshold James Lee during the Cheonliang period, a near-complete speed and technique monster with growing endurance.",
+    "rarity": "Mythical",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377631125995664/1513517542210015405/Picsart_26-06-08_17-47-55-210.png?ex=6a48fa0d&is=6a47a88d&hm=d0d5f473decb22dc752d0a43eb7d8af721f38038b2758d44d72470ef1b854116&",
+    "masteries": [
+      "Speed Mastery",
+      "Endurance Mastery",
+      "Technique Mastery"
+    ],
+    "unique_skills": [
+      "Three Thresholds",
+      "Invisible Strike",
+      "Perfect Footwork"
+    ],
+    "stats": {
+      "strength": 70,
+      "speed": 93,
+      "endurance": 63,
+      "technique": 92,
+      "iq": 49,
+      "battle_iq": 60
+    },
+    "moves": [
+      {
+        "name": "Perfect Step",
+        "type": "Normal",
+        "dialogue": "James moves with flawless footwork.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Blindspot Kick",
+        "type": "Normal",
+        "dialogue": "James attacks from a blind spot with a clean kick.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Angle Break",
+        "type": "Normal",
+        "dialogue": "James breaks the opponent's position with a sharp angle.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Invisible Strike",
+        "type": "Special",
+        "dialogue": "James attacks faster than the opponent can properly track.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Threshold Flow",
+        "type": "Special",
+        "dialogue": "James links speed, endurance, and technique into a complete sequence.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Cheonliang Flash",
+        "type": "Ultimate",
+        "dialogue": "James finishes with a high-speed sequence of invisible strikes.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Perfect Step",
+      "Blindspot Kick",
+      "Angle Break"
+    ],
+    "special": [
+      "Invisible Strike",
+      "Threshold Flow"
+    ],
+    "ultimate": [
+      "Cheonliang Flash"
+    ],
+    "defensive_moves": []
+  },
+  "Seongji Yuk 3T": {
+    "name": "Seongji Yuk",
+    "title": "King of Cheonliang",
+    "description": "Three-threshold Seongji Yuk, a Cheonliang King with terrifying strength, endurance, and improved speed.",
+    "rarity": "Mythical",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377631125995664/1513618496116883627/SEONJI_YUK_3T.jpeg?ex=6a48af53&is=6a475dd3&hm=b27632a2f84b46beb9fc42766cb4c283e1e9695832e1991dda1e807eba86eab7&",
+    "masteries": [
+      "Strength Mastery",
+      "Speed Mastery",
+      "Endurance Mastery"
+    ],
+    "unique_skills": [
+      "Three Thresholds",
+      "Mujin Ssireum",
+      "Cheonliang King's Grip"
+    ],
+    "stats": {
+      "strength": 89,
+      "speed": 66,
+      "endurance": 90,
+      "technique": 72,
+      "iq": 48,
+      "battle_iq": 60
+    },
+    "moves": [
+      {
+        "name": "King's Grip",
+        "type": "Normal",
+        "dialogue": "Seongji takes control with a crushing grip.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Mujin Throw",
+        "type": "Normal",
+        "dialogue": "Seongji throws the opponent with overwhelming force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Step",
+        "type": "Normal",
+        "dialogue": "Seongji advances with unstoppable pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Threshold Drive",
+        "type": "Special",
+        "dialogue": "Seongji combines strength, speed, and endurance into one charge.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Cheonliang Lock",
+        "type": "Special",
+        "dialogue": "Seongji traps the opponent and shuts down their movement.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Mountain Throw",
+        "type": "Ultimate",
+        "dialogue": "Seongji finishes with a devastating Cheonliang throw.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "King's Grip",
+      "Mujin Throw",
+      "Heavy Step"
+    ],
+    "special": [
+      "Threshold Drive",
+      "Cheonliang Lock"
+    ],
+    "ultimate": [
+      "Mountain Throw"
+    ],
+    "defensive_moves": []
+  },
+  "Manager Kim White Tiger No.2": {
+    "name": "Manager Kim",
+    "title": "White Tiger No.2",
+    "description": "Manager Kim as White Tiger No.2, a complete military combat specialist with all four masteries and elite technical control.",
+    "rarity": "Mythical",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377631125995664/1516475947602153584/MANAGER_KIM_HOH.jpeg?ex=6a493148&is=6a47dfc8&hm=fee69c59d1d35031f465885077d793c1de1492bef24ac8ccbdb96906ec2ab9d1&",
+    "masteries": [
+      "Strength Mastery",
+      "Speed Mastery",
+      "Endurance Mastery",
+      "Technique Mastery"
+    ],
+    "unique_skills": [
+      "CQC Mastery",
+      "Military Precision",
+      "Four Masteries"
+    ],
+    "stats": {
+      "strength": 76,
+      "speed": 82,
+      "endurance": 72,
+      "technique": 89,
+      "iq": 51,
+      "battle_iq": 60
+    },
+    "moves": [
+      {
+        "name": "CQC Jab",
+        "type": "Normal",
+        "dialogue": "Manager Kim strikes with compact close-quarters precision.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Joint Lock",
+        "type": "Normal",
+        "dialogue": "Manager Kim attacks the joint with controlled force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Tactical Step",
+        "type": "Normal",
+        "dialogue": "Manager Kim shifts into a better angle without wasted motion.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Military Precision",
+        "type": "Special",
+        "dialogue": "Manager Kim targets a weak point with trained accuracy.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "CQC Suppression",
+        "type": "Special",
+        "dialogue": "Manager Kim shuts down the opponent with close-quarters control.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "CQC Sequence",
+        "type": "Ultimate",
+        "dialogue": "Manager Kim executes a complete CQC finishing sequence.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "CQC Jab",
+      "Joint Lock",
+      "Tactical Step"
+    ],
+    "special": [
+      "Military Precision",
+      "CQC Suppression"
+    ],
+    "ultimate": [
+      "CQC Sequence"
+    ],
+    "defensive_moves": []
+  },
+  "Kitae Kim Silhouette": {
+    "name": "Kitae Kim",
+    "title": "Silhouette",
+    "description": "Kitae Kim in silhouette, a peak Infernal threat defined by monstrous strength, brutal endurance, and overwhelming presence.",
+    "rarity": "Infernal",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377577661337640/1519606820463837234/KITAE_KIM_CHEONGLIANG.jpeg?ex=6a48b7a2&is=6a476622&hm=99bc03c668c560bf84e43698d17a6f10b45712b685095db8b7923ffd795be43f&",
+    "masteries": [
+      "Strength Mastery",
+      "Endurance Mastery"
+    ],
+    "unique_skills": [
+      "Brutal Bloodline",
+      "Overwhelming Frame",
+      "Predatory Pressure"
+    ],
+    "stats": {
+      "strength": 98,
+      "speed": 77,
+      "endurance": 96,
+      "technique": 82,
+      "iq": 61,
+      "battle_iq": 73
+    },
+    "moves": [
+      {
+        "name": "Heavy Strike",
+        "type": "Normal",
+        "dialogue": "Kitae attacks with frightening raw power.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Step-In",
+        "type": "Normal",
+        "dialogue": "Kitae closes the gap with predatory pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Blow",
+        "type": "Normal",
+        "dialogue": "Kitae lands a brutal force-driven hit.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Frame Control",
+        "type": "Special",
+        "dialogue": "Kitae uses his physical presence to dominate the exchange.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Endurance Breaker",
+        "type": "Special",
+        "dialogue": "Kitae tanks the impact and answers with crushing force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Silhouette Strike",
+        "type": "Ultimate",
+        "dialogue": "Kitae ends the fight with a brutal, unreadable finishing strike.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Heavy Strike",
+      "Heavy Step-In",
+      "Heavy Blow"
+    ],
+    "special": [
+      "Frame Control",
+      "Endurance Breaker"
+    ],
+    "ultimate": [
+      "Silhouette Strike"
+    ],
+    "defensive_moves": []
+  },
+  "Diego Kang Idol of PTJ Company": {
+    "name": "Diego Kang",
+    "title": "Idol of PTJ Company",
+    "description": "Diego Kang at peak Abyssal level, a supreme speed and technique monster whose invisible strikes define the top of the system.",
+    "rarity": "Abyssal",
+    "image_url": "https://cdn.discordapp.com/attachments/1482377522640584776/1519433746124771488/DIEGO_KANG.jpeg?ex=6a48bf32&is=6a476db2&hm=ae7c9d6faa6659b1a2b7d9b1f4742356d4e11f71246eb32a4e3db92f2a3cd78d&",
+    "masteries": [
+      "Strength Mastery",
+      "Speed Mastery",
+      "Technique Mastery"
+    ],
+    "unique_skills": [
+      "Invisible Strike",
+      "Perfect Footwork",
+      "Peak Technique"
+    ],
+    "stats": {
+      "strength": 94,
+      "speed": 100,
+      "endurance": 82,
+      "technique": 100,
+      "iq": 76,
+      "battle_iq": 86
+    },
+    "moves": [
+      {
+        "name": "Invisible Step",
+        "type": "Normal",
+        "dialogue": "Diego moves before the opponent can react.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Vital Kick",
+        "type": "Normal",
+        "dialogue": "Diego targets a vital point with a clean kick.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Hands-Free Feint",
+        "type": "Normal",
+        "dialogue": "Diego creates an opening with effortless movement.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Invisible Strike",
+        "type": "Special",
+        "dialogue": "Diego attacks from a blind spot at overwhelming speed.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Perfect Footwork",
+        "type": "Special",
+        "dialogue": "Diego controls the entire exchange through flawless positioning.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Final Sequence",
+        "type": "Ultimate",
+        "dialogue": "Diego ends the fight with a perfect invisible-strike sequence.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      }
+    ],
+    "attacks": [
+      "Invisible Step",
+      "Vital Kick",
+      "Hands-Free Feint"
+    ],
+    "special": [
+      "Invisible Strike",
+      "Perfect Footwork"
+    ],
+    "ultimate": [
+      "Final Sequence"
+    ],
     "defensive_moves": []
   }
 }

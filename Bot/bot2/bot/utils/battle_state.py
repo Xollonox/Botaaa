@@ -10,7 +10,7 @@ from typing import Any
 
 from bot.utils.attacks_logic import ensure_attacks_structure
 from bot.utils.battle_engine_pdf import normalize_attack_type
-from bot.utils.cards_logic import compute_scaled_stats
+from bot.utils.cards_logic import compute_scaled_stats, normalize_mastery_list
 from bot.utils.squad_logic import get_player
 from bot.utils.timeutil import now_ts
 from bot.utils import achievement_logic as _ach
@@ -169,6 +169,11 @@ def _build_hp(stats: dict[str, int], mastery: list[str]) -> int:
     return max(1, endurance * mult)
 
 
+def _catalog_mastery(card_def: dict[str, Any]) -> list[str]:
+    raw = card_def.get("mastery", card_def.get("masteries", []))
+    return [str(m).lower() for m in normalize_mastery_list(raw)]
+
+
 def _build_cpu_side(data: dict[str, Any], team_size: int = 4, min_rarity: str = "Rare", player_trophies: int = 0) -> dict[str, Any]:
     """
     Build a CPU team side from the card catalog with star levels scaled to player rank.
@@ -237,13 +242,7 @@ def _build_cpu_side(data: dict[str, Any], team_size: int = 4, min_rarity: str = 
             star_range = (3, 5)
         stars = random.randint(*star_range)
         scaled = compute_scaled_stats(card_def, stars) if isinstance(card_def, dict) else {}
-        mastery_raw = card_def.get("mastery", [])
-        if isinstance(mastery_raw, list):
-            mastery = [str(m).lower() for m in mastery_raw]
-        elif isinstance(mastery_raw, dict):
-            mastery = [str(mastery_raw.get("type", "")).lower()] if mastery_raw.get("type") else []
-        else:
-            mastery = []
+        mastery = _catalog_mastery(card_def)
 
         cur_hp = _build_hp(scaled, mastery)
         hp[uid] = cur_hp
@@ -317,7 +316,7 @@ def _build_player_side(data: dict[str, Any], user_id: str, team_uids: list[str])
         card_def = cards.get(card_name, {}) if isinstance(cards.get(card_name, {}), dict) else {}
         stars = int(inst.get("stars", 0))
         scaled = compute_scaled_stats(card_def, stars) if isinstance(card_def, dict) else {}
-        mastery = list(card_def.get("mastery", [])) if isinstance(card_def.get("mastery", []), list) else []
+        mastery = _catalog_mastery(card_def)
 
         # Apply weapon buffs if equipped
         weapon_uid = inst.get("weapon_uid")

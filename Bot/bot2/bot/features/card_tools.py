@@ -29,6 +29,15 @@ def _resolve_field(raw: Any, desc_raw: Any = None) -> tuple[str, str]:
     return name, desc
 
 
+def _resolve_unique_skills(card: dict[str, Any]) -> tuple[str, str]:
+    skill_names = card.get("unique_skills")
+    if isinstance(skill_names, list):
+        names = [str(name).strip() for name in skill_names if str(name).strip()]
+        if names:
+            return ", ".join(names), "—"
+    return _resolve_field(card.get("unique_skill"), card.get("unique_skill_description"))
+
+
 def _card_name_choices(data: dict[str, Any], current: str) -> list[app_commands.Choice[str]]:
     cards = data.get("cards", {})
     if not isinstance(cards, dict):
@@ -70,11 +79,11 @@ def _build_catalog_card_embed(data: dict[str, Any], card: dict[str, Any]) -> dis
     scaled = compute_scaled_stats(card, 0)
     power  = compute_power(scaled)
 
-    mastery_list = normalize_mastery_list(card.get("mastery", []))
+    mastery_list = normalize_mastery_list(card.get("mastery", card.get("masteries", [])))
     mastery_str  = "  ".join(f"• {m}" for m in mastery_list) if mastery_list else "—"
 
     unique_path,  unique_path_desc  = _resolve_field(card.get("unique_path"),  card.get("unique_path_description"))
-    unique_skill, unique_skill_desc = _resolve_field(card.get("unique_skill"), card.get("unique_skill_description"))
+    unique_skill, unique_skill_desc = _resolve_unique_skills(card)
 
     heading = f"{_rarity_icon(rarity)} {rarity} • {card_name}"
     if title:

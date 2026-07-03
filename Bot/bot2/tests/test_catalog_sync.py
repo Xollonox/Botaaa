@@ -60,7 +60,7 @@ def test_ensure_structure_refreshes_known_cards_without_dropping_runtime_cards()
 
     normalized = ensure_structure(data)
 
-    assert normalized["cards"]["Vin Jin"]["stats"]["technique"] == 24
+    assert normalized["cards"]["Vin Jin"]["stats"]["technique"] == 22
     assert normalized["cards"]["Admin Custom"]["description"] == "runtime card"
     assert "biq" not in normalized["cards"]["Admin Custom"]["stats"]
 

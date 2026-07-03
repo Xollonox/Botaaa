@@ -2,25 +2,29 @@
 
 > Bot2 - Lookism HXCC Card Catalog
 
+## Battle Connection
+
+- Battle reads each card from `cards.json` through the catalog in runtime data.
+- Active battle stats use `stats` with the connected keys `strength`, `speed`, `endurance`, `technique`, `iq`, and `battle_iq`.
+- Move buttons are sourced from `attacks`, `special`, and `ultimate` lists.
+- Catalog move definitions live in `moves`; each listed move name must match its reference list.
+- Higher-rarity cards use `masteries` and `unique_skills`; runtime compatibility also accepts the older `mastery` and `unique_skill` fields.
+
 ## Rarity Stat Ranges
 
-| Rarity | Total Range | Current Status |
-|---|---:|---|
-| Common | 0-20 | 38 cards in catalog |
-| Rare | 70-120 | 35 cards in catalog |
-| Epic | 170-220 | 23 cards in catalog |
-| Legendary | 290-390 | not present yet |
-| Mythical | 340-440 | not present yet |
-| Infernal | 390-490 | not present yet |
-| Abyssal | 440-540 | not present yet |
+| Rarity | Total Range | Cards |
+|---|---:|---:|
+| Common | 0-20 | 38 |
+| Rare | 70-120 | 35 |
+| Epic | 170-220 | 29 |
+| Legendary | 290-390 | 13 |
+| Mythical | 340-440 | 5 |
+| Infernal | 390-490 | 1 |
+| Abyssal | 440-540 | 1 |
 
-## Notes
+## Cards By Rarity
 
-- Common and Rare cards use the reduced stat scale currently active in `cards.json`.
-- Epic cards are listed from the current catalog but have not yet been rescaled to the new Epic range.
-- Stat order is `strength`, `speed`, `endurance`, `technique`, `iq`, `battle_iq`.
-
-## Common Cards (38)
+### Common (38 cards)
 
 | # | Key | Title | STR | SPD | END | TEC | IQ | BIQ | Total |
 |---:|---|---|---:|---:|---:|---:|---:|---:|---:|
@@ -63,7 +67,7 @@
 | 37 | Old Face | Big Deal No. 2 | 3 | 3 | 3 | 3 | 2 | 4 | 18 |
 | 38 | Olly Wang Happy | Middle School Happy | 2 | 2 | 8 | 1 | 2 | 2 | 17 |
 
-## Rare Cards (35)
+### Rare (35 cards)
 
 | # | Key | Title | STR | SPD | END | TEC | IQ | BIQ | Total |
 |---:|---|---|---:|---:|---:|---:|---:|---:|---:|
@@ -103,41 +107,87 @@
 | 34 | Logan Lee 3A | Goo's Friend | 18 | 10 | 24 | 15 | 11 | 28 | 106 |
 | 35 | Channing Choi | Ansan Public No.2 | 22 | 15 | 23 | 16 | 9 | 20 | 105 |
 
-## Epic Cards (23)
+### Epic (29 cards)
 
 | # | Key | Title | STR | SPD | END | TEC | IQ | BIQ | Total |
 |---:|---|---|---:|---:|---:|---:|---:|---:|---:|
-| 1 | Hudson | Holiday Arc | 42 | 38 | 40 | 37 | 35 | 38 | 230 |
-| 2 | Daniel Park | Masterpiece | 43 | 40 | 39 | 38 | 36 | 39 | 235 |
-| 3 | Xiaolung | Lover | 41 | 39 | 40 | 38 | 37 | 40 | 235 |
-| 4 | Jerry Kwon | Big Deal No.2 | 44 | 39 | 41 | 37 | 35 | 39 | 235 |
-| 5 | Sinu Han | Boy of Promise | 42 | 45 | 38 | 39 | 36 | 40 | 240 |
-| 6 | Zack Lee | Iron Boxer | 44 | 38 | 43 | 37 | 35 | 38 | 235 |
-| 7 | Kuroda Ryuhae | Biker Gang Leader | 43 | 40 | 39 | 38 | 36 | 39 | 235 |
-| 8 | Kojima Brothers | Ghost Brothers | 41 | 39 | 40 | 39 | 37 | 39 | 235 |
-| 9 | Jaesu Noh 2 | Old Pre Gen | 42 | 40 | 39 | 38 | 37 | 39 | 235 |
-| 10 | Gwang Yu 2 | MMA Creator | 43 | 39 | 40 | 39 | 36 | 38 | 235 |
-| 11 | Beolgu Lee 2 | Pre Gen | 41 | 40 | 39 | 40 | 36 | 39 | 235 |
-| 12 | Sameul Seo | Crazy Mode | 44 | 39 | 38 | 40 | 37 | 37 | 235 |
-| 13 | Zack Lee 2 | Imperfect Iron Fortess | 42 | 41 | 42 | 38 | 36 | 38 | 237 |
-| 14 | Hudson 2 | Sun of Ansan | 43 | 39 | 40 | 38 | 36 | 39 | 235 |
-| 15 | Vasco | Hero | 44 | 38 | 41 | 37 | 36 | 39 | 235 |
-| 16 | Daniel Park 2 | Workers Arc | 44 | 40 | 39 | 38 | 37 | 37 | 235 |
-| 17 | Taejin Choi | Kalwa | 42 | 39 | 40 | 39 | 37 | 38 | 235 |
-| 18 | Warren Chae | Gangdong's Mighty | 43 | 38 | 41 | 38 | 37 | 38 | 235 |
-| 19 | Eli Jang | Hostel No.1 | 42 | 39 | 40 | 39 | 37 | 38 | 235 |
-| 20 | Jerry Kwon 2 | Workers Arc 1st | 43 | 39 | 40 | 38 | 37 | 38 | 235 |
-| 21 | Jake Kim | Big Deal No.1 | 44 | 39 | 40 | 38 | 37 | 37 | 235 |
-| 22 | Minsik Choi | Criminal | 43 | 38 | 40 | 39 | 37 | 38 | 235 |
-| 23 | Daniel Park 3 | The Affiliate Hunter | 45 | 39 | 40 | 38 | 36 | 37 | 235 |
+| 1 | Hudson | Holiday Arc | 54 | 20 | 35 | 31 | 22 | 22 | 184 |
+| 2 | Daniel Park | Masterpiece | 39 | 43 | 34 | 45 | 22 | 24 | 207 |
+| 3 | Xiaolung | Lover | 28 | 31 | 27 | 47 | 17 | 30 | 180 |
+| 4 | Jerry Kwon | Big Deal No.2 | 43 | 24 | 43 | 24 | 15 | 39 | 188 |
+| 5 | Sinu Han | Boy of Promise | 35 | 50 | 37 | 43 | 16 | 25 | 206 |
+| 6 | Zack Lee | Iron Boxer | 36 | 37 | 41 | 35 | 18 | 22 | 189 |
+| 7 | Kuroda Ryuhae | Biker Gang Leader | 42 | 35 | 40 | 28 | 23 | 34 | 202 |
+| 8 | Kojima Brothers | Ghost Brothers | 40 | 34 | 39 | 39 | 23 | 30 | 205 |
+| 9 | Jaesu Noh 2 | Old Pre Gen | 40 | 27 | 38 | 31 | 24 | 32 | 192 |
+| 10 | Gwang Yu 2 | MMA Creator | 39 | 30 | 38 | 38 | 23 | 26 | 194 |
+| 11 | Beolgu Lee 2 | Pre Gen | 40 | 28 | 37 | 30 | 24 | 32 | 191 |
+| 12 | Sameul Seo | Crazy Mode | 41 | 36 | 42 | 35 | 21 | 25 | 200 |
+| 13 | Zack Lee 2 | Imperfect Iron Fortess | 38 | 42 | 46 | 47 | 13 | 19 | 205 |
+| 14 | Hudson 2 | Sun of Ansan | 52 | 26 | 39 | 36 | 21 | 29 | 203 |
+| 15 | Vasco | Hero | 49 | 34 | 45 | 38 | 14 | 24 | 204 |
+| 16 | Daniel Park 2 | Workers Arc | 39 | 43 | 34 | 45 | 24 | 26 | 211 |
+| 17 | Taejin Choi | Kalwa | 43 | 34 | 41 | 36 | 19 | 30 | 203 |
+| 18 | Warren Chae | Gangdong's Mighty | 35 | 37 | 34 | 44 | 19 | 27 | 196 |
+| 19 | Eli Jang | Hostel No.1 | 35 | 41 | 34 | 43 | 20 | 26 | 199 |
+| 20 | Jerry Kwon 2 | Workers Arc 1st | 45 | 26 | 46 | 25 | 16 | 38 | 196 |
+| 21 | Jake Kim | Big Deal No.1 | 40 | 36 | 38 | 37 | 22 | 28 | 201 |
+| 22 | Minsik Choi | Criminal | 39 | 23 | 38 | 21 | 13 | 38 | 172 |
+| 23 | Daniel Park 3 | The Affiliate Hunter | 30 | 33 | 39 | 46 | 17 | 21 | 186 |
+| 24 | Vin Jin Workers 2A | Workers 2A | 39 | 30 | 34 | 33 | 17 | 24 | 177 |
+| 25 | Shiba Inu Workers 2A | Workers 2A | 39 | 37 | 38 | 39 | 18 | 20 | 191 |
+| 26 | Samuel Seo Workers 2A | Workers 2A | 39 | 31 | 41 | 31 | 20 | 24 | 186 |
+| 27 | Ryuhei Kuroda Workers 2A | Workers 2A | 40 | 31 | 37 | 29 | 22 | 28 | 187 |
+| 28 | Warren Chae Workers 2A | Workers 2A | 32 | 34 | 31 | 42 | 18 | 22 | 179 |
+| 29 | Jake Kim Workers 2A | Workers 2A | 38 | 35 | 36 | 36 | 20 | 24 | 189 |
+
+### Legendary (13 cards)
+
+| # | Key | Title | STR | SPD | END | TEC | IQ | BIQ | Total | Masteries | Unique Skills |
+|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|
+| 1 | Yamazaki Gun Cheonliang Arc | Cheonliang Arc | 72 | 60 | 67 | 66 | 45 | 57 | 367 | Strength Mastery | Yamazaki Karate, Power Threshold, Oni Pressure |
+| 2 | James Lee 2T Cheonliang Arc | Cheonliang Arc | 56 | 81 | 55 | 80 | 42 | 50 | 364 | Speed Mastery, Technique Mastery | Speed Threshold, Technique Threshold, Blindspot Pressure |
+| 3 | Jichang Kwak Holiday Arc | Holiday Arc | 73 | 73 | 59 | 60 | 44 | 47 | 356 | Strength Mastery, Speed Mastery | Hand-Blade Style, King's Analysis, Dual Threshold |
+| 4 | UI OG Daniel Holiday Arc | Holiday Arc | 66 | 76 | 69 | 78 | 9 | 70 | 368 | - | Ultra Instinct, Copy Response, Automatic Combat |
+| 5 | Charles Choi Holiday Arc | Holiday Arc | 68 | 60 | 58 | 69 | 49 | 53 | 357 | Strength Mastery, Speed Mastery, Endurance Mastery, Technique Mastery | Four Masteries, One-Handed Control, Elite Combat Reading |
+| 6 | Goo Kim Cheonliang Arc | Cheonliang Arc | 68 | 69 | 61 | 82 | 41 | 48 | 369 | - | Weapon Handling, Improvised Blade, Unpredictable Rhythm |
+| 7 | Seongji Yuk 2T | King of Cheonliang | 75 | 51 | 74 | 61 | 46 | 55 | 362 | Strength Mastery, Endurance Mastery | Cheonliang Grip, Power Threshold, Endurance Threshold |
+| 8 | The Thing Workers 1A | Workers 1A No.1 | 84 | 50 | 84 | 42 | 8 | 70 | 338 | Strength Mastery, Endurance Mastery | Brute Force, Iron Body, Relentless Pressure |
+| 9 | Johan Seong Workers 1A | Workers 1A | 58 | 69 | 52 | 79 | 30 | 47 | 335 | - | Copy, Accelerated Imitation, Blindspot Adaptation |
+| 10 | Seokdu Wang | King of Suwon | 79 | 43 | 74 | 50 | 17 | 62 | 325 | Strength Mastery | Suwon Headbutt, King's Pressure, Heavy Frame |
+| 11 | Taesoo Ma | King of Ansan | 87 | 45 | 68 | 46 | 22 | 62 | 330 | Strength Mastery | Ansan Fist, Power Threshold, Single-Fist Resolve |
+| 12 | Jinyoung Park Medicine Genius | Medicine Genius | 69 | 73 | 67 | 80 | 50 | 47 | 386 | Strength Mastery, Speed Mastery, Endurance Mastery, Technique Mastery | Medical Precision, Four Masteries, Copy Analysis |
+| 13 | Goo Kim 1st Moonlight Technique | 1st Moonlight Technique | 67 | 74 | 58 | 94 | 38 | 57 | 388 | - | Moonlight Technique, Blade Control, Weapon Genius |
+
+### Mythical (5 cards)
+
+| # | Key | Title | STR | SPD | END | TEC | IQ | BIQ | Total | Masteries | Unique Skills |
+|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|
+| 1 | Gun Park Shiro Oni | Shiro Oni | 95 | 66 | 92 | 74 | 48 | 65 | 440 | Strength Mastery, Endurance Mastery | Shiro Oni, Yamazaki Combat, Iron Pressure |
+| 2 | Tom Lee Beggar King | Beggar King | 88 | 68 | 84 | 79 | 48 | 64 | 431 | Strength Mastery, Speed Mastery, Endurance Mastery, Technique Mastery | Fighting Genius, Wild Intercept, Four Masteries |
+| 3 | James Lee 3T Cheonliang Arc | Cheonliang Arc | 70 | 93 | 63 | 92 | 49 | 60 | 427 | Speed Mastery, Endurance Mastery, Technique Mastery | Three Thresholds, Invisible Strike, Perfect Footwork |
+| 4 | Seongji Yuk 3T | King of Cheonliang | 89 | 66 | 90 | 72 | 48 | 60 | 425 | Strength Mastery, Speed Mastery, Endurance Mastery | Three Thresholds, Mujin Ssireum, Cheonliang King's Grip |
+| 5 | Manager Kim White Tiger No.2 | White Tiger No.2 | 76 | 82 | 72 | 89 | 51 | 60 | 430 | Strength Mastery, Speed Mastery, Endurance Mastery, Technique Mastery | CQC Mastery, Military Precision, Four Masteries |
+
+### Infernal (1 cards)
+
+| # | Key | Title | STR | SPD | END | TEC | IQ | BIQ | Total | Masteries | Unique Skills |
+|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|
+| 1 | Kitae Kim Silhouette | Silhouette | 98 | 77 | 96 | 82 | 61 | 73 | 487 | Strength Mastery, Endurance Mastery | Brutal Bloodline, Overwhelming Frame, Predatory Pressure |
+
+### Abyssal (1 cards)
+
+| # | Key | Title | STR | SPD | END | TEC | IQ | BIQ | Total | Masteries | Unique Skills |
+|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|
+| 1 | Diego Kang Idol of PTJ Company | Idol of PTJ Company | 94 | 100 | 82 | 100 | 76 | 86 | 538 | Strength Mastery, Speed Mastery, Technique Mastery | Invisible Strike, Perfect Footwork, Peak Technique |
 
 ## Summary
 
-- Total cards: 96
+- Total cards: 122
 - Common: 38
 - Rare: 35
-- Epic: 23
-- Legendary: 0
-- Mythical: 0
-- Infernal: 0
-- Abyssal: 0
+- Epic: 29
+- Legendary: 13
+- Mythical: 5
+- Infernal: 1
+- Abyssal: 1

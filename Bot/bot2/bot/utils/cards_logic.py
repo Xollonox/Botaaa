@@ -158,7 +158,14 @@ def normalize_mastery_list(values: list[str] | tuple[str, ...] | set[str] | Any)
     else:
         raw_values = []
 
-    wanted = {str(v).strip().lower() for v in raw_values if str(v).strip()}
+    wanted: set[str] = set()
+    for value in raw_values:
+        normalized = str(value).strip().lower()
+        if not normalized:
+            continue
+        if normalized.endswith(" mastery"):
+            normalized = normalized.removesuffix(" mastery").strip()
+        wanted.add(normalized)
     return [m for m in MASTERY_VALUES if m.lower() in wanted]
 
 
