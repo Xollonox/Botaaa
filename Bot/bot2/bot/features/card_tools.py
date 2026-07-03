@@ -29,6 +29,34 @@ def _resolve_field(raw: Any, desc_raw: Any = None) -> tuple[str, str]:
     return name, desc
 
 
+def _card_name_choices(data: dict[str, Any], current: str) -> list[app_commands.Choice[str]]:
+    cards = data.get("cards", {})
+    if not isinstance(cards, dict):
+        return []
+
+    token = str(current or "").casefold()
+    choices: list[app_commands.Choice[str]] = []
+    for key, card in cards.items():
+        if not isinstance(card, dict):
+            continue
+        name = str(card.get("name") or key)
+        title = str(card.get("title") or "").strip()
+        rarity = str(card.get("rarity") or "").strip()
+        searchable = f"{key} {name} {title} {rarity}".casefold()
+        if token and token not in searchable:
+            continue
+
+        label_parts = [str(key)]
+        if rarity:
+            label_parts.append(f"[{rarity}]")
+        if title:
+            label_parts.append(f"- {title}")
+        choices.append(app_commands.Choice(name=" ".join(label_parts)[:100], value=str(key)))
+        if len(choices) >= 25:
+            break
+    return choices
+
+
 def _build_catalog_card_embed(data: dict[str, Any], card: dict[str, Any]) -> discord.Embed:
     """Build a card embed matching the collection_view layout exactly."""
     card_name = str(card.get("name", "Unknown"))
@@ -105,6 +133,14 @@ class CardToolsCog(commands.Cog):
 
         embed = _build_catalog_card_embed(data, card)
         await smart_reply(interaction, embed=embed)
+
+    @card_info.autocomplete("card_name")
+    async def card_info_autocomplete(
+        self,
+        interaction: discord.Interaction,
+        current: str,
+    ) -> list[app_commands.Choice[str]]:
+        return _card_name_choices(self.bot.storage.load(), current)
 
     async def _set_flag(self, interaction: discord.Interaction, query: str, key: str, value: bool, title_key: str) -> None:
         from bot.utils.checks import ensure_registered
