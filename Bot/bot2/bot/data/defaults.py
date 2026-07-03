@@ -39,6 +39,21 @@ def _sync_catalog_cards(existing_cards: Any, catalog: dict[str, Any] | None = No
     return synced
 
 
+def _normalize_card_stats(card: dict[str, Any]) -> None:
+    stats = card.get("stats")
+    if not isinstance(stats, dict):
+        return
+    normalized = {
+        "strength": int(stats.get("strength", 0) or 0),
+        "speed": int(stats.get("speed", 0) or 0),
+        "endurance": int(stats.get("endurance", 0) or 0),
+        "technique": int(stats.get("technique", 0) or 0),
+        "iq": int(stats.get("iq", 0) or 0),
+        "battle_iq": int(stats.get("battle_iq", stats.get("biq", 0)) or 0),
+    }
+    card["stats"] = normalized
+
+
 DEFAULT_PACK_DEFINITIONS = {
     "newbie_pack": {
         "key": "newbie_pack",
@@ -689,6 +704,7 @@ def ensure_structure(data: Any) -> dict[str, Any]:
     data["cards"] = _sync_catalog_cards(data.get("cards"))
     for _, card in data["cards"].items():
         if isinstance(card, dict):
+            _normalize_card_stats(card)
             card.setdefault("emoji", "🃏")
             card.setdefault("default_dialogue", str(card.get("dialogue", "The fighter stays focused.")))
             mastery = card.get("mastery")

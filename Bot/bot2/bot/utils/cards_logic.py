@@ -116,7 +116,6 @@ def build_card_def(
         "technique": int(technique),
         "iq": int(iq),
         "battle_iq": int(battle_iq),
-        "biq": int(battle_iq),
     }
     card: dict[str, Any] = {
         "name": str(name).strip(),
@@ -261,8 +260,6 @@ def edit_card_def(data: dict[str, Any], card_name: str, updates: dict[str, Any])
                 continue
             key_name = "battle_iq" if field == "biq" else field
             stats[key_name] = int(value)
-            if field == "biq":
-                stats["biq"] = int(value)
 
     mastery = updates.get("mastery")
     if mastery is not None:

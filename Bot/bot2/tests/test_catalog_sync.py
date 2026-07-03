@@ -1,4 +1,4 @@
-from bot.data.defaults import _sync_catalog_cards, ensure_structure
+from bot.data.defaults import _normalize_card_stats, _sync_catalog_cards, ensure_structure
 
 
 def test_sync_catalog_cards_updates_seeded_cards_and_preserves_admin_cards() -> None:
@@ -53,7 +53,7 @@ def test_ensure_structure_refreshes_known_cards_without_dropping_runtime_cards()
                 "name": "Admin Custom",
                 "rarity": "Common",
                 "description": "runtime card",
-                "stats": {"strength": 9, "speed": 8, "endurance": 7, "technique": 6, "iq": 5, "battle_iq": 4},
+                "stats": {"strength": 9, "speed": 8, "endurance": 7, "technique": 6, "iq": 5, "battle_iq": 4, "biq": 4},
             },
         },
     }
@@ -62,3 +62,29 @@ def test_ensure_structure_refreshes_known_cards_without_dropping_runtime_cards()
 
     assert normalized["cards"]["Vin Jin"]["stats"]["technique"] == 24
     assert normalized["cards"]["Admin Custom"]["description"] == "runtime card"
+    assert "biq" not in normalized["cards"]["Admin Custom"]["stats"]
+
+
+def test_normalize_card_stats_keeps_exactly_six_stat_keys() -> None:
+    card = {
+        "stats": {
+            "strength": 1,
+            "speed": 2,
+            "endurance": 3,
+            "technique": 4,
+            "iq": 5,
+            "biq": 6,
+            "unused": 99,
+        }
+    }
+
+    _normalize_card_stats(card)
+
+    assert card["stats"] == {
+        "strength": 1,
+        "speed": 2,
+        "endurance": 3,
+        "technique": 4,
+        "iq": 5,
+        "battle_iq": 6,
+    }

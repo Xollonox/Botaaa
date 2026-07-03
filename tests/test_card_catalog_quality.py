@@ -53,17 +53,16 @@ def test_common_and_rare_cards_stay_inside_rarity_bands() -> None:
         assert low <= total <= high, f"{name} {rarity} total {total} outside {low}-{high}"
 
 
-def test_card_stats_have_required_keys_and_biq_mirror() -> None:
+def test_card_stats_have_exactly_six_connected_keys() -> None:
     for name, card in _load_seed_cards().items():
         if not isinstance(card, dict):
             continue
         stats = card.get("stats", {})
         assert isinstance(stats, dict), f"{name} missing stats"
+        assert set(stats) == set(STAT_KEYS), f"{name} stats must contain exactly the six connected keys"
         for key in STAT_KEYS:
-            assert key in stats, f"{name} missing stat {key}"
             assert isinstance(stats[key], int), f"{name} stat {key} must be int"
             assert stats[key] >= 0, f"{name} stat {key} must be non-negative"
-        assert stats.get("biq") == stats["battle_iq"], f"{name} biq mirror mismatch"
 
 
 def test_arc_versions_are_stronger_than_base_versions() -> None:

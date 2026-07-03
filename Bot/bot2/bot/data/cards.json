@@ -11,8 +11,7 @@
       "endurance": 8,
       "technique": 5,
       "iq": 5,
-      "battle_iq": 6,
-      "biq": 6
+      "battle_iq": 6
     },
     "moves": [
       {
@@ -99,8 +98,7 @@
       "endurance": 4,
       "technique": 5,
       "iq": 4,
-      "battle_iq": 4,
-      "biq": 4
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -187,8 +185,7 @@
       "endurance": 3,
       "technique": 3,
       "iq": 7,
-      "battle_iq": 5,
-      "biq": 5
+      "battle_iq": 5
     },
     "moves": [
       {
@@ -275,8 +272,7 @@
       "endurance": 3,
       "technique": 5,
       "iq": 8,
-      "battle_iq": 7,
-      "biq": 7
+      "battle_iq": 7
     },
     "moves": [
       {
@@ -363,8 +359,7 @@
       "endurance": 5,
       "technique": 4,
       "iq": 5,
-      "battle_iq": 5,
-      "biq": 5
+      "battle_iq": 5
     },
     "moves": [
       {
@@ -451,8 +446,7 @@
       "endurance": 5,
       "technique": 6,
       "iq": 6,
-      "battle_iq": 6,
-      "biq": 6
+      "battle_iq": 6
     },
     "moves": [
       {
@@ -539,8 +533,7 @@
       "endurance": 6,
       "technique": 6,
       "iq": 6,
-      "battle_iq": 6,
-      "biq": 6
+      "battle_iq": 6
     },
     "moves": [
       {
@@ -627,8 +620,7 @@
       "endurance": 7,
       "technique": 6,
       "iq": 5,
-      "battle_iq": 6,
-      "biq": 6
+      "battle_iq": 6
     },
     "moves": [
       {
@@ -715,8 +707,7 @@
       "endurance": 5,
       "technique": 4,
       "iq": 6,
-      "battle_iq": 6,
-      "biq": 6
+      "battle_iq": 6
     },
     "moves": [
       {
@@ -803,8 +794,7 @@
       "endurance": 6,
       "technique": 3,
       "iq": 4,
-      "battle_iq": 4,
-      "biq": 4
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -891,8 +881,7 @@
       "endurance": 7,
       "technique": 7,
       "iq": 5,
-      "battle_iq": 6,
-      "biq": 6
+      "battle_iq": 6
     },
     "moves": [
       {
@@ -979,8 +968,7 @@
       "endurance": 5,
       "technique": 6,
       "iq": 5,
-      "battle_iq": 6,
-      "biq": 6
+      "battle_iq": 6
     },
     "moves": [
       {
@@ -1067,8 +1055,7 @@
       "endurance": 4,
       "technique": 3,
       "iq": 2,
-      "battle_iq": 3,
-      "biq": 3
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -1155,8 +1142,7 @@
       "endurance": 4,
       "technique": 3,
       "iq": 2,
-      "battle_iq": 3,
-      "biq": 3
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -1243,8 +1229,7 @@
       "endurance": 4,
       "technique": 7,
       "iq": 6,
-      "battle_iq": 6,
-      "biq": 6
+      "battle_iq": 6
     },
     "moves": [
       {
@@ -1331,8 +1316,7 @@
       "endurance": 17,
       "technique": 24,
       "iq": 18,
-      "battle_iq": 19,
-      "biq": 19
+      "battle_iq": 19
     },
     "moves": [
       {
@@ -1419,8 +1403,7 @@
       "endurance": 6,
       "technique": 5,
       "iq": 5,
-      "battle_iq": 6,
-      "biq": 6
+      "battle_iq": 6
     },
     "moves": [
       {
@@ -1507,8 +1490,7 @@
       "endurance": 5,
       "technique": 5,
       "iq": 4,
-      "battle_iq": 5,
-      "biq": 5
+      "battle_iq": 5
     },
     "moves": [
       {
@@ -1595,8 +1577,7 @@
       "endurance": 5,
       "technique": 4,
       "iq": 5,
-      "battle_iq": 5,
-      "biq": 5
+      "battle_iq": 5
     },
     "moves": [
       {
@@ -1683,8 +1664,7 @@
       "endurance": 4,
       "technique": 3,
       "iq": 4,
-      "battle_iq": 4,
-      "biq": 4
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -1771,8 +1751,7 @@
       "endurance": 4,
       "technique": 2,
       "iq": 3,
-      "battle_iq": 3,
-      "biq": 3
+      "battle_iq": 3
     },
     "moves": [
       {
@@ -1859,8 +1838,7 @@
       "endurance": 7,
       "technique": 5,
       "iq": 4,
-      "battle_iq": 6,
-      "biq": 6
+      "battle_iq": 6
     },
     "moves": [
       {
@@ -1947,8 +1925,7 @@
       "endurance": 4,
       "technique": 4,
       "iq": 3,
-      "battle_iq": 4,
-      "biq": 4
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -2035,8 +2012,7 @@
       "endurance": 7,
       "technique": 6,
       "iq": 6,
-      "battle_iq": 7,
-      "biq": 7
+      "battle_iq": 7
     },
     "moves": [
       {
@@ -2123,8 +2099,7 @@
       "endurance": 6,
       "technique": 5,
       "iq": 4,
-      "battle_iq": 5,
-      "biq": 5
+      "battle_iq": 5
     },
     "moves": [
       {
@@ -2211,8 +2186,7 @@
       "endurance": 5,
       "technique": 4,
       "iq": 4,
-      "battle_iq": 5,
-      "biq": 5
+      "battle_iq": 5
     },
     "moves": [
       {
@@ -2299,8 +2273,7 @@
       "endurance": 4,
       "technique": 4,
       "iq": 4,
-      "battle_iq": 4,
-      "biq": 4
+      "battle_iq": 4
     },
     "moves": [
       {
@@ -2387,8 +2360,7 @@
       "endurance": 5,
       "technique": 5,
       "iq": 6,
-      "battle_iq": 5,
-      "biq": 5
+      "battle_iq": 5
     },
     "moves": [
       {
@@ -2475,8 +2447,7 @@
       "endurance": 7,
       "technique": 5,
       "iq": 5,
-      "battle_iq": 6,
-      "biq": 6
+      "battle_iq": 6
     },
     "moves": [
       {
@@ -2563,8 +2534,7 @@
       "endurance": 18,
       "technique": 24,
       "iq": 18,
-      "battle_iq": 20,
-      "biq": 20
+      "battle_iq": 20
     },
     "moves": [
       {
@@ -2651,8 +2621,7 @@
       "endurance": 22,
       "technique": 18,
       "iq": 16,
-      "battle_iq": 18,
-      "biq": 18
+      "battle_iq": 18
     },
     "moves": [
       {
@@ -2739,8 +2708,7 @@
       "endurance": 24,
       "technique": 19,
       "iq": 20,
-      "battle_iq": 22,
-      "biq": 22
+      "battle_iq": 22
     },
     "moves": [
       {
@@ -2827,8 +2795,7 @@
       "endurance": 19,
       "technique": 18,
       "iq": 18,
-      "battle_iq": 21,
-      "biq": 21
+      "battle_iq": 21
     },
     "moves": [
       {
@@ -2915,8 +2882,7 @@
       "endurance": 18,
       "technique": 21,
       "iq": 19,
-      "battle_iq": 22,
-      "biq": 22
+      "battle_iq": 22
     },
     "moves": [
       {
@@ -3003,8 +2969,7 @@
       "endurance": 23,
       "technique": 20,
       "iq": 17,
-      "battle_iq": 20,
-      "biq": 20
+      "battle_iq": 20
     },
     "moves": [
       {
@@ -3091,8 +3056,7 @@
       "endurance": 18,
       "technique": 21,
       "iq": 17,
-      "battle_iq": 18,
-      "biq": 18
+      "battle_iq": 18
     },
     "moves": [
       {
@@ -3179,8 +3143,7 @@
       "endurance": 6,
       "technique": 4,
       "iq": 4,
-      "battle_iq": 6,
-      "biq": 6
+      "battle_iq": 6
     },
     "moves": [
       {
@@ -3267,8 +3230,7 @@
       "endurance": 8,
       "technique": 8,
       "iq": 7,
-      "battle_iq": 8,
-      "biq": 8
+      "battle_iq": 8
     },
     "moves": [
       {
@@ -3355,8 +3317,7 @@
       "endurance": 24,
       "technique": 21,
       "iq": 19,
-      "battle_iq": 22,
-      "biq": 22
+      "battle_iq": 22
     },
     "moves": [
       {
@@ -3443,8 +3404,7 @@
       "endurance": 21,
       "technique": 18,
       "iq": 20,
-      "battle_iq": 22,
-      "biq": 22
+      "battle_iq": 22
     },
     "moves": [
       {
@@ -3531,8 +3491,7 @@
       "endurance": 20,
       "technique": 25,
       "iq": 20,
-      "battle_iq": 23,
-      "biq": 23
+      "battle_iq": 23
     },
     "moves": [
       {
@@ -3619,8 +3578,7 @@
       "endurance": 23,
       "technique": 15,
       "iq": 16,
-      "battle_iq": 17,
-      "biq": 17
+      "battle_iq": 17
     },
     "moves": [
       {
@@ -3707,8 +3665,7 @@
       "endurance": 18,
       "technique": 20,
       "iq": 16,
-      "battle_iq": 17,
-      "biq": 17
+      "battle_iq": 17
     },
     "moves": [
       {
@@ -3795,8 +3752,7 @@
       "endurance": 24,
       "technique": 16,
       "iq": 17,
-      "battle_iq": 22,
-      "biq": 22
+      "battle_iq": 22
     },
     "moves": [
       {
@@ -3883,8 +3839,7 @@
       "endurance": 19,
       "technique": 24,
       "iq": 21,
-      "battle_iq": 21,
-      "biq": 21
+      "battle_iq": 21
     },
     "moves": [
       {
@@ -3971,8 +3926,7 @@
       "endurance": 19,
       "technique": 23,
       "iq": 18,
-      "battle_iq": 19,
-      "biq": 19
+      "battle_iq": 19
     },
     "moves": [
       {
@@ -4059,8 +4013,7 @@
       "endurance": 19,
       "technique": 25,
       "iq": 19,
-      "battle_iq": 22,
-      "biq": 22
+      "battle_iq": 22
     },
     "moves": [
       {
@@ -4147,8 +4100,7 @@
       "endurance": 19,
       "technique": 21,
       "iq": 17,
-      "battle_iq": 20,
-      "biq": 20
+      "battle_iq": 20
     },
     "moves": [
       {
@@ -4235,8 +4187,7 @@
       "endurance": 22,
       "technique": 17,
       "iq": 18,
-      "battle_iq": 19,
-      "biq": 19
+      "battle_iq": 19
     },
     "moves": [
       {
@@ -4323,8 +4274,7 @@
       "endurance": 21,
       "technique": 19,
       "iq": 20,
-      "battle_iq": 21,
-      "biq": 21
+      "battle_iq": 21
     },
     "moves": [
       {
@@ -4411,8 +4361,7 @@
       "endurance": 19,
       "technique": 24,
       "iq": 21,
-      "battle_iq": 16,
-      "biq": 16
+      "battle_iq": 16
     },
     "moves": [
       {
@@ -4499,8 +4448,7 @@
       "endurance": 23,
       "technique": 24,
       "iq": 22,
-      "battle_iq": 18,
-      "biq": 18
+      "battle_iq": 18
     },
     "moves": [
       {
@@ -4587,8 +4535,7 @@
       "endurance": 40,
       "technique": 37,
       "iq": 35,
-      "battle_iq": 38,
-      "biq": 38
+      "battle_iq": 38
     },
     "moves": [
       {
@@ -4675,8 +4622,7 @@
       "endurance": 39,
       "technique": 38,
       "iq": 36,
-      "battle_iq": 39,
-      "biq": 39
+      "battle_iq": 39
     },
     "moves": [
       {
@@ -4763,8 +4709,7 @@
       "endurance": 40,
       "technique": 38,
       "iq": 37,
-      "battle_iq": 40,
-      "biq": 40
+      "battle_iq": 40
     },
     "moves": [
       {
@@ -4851,8 +4796,7 @@
       "endurance": 41,
       "technique": 37,
       "iq": 35,
-      "battle_iq": 39,
-      "biq": 39
+      "battle_iq": 39
     },
     "moves": [
       {
@@ -4940,8 +4884,7 @@
       "endurance": 38,
       "technique": 39,
       "iq": 36,
-      "battle_iq": 40,
-      "biq": 40
+      "battle_iq": 40
     },
     "moves": [
       {
@@ -5039,8 +4982,7 @@
       "endurance": 43,
       "technique": 37,
       "iq": 35,
-      "battle_iq": 38,
-      "biq": 38
+      "battle_iq": 38
     },
     "moves": [
       {
@@ -5127,8 +5069,7 @@
       "endurance": 39,
       "technique": 38,
       "iq": 36,
-      "battle_iq": 39,
-      "biq": 39
+      "battle_iq": 39
     },
     "moves": [
       {
@@ -5215,8 +5156,7 @@
       "endurance": 40,
       "technique": 39,
       "iq": 37,
-      "battle_iq": 39,
-      "biq": 39
+      "battle_iq": 39
     },
     "moves": [
       {
@@ -5303,8 +5243,7 @@
       "endurance": 39,
       "technique": 38,
       "iq": 37,
-      "battle_iq": 39,
-      "biq": 39
+      "battle_iq": 39
     },
     "moves": [
       {
@@ -5391,8 +5330,7 @@
       "endurance": 40,
       "technique": 39,
       "iq": 36,
-      "battle_iq": 38,
-      "biq": 38
+      "battle_iq": 38
     },
     "moves": [
       {
@@ -5479,8 +5417,7 @@
       "endurance": 39,
       "technique": 40,
       "iq": 36,
-      "battle_iq": 39,
-      "biq": 39
+      "battle_iq": 39
     },
     "moves": [
       {
@@ -5567,8 +5504,7 @@
       "endurance": 38,
       "technique": 40,
       "iq": 37,
-      "battle_iq": 37,
-      "biq": 37
+      "battle_iq": 37
     },
     "moves": [
       {
@@ -5659,8 +5595,7 @@
       "endurance": 42,
       "technique": 38,
       "iq": 36,
-      "battle_iq": 38,
-      "biq": 38
+      "battle_iq": 38
     },
     "moves": [
       {
@@ -5747,8 +5682,7 @@
       "endurance": 40,
       "technique": 38,
       "iq": 36,
-      "battle_iq": 39,
-      "biq": 39
+      "battle_iq": 39
     },
     "moves": [
       {
@@ -5835,8 +5769,7 @@
       "endurance": 41,
       "technique": 37,
       "iq": 36,
-      "battle_iq": 39,
-      "biq": 39
+      "battle_iq": 39
     },
     "moves": [
       {
@@ -5923,8 +5856,7 @@
       "endurance": 39,
       "technique": 38,
       "iq": 37,
-      "battle_iq": 37,
-      "biq": 37
+      "battle_iq": 37
     },
     "moves": [
       {
@@ -6011,8 +5943,7 @@
       "endurance": 40,
       "technique": 39,
       "iq": 37,
-      "battle_iq": 38,
-      "biq": 38
+      "battle_iq": 38
     },
     "moves": [
       {
@@ -6099,8 +6030,7 @@
       "endurance": 41,
       "technique": 38,
       "iq": 37,
-      "battle_iq": 38,
-      "biq": 38
+      "battle_iq": 38
     },
     "moves": [
       {
@@ -6187,8 +6117,7 @@
       "endurance": 40,
       "technique": 39,
       "iq": 37,
-      "battle_iq": 38,
-      "biq": 38
+      "battle_iq": 38
     },
     "moves": [
       {
@@ -6275,8 +6204,7 @@
       "endurance": 40,
       "technique": 38,
       "iq": 37,
-      "battle_iq": 38,
-      "biq": 38
+      "battle_iq": 38
     },
     "moves": [
       {
@@ -6363,8 +6291,7 @@
       "endurance": 40,
       "technique": 38,
       "iq": 37,
-      "battle_iq": 37,
-      "biq": 37
+      "battle_iq": 37
     },
     "moves": [
       {
@@ -6451,8 +6378,7 @@
       "endurance": 40,
       "technique": 39,
       "iq": 37,
-      "battle_iq": 38,
-      "biq": 38
+      "battle_iq": 38
     },
     "moves": [
       {
@@ -6539,8 +6465,7 @@
       "endurance": 40,
       "technique": 38,
       "iq": 36,
-      "battle_iq": 37,
-      "biq": 37
+      "battle_iq": 37
     },
     "moves": [
       {

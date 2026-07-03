@@ -69,7 +69,6 @@ def _mk_stats(strength: int, speed: int, endurance: int, technique: int, iq: int
         "endurance": int(endurance),
         "technique": int(technique),
         "iq": int(iq),
-        "biq": int(biq),
         "battle_iq": int(biq),
     }
 
@@ -140,7 +139,6 @@ def _ensure_editor_payload(card: dict[str, Any]) -> dict[str, Any]:
 
 def _to_storage_card(payload: dict[str, Any]) -> dict[str, Any]:
     card = deepcopy(payload)
-    # compatibility mirrors for existing systems
     stats = card.get("stats", {}) if isinstance(card.get("stats"), dict) else {}
     card["stats"] = {
         "strength": int(stats.get("strength", 0)),
@@ -148,7 +146,6 @@ def _to_storage_card(payload: dict[str, Any]) -> dict[str, Any]:
         "endurance": int(stats.get("endurance", 0)),
         "technique": int(stats.get("technique", 0)),
         "iq": int(stats.get("iq", 0)),
-        "biq": int(stats.get("biq", stats.get("battle_iq", 0))),
         "battle_iq": int(stats.get("biq", stats.get("battle_iq", 0))),
     }
     card["mastery"] = {"type": str(card.get("mastery", "None")), "description": ""}
@@ -547,7 +544,7 @@ class EditStatsModal(discord.ui.Modal, title="Edit Stats"):
                 _safe_int(self.endurance.value),
                 _safe_int(self.technique.value),
                 _safe_int(self.iq.value),
-                int(self.panel.payload["stats"].get("biq", 0)),
+                int(self.panel.payload["stats"].get("battle_iq", self.panel.payload["stats"].get("biq", 0))),
             )
         )
         await interaction.response.edit_message(embed=_editor_embed(self.panel.payload), view=self.panel)
@@ -562,7 +559,6 @@ class EditBIQModal(discord.ui.Modal, title="Edit Battle IQ"):
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
         biq_val = _safe_int(self.biq.value)
-        self.panel.payload["stats"]["biq"] = biq_val
         self.panel.payload["stats"]["battle_iq"] = biq_val
         await interaction.response.edit_message(embed=_editor_embed(self.panel.payload), view=self.panel)
 

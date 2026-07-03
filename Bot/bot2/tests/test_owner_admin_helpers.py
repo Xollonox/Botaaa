@@ -55,6 +55,7 @@ def test_card_add_edit_delete_helpers() -> None:
     assert edited["description"] == "Public bio"
     assert edited["stats"]["speed"] == 25
     assert edited["stats"]["battle_iq"] == 65
+    assert "biq" not in edited["stats"]
     assert edited["mastery"] == ["Speed", "Technique"]
 
     ok, msg = delete_card_def(data, "Park Daniel", "no")
