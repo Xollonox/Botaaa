@@ -38,6 +38,10 @@ def _clamp_stars(stars: Any) -> int:
     return max(0, min(5, int(stars or 0)))
 
 
+def get_star_multiplier(stars: int) -> float:
+    return [1.00, 1.20, 1.45, 1.75, 2.10, 2.50][_clamp_stars(stars)]
+
+
 def _is_favorite(item: dict[str, Any]) -> bool:
     return bool(item.get("favorite", item.get("favourite", False)))
 
