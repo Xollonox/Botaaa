@@ -1,7 +1,6 @@
 # Root requirements — bot1 (main Discord bot) dependencies
 # Bot/bot2 has its own requirements.txt at Bot/bot2/requirements.txt
 discord.py
-openai==1.37.1
 beautifulsoup4
 youtube-search-python
 pydantic==1.10.15

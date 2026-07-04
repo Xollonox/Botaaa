@@ -20,6 +20,7 @@ from memory import (
     BOT_MEMORY,
     BOT_SETTINGS,
     _should_summarize,
+    build_full_user_prompt,
     clear_all_memory,
     clear_user_memory,
     get_language_setting,
@@ -33,7 +34,6 @@ from memory import (
 from persona import (
     VALID_MOODS,
     build_system_prompt,
-    build_user_prompt_with_lore,
     detect_language,
     is_lookism_query,
 )
@@ -43,7 +43,7 @@ logger = logging.getLogger("misskim")
 
 
 def is_power_user(user: discord.abc.User) -> bool:
-    if getattr(user, "id", None) == SPECIAL_USER_ID:
+    if SPECIAL_USER_ID is not None and getattr(user, "id", None) == SPECIAL_USER_ID:
         return True
     if isinstance(user, discord.Member):
         return bool(
@@ -99,20 +99,6 @@ async def send_discord_text(
     return result
 
 
-def _build_full_user_prompt(
-    text: str,
-    user_id: int,
-    guild_id: Optional[int],
-    channel_id: int,
-) -> str:
-    from memory import add_memory_to_prompt
-
-    lore_prompt = build_user_prompt_with_lore(text)
-    return add_memory_to_prompt(
-        user_id, lore_prompt, guild_id=guild_id, channel_id=channel_id
-    )
-
-
 class ResetMemoryView(discord.ui.View):
     def __init__(self, requester_id: int, allow_all: bool) -> None:
         super().__init__(timeout=60)
@@ -135,7 +121,7 @@ class ResetMemoryView(discord.ui.View):
     ) -> None:
         if not await self._guard(interaction):
             return
-        clear_user_memory(
+        await clear_user_memory(
             interaction.user.id,
             guild_id=interaction.guild_id,
             channel_id=interaction.channel_id,
@@ -157,7 +143,7 @@ class ResetMemoryView(discord.ui.View):
                 "You do not have permission for global reset.", ephemeral=True
             )
             return
-        clear_all_memory()
+        await clear_all_memory()
         await interaction.response.edit_message(
             content="All bot memory was reset.", view=None
         )
@@ -177,66 +163,15 @@ class CommandsCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    # ── /ask ─────────────────────────────────────────────────────────────────
-    @commands.hybrid_command(name="ask", description="Ask Miss Kim anything")
-    async def ask(self, ctx: commands.Context, *, question: str) -> None:
-        if ctx.interaction and not ctx.interaction.response.is_done():
-            await ctx.interaction.response.defer(thinking=True)
+    # ── shared chat logic ─────────────────────────────────────────────────────
+    async def _handle_chat_command(
+        self, ctx: commands.Context, prompt: str
+    ) -> None:
+        """Core chat pipeline shared by /ask and !kim.
 
-        guild_id = ctx.guild.id if ctx.guild else None
-        channel_id = ctx.channel.id
-        lang = detect_language(question, channel_id=channel_id)
-        mood = get_mood(channel_id)
-        system = build_system_prompt(ctx.author.id, mood, lang)
-
-        await remember_line(
-            ctx.author.id, "U", question, guild_id=guild_id, channel_id=channel_id
-        )
-        # Store in channel-level memory
-        if guild_id is not None:
-            await remember_channel_line(
-                channel_id,
-                speaker_name=ctx.author.display_name,
-                prefix="U",
-                line=question,
-                guild_id=guild_id,
-            )
-        reply = await chat_with_fallback(
-            system_prompt=system,
-            user_prompt=_build_full_user_prompt(
-                question, ctx.author.id, guild_id, channel_id
-            ),
-            prefer_search=is_lookism_query(question),
-        )
-        await remember_line(
-            ctx.author.id, "B", reply, guild_id=guild_id, channel_id=channel_id
-        )
-        # Store bot reply in channel-level memory
-        if guild_id is not None:
-            bot_name = self.bot.user.display_name if self.bot.user else "Miss Kim"
-            await remember_channel_line(
-                channel_id,
-                speaker_name=bot_name,
-                prefix="B",
-                line=reply,
-                guild_id=guild_id,
-            )
-        if _should_summarize(ctx.author.id, guild_id=guild_id, channel_id=channel_id):
-            await update_conversation_summary(
-                ctx.author.id, guild_id=guild_id, channel_id=channel_id
-            )
-        if ctx.interaction:
-            await send_discord_text(ctx.interaction.followup.send, reply)
-        else:
-            await send_discord_text(ctx.reply, reply, mention_author=False)
-
-    # ── !kim ─────────────────────────────────────────────────────────────────
-    @commands.command(name="kim")
-    async def kim(self, ctx: commands.Context, *, text: str = "") -> None:
-        if ctx.interaction and not ctx.interaction.response.is_done():
-            await ctx.interaction.response.defer(thinking=True)
-
-        prompt = text.strip() or "Start a conversation to make this chat active right now."
+        Both commands produce a *prompt* string before calling this; all
+        memory, LLM, and reply logic lives here so there is only one copy.
+        """
         guild_id = ctx.guild.id if ctx.guild else None
         channel_id = ctx.channel.id
         lang = detect_language(prompt, channel_id=channel_id)
@@ -257,7 +192,7 @@ class CommandsCog(commands.Cog):
             )
         reply = await chat_with_fallback(
             system_prompt=system,
-            user_prompt=_build_full_user_prompt(
+            user_prompt=build_full_user_prompt(
                 prompt, ctx.author.id, guild_id, channel_id
             ),
             prefer_search=is_lookism_query(prompt),
@@ -283,6 +218,21 @@ class CommandsCog(commands.Cog):
             await send_discord_text(ctx.interaction.followup.send, reply)
         else:
             await send_discord_text(ctx.reply, reply, mention_author=False)
+
+    # ── /ask ─────────────────────────────────────────────────────────────────
+    @commands.hybrid_command(name="ask", description="Ask Miss Kim anything")
+    async def ask(self, ctx: commands.Context, *, question: str) -> None:
+        if ctx.interaction and not ctx.interaction.response.is_done():
+            await ctx.interaction.response.defer(thinking=True)
+        await self._handle_chat_command(ctx, question)
+
+    # ── !kim ─────────────────────────────────────────────────────────────────
+    @commands.command(name="kim")
+    async def kim(self, ctx: commands.Context, *, text: str = "") -> None:
+        if ctx.interaction and not ctx.interaction.response.is_done():
+            await ctx.interaction.response.defer(thinking=True)
+        prompt = text.strip() or "Start a conversation to make this chat active right now."
+        await self._handle_chat_command(ctx, prompt)
 
     # ── /imagine ──────────────────────────────────────────────────────────────
     @app_commands.command(
@@ -395,7 +345,9 @@ class CommandsCog(commands.Cog):
         self, interaction: discord.Interaction, prompt: str
     ) -> None:
         await interaction.response.defer(thinking=True)
-        generated = await generate_free_image(prompt)
+        _ch = interaction.channel
+        _nsfw = bool(getattr(_ch, "is_nsfw", lambda: False)())
+        generated = await generate_free_image(prompt, nsfw=_nsfw)
         if not generated:
             logger.warning(
                 "Pollo generation failed | user=%s prompt=%s",
@@ -430,9 +382,10 @@ class CommandsCog(commands.Cog):
     ) -> None:
         if ctx.interaction and not ctx.interaction.response.is_done():
             await ctx.interaction.response.defer()
+            result = await fetch_perchance_output(generator, list_name)
         else:
-            await ctx.trigger_typing()
-        result = await fetch_perchance_output(generator, list_name)
+            async with ctx.typing():
+                result = await fetch_perchance_output(generator, list_name)
         await send_discord_text(
             ctx.reply if ctx.interaction else ctx.send,
             result,
@@ -469,7 +422,7 @@ class CommandsCog(commands.Cog):
     ) -> None:
         if ctx.interaction and not ctx.interaction.response.is_done():
             await ctx.interaction.response.defer(ephemeral=True)
-        set_language_setting(ctx.channel.id, lang.value)
+        await set_language_setting(ctx.channel.id, lang.value)
         await ctx.send(f"Language set to **{lang.name}** in this channel.")
 
     # ── /mood ─────────────────────────────────────────────────────────────────
@@ -494,7 +447,7 @@ class CommandsCog(commands.Cog):
                 f"Invalid mood. Valid options: {', '.join(sorted(VALID_MOODS))}"
             )
             return
-        set_mood(ctx.channel.id, mood.value)
+        await set_mood(ctx.channel.id, mood.value)
         await ctx.send(f"Miss Kim mood set to **{mood.name}** in this channel.")
 
     # ── /roast ────────────────────────────────────────────────────────────────
@@ -513,7 +466,7 @@ class CommandsCog(commands.Cog):
         if not is_power_user(interaction.user):
             await interaction.response.send_message("No permission.", ephemeral=True)
             return
-        set_mood(interaction.channel_id, level.value)
+        await set_mood(interaction.channel_id, level.value)
         emoji = {"roast_low": "🔥", "roast_medium": "🔥🔥", "roast_extreme": "🔥🔥🔥"}
         msg = (
             f"{emoji.get(level.value, '🔥')} Roast mode set to **{level.name}**. "
@@ -527,7 +480,7 @@ class CommandsCog(commands.Cog):
         if not is_power_user(interaction.user):
             await interaction.response.send_message("No permission.", ephemeral=True)
             return
-        set_mood(interaction.channel_id, "angry")
+        await set_mood(interaction.channel_id, "angry")
         await interaction.response.send_message("😤 Mood set to **Angry**. Watch your mouth.")
 
     # ── /sad ──────────────────────────────────────────────────────────────────
@@ -536,7 +489,7 @@ class CommandsCog(commands.Cog):
         if not is_power_user(interaction.user):
             await interaction.response.send_message("No permission.", ephemeral=True)
             return
-        set_mood(interaction.channel_id, "sad")
+        await set_mood(interaction.channel_id, "sad")
         await interaction.response.send_message("😢 Mood set to **Sad**. Feeling down today...")
 
     # ── /happy ────────────────────────────────────────────────────────────────
@@ -545,7 +498,7 @@ class CommandsCog(commands.Cog):
         if not is_power_user(interaction.user):
             await interaction.response.send_message("No permission.", ephemeral=True)
             return
-        set_mood(interaction.channel_id, "happy")
+        await set_mood(interaction.channel_id, "happy")
         await interaction.response.send_message("😊 Mood set to **Happy**! Let's have some fun!")
 
     # ── /purge ────────────────────────────────────────────────────────────────
@@ -555,6 +508,25 @@ class CommandsCog(commands.Cog):
             await ctx.reply("You do not have permission.", mention_author=False)
             return
         amount = max(1, min(amount, 200))
+        confirm_msg = await ctx.reply(
+            f"⚠️ This will delete up to **{amount}** messages. "
+            f"Type `confirm` within 15 seconds to proceed.",
+            mention_author=False,
+        )
+
+        def check(m: discord.Message) -> bool:
+            return (
+                m.author == ctx.author
+                and m.channel == ctx.channel
+                and m.content.lower() == "confirm"
+            )
+
+        try:
+            await ctx.bot.wait_for("message", check=check, timeout=15.0)
+        except TimeoutError:
+            await confirm_msg.edit(content="❌ Purge cancelled (timed out).")
+            return
+
         deleted = await ctx.channel.purge(limit=amount + 1)
         await ctx.send(f"Deleted {len(deleted) - 1} messages.", delete_after=5)
 
@@ -565,7 +537,7 @@ class CommandsCog(commands.Cog):
             await ctx.reply("You do not have permission.", mention_author=False)
             return
         await ctx.message.delete()
-        await send_discord_text(ctx.send, text)
+        await send_discord_text(ctx.send, text, allowed_mentions=discord.AllowedMentions.none())
 
     # ── /stats ────────────────────────────────────────────────────────────────
     @app_commands.command(name="stats", description="Show bot statistics")

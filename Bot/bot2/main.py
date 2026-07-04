@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import logging
 import os
 import sys
@@ -17,7 +18,7 @@ from discord.ext import commands
 # ---------------------------------------------------------------------------
 sys.path.insert(0, os.path.dirname(__file__))
 
-from bot.config import BOT_TOKEN, DATA_PATH, GUILD_IDS, OWNER_GUILD_ID, SQLITE_PATH
+from bot.config import BOT_TOKEN, DATA_PATH, OWNER_GUILD_ID, SQLITE_PATH, assert_runtime_config
 from bot.features.onboarding import TermsGateView, build_terms_embed, has_user_accepted_terms
 from bot.data.storage import Storage
 from bot.data.sqlite_store import SQLiteBattleRepository, SQLiteMarketRepository, SQLiteTradeRepository
@@ -29,6 +30,70 @@ from bot.utils.logging_setup import setup_logging
 
 setup_logging()
 logger = logging.getLogger(__name__)
+
+# Marker file used to distinguish clean shutdown from crash recovery.
+# Present after a graceful close(); absent means the previous process
+# died without running the shutdown path.
+CLEAN_SHUTDOWN_MARKER = os.path.join(os.path.dirname(DATA_PATH), ".clean_shutdown")
+
+# Marker file for one-shot global commands clear.
+# Prevents re-running the clear on every restart if HXCC_CLEAR_GLOBAL_COMMANDS_ONCE is left set.
+CLEARED_GLOBAL_COMMANDS_MARKER = os.path.join(DATA_PATH, ".cleared_global_commands")
+
+
+# ---------------------------------------------------------------------------
+# One-shot clear global commands helpers
+# ---------------------------------------------------------------------------
+def _get_env_token(env_value: str) -> str:
+    """Compute a stable hash token for the current env value."""
+    return hashlib.sha256(env_value.encode("utf-8")).hexdigest()[:16]
+
+
+def _should_clear_global_commands() -> bool:
+    """Check if global commands should be cleared based on env and marker file.
+
+    Returns True if:
+    - Env var is set AND marker doesn't exist (first run)
+    - Env var is set AND marker exists but with different token (value changed)
+
+    Returns False if:
+    - Env var not set
+    - Env var is set AND marker exists with matching token (already cleared for this value)
+    """
+    env_value = os.getenv("HXCC_CLEAR_GLOBAL_COMMANDS_ONCE", "").strip()
+
+    if not env_value:
+        return False
+
+    current_token = _get_env_token(env_value)
+
+    # If marker exists, check if token matches
+    if os.path.isfile(CLEARED_GLOBAL_COMMANDS_MARKER):
+        try:
+            with open(CLEARED_GLOBAL_COMMANDS_MARKER, "r", encoding="utf-8") as fh:
+                stored_token = fh.read().strip()
+            if stored_token == current_token:
+                logger.info(
+                    "[BOOT] Global commands already cleared for this env value (token: %s). Skipping.",
+                    current_token
+                )
+                return False
+        except OSError as exc:
+            logger.warning("[BOOT] Could not read global commands marker: %s", exc)
+
+    return True
+
+
+def _write_global_commands_marker(env_value: str) -> None:
+    """Write marker file with a token of the current env value."""
+    try:
+        os.makedirs(DATA_PATH, exist_ok=True)
+        token = _get_env_token(env_value)
+        with open(CLEARED_GLOBAL_COMMANDS_MARKER, "w", encoding="utf-8") as fh:
+            fh.write(token)
+        logger.info("[BOOT] Wrote global commands marker with token: %s", token)
+    except OSError as exc:
+        logger.warning("[BOOT] Could not write global commands marker: %s", exc)
 
 # ---------------------------------------------------------------------------
 # All feature cogs to load
@@ -104,11 +169,42 @@ class LookismBot(commands.Bot):
         """Called by onboarding code when a user accepts the ToS."""
         self._terms_cache.add(int(user_id))
 
+    def invalidate_terms_cache(self, user_id: int) -> None:
+        """Drop a user from the in-memory ToS cache.
+
+        Call this whenever a user record is banned, reset, or wiped so
+        that the next command re-consults storage instead of trusting a
+        stale cached acceptance.
+        """
+        try:
+            self._terms_cache.discard(int(user_id))
+        except (TypeError, ValueError):
+            pass
+
     async def _unlock_stale_trades(self) -> None:
-        """On startup, unlock any cards that were left trade_locked after a crash."""
+        """On startup, decide between clean-shutdown vs. crash recovery.
+
+        Clean shutdown (marker file present): trust on-disk state, do not
+        touch pending trades or trade_locked flags — just delete the marker
+        so the next boot can detect a crash.
+
+        Crash recovery (marker missing): only clear trade_locked flags on
+        inventory items so cards aren't stranded. Pending trades are left
+        intact; a crashed process is not a reason to destroy legitimate
+        in-flight offers.
+        """
+        clean_shutdown = os.path.exists(CLEAN_SHUTDOWN_MARKER)
+        if clean_shutdown:
+            try:
+                os.remove(CLEAN_SHUTDOWN_MARKER)
+            except OSError as exc:
+                logger.warning("[BOOT] Could not remove clean-shutdown marker: %s", exc)
+            logger.info("[BOOT] Clean shutdown detected; preserving pending trades and locks.")
+            return
+
         def mutate(data: dict[str, Any]) -> int:
             unlocked = 0
-            for pid, player in data.get("players", {}).items():
+            for _pid, player in data.get("players", {}).items():
                 if not isinstance(player, dict):
                     continue
                 user = player.get("user", {})
@@ -121,15 +217,27 @@ class LookismBot(commands.Bot):
                     if isinstance(item, dict) and item.get("trade_locked"):
                         item["trade_locked"] = False
                         unlocked += 1
-            # Also clear pending trade records
-            trades = data.get("trades", {})
-            if isinstance(trades, dict):
-                trades["pending"] = {}
             return unlocked
 
         count = self.storage.with_lock(mutate)
-        if count:
-            logger.warning("[BOOT] Unlocked %d cards left trade_locked from a previous crash.", count)
+        logger.warning(
+            "[BOOT] Crash recovery: cleared trade_locked on %d inventory item(s); pending trades preserved.",
+            count,
+        )
+
+    def _write_clean_shutdown_marker(self) -> None:
+        """Best-effort write of the clean-shutdown marker file."""
+        try:
+            os.makedirs(os.path.dirname(CLEAN_SHUTDOWN_MARKER), exist_ok=True)
+            with open(CLEAN_SHUTDOWN_MARKER, "w", encoding="utf-8") as fh:
+                fh.write("ok")
+        except OSError as exc:
+            logger.warning("[SHUTDOWN] Could not write clean-shutdown marker: %s", exc)
+
+    async def close(self) -> None:
+        """Override to drop the clean-shutdown marker before disconnecting."""
+        self._write_clean_shutdown_marker()
+        await super().close()
 
     async def _global_terms_gate(self, interaction: discord.Interaction) -> bool:
         command = getattr(interaction, "command", None)
@@ -187,18 +295,17 @@ class LookismBot(commands.Bot):
         owner_guild = discord.Object(id=OWNER_GUILD_ID)
 
         # Optional one-time cleanup for stale global command registry.
-        # Set HXCC_CLEAR_GLOBAL_COMMANDS_ONCE=1 for a single startup run, then unset it.
-        if os.getenv("HXCC_CLEAR_GLOBAL_COMMANDS_ONCE") == "1":
+        # Set HXCC_CLEAR_GLOBAL_COMMANDS_ONCE=1 to trigger a wipe. On success, a marker file
+        # is written with a token of the env value. Subsequent restarts with the same env value
+        # will skip the wipe (idempotent). If the env value changes, the wipe runs again.
+        if _should_clear_global_commands():
+            env_value = os.getenv("HXCC_CLEAR_GLOBAL_COMMANDS_ONCE", "").strip()
             self.tree.clear_commands(guild=None)
             await self.tree.sync()
+            _write_global_commands_marker(env_value)
             logger.info("[BOOT] Cleared and synced empty global command registry.")
 
-        if GUILD_IDS:
-            for gid in GUILD_IDS:
-                guild = discord.Object(id=gid)
-                self.tree.copy_global_to(guild=guild)
-                await self.tree.sync(guild=guild)
-                logger.info("[BOOT] Synced commands to guild %s", gid)
+        # Per-guild dev sync removed: GUILD_IDS was always None (global sync only).
 
         # Sync owner-guild-only commands (o_ commands registered via @app_commands.guilds(OWNER_GUILD)).
         # Do NOT use copy_global_to here — that would push all 100+ global commands into the guild.
@@ -280,7 +387,8 @@ class LookismCommandTree(app_commands.CommandTree["LookismBot"]):
         if allowed:
             return True
 
-        data = self.client.storage.load()
+        # Read-only fast path: only passed to make_embed/e which read only.
+        data = self.client.storage.load_readonly()
         embed = make_embed(
             data,
             f"{e('warning', data)} Wrong Channel",
@@ -317,6 +425,7 @@ class LookismCommandTree(app_commands.CommandTree["LookismBot"]):
 # Entry point
 # ---------------------------------------------------------------------------
 async def main() -> None:
+    assert_runtime_config()
     bot = LookismBot()
     async with bot:
         await bot.start(BOT_TOKEN)

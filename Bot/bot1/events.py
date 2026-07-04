@@ -1,6 +1,7 @@
 import io
 import logging
 import time
+from collections import OrderedDict
 from typing import Dict, Optional
 
 import discord
@@ -24,6 +25,7 @@ from image import (
 from llm import chat_with_fallback
 from memory import (
     _should_summarize,
+    build_full_user_prompt,
     get_channel_context,
     get_mood,
     remember_channel_line,
@@ -32,7 +34,6 @@ from memory import (
 )
 from persona import (
     build_system_prompt,
-    build_user_prompt_with_lore,
     detect_language,
     is_apology,
     is_lookism_query,
@@ -45,32 +46,34 @@ logger = logging.getLogger("misskim")
 
 _user_message_times: Dict[int, list] = {}
 # generated image message id -> {prompt, raw_prompt, backend}
-generated_image_messages: Dict[int, dict] = {}
+# Bounded FIFO: at most 500 entries; oldest entry evicted on overflow.
+generated_image_messages: OrderedDict = OrderedDict()
+
+_BACKEND_LABELS: Dict[str, str] = {
+    "pollinations": "Pollinations",
+    "bluesminds": "BluesMinds",
+}
+
+
+def _backend_label(backend: str) -> str:
+    """Return the human-readable display name for a generation backend."""
+    return _BACKEND_LABELS.get(backend, "Cloudflare")
 
 
 def _is_rate_limited(user_id: int) -> bool:
     now = time.time()
     times = _user_message_times.setdefault(user_id, [])
     times = [t for t in times if now - t < 10]
-    _user_message_times[user_id] = times
+    # Prune stale entry if all timestamps expired; otherwise write pruned list back.
+    if not times:
+        _user_message_times.pop(user_id, None)
+    else:
+        _user_message_times[user_id] = times
     if len(times) >= 5:
         return True
     times.append(now)
+    _user_message_times[user_id] = times
     return False
-
-
-def _build_full_user_prompt(
-    text: str,
-    user_id: int,
-    guild_id: Optional[int],
-    channel_id: int,
-) -> str:
-    from memory import add_memory_to_prompt
-
-    lore_prompt = build_user_prompt_with_lore(text)
-    return add_memory_to_prompt(
-        user_id, lore_prompt, guild_id=guild_id, channel_id=channel_id
-    )
 
 
 class EventsCog(commands.Cog):
@@ -79,7 +82,7 @@ class EventsCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        from memory import BOT_MEMORY, BOT_SETTINGS, _save_json_file
+        from memory import BOT_MEMORY, BOT_SETTINGS, _save_json_file_async
         from config import MEMORY_FILE, SETTINGS_FILE
 
         logger.info(
@@ -87,8 +90,8 @@ class EventsCog(commands.Cog):
             self.bot.user,
             getattr(self.bot.user, "id", "unknown"),
         )
-        _save_json_file(MEMORY_FILE, BOT_MEMORY)
-        _save_json_file(SETTINGS_FILE, BOT_SETTINGS)
+        await _save_json_file_async(MEMORY_FILE, BOT_MEMORY)
+        await _save_json_file_async(SETTINGS_FILE, BOT_SETTINGS)
         try:
             await self.bot.tree.sync()
         except Exception:
@@ -234,16 +237,19 @@ class EventsCog(commands.Cog):
             guild_id=guild_id,
             channel_id=channel_id,
         )
-        generated = await self._generate(backend, enhanced, source_bytes)
+        _nsfw = bool(getattr(message.channel, "is_nsfw", lambda: False)())
+        generated = await self._generate(backend, enhanced, source_bytes, nsfw=_nsfw)
         if generated:
             buf = io.BytesIO(generated)
             buf.seek(0)
-            label = "Pollinations" if backend == "pollinations" else "BluesMinds" if backend == "bluesminds" else "Cloudflare"
+            label = _backend_label(backend)
             sent = await send_discord_text(
                 message.channel.send,
                 f"{label} | Prompt: {enhanced}",
                 file=discord.File(buf, filename="generated.png"),
             )
+            if len(generated_image_messages) >= 500:
+                generated_image_messages.popitem(last=False)
             generated_image_messages[sent.id] = {
                 "prompt": enhanced,
                 "raw_prompt": raw_prompt,
@@ -291,18 +297,21 @@ class EventsCog(commands.Cog):
             channel_id=channel_id,
         )
         ref_bytes = await fetch_url_bytes(ref_image_url) if ref_image_url else None
-        generated = await self._generate(backend, improved, ref_bytes)
+        _nsfw = bool(getattr(message.channel, "is_nsfw", lambda: False)())
+        generated = await self._generate(backend, improved, ref_bytes, nsfw=_nsfw)
 
         if generated:
             buf = io.BytesIO(generated)
             buf.seek(0)
-            label = "Pollinations" if backend == "pollinations" else "BluesMinds" if backend == "bluesminds" else "Cloudflare"
+            label = _backend_label(backend)
             sent = await send_discord_text(
                 message.channel.send,
                 f"{label} | Improved prompt: {improved}",
                 file=discord.File(buf, filename="improved.png"),
                 reference=message,
             )
+            if len(generated_image_messages) >= 500:
+                generated_image_messages.popitem(last=False)
             generated_image_messages[sent.id] = {
                 "prompt": improved,
                 "raw_prompt": improved,
@@ -389,7 +398,7 @@ class EventsCog(commands.Cog):
             system = build_system_prompt(user_id, mood, lang)
             reply = await chat_with_fallback(
                 system_prompt=system,
-                user_prompt=_build_full_user_prompt(
+                user_prompt=build_full_user_prompt(
                     content_raw, user_id, guild_id, channel_id
                 ),
                 prefer_search=is_lookism_query(content_raw),
@@ -436,10 +445,10 @@ class EventsCog(commands.Cog):
 
     @staticmethod
     async def _generate(
-        backend: str, prompt: str, source_bytes: Optional[bytes]
+        backend: str, prompt: str, source_bytes: Optional[bytes], nsfw: bool = False
     ) -> Optional[bytes]:
         if backend == "pollinations":
-            return await generate_free_image(prompt)
+            return await generate_free_image(prompt, nsfw=nsfw)
         if backend == "bluesminds":
             result = await generate_bluesminds_image(prompt)
             if result:

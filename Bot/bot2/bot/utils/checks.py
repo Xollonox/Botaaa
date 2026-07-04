@@ -8,35 +8,17 @@ from typing import Any
 import discord
 from discord.ext import commands
 
-from bot.config import OWNER_IDS as CONFIG_OWNER_IDS
+from bot import config as _config
 from bot.utils.interaction_visibility import smart_reply
 
 
-def _parse_owner_ids(raw: str) -> set[int]:
-    ids: set[int] = set()
-    for part in raw.replace(";", ",").split(","):
-        value = part.strip()
-        if not value:
-            continue
-        try:
-            ids.add(int(value))
-        except ValueError:
-            continue
-    return ids
-
-
 def effective_owner_ids() -> set[int]:
-    """Return configured bot owner IDs.
+    """Return configured bot owner IDs from environment.
 
-    Prefer environment configuration, but fall back to the legacy config
-    constant so existing deployments continue to work without extra env vars.
+    Reads OWNER_IDS from bot.config dynamically so tests that reload the
+    config module (or runtime env changes) are picked up.
     """
-    raw = os.getenv("LOOKISM_OWNER_IDS") or os.getenv("BOT_OWNER_IDS") or os.getenv("OWNER_IDS")
-    if raw is not None:
-        parsed = _parse_owner_ids(raw)
-        if parsed:
-            return parsed
-    return {int(owner_id) for owner_id in CONFIG_OWNER_IDS}
+    return _config.OWNER_IDS
 
 
 def is_owner(interaction: discord.Interaction) -> bool:
@@ -61,7 +43,8 @@ async def ensure_registered(
     from bot.utils.ui import e, make_embed
 
     user_id = str(interaction.user.id)
-    data = storage.load()
+    # Read-only fast path: ensure_registered only inspects players/user_row.
+    data = storage.load_readonly()
 
     if is_registered(data, user_id):
         # Block banned users from all bot commands

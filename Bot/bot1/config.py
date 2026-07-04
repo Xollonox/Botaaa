@@ -15,11 +15,20 @@ def _int(key: str, default: int = 0) -> int:
         return default
 
 
-DISCORD_TOKEN: str = _str("DISCORD_TOKEN")
-if not DISCORD_TOKEN:
-    raise RuntimeError("DISCORD_TOKEN not set in .env")
+def _int_or_none(key: str) -> int | None:
+    """Parse environment variable to int or None if unset."""
+    raw = os.environ.get(key, "").strip()
+    if not raw:
+        return None
+    try:
+        return int(raw)
+    except ValueError:
+        return None
 
-SPECIAL_USER_ID: int = _int("SPECIAL_USER_ID", 1152936208742240316)
+
+DISCORD_TOKEN: str = _str("DISCORD_TOKEN")
+
+SPECIAL_USER_ID: int | None = _int_or_none("SPECIAL_USER_ID")
 CEREBRAS_API_KEY: str = _str("CEREBRAS_API_KEY")
 CEREBRAS_API_KEY_2: str = _str("CEREBRAS_API_KEY_2")
 CEREBRAS_BASE_URL: str = _str("CEREBRAS_BASE_URL", "https://api.cerebras.ai/v1")
@@ -53,3 +62,13 @@ BLUESMINDS_IMAGE_MODEL: str = _str("BLUESMINDS_IMAGE_MODEL", "grok-imagine-image
 MEMORY_FILE: str = _str("MEMORY_FILE", "bot_memory.json")
 SETTINGS_FILE: str = _str("SETTINGS_FILE", "bot_settings.json")
 LOG_LEVEL: str = _str("LOG_LEVEL", "INFO")
+
+
+def assert_runtime_config() -> None:
+    """Validate required runtime configuration.
+
+    Called from the bot's main entry point (not at import time) to allow
+    test collection and non-runtime imports to succeed even without .env.
+    """
+    if not DISCORD_TOKEN:
+        raise RuntimeError("DISCORD_TOKEN not set in .env")

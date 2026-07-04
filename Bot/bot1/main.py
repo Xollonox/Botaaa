@@ -5,7 +5,8 @@ from typing import Optional
 import discord
 from discord.ext import commands
 
-from config import DISCORD_TOKEN, LOG_LEVEL
+from config import DISCORD_TOKEN, LOG_LEVEL, assert_runtime_config
+from http_client import close_session
 import memory as _memory
 
 logging.basicConfig(
@@ -31,7 +32,12 @@ async def remember_line(
     guild_id: Optional[int] = None,
     channel_id: Optional[int] = None,
 ) -> None:
-    """Compatibility wrapper for tests/older imports that used main.remember_line."""
+    """Wrapper for tests that patch main.BOT_MEMORY, _save_json_file_async, BOT_SETTINGS.
+
+    The assignments below are no-ops functionally (both sides reference the same objects),
+    but they're retained because tests in test_remember_line.py patch these module attributes
+    with mock objects. Without these lines, the patches wouldn't affect _memory's use.
+    """
     _memory.BOT_MEMORY = BOT_MEMORY
     _memory.BOT_SETTINGS = BOT_SETTINGS
     _memory._save_json_file_async = _save_json_file_async
@@ -45,10 +51,14 @@ async def remember_line(
 
 
 async def main() -> None:
-    async with bot:
-        await bot.load_extension("commands")
-        await bot.load_extension("events")
-        await bot.start(DISCORD_TOKEN)
+    assert_runtime_config()
+    try:
+        async with bot:
+            await bot.load_extension("commands")
+            await bot.load_extension("events")
+            await bot.start(DISCORD_TOKEN)
+    finally:
+        await close_session()
 
 
 if __name__ == "__main__":

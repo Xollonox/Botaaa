@@ -6,6 +6,7 @@ import tempfile
 from typing import Optional
 
 from config import MEMORY_FILE, SETTINGS_FILE, SPECIAL_USER_ID
+from llm import LLM_ERROR_SENTINELS
 
 logger = logging.getLogger("misskim")
 
@@ -83,7 +84,8 @@ def _save_json_file(path: str, data: dict) -> None:
 
 async def _save_json_file_async(path: str, data: dict) -> None:
     async with _memory_lock:
-        _save_json_file(path, data)
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(None, _save_json_file, path, data)
 
 
 BOT_MEMORY: dict = _load_json_file(MEMORY_FILE, {"users": {}, "channels": {}})
@@ -105,7 +107,7 @@ def _memory_scope_key(
     guild_id: Optional[int],
     channel_id: Optional[int] = None,
 ) -> str:
-    user_prefix = "special" if user_id == SPECIAL_USER_ID else "user"
+    user_prefix = "special" if (SPECIAL_USER_ID is not None and user_id == SPECIAL_USER_ID) else "user"
     if guild_id is None:
         return f"{user_prefix}:{user_id}:dm"
     if channel_id is not None:
@@ -152,9 +154,7 @@ async def remember_line(
     channel_id: Optional[int] = None,
 ) -> None:
     cleaned = line.strip()
-    if prefix == "B" and cleaned.startswith(
-        "I could not reach the AI backend right now"
-    ):
+    if prefix == "B" and any(s in cleaned for s in LLM_ERROR_SENTINELS):
         return
     state = _scope_state(user_id, guild_id, channel_id)
     lines = state["lines"]
@@ -282,10 +282,10 @@ async def update_conversation_summary(
             ),
             user_prompt="Conversation:\n" + "\n".join(to_summarize),
         )
-        if "I could not reach the AI backend right now" not in summary:
+        if not any(s in summary for s in LLM_ERROR_SENTINELS):
             state["summary"] = summary.strip()[:300]
             state["lines"] = lines[-4:]
-            _save_json_file(MEMORY_FILE, BOT_MEMORY)
+            await _save_json_file_async(MEMORY_FILE, BOT_MEMORY)
     except Exception:
         logger.exception(
             "Conversation summary update failed | user=%s guild=%s channel=%s",
@@ -295,7 +295,7 @@ async def update_conversation_summary(
         )
 
 
-def clear_user_memory(
+async def clear_user_memory(
     user_id: int,
     guild_id: Optional[int] = None,
     channel_id: Optional[int] = None,
@@ -304,13 +304,13 @@ def clear_user_memory(
     users.pop(_memory_scope_key(user_id, guild_id, channel_id), None)
     if guild_id is None:
         users.pop(str(user_id), None)
-    _save_json_file(MEMORY_FILE, BOT_MEMORY)
+    await _save_json_file_async(MEMORY_FILE, BOT_MEMORY)
 
 
-def clear_all_memory() -> None:
+async def clear_all_memory() -> None:
     BOT_MEMORY["users"] = {}
     BOT_MEMORY["channels"] = {}
-    _save_json_file(MEMORY_FILE, BOT_MEMORY)
+    await _save_json_file_async(MEMORY_FILE, BOT_MEMORY)
 
 
 def _should_summarize(
@@ -329,11 +329,11 @@ def get_language_setting(channel_id: int) -> str:
     return channels.get(str(channel_id), {}).get("lang", "auto")
 
 
-def set_language_setting(channel_id: int, lang: str) -> None:
+async def set_language_setting(channel_id: int, lang: str) -> None:
     channels = BOT_MEMORY.setdefault("channels", {})
     chan_data = channels.setdefault(str(channel_id), {})
     chan_data["lang"] = lang
-    _save_json_file(MEMORY_FILE, BOT_MEMORY)
+    await _save_json_file_async(MEMORY_FILE, BOT_MEMORY)
 
 
 def get_mood(channel_id: int) -> str:
@@ -341,8 +341,28 @@ def get_mood(channel_id: int) -> str:
     return channels.get(str(channel_id), {}).get("mood", "calm")
 
 
-def set_mood(channel_id: int, mood: str) -> None:
+async def set_mood(channel_id: int, mood: str) -> None:
     channels = BOT_MEMORY.setdefault("channels", {})
     chan_data = channels.setdefault(str(channel_id), {})
     chan_data["mood"] = mood
-    _save_json_file(MEMORY_FILE, BOT_MEMORY)
+    await _save_json_file_async(MEMORY_FILE, BOT_MEMORY)
+
+
+def build_full_user_prompt(
+    text: str,
+    user_id: int,
+    guild_id: Optional[int],
+    channel_id: int,
+) -> str:
+    """Build the full user-facing prompt by injecting lore + memories.
+
+    Kept in memory.py so both commands.py and events.py share one copy.
+    Imports from persona are deferred to avoid the memory ↔ persona
+    circular-import that would arise from a top-level import.
+    """
+    from persona import build_user_prompt_with_lore  # deferred — persona lazily imports memory
+
+    lore_prompt = build_user_prompt_with_lore(text)
+    return add_memory_to_prompt(
+        user_id, lore_prompt, guild_id=guild_id, channel_id=channel_id
+    )
