@@ -8,7 +8,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from bot.utils.cards_logic import compute_power, compute_scaled_stats, get_flat_stat_bonus, normalize_mastery_list, rarity_rank
+from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card, get_flat_stat_bonus, normalize_mastery_list, rarity_rank
 from bot.utils.checks import ensure_registered
 from bot.utils.interaction_visibility import smart_reply, error_reply
 from bot.utils.ui import e, make_embed, simple_embed
@@ -47,7 +47,7 @@ def _get_card_def(data: dict[str, Any], item: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(catalog, dict):
         return {}
     card_name = str(item.get("card_name", item.get("name", "")))
-    card = catalog.get(card_name)
+    card = find_catalog_card(catalog, card_name)
     return card if isinstance(card, dict) else {}
 
 

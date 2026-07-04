@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from bot.utils.cards_logic import find_catalog_card
+
 
 def grant_reward(
     data: dict[str, Any],
@@ -51,7 +53,7 @@ def grant_reward(
         if not card_name:
             return False, "no_card_name"
         catalog = data.get("cards", {})
-        card_def = catalog.get(card_name) if isinstance(catalog, dict) else None
+        card_def = find_catalog_card(catalog, card_name) if isinstance(catalog, dict) else None
         if not isinstance(card_def, dict):
             return False, f"Card '{card_name}' not found in catalog."
         from bot.utils.inventory_api import add_card_instance_from_def

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from bot.utils.cards_logic import compute_power, compute_scaled_stats
+from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card
 
 
 def get_player(data: dict[str, Any], user_id: str) -> dict[str, Any] | None:
@@ -77,7 +77,7 @@ def resolve_instance_and_def(
         return None, None
     card_name = str(instance.get("card_name", ""))
     catalog = data.get("cards", {})
-    card_def = catalog.get(card_name) if isinstance(catalog, dict) else None
+    card_def = find_catalog_card(catalog, card_name) if isinstance(catalog, dict) else None
     return instance, card_def if isinstance(card_def, dict) else None
 
 
@@ -101,7 +101,7 @@ def compute_squad_power(
         if instance is None:
             continue
         card_name = str(instance.get("card_name", ""))
-        card_def = catalog.get(card_name)
+        card_def = find_catalog_card(catalog, card_name)
         if not isinstance(card_def, dict):
             continue
         stars = int(instance.get("stars", 0))
