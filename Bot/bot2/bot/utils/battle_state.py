@@ -22,42 +22,69 @@ from bot.utils.typing_matchup import (
     normalize_typing,
     type_multiplier,
 )
+from bot.data.constants import (
+    ANTI_FARM_TIER1_WINS,
+    ANTI_FARM_TIER2_WINS,
+    ANTI_FARM_WINDOW_SECS,
+    CPU_DAILY_TROPHY_CAP,
+    CPU_STAR_TIER_1_MAX,
+    CPU_STAR_TIER_2_MAX,
+    CPU_STAR_TIER_3_MAX,
+    ELO_DENOMINATOR,
+    ELO_K_ABOVE_2000,
+    ELO_K_BELOW_500,
+    ELO_K_DEFAULT,
+    ELO_LOSS_CLAMP_MAX,
+    ELO_LOSS_CLAMP_MIN,
+    ELO_TP_HIGH_THRESHOLD,
+    ELO_TP_LOW_THRESHOLD,
+    ELO_WIN_CLAMP_MAX,
+    ELO_WIN_CLAMP_MIN,
+    PVP_DIFF_DRAW_FAVOURITE_LOSS_MAX,
+    PVP_DIFF_DRAW_FAVOURITE_LOSS_MIN,
+    PVP_DIFF_DRAW_UNDERDOG_GAIN_MAX,
+    PVP_DIFF_DRAW_UNDERDOG_GAIN_MIN,
+    PVP_DIFF_FAVOURITE_WIN_MAX,
+    PVP_DIFF_FAVOURITE_WIN_MIN,
+    PVP_DIFF_UPSET_WIN_MAX,
+    PVP_DIFF_UPSET_WIN_MIN,
+    PVP_SAME_BRACKET_GAP,
+    PVP_SAME_DRAW_FLAT,
+    PVP_SAME_WIN_MAX,
+    PVP_SAME_WIN_MIN,
+    REJECTION_THRESHOLD,
+    STAMINA_BASE,
+    STAMINA_COST,
+    TROPHY_THRESHOLD_BRONZE,
+    TROPHY_THRESHOLD_DIAMOND,
+    TROPHY_THRESHOLD_GOLD,
+    TROPHY_THRESHOLD_IRON,
+    TROPHY_THRESHOLD_PLATINUM,
+    TROPHY_THRESHOLD_RUBY,
+    TROPHY_THRESHOLD_SAPPHIRE,
+    TROPHY_THRESHOLD_SILVER,
+    WIN_COIN_REWARD_MAX,
+    WIN_COIN_REWARD_MIN,
+)
 
 logger = logging.getLogger(__name__)
 
-# ── Constants ────────────────────────────────────────────────────────────────
-REJECTION_THRESHOLD: int = 30  # stat gap above which defense is rejected
-
-STAMINA_BASE: int = 100
-STAMINA_COST: dict[str, int] = {
-    "normal": 10,
-    "special": 20,
-    "ultimate": 35,
-    "unique_skill": 25,
-    "unique_path": 25,
-    "block": 15,
-    "dodge": 15,
-    "parry": 15,
-    "revert": 15,
-    "tank": 15,
-}
-
 def _rank_from_trophies(trophies: int) -> str:
-    if trophies >= 4000:
+    if trophies >= TROPHY_THRESHOLD_RUBY:
         return "Ruby"
-    if trophies >= 3200:
+    if trophies >= TROPHY_THRESHOLD_SAPPHIRE:
         return "Sapphire"
-    if trophies >= 2400:
+    if trophies >= TROPHY_THRESHOLD_PLATINUM:
         return "Platinum"
-    if trophies >= 1600:
+    if trophies >= TROPHY_THRESHOLD_DIAMOND:
         return "Diamond"
-    if trophies >= 1200:
+    if trophies >= TROPHY_THRESHOLD_GOLD:
         return "Gold"
-    if trophies >= 800:
+    if trophies >= TROPHY_THRESHOLD_SILVER:
         return "Silver"
-    if trophies >= 400:
+    if trophies >= TROPHY_THRESHOLD_BRONZE:
         return "Bronze"
-    if trophies >= 200:
+    if trophies >= TROPHY_THRESHOLD_IRON:
         return "Iron"
     return "Copper"
 
@@ -232,11 +259,11 @@ def _build_cpu_side(data: dict[str, Any], team_size: int = 4, min_rarity: str = 
             continue
 
         # Scale CPU star level based on player trophies for fair difficulty
-        if player_trophies < 400:
+        if player_trophies < CPU_STAR_TIER_1_MAX:
             star_range = (1, 2)
-        elif player_trophies < 1200:
+        elif player_trophies < CPU_STAR_TIER_2_MAX:
             star_range = (1, 3)
-        elif player_trophies < 2400:
+        elif player_trophies < CPU_STAR_TIER_3_MAX:
             star_range = (2, 4)
         else:
             star_range = (3, 5)
@@ -937,12 +964,12 @@ def _pvp_trophy_delta(tp_a: int, tp_b: int, winner: str) -> tuple[int, int]:
     winner: "A", "B", or "draw"
     """
     diff = abs(tp_a - tp_b)
-    same = diff <= 50  # treat as equal if within 50
+    same = diff <= PVP_SAME_BRACKET_GAP
 
     if same:
         if winner == "draw":
-            return 10, 10
-        gain = random.randint(25, 40)
+            return PVP_SAME_DRAW_FLAT, PVP_SAME_DRAW_FLAT
+        gain = random.randint(PVP_SAME_WIN_MIN, PVP_SAME_WIN_MAX)
         if winner == "A":
             return gain, -gain
         else:
@@ -951,29 +978,29 @@ def _pvp_trophy_delta(tp_a: int, tp_b: int, winner: str) -> tuple[int, int]:
         # A has higher trophies, B has lower
         if winner == "draw":
             # B loses 0-10, A gains 10-20
-            b_loss = random.randint(0, 10)
-            a_gain = random.randint(10, 20)
+            b_loss = random.randint(PVP_DIFF_DRAW_FAVOURITE_LOSS_MIN, PVP_DIFF_DRAW_FAVOURITE_LOSS_MAX)
+            a_gain = random.randint(PVP_DIFF_DRAW_UNDERDOG_GAIN_MIN, PVP_DIFF_DRAW_UNDERDOG_GAIN_MAX)
             return a_gain, -b_loss
         elif winner == "B":
-            gain = random.randint(30, 50)
+            gain = random.randint(PVP_DIFF_UPSET_WIN_MIN, PVP_DIFF_UPSET_WIN_MAX)
             return -gain, gain
         else:  # A wins
-            gain = random.randint(20, 30)
+            gain = random.randint(PVP_DIFF_FAVOURITE_WIN_MIN, PVP_DIFF_FAVOURITE_WIN_MAX)
             return gain, -gain
 
 
 def _elo_delta_cpu(tp: int, tc: int, won: bool) -> int:
     """Legacy ELO delta for CPU matches only."""
-    ew = 1 / (1 + 10 ** ((tc - tp) / 400))
-    k = 22
-    if tp < 500:
-        k = 28
-    elif tp > 2000:
-        k = 16
+    ew = 1 / (1 + 10 ** ((tc - tp) / ELO_DENOMINATOR))
+    k = ELO_K_DEFAULT
+    if tp < ELO_TP_LOW_THRESHOLD:
+        k = ELO_K_BELOW_500
+    elif tp > ELO_TP_HIGH_THRESHOLD:
+        k = ELO_K_ABOVE_2000
     raw = round(k * ((1 - ew) if won else (0 - ew)))
     if won:
-        return max(4, min(22, raw))
-    return max(-22, min(-4, raw))
+        return max(ELO_WIN_CLAMP_MIN, min(ELO_WIN_CLAMP_MAX, raw))
+    return max(ELO_LOSS_CLAMP_MIN, min(ELO_LOSS_CLAMP_MAX, raw))
 
 
 def _update_mission_progress(data: dict, user_id: str, battle_type: str, won: bool) -> None:
@@ -1003,10 +1030,6 @@ def _update_mission_progress(data: dict, user_id: str, battle_type: str, won: bo
         logger.exception("Failed to update mission progress for user %s", user_id)
 
 
-WIN_COIN_REWARD_MIN = 50
-WIN_COIN_REWARD_MAX = 90
-
-
 def _resolve_cpu_outcome(state: dict, data: dict, human_id: str, winner_id: str) -> None:
     """Apply CPU match ELO, anti-farm scaling, coin reward, and opponent line."""
     human = get_player(data, human_id)
@@ -1021,11 +1044,11 @@ def _resolve_cpu_outcome(state: dict, data: dict, human_id: str, winner_id: str)
     won = str(winner_id) == human_id
     delta = _elo_delta_cpu(tp, tc, won)
 
-    # Anti-farm: scale down if many CPU wins in last 10 minutes
+    # Anti-farm: scale down if many CPU wins in last ANTI_FARM_WINDOW_SECS seconds
     now = int(state.get("turn_started_at", 0))
     cpu_wins = user_data.setdefault("cpu_win_timestamps", [])
     if isinstance(cpu_wins, list):
-        cpu_wins[:] = [ts for ts in cpu_wins if now - ts <= 600]
+        cpu_wins[:] = [ts for ts in cpu_wins if now - ts <= ANTI_FARM_WINDOW_SECS]
         recent_wins = len(cpu_wins)
     else:
         recent_wins = 0
@@ -1034,22 +1057,22 @@ def _resolve_cpu_outcome(state: dict, data: dict, human_id: str, winner_id: str)
 
     if won:
         cpu_wins.append(now)
-        if recent_wins >= 6:
+        if recent_wins >= ANTI_FARM_TIER2_WINS:
             delta = max(1, round(delta * 0.25))
-        elif recent_wins >= 3:
+        elif recent_wins >= ANTI_FARM_TIER1_WINS:
             delta = max(1, round(delta * 0.5))
 
-    # Daily +100 trophy cap from CPU wins (UTC-midnight rollover).
+    # Daily CPU_DAILY_TROPHY_CAP trophy cap from CPU wins (UTC-midnight rollover).
     day_start = (int(now) // 86400) * 86400
     if int(user_data.get("last_cpu_trophy_reset", 0)) < day_start:
         user_data["daily_cpu_trophy_sum"] = 0
         user_data["last_cpu_trophy_reset"] = day_start
     if won and delta > 0:
         sum_today = int(user_data.get("daily_cpu_trophy_sum", 0))
-        if sum_today >= 100:
+        if sum_today >= CPU_DAILY_TROPHY_CAP:
             delta = 0
-        elif sum_today + delta > 100:
-            delta = 100 - sum_today
+        elif sum_today + delta > CPU_DAILY_TROPHY_CAP:
+            delta = CPU_DAILY_TROPHY_CAP - sum_today
         user_data["daily_cpu_trophy_sum"] = sum_today + delta
 
     user_data["trophies"] = max(0, tp + delta)

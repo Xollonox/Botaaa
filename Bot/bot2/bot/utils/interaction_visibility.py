@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
+import discord
+
 from bot.utils.ui import skin_embed, style_view
+
+logger = logging.getLogger(__name__)
 
 
 def _is_owner_command(interaction: Any) -> bool:
@@ -17,9 +22,12 @@ def _load_data(interaction: Any) -> dict[str, Any] | None:
     if storage is None:
         return None
     try:
-        payload = storage.load()
+        # Read-only fast path: payload is only passed to skin_embed/style_view
+        # which must treat it as immutable.
+        payload = storage.load_readonly()
         return payload if isinstance(payload, dict) else None
     except Exception:
+        logger.exception("Unexpected error loading storage data for interaction styling")
         return None
 
 
@@ -66,13 +74,13 @@ async def error_reply(interaction: Any, *args: Any, **kwargs: Any) -> None:
             await interaction.response.send_message(*args, **kwargs)
             try:
                 msg = await interaction.original_response()
-            except Exception:
+            except discord.HTTPException:
                 return
         if msg:
             await asyncio.sleep(2)
             try:
                 await msg.delete()
-            except Exception:
+            except discord.HTTPException:
                 pass
-    except Exception:
-        pass
+    except discord.HTTPException:
+        logger.exception("Discord HTTP error sending error_reply")

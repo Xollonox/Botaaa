@@ -8,12 +8,15 @@ import json
 import logging
 import os
 import threading
+import time
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+# Minimum seconds between successive POSTs.  Override with SUPABASE_SYNC_INTERVAL.
+SUPABASE_SYNC_INTERVAL: float = float(os.getenv("SUPABASE_SYNC_INTERVAL", "5.0"))
 
 _sync_lock = threading.Lock()
 _pending = False
@@ -40,8 +43,10 @@ def _do_sync(data: dict[str, Any]) -> None:
         )
         with urllib.request.urlopen(req, timeout=5) as resp:
             resp.read()
-    except Exception as e:
-        logger.warning("Supabase sync failed: %s", e)
+    except (OSError, ValueError, TypeError):
+        # OSError covers urllib.error.URLError / HTTPError / socket.timeout (all subclass OSError).
+        # ValueError covers malformed URL schemes; TypeError covers json.dumps failures.
+        logger.exception("Supabase sync failed")
 
 
 def sync_async(data: dict[str, Any]) -> None:
@@ -72,5 +77,13 @@ def sync_async(data: dict[str, Any]) -> None:
                         return
                     continue
             _do_sync(current)
+            # Debounce: sleep for the configured interval so that a burst of
+            # save() calls in the next SUPABASE_SYNC_INTERVAL seconds is
+            # coalesced into one POST rather than one POST per call.
+            # Any snapshot written to _latest_data while we sleep will be
+            # picked up on the next loop iteration (newest-wins).
+            interval = SUPABASE_SYNC_INTERVAL
+            if interval > 0:
+                time.sleep(interval)
 
     threading.Thread(target=run, daemon=True).start()

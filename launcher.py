@@ -35,8 +35,8 @@ def _bot_names() -> list[str]:
 
 
 def _env_for_bot(bot_name: str) -> dict[str, str]:
-    env = os.environ.copy()
-    env.update(_load_env_file(os.path.join(BOT_ROOT, bot_name, ".env")))
+    dotenv = _load_env_file(os.path.join(BOT_ROOT, bot_name, ".env"))
+    env = {**dotenv, **os.environ}
     return env
 
 

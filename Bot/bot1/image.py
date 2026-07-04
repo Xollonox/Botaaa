@@ -10,6 +10,8 @@ from typing import List, Optional, Tuple
 import aiohttp
 import discord
 
+from http_client import get_session
+
 from config import (
     BLUESMINDS_API_KEY,
     BLUESMINDS_BASE_URL,
@@ -96,35 +98,34 @@ async def _cf_post_json(model: str, body: dict) -> Optional[bytes]:
         "Content-Type": "application/json",
     }
     try:
-        async with aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=80)
-        ) as session:
-            async with session.post(
-                _cf_endpoint(model), json=body, headers=headers
-            ) as resp:
-                resp_text = await resp.text()
-                if resp.status != 200:
-                    logger.error(
-                        "Cloudflare image API failed | model=%s status=%s body=%s",
-                        model, resp.status, resp_text[:500],
-                    )
-                    return None
-                try:
-                    data = json.loads(resp_text)
-                except json.JSONDecodeError:
-                    logger.error(
-                        "Cloudflare image API non-JSON | model=%s body=%s",
-                        model, resp_text[:500],
-                    )
-                    return None
-                b64 = _extract_cf_image_b64(data)
-                if not b64:
-                    logger.error(
-                        "Cloudflare image API missing image field | model=%s body=%s",
-                        model, resp_text[:500],
-                    )
-                    return None
-                return base64.b64decode(b64)
+        session = await get_session()
+        async with session.post(
+            _cf_endpoint(model), json=body, headers=headers,
+            timeout=aiohttp.ClientTimeout(total=80),
+        ) as resp:
+            resp_text = await resp.text()
+            if resp.status != 200:
+                logger.error(
+                    "Cloudflare image API failed | model=%s status=%s body=%s",
+                    model, resp.status, resp_text[:500],
+                )
+                return None
+            try:
+                data = json.loads(resp_text)
+            except json.JSONDecodeError:
+                logger.error(
+                    "Cloudflare image API non-JSON | model=%s body=%s",
+                    model, resp_text[:500],
+                )
+                return None
+            b64 = _extract_cf_image_b64(data)
+            if not b64:
+                logger.error(
+                    "Cloudflare image API missing image field | model=%s body=%s",
+                    model, resp_text[:500],
+                )
+                return None
+            return base64.b64decode(b64)
     except Exception:
         logger.exception("Cloudflare JSON image request crashed | model=%s", model)
         return None
@@ -143,37 +144,36 @@ async def _cf_post_multipart_flux2(
         "image", image_bytes, filename="input.png", content_type="image/png"
     )
     try:
-        async with aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=120)
-        ) as session:
-            async with session.post(
-                _cf_endpoint(CLOUDFLARE_FLUX2_DEV_IMG2IMG_MODEL),
-                data=form,
-                headers=headers,
-            ) as resp:
-                resp_text = await resp.text()
-                if resp.status != 200:
-                    logger.error(
-                        "Cloudflare Flux2 img2img failed | status=%s body=%s",
-                        resp.status, resp_text[:500],
-                    )
-                    return None
-                try:
-                    data = json.loads(resp_text)
-                except json.JSONDecodeError:
-                    logger.error(
-                        "Cloudflare Flux2 img2img non-JSON | body=%s",
-                        resp_text[:500],
-                    )
-                    return None
-                b64 = _extract_cf_image_b64(data)
-                if not b64:
-                    logger.error(
-                        "Cloudflare Flux2 img2img missing image field | body=%s",
-                        resp_text[:500],
-                    )
-                    return None
-                return base64.b64decode(b64)
+        session = await get_session()
+        async with session.post(
+            _cf_endpoint(CLOUDFLARE_FLUX2_DEV_IMG2IMG_MODEL),
+            data=form,
+            headers=headers,
+            timeout=aiohttp.ClientTimeout(total=120),
+        ) as resp:
+            resp_text = await resp.text()
+            if resp.status != 200:
+                logger.error(
+                    "Cloudflare Flux2 img2img failed | status=%s body=%s",
+                    resp.status, resp_text[:500],
+                )
+                return None
+            try:
+                data = json.loads(resp_text)
+            except json.JSONDecodeError:
+                logger.error(
+                    "Cloudflare Flux2 img2img non-JSON | body=%s",
+                    resp_text[:500],
+                )
+                return None
+            b64 = _extract_cf_image_b64(data)
+            if not b64:
+                logger.error(
+                    "Cloudflare Flux2 img2img missing image field | body=%s",
+                    resp_text[:500],
+                )
+                return None
+            return base64.b64decode(b64)
     except Exception:
         logger.exception("Cloudflare Flux2 img2img request crashed")
         return None
@@ -196,33 +196,34 @@ async def generate_bluesminds_image(prompt: str) -> Optional[bytes]:
     }
     url = f"{BLUESMINDS_BASE_URL.rstrip('/')}/images/generations"
     try:
-        async with aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=60)
-        ) as session:
-            async with session.post(url, json=body, headers=headers) as resp:
-                resp_text = await resp.text()
-                if resp.status != 200:
-                    logger.warning(
-                        "BluesMinds image API failed (will fallback) | status=%s body=%s",
-                        resp.status, resp_text[:300],
-                    )
-                    return None
-                try:
-                    data = json.loads(resp_text)
-                except json.JSONDecodeError:
-                    logger.warning(
-                        "BluesMinds image API non-JSON (will fallback) | body=%s",
-                        resp_text[:300],
-                    )
-                    return None
-                b64 = data.get("data", [{}])[0].get("b64_json", "")
-                if not b64:
-                    logger.warning(
-                        "BluesMinds image API missing b64_json (will fallback) | body=%s",
-                        resp_text[:300],
-                    )
-                    return None
-                return base64.b64decode(b64)
+        session = await get_session()
+        async with session.post(
+            url, json=body, headers=headers,
+            timeout=aiohttp.ClientTimeout(total=60),
+        ) as resp:
+            resp_text = await resp.text()
+            if resp.status != 200:
+                logger.warning(
+                    "BluesMinds image API failed (will fallback) | status=%s body=%s",
+                    resp.status, resp_text[:300],
+                )
+                return None
+            try:
+                data = json.loads(resp_text)
+            except json.JSONDecodeError:
+                logger.warning(
+                    "BluesMinds image API non-JSON (will fallback) | body=%s",
+                    resp_text[:300],
+                )
+                return None
+            b64 = data.get("data", [{}])[0].get("b64_json", "")
+            if not b64:
+                logger.warning(
+                    "BluesMinds image API missing b64_json (will fallback) | body=%s",
+                    resp_text[:300],
+                )
+                return None
+            return base64.b64decode(b64)
     except Exception:
         logger.warning("BluesMinds image generation crashed (will fallback)")
         return None
@@ -259,7 +260,7 @@ async def generate_image_bytes(
 
 
 async def generate_free_image(
-    prompt: str, width: int = 1024, height: int = 1024
+    prompt: str, width: int = 1024, height: int = 1024, nsfw: bool = False
 ) -> Optional[bytes]:
     cleaned_prompt = " ".join(prompt.strip().split()) or "a high quality photo"
     tuned_prompt = (
@@ -272,22 +273,20 @@ async def generate_free_image(
     url = (
         f"https://image.pollinations.ai/prompt/{encoded_prompt}"
         f"?width={width}&height={height}"
-        f"&seed={random.randint(100000, 9999999)}&safe=false&model=flux"
+        f"&seed={random.randint(100000, 9999999)}&safe={'false' if nsfw else 'true'}&model=flux"
         f"&nologo=true&enhance=true"
     )
     try:
-        async with aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=90)
-        ) as session:
-            async with session.get(url) as resp:
-                if resp.status == 200:
-                    return await resp.read()
-                body = await resp.text()
-                logger.error(
-                    "Pollinations failed | status=%s prompt=%s body=%s",
-                    resp.status, prompt[:120], body[:500],
-                )
-                return None
+        session = await get_session()
+        async with session.get(url, timeout=aiohttp.ClientTimeout(total=90)) as resp:
+            if resp.status == 200:
+                return await resp.read()
+            body = await resp.text()
+            logger.error(
+                "Pollinations failed | status=%s prompt=%s body=%s",
+                resp.status, prompt[:120], body[:500],
+            )
+            return None
     except Exception:
         logger.exception(
             "Pollinations image generation crashed | prompt=%s", prompt[:120]
@@ -297,17 +296,15 @@ async def generate_free_image(
 
 async def fetch_url_bytes(url: str) -> Optional[bytes]:
     try:
-        async with aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=30)
-        ) as session:
-            async with session.get(url) as resp:
-                if resp.status != 200:
-                    logger.warning(
-                        "Failed to fetch attachment URL | status=%s url=%s",
-                        resp.status, url,
-                    )
-                    return None
-                return await resp.read()
+        session = await get_session()
+        async with session.get(url, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+            if resp.status != 200:
+                logger.warning(
+                    "Failed to fetch attachment URL | status=%s url=%s",
+                    resp.status, url,
+                )
+                return None
+            return await resp.read()
     except Exception:
         logger.exception("Attachment download crashed | url=%s", url)
         return None
@@ -339,42 +336,41 @@ def gather_image_urls(message: discord.Message) -> List[str]:
 async def fetch_perchance_output(
     generator_name: str, list_name: str = "output"
 ) -> str:
+    safe_generator = urllib.parse.quote(generator_name, safe="")
     url = (
         f"https://perchance.org/api/downloadGenerator"
-        f"?generatorName={generator_name}&listsOnly=true"
+        f"?generatorName={safe_generator}&listsOnly=true"
         f"&__cacheBust={random.random()}"
     )
     try:
-        async with aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=15)
-        ) as session:
-            async with session.get(url) as resp:
-                if resp.status != 200:
-                    return "Error: Unable to connect to Perchance servers right now."
-                raw_text = await resp.text()
-                pattern = (
-                    rf"(?:^|\n){re.escape(list_name)}\s*\n"
-                    rf"([\s\S]*?)(?=\n\w+\s*\n|$)"
+        session = await get_session()
+        async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+            if resp.status != 200:
+                return "Error: Unable to connect to Perchance servers right now."
+            raw_text = await resp.text()
+            pattern = (
+                rf"(?:^|\n){re.escape(list_name)}\s*\n"
+                rf"([\s\S]*?)(?=\n\w+\s*\n|$)"
+            )
+            match = re.search(pattern, raw_text)
+            if not match:
+                return (
+                    f"Error: Could not locate the list '{list_name}' "
+                    "in that generator."
                 )
-                match = re.search(pattern, raw_text)
-                if not match:
-                    return (
-                        f"Error: Could not locate the list '{list_name}' "
-                        "in that generator."
-                    )
-                lines = [
-                    line.strip()
-                    for line in match.group(1).split("\n")
-                    if line.strip() and not line.strip().startswith("//")
-                ]
-                if not lines:
-                    return "Error: The selected Perchance list is completely empty."
-                return random.choice(lines)
-    except Exception as exc:
+            lines = [
+                line.strip()
+                for line in match.group(1).split("\n")
+                if line.strip() and not line.strip().startswith("//")
+            ]
+            if not lines:
+                return "Error: The selected Perchance list is completely empty."
+            return random.choice(lines)
+    except Exception:
         logger.exception(
             "Perchance extraction failed | generator=%s", generator_name
         )
-        return f"An error occurred while connecting to Perchance: {exc}"
+        return "An error occurred while connecting to Perchance."
 
 
 async def vision_chat_from_urls(

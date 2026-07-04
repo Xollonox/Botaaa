@@ -56,6 +56,12 @@ class ModerationOwnerCog(commands.Cog):
             )
             return
 
+        # Drop stale ToS-acceptance cache so the banned user is re-gated
+        # if they are ever unbanned or if their record is later reset.
+        invalidate = getattr(self.bot, "invalidate_terms_cache", None)
+        if callable(invalidate):
+            invalidate(target.id)
+
         embed = make_embed(
             data,
             f"{e('no', data)} User Banned",

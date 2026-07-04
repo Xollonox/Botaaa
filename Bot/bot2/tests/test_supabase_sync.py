@@ -20,6 +20,7 @@ def test_sync_async_coalesces_to_latest_snapshot(monkeypatch) -> None:
     monkeypatch.setattr(supabase_sync, "SUPABASE_URL", "https://example.supabase.co")
     monkeypatch.setattr(supabase_sync, "SUPABASE_KEY", "secret")
     monkeypatch.setattr(supabase_sync, "_do_sync", fake_do_sync)
+    monkeypatch.setattr(supabase_sync, "SUPABASE_SYNC_INTERVAL", 0.0)  # disable debounce sleep in tests
     monkeypatch.setattr(supabase_sync, "_pending", False)
     monkeypatch.setattr(supabase_sync, "_latest_data", None)
 

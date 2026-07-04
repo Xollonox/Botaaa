@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import sqlite3
 import time
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 def _ensure_migration_table(conn: sqlite3.Connection) -> None:
@@ -43,6 +46,9 @@ class SQLiteMarketRepository:
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
+        # Per-connection PRAGMAs (not persisted to the database file).
+        # journal_mode=WAL is persisted, so it is only set in _init_db.
+        conn.execute("PRAGMA synchronous=NORMAL")
         return conn
 
     def _init_db(self) -> None:
@@ -313,7 +319,8 @@ class SQLiteMarketRepository:
             return None
         try:
             payload = json.loads(row["payload_json"])
-        except Exception:
+        except json.JSONDecodeError:
+            logger.exception("Malformed JSON in market_listings for id=%s", listing_id)
             return None
         return payload if isinstance(payload, dict) else None
 
@@ -327,7 +334,8 @@ class SQLiteMarketRepository:
         for row in rows:
             try:
                 payload = json.loads(row["payload_json"])
-            except Exception:
+            except json.JSONDecodeError:
+                logger.exception("Malformed JSON in market_listings for id=%s; skipping row", row["id"])
                 continue
             if isinstance(payload, dict):
                 out[str(row["id"])] = payload
@@ -412,6 +420,8 @@ class SQLiteTradeRepository:
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
+        # Per-connection PRAGMAs (not persisted to the database file).
+        conn.execute("PRAGMA synchronous=NORMAL")
         return conn
 
     def _init_db(self) -> None:
@@ -723,6 +733,8 @@ class SQLiteBattleRepository:
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
+        # Per-connection PRAGMAs (not persisted to the database file).
+        conn.execute("PRAGMA synchronous=NORMAL")
         return conn
 
     def _init_db(self) -> None:

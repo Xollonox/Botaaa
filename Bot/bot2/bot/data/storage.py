@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import asyncio
 import os
 import threading
 from copy import deepcopy
@@ -90,6 +91,31 @@ class Storage:
         """
         return deepcopy(self._live_data())
 
+    def load_readonly(self) -> dict[str, Any]:
+        """Return the raw cached dict WITHOUT deepcopy.
+
+        Fast-path read for hot code that only inspects the data. Callers MUST
+        NOT mutate the returned dict (or any nested structure); doing so would
+        corrupt the in-memory cache and bypass the atomic-write path. Use
+        :meth:`load` or :meth:`with_lock` for any code that may mutate.
+        """
+        return self._live_data()
+
+    def _write_to_disk(self, data: dict[str, Any]) -> None:
+        """Sanitize *data* and write it atomically to ``self.path``.
+
+        Extracted so both the sync :meth:`save` and the async
+        :meth:`async_save` paths share the identical write body.
+        """
+        sanitized = _sanitize_for_json(data)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        tmp_path = self.path.with_suffix(f"{self.path.suffix}.tmp")
+        with tmp_path.open("w", encoding="utf-8") as f:
+            json.dump(sanitized, f, ensure_ascii=False, indent=2, sort_keys=True)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_path, self.path)
+
     def save(self, data: dict[str, Any]) -> None:
         """Write *data* to disk and refresh the in‑memory cache.
 
@@ -100,17 +126,24 @@ class Storage:
         The cache is updated after the atomic write succeeds. The write stays
         synchronous so two consecutive saves cannot reach disk out of order.
         """
-        def _write() -> None:
-            sanitized = _sanitize_for_json(data)
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            tmp_path = self.path.with_suffix(f"{self.path.suffix}.tmp")
-            with tmp_path.open("w", encoding="utf-8") as f:
-                json.dump(sanitized, f, ensure_ascii=False, indent=2, sort_keys=True)
-                f.flush()
-                os.fsync(f.fileno())
-            os.replace(tmp_path, self.path)
+        self._write_to_disk(data)
+        self._cache = data
+        try:
+            from .supabase_sync import sync_async
 
-        _write()
+            sync_async(deepcopy(self._cache))
+        except Exception:
+            logger.exception("Failed to schedule Supabase sync for %s", self.path)
+
+    async def async_save(self, data: dict[str, Any]) -> None:
+        """Async variant of :meth:`save` that offloads the disk write.
+
+        The JSON serialization + fsync are pushed to the default executor so
+        the event loop is not blocked. The in-memory cache and Supabase sync
+        happen back on the loop thread after the write completes.
+        """
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, self._write_to_disk, data)
         self._cache = data
         try:
             from .supabase_sync import sync_async
