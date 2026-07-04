@@ -38,8 +38,14 @@ def _clamp_stars(stars: Any) -> int:
     return max(0, min(5, int(stars or 0)))
 
 
-def get_star_multiplier(stars: int) -> float:
-    return [1.00, 1.20, 1.45, 1.75, 2.10, 2.50][_clamp_stars(stars)]
+def get_star_multiplier(data: dict[str, Any], item: dict[str, Any], stars: int) -> float:
+    card_def = _get_card_def(data, item)
+    if not card_def:
+        return 1.0
+    base = compute_power(compute_scaled_stats(card_def, 0))
+    if base <= 0:
+        return 1.0
+    return compute_power(compute_scaled_stats(card_def, _clamp_stars(stars))) / base
 
 
 def _is_favorite(item: dict[str, Any]) -> bool:
@@ -199,7 +205,7 @@ class UpgradeConfirmView(discord.ui.View):
         item = self.cog._find_item(data, str(interaction.user.id), self.uid)
         name = str(item.get("card_name", item.get("name", "Card"))) if item else "Card"
         now_stats = _effective_stats(data, item or {}, stars_override=stars)
-        mult = get_star_multiplier(stars)
+        mult = get_star_multiplier(data, item, stars)
 
         embed = make_embed(
             data,
@@ -648,8 +654,8 @@ class InventoryCog(commands.Cog):
     def _build_upgrade_preview_embed(self, data: dict[str, Any], item: dict[str, Any]) -> discord.Embed:
         stars = _clamp_stars(item.get("stars", 0))
         next_stars = min(5, stars + 1)
-        cur_mult = get_star_multiplier(stars)
-        nxt_mult = get_star_multiplier(next_stars)
+        cur_mult = get_star_multiplier(data, item, stars)
+        nxt_mult = get_star_multiplier(data, item, next_stars)
 
         cur_stats = _effective_stats(data, item, stars_override=stars)
         nxt_stats = _effective_stats(data, item, stars_override=next_stars)
