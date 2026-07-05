@@ -181,7 +181,7 @@ class TradeGroup(app_commands.Group):
 
         have_item = None
         for item in inventory:
-            if isinstance(item, dict) and str(item.get("name", "")).lower() == have_card.lower() and not item.get("trade_locked"):
+            if isinstance(item, dict) and str(item.get("card_name", item.get("name", ""))).lower() == have_card.lower() and not item.get("trade_locked"):
                 have_item = item
                 break
 
@@ -274,7 +274,7 @@ class TradeGroup(app_commands.Group):
 
         want_item = None
         for item in acceptor_inventory:
-            if isinstance(item, dict) and str(item.get("name", "")).lower() == want_card.lower() and not item.get("trade_locked"):
+            if isinstance(item, dict) and str(item.get("card_name", item.get("name", ""))).lower() == want_card.lower() and not item.get("trade_locked"):
                 want_item = item
                 break
 
@@ -301,13 +301,13 @@ class TradeGroup(app_commands.Group):
 
             have_idx = None
             for i, item in enumerate(poster_inv):
-                if isinstance(item, dict) and str(item.get("name", "")).lower() == have_card.lower():
+                if isinstance(item, dict) and str(item.get("card_name", item.get("name", ""))).lower() == have_card.lower():
                     have_idx = i
                     break
 
             want_idx = None
             for i, item in enumerate(acceptor_inv):
-                if isinstance(item, dict) and str(item.get("name", "")).lower() == want_card.lower():
+                if isinstance(item, dict) and str(item.get("card_name", item.get("name", ""))).lower() == want_card.lower():
                     want_idx = i
                     break
 

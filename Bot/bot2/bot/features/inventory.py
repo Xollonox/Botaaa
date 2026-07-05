@@ -23,8 +23,8 @@ UPGRADE_BASE_COSTS = {
     "Epic":      3000,
     "Legendary": 6000,
     "Mythical":  9000,
-    "Abyssal":   14000,
-    "Infernal":  20000,
+    "Infernal":  14000,
+    "Abyssal":   20000,
 }
 
 
@@ -352,7 +352,7 @@ class CollectionDetailView(discord.ui.View):
             await smart_reply(interaction, "Card not found.", ephemeral=True)
             return
 
-        inv = data["players"][str(interaction.user.id)]["user"].get("inventory", [])
+        inv = data.get("players", {}).get(str(interaction.user.id), {}).get("user", {}).get("inventory", [])
         if not isinstance(inv, list):
             inv = []
         same = [x for x in inv if isinstance(x, dict) and str(x.get("card_name", "")) == str(item.get("card_name", "")) and str(x.get("uid", "")) != str(item.get("uid", ""))]
@@ -515,7 +515,7 @@ class CollectionGalleryView(discord.ui.View):
 
         catalog = data.get("cards", {})
         total = len(catalog) if isinstance(catalog, dict) else 0
-        inv = data["players"][str(self.invoker_id)]["user"].get("inventory", [])
+        inv = data.get("players", {}).get(str(self.invoker_id), {}).get("user", {}).get("inventory", [])
         unique_owned = {
             str(item.get("card_name", item.get("name", "")))
             for item in inv
@@ -573,7 +573,7 @@ class InventoryCog(commands.Cog):
 
     def _ensure_inventory_defaults(self, user_id: str) -> None:
         def mutate(data: dict[str, Any]) -> None:
-            inv = data["players"][user_id]["user"].get("inventory", [])
+            inv = data.get("players", {}).get(user_id, {}).get("user", {}).get("inventory", [])
             if not isinstance(inv, list):
                 return
             for item in inv:
@@ -592,7 +592,7 @@ class InventoryCog(commands.Cog):
         self.bot.storage.with_lock(mutate)
 
     def _get_entries(self, data: dict[str, Any], user_id: str, filter_value: str, sort_value: str) -> list[dict[str, Any]]:
-        inventory = data["players"][user_id]["user"].get("inventory", [])
+        inventory = data.get("players", {}).get(user_id, {}).get("user", {}).get("inventory", [])
         if not isinstance(inventory, list):
             return []
 
@@ -633,7 +633,7 @@ class InventoryCog(commands.Cog):
 
 
     def _find_item(self, data: dict[str, Any], user_id: str, uid_or_name: str) -> dict[str, Any] | None:
-        inv = data["players"][user_id]["user"].get("inventory", [])
+        inv = data.get("players", {}).get(user_id, {}).get("user", {}).get("inventory", [])
         if not isinstance(inv, list):
             return None
 
@@ -870,7 +870,7 @@ class InventoryCog(commands.Cog):
             if coins < cost:
                 return "not_enough", stars, coins
 
-            dup_idx = next((i for i, row in enumerate(user.get("inventory", [])) if isinstance(row, dict) and str(row.get("card_name", "")) == str(item.get("card_name", "")) and str(row.get("uid", "")) != str(item.get("uid", "")) and not bool(row.get("squad_locked", False) or row.get("market_locked", False))), -1)
+            dup_idx = next((i for i, row in enumerate(user.get("inventory", [])) if isinstance(row, dict) and str(row.get("card_name", "")) == str(item.get("card_name", "")) and str(row.get("uid", "")) != str(item.get("uid", "")) and not bool(row.get("squad_locked", False) or row.get("market_locked", False) or row.get("locked", False) or row.get("trade_locked", False) or row.get("weapon_uid"))), -1)
             if dup_idx < 0:
                 return "need_duplicate", stars, coins
 

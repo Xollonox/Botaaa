@@ -13,8 +13,8 @@ _UPGRADE_BASE_COSTS: dict[str, int] = {
     "Epic":      3000,
     "Legendary": 6000,
     "Mythical":  9000,
-    "Infernal":  20000,
-    "Abyssal":   14000,
+    "Infernal":  14000,
+    "Abyssal":   20000,
 }
 
 

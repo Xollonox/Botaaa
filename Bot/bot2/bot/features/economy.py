@@ -45,7 +45,7 @@ class EconomyCog(commands.Cog):
             return
 
         data = self.bot.storage.load()
-        user_data = data["players"][str(interaction.user.id)]["user"]
+        user_data = data.get("players", {}).get(str(interaction.user.id), {}).get("user", {})
 
         coins = int(user_data.get("balance", 0))
         gems = int(user_data.get("premium_balance", 0))
@@ -92,7 +92,7 @@ class EconomyCog(commands.Cog):
         def mutate(data: dict[str, Any]) -> tuple[bool, int, int]:
             if not is_registered(data, target_id):
                 return False, 0, 0
-            user = data["players"][target_id]["user"]
+            user = data.get("players", {}).get(target_id, {}).get("user", {})
             before = int(user.get("balance", 0))
             after = add_balance(user, amount)
             return True, before, after
@@ -145,7 +145,7 @@ class EconomyCog(commands.Cog):
         def mutate(data: dict[str, Any]) -> tuple[bool, int, int]:
             if not is_registered(data, target_id):
                 return False, 0, 0
-            user = data["players"][target_id]["user"]
+            user = data.get("players", {}).get(target_id, {}).get("user", {})
             before = int(user.get("balance", 0))
             after = max(0, before - amount)
             user["balance"] = after
@@ -199,7 +199,7 @@ class EconomyCog(commands.Cog):
         def mutate(data: dict[str, Any]) -> tuple[bool, int, int]:
             if not is_registered(data, target_id):
                 return False, 0, 0
-            user = data["players"][target_id]["user"]
+            user = data.get("players", {}).get(target_id, {}).get("user", {})
             before = int(user.get("premium_balance", 0))
             after = add_premium(user, amount)
             return True, before, after

@@ -34,7 +34,7 @@ def check_single_mode_allowed(
     if storage is None:
         return True, "all", 0
 
-    data = storage.load()
+    data = storage.load_readonly()
     settings = data.get("server_settings", {})
     if not isinstance(settings, dict):
         return True, "all", 0
@@ -68,7 +68,7 @@ def check_battle_channel_allowed(
     if storage is None:
         return True, None, None
 
-    data = storage.load()
+    data = storage.load_readonly()
     settings = data.get("server_settings", {})
     if not isinstance(settings, dict):
         return True, None, None
