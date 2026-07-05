@@ -150,7 +150,17 @@ At defender IQ 100 → −20%. Symmetric to step 5.
 
 Identical-set rule also applies here.
 
-### Step 9 — Defense reaction (if the defender queued one)
+### Step 9 — Card of the Day
+
+Before defense is resolved, if the attacking fighter matches the current Card of the Day (`data["cotd"]["card_name"]`):
+
+```
+damage *= 1.15
+```
+
++15% flat damage boost. Checked per-attack in `battle_state.py:786-790`.
+
+### Step 10 — Defense reaction (if the defender queued one)
 
 `_apply_defense_and_finalize_damage` (`battle_state.py:635`). The defender may have set a pending defense move last turn. `REJECTION_THRESHOLD = 30` means defenses **fail** when the attacker's relevant stat is 30+ higher than the defender's gating stat.
 
@@ -161,6 +171,16 @@ Identical-set rule also applies here.
 | Parry   | (not rejected)                            | `atk_str − def_end ≥ 30`       | Attacker is **guard-broken** → next hit on them gets a flag (engine consumes it). |
 | Revert  | `def_tec > atk_str` (damage reflected)    | `atk_str − def_tec ≥ 30`       | Attacker takes the original damage as recoil. |
 | Tank    | always partial — `damage *= end/(end+str)` | —                              | Pure DR; never zeroes. |
+
+### Step 11 — Guard Break (from Parry)
+
+If the defender's guard was broken by a previous Parry rejection (`guard_broken_by_char_uid` flag):
+
+```
+damage *= 1.5
+```
+
+The flag is consumed on use (set back to False). +50% damage.
 
 ### Final
 
