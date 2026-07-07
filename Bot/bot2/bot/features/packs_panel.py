@@ -18,6 +18,18 @@ from bot.features.tutorial import advance_tutorial
 from bot.utils.squad_logic import get_player, get_squad
 from bot.utils.market_logic import quick_sell_value
 from bot.utils.pack_logic import PITY_THRESHOLDS
+from bot.utils.ui import e as _e
+
+# Public exports for shop.py to reuse
+__all__ = [
+    "animate_pack_open",
+    "_AnimView",
+    "PostRevealView",
+    "_anim_embed",
+    "_card_reveal_embed",
+    "RARITY_ICONS",
+    "HIGH_RARITY",
+]
 
 RARITY_ICONS = {
     "common": "⚪", "rare": "🔵", "epic": "🟣", "legendary": "🟠", "mythical": "🔴", "infernal": "🔥", "abyssal": "🌌",
@@ -120,6 +132,91 @@ def _anim_embed(title: str, slots: str, caption: str, color: int = 0xE11D48) -> 
     )
 
 
+async def animate_pack_open(
+    msg: discord.Message,
+    title: str,
+    rolls: list[dict],
+    data: dict,
+    anim_view: "_AnimView",
+) -> None:
+    """Standalone Free Fire-style pack opening animation.
+
+    Checks *anim_view.skipped* between every step so the Skip button works.
+    """
+    import asyncio
+
+    build = [
+        (0.4, "⬛  ⬛  ⬛  ⬛  ⬛", "Preparing your packs...",  0x2B2D31),
+        (0.4, "🟥  🟥  🟥  🟥  🟥", "⚡ Energy charging...",    0xE74C3C),
+        (0.4, "🔄  🔄  🔄  🔄  🔄", "💫 Cards spinning...",     0xE11D48),
+    ]
+    for delay, slots, caption, color in build:
+        if anim_view.skipped:
+            return
+        await asyncio.sleep(delay)
+        if anim_view.skipped:
+            return
+        try:
+            await msg.edit(embed=_anim_embed(title, slots, caption, color))
+        except (discord.NotFound, discord.Forbidden):
+            return
+        except discord.HTTPException:
+            logger.warning("Failed to update pack animation", exc_info=True)
+            return
+
+    locked: list[str] = []
+    display = rolls[:8]
+    for i, roll in enumerate(display):
+        if anim_view.skipped:
+            return
+        await asyncio.sleep(0.35)
+        if anim_view.skipped:
+            return
+        locked.append(_ri(roll.get("rarity", "common")))
+        remaining   = len(display) - len(locked)
+        slot_row    = "  ".join(locked + [_e("switch", data)] * min(remaining, 5))
+        rarity_name = str(roll.get("rarity", "")).title()
+        caption     = f"🔒 {rarity_name} locked in!" if remaining > 0 else "🔄 Almost..."
+        try:
+            await msg.edit(embed=_anim_embed(title, slot_row, caption))
+        except (discord.NotFound, discord.Forbidden):
+            return
+        except discord.HTTPException:
+            logger.warning("Failed to update pack reveal animation", exc_info=True)
+            return
+
+    if anim_view.skipped:
+        return
+    await asyncio.sleep(0.5)
+    if anim_view.skipped:
+        return
+    slot_row = "  ".join(locked)
+    try:
+        await msg.edit(embed=_anim_embed(title, slot_row, "✨  ✨  ✨  ✨  ✨"))
+    except (discord.NotFound, discord.Forbidden):
+        return
+    except discord.HTTPException:
+        logger.warning("Failed to finish pack animation", exc_info=True)
+        return
+
+    rarest = max(rolls, key=lambda r: _rv(r.get("rarity", "common")))
+    if str(rarest.get("rarity", "")).lower() in HIGH_RARITY:
+        if anim_view.skipped:
+            return
+        await asyncio.sleep(0.8)
+        if anim_view.skipped:
+            return
+        sep   = "━" * 14
+        alert = f"{sep}\n│ ⚠️  {str(rarest.get('rarity','')).upper()} DETECTED!\n│ {sep}"
+        try:
+            await msg.edit(embed=_anim_embed(title, slot_row, alert, 0xF39C12))
+        except (discord.NotFound, discord.Forbidden):
+            return
+        except discord.HTTPException:
+            logger.warning("Failed to show high-rarity pack alert", exc_info=True)
+            return
+
+
 # ── Post-reveal view (shown after opening) ────────────────────────
 
 class PostRevealView(discord.ui.View):
@@ -136,6 +233,12 @@ class PostRevealView(discord.ui.View):
         self.main_panel = main_panel
         self.idx        = 0          # current card index (0-based)
         self.message: discord.Message | None = None
+        # Relabel back button when returning to shop
+        if hasattr(main_panel, '_shop_view'):
+            for child in self.children:
+                if isinstance(child, discord.ui.Button) and "Back to Packs" in str(getattr(child, "label", "")):
+                    child.label = "← Back to Shop"
+                    break
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.invoker_id:
@@ -285,9 +388,17 @@ class PostRevealView(discord.ui.View):
         e = make_embed(None, "LOOKISM HXCC • PACKS", body, color=0x3498DB, footer=f"Card {self.idx + 1} of {len(self.rolls)} • Added")
         await interaction.response.edit_message(embed=e, view=self)
 
-    # Row 2 — Back to pack panel
+    # Row 2 — Back to pack panel (or shop if main_panel has _shop_view)
     @discord.ui.button(label="← Back to Packs", style=discord.ButtonStyle.secondary, row=2)
     async def back_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
+        # If opened from shop flow, go back to shop
+        if hasattr(self.main_panel, '_shop_view') and self.main_panel._shop_view is not None:
+            shop_view: Any = self.main_panel._shop_view
+            data = self.cog.bot.storage.load()
+            shop_view._rebuild_selects()
+            await interaction.response.edit_message(embed=shop_view.embed(data), view=shop_view)
+            shop_view.message = interaction.message
+            return
         data   = self.cog.bot.storage.load()
         player = get_player(data, str(interaction.user.id))
         inv    = _get_player_pack_inventory(player) if player else []
@@ -343,6 +454,7 @@ class PacksPanel(discord.ui.View):
         self.invoker_id   = invoker_id
         self.current_slot = 0
         self.skipped      = False
+        self._anim_view: _AnimView | None = None
         self.message: discord.Message | None = None
 
     def _pack_keys(self, data: dict[str, Any]) -> list[str]:
@@ -429,68 +541,7 @@ class PacksPanel(discord.ui.View):
     # ── Animation ─────────────────────────────────────────────────
 
     async def _animate(self, msg: discord.Message, title: str, rolls: list[dict], data: dict) -> None:
-        build = [
-            (0.4, "⬛  ⬛  ⬛  ⬛  ⬛", "Preparing your packs...",  0x2B2D31),
-            (0.4, "🟥  🟥  🟥  🟥  🟥", "⚡ Energy charging...",    0xE74C3C),
-            (0.4, "🔄  🔄  🔄  🔄  🔄", "💫 Cards spinning...",     0xE11D48),
-        ]
-        for delay, slots, caption, color in build:
-            if self.skipped: return
-            await asyncio.sleep(delay)
-            if self.skipped: return
-            try:
-                await msg.edit(embed=_anim_embed(title, slots, caption, color))
-            except (discord.NotFound, discord.Forbidden):
-                return
-            except discord.HTTPException:
-                logger.warning("Failed to update pack animation", exc_info=True)
-                return
-
-        locked: list[str] = []
-        display = rolls[:8]
-        for i, roll in enumerate(display):
-            if self.skipped: return
-            await asyncio.sleep(0.35)
-            if self.skipped: return
-            locked.append(_ri(roll.get("rarity", "common")))
-            remaining   = len(display) - len(locked)
-            slot_row    = "  ".join(locked + [e("switch", data)] * min(remaining, 5))
-            rarity_name = str(roll.get("rarity", "")).title()
-            caption     = f"🔒 {rarity_name} locked in!" if remaining > 0 else "🔄 Almost..."
-            try:
-                await msg.edit(embed=_anim_embed(title, slot_row, caption))
-            except (discord.NotFound, discord.Forbidden):
-                return
-            except discord.HTTPException:
-                logger.warning("Failed to update pack reveal animation", exc_info=True)
-                return
-
-        if self.skipped: return
-        await asyncio.sleep(0.5)
-        if self.skipped: return
-        slot_row = "  ".join(locked)
-        try:
-            await msg.edit(embed=_anim_embed(title, slot_row, "✨  ✨  ✨  ✨  ✨"))
-        except (discord.NotFound, discord.Forbidden):
-            return
-        except discord.HTTPException:
-            logger.warning("Failed to finish pack animation", exc_info=True)
-            return
-
-        rarest = max(rolls, key=lambda r: _rv(r.get("rarity", "common")))
-        if str(rarest.get("rarity", "")).lower() in HIGH_RARITY:
-            if self.skipped: return
-            await asyncio.sleep(0.8)
-            if self.skipped: return
-            sep   = "━" * 14
-            alert = f"{sep}\n│ ⚠️  {str(rarest.get('rarity','')).upper()} DETECTED!\n│ {sep}"
-            try:
-                await msg.edit(embed=_anim_embed(title, slot_row, alert, 0xF39C12))
-            except (discord.NotFound, discord.Forbidden):
-                return
-            except discord.HTTPException:
-                logger.warning("Failed to show high-rarity pack alert", exc_info=True)
-                return
+        await animate_pack_open(msg, title, rolls, data, self._anim_view)
 
     async def _do_open(self, interaction: discord.Interaction, qty: int) -> None:
         data  = self.cog.bot.storage.load()
@@ -512,6 +563,7 @@ class PacksPanel(discord.ui.View):
         title = f"Opening {qty}x {pack_name}..."
 
         anim_view    = _AnimView(self)
+        self._anim_view = anim_view
         self.skipped = False
         try:
             await interaction.response.edit_message(

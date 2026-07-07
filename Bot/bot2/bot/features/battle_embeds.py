@@ -463,11 +463,12 @@ def build_embed_view(
             f"{squad_block('Squad', b)}"
         )
 
-        header = f"{mode_label} DUEL — Round {round_no} — Turn: {turn_label}"
+        header = f"{mode_label} DUEL"
         embed_a = make_embed(None, header, desc_a, color=0x2b2d31, image_url=a_img)
         embed_b = make_embed(None, "", desc_b, color=0x2b2d31, image_url=b_img)
         log_display = log_text[:1024] if log_text else "—"
-        embed_c = make_embed(None, f"{e('list', data)} Battle Log", log_display, color=0x2b2d31, footer=f"Round {round_no}")
+        turn_line = f"**Turn:** {turn_label}  •  **Round:** {round_no}\n\n"
+        embed_c = make_embed(None, f"{e('list', data)} Battle Log", turn_line + log_display, color=0x2b2d31)
 
     except Exception:
         logger.exception("[BATTLE_EMBED_ERROR] battle_id=%s", battle_id)
@@ -489,7 +490,8 @@ def build_embed_view(
                 "No trophies or rewards were granted.",
             ]
             embed_a.description = "─" * 32 + "\n" + "\n".join(result_lines) + "\n" + "─" * 32 + "\n\n" + (embed_a.description or "")
-            embed_c_log = make_embed(None, f"{e('list', data)} Battle Log — Ended", log_text[:1024] if log_text else "—", color=0x2b2d31)
+            ended_log = f"**Turn:** {turn_label}  •  **Round:** {round_no}  •  *Ended*\n\n" if turn_label else ""
+            embed_c_log = make_embed(None, f"{e('list', data)} Battle Log — Ended", ended_log + (log_text[:1024] if log_text else "—"), color=0x2b2d31)
             return embed_a, embed_b, embed_c_log, None
 
         if end_reason == "draw":
@@ -498,7 +500,8 @@ def build_embed_view(
                 "Both sides were knocked out at the same time.",
             ]
             embed_a.description = "─" * 32 + "\n" + "\n".join(result_lines) + "\n" + "─" * 32 + "\n\n" + (embed_a.description or "")
-            embed_c_log = make_embed(None, "Battle Log — Ended", log_text[:1024] if log_text else "—", color=0x2b2d31)
+            ended_log = f"**Turn:** {turn_label}  •  **Round:** {round_no}  •  *Ended*\n\n" if turn_label else ""
+            embed_c_log = make_embed(None, "Battle Log — Ended", ended_log + (log_text[:1024] if log_text else "—"), color=0x2b2d31)
             return embed_a, embed_b, embed_c_log, None
 
         winner = str(battle.get("winner_id", ""))
@@ -526,7 +529,8 @@ def build_embed_view(
             result_lines.append(f"💰 Reward: +{coin_reward} coins")
 
         embed_a.description = "─" * 32 + "\n" + "\n".join(result_lines) + "\n" + "─" * 32 + "\n\n" + (embed_a.description or "")
-        embed_c_log = make_embed(None, "Battle Log \u2014 Ended", log_text[:1024] if log_text else "\u2014", color=0x2b2d31)
+        ended_log = f"**Turn:** {turn_label}  •  **Round:** {round_no}  •  *Ended*\n\n" if turn_label else ""
+        embed_c_log = make_embed(None, "Battle Log \u2014 Ended", ended_log + (log_text[:1024] if log_text else "\u2014"), color=0x2b2d31)
         return embed_a, embed_b, embed_c_log, None
 
     offensive, defensive = cog._fighter_attack_rows(data, battle_id, turn_user)

@@ -1,7 +1,9 @@
-"""Shop listing for packs and owner visibility controls."""
+"""Shop listing for packs and immediate buy+open flow."""
 
 from __future__ import annotations
 
+import asyncio
+import logging
 from typing import Any
 
 import discord
@@ -13,7 +15,16 @@ from bot.utils.checks import is_owner
 from bot.utils.pack_logic import ensure_packs_structure, format_rates_table, get_pack_by_name
 from bot.utils.ui import box, e, make_embed
 from bot.utils.interaction_visibility import smart_reply, error_reply
-from bot.features.packs import _add_packs_to_inventory, _packs_root, _wallet_balance, _set_wallet_balance
+from bot.features.packs import _add_packs_to_inventory, _open_pack_from_inventory, _packs_root, _wallet_balance, _set_wallet_balance
+from bot.features.packs_panel import (
+    _AnimView,
+    PostRevealView,
+    _anim_embed,
+    _card_reveal_embed,
+    animate_pack_open,
+)
+
+logger = logging.getLogger(__name__)
 
 OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
@@ -148,60 +159,108 @@ class ShopSortSelect(discord.ui.Select):
         await interaction.response.edit_message(embed=v.embed(data), view=v)
 
 
-class BuyQtyModal(discord.ui.Modal, title="Buy Packs"):
-    quantity = discord.ui.TextInput(
-        label="How many to buy?",
-        placeholder="1–10",
-        min_length=1,
-        max_length=2,
-    )
+class ShopBuyOpenButtons:
+    """Holds the Buy 1 / Buy 10 button callbacks; attached to ShopPages row 4."""
 
-    def __init__(self, view: "ShopPages", pack_key: str, pack_name: str, price: int) -> None:
-        super().__init__()
-        self.shop_view = view
-        self.pack_key  = pack_key
-        self.pack_name = pack_name
-        self.price     = price
-
-    async def on_submit(self, interaction: discord.Interaction) -> None:
-        try:
-            qty = int(str(self.quantity.value).strip())
-            if not (1 <= qty <= 10): raise ValueError
-        except ValueError:
-            await interaction.response.send_message("Enter a number between 1 and 10.", ephemeral=True)
+    @staticmethod
+    async def _buy_open(interaction: discord.Interaction, view: "ShopPages", qty: int) -> None:
+        if str(interaction.user.id) != view.user_id:
+            await error_reply(interaction, "Not your panel.")
+            return
+        if not view.selected_pack:
+            await interaction.response.send_message("Select a pack first.", ephemeral=True)
+            return
+        filtered = view._filtered()
+        pack = next((p for p in filtered if str(p.get("key", "")) == view.selected_pack), None)
+        if not pack:
+            await error_reply(interaction, "Pack not found.")
             return
 
-        user_id    = self.shop_view.user_id
-        pack_key   = self.pack_key
-        pack_name  = self.pack_name
-        total_cost = self.price * qty
+        pack_key = str(pack.get("key", ""))
+        pack_name = str(pack.get("name", "Pack"))
+        price = int(pack.get("price", 0))
+        total_cost = price * qty
+        user_id = view.user_id
 
-        def mutate(data: dict[str, Any]) -> tuple[bool, str]:
-            return purchase_shop_pack(data, user_id, pack_key, qty, self.price)
+        # 1. Show initial animation frame
+        class _AnimPanelProxy:
+            """Minimal stand-in for PacksPanel so _AnimView works from shop."""
+            def __init__(self2):
+                self2.invoker_id = int(user_id)
+                self2.skipped = False
+                self2.message = None
+        anim_view = _AnimView(_AnimPanelProxy())
 
-        ok, reason = self.shop_view.cog.bot.storage.with_lock(mutate)
+        title = f"Buying {qty}x {pack_name}..."
+        try:
+            await interaction.response.edit_message(
+                embed=_anim_embed(title, "⬛  ⬛  ⬛  ⬛  ⬛", "The pack is sealed..."),
+                view=anim_view,
+            )
+        except Exception:
+            logger.exception("[SHOP_BUY_OPEN] failed to show initial frame")
+            return
+
+        msg = interaction.message
+
+        # 2. Mutate: deduct coins + open packs + add cards to inventory
+        def mutate(data: dict[str, Any]) -> tuple[bool, str, list[dict[str, str]]]:
+            ok, reason = purchase_shop_pack(data, user_id, pack_key, qty, price)
+            if not ok:
+                return False, reason, []
+            rolls: list[dict[str, str]] = []
+            for _ in range(qty):
+                ok2, _, r = _open_pack_from_inventory(data, user_id, pack_key)
+                if ok2:
+                    rolls.extend(r)
+            return True, "ok", rolls
+
+        ok, reason, all_rolls = view.cog.bot.storage.with_lock(mutate)
+
         if not ok:
-            msg = "Not registered." if reason == "not_registered" else reason
+            msg_text = "Not registered." if reason == "not_registered" else reason
             if reason.startswith("insufficient:"):
                 _, have, need = reason.split(":")
-                msg = f"Not enough coins. You have **{int(have):,}** but need **{int(need):,}**."
-            await interaction.response.send_message(msg, ephemeral=True)
+                msg_text = f"Not enough coins. You have **{int(have):,}** but need **{int(need):,}**."
+            try:
+                await msg.edit(
+                    embed=make_embed(None, "❌ Purchase Failed", msg_text, color=0xE74C3C),
+                    view=None,
+                )
+            except Exception:
+                pass
             return
 
-        data = self.shop_view.cog.bot.storage.load()
-        body = (
-            f"╭─ ✅ Purchased!\n"
-            f"│ 🎴 {pack_name}  ×{qty}\n"
-            f"│ 💰 -{total_cost:,} coins\n"
-            "│ Use /packs to open them!\n"
-            "╰────────────────"
-        )
-        embed = make_embed(None, "LOOKISM HXCC • SHOP", body, color=0x2ECC71)
-        self.shop_view._rebuild_selects()
-        await interaction.response.edit_message(
-            embed=self.shop_view.embed(data), view=self.shop_view
-        )
-        await interaction.followup.send(embed=embed, ephemeral=True)
+        if not all_rolls:
+            try:
+                await msg.edit(
+                    embed=make_embed(None, "❌ Open Failed", "Could not open packs.", color=0xE74C3C),
+                    view=None,
+                )
+            except Exception:
+                pass
+            return
+
+        # 3. Run animation
+        if msg and not anim_view.skipped:
+            await animate_pack_open(msg, title, all_rolls, view.cog.bot.storage.load(), anim_view)
+
+        await asyncio.sleep(0.3)
+
+        # 4. Show post-reveal view (create a minimal stand-in for PacksPanel)
+        dummy_panel = lambda: None  # noqa: E731
+        dummy_panel.message = msg
+        dummy_panel.current_slot = 0
+        dummy_panel.invoker_id = int(user_id)
+        dummy_panel._shop_view = view  # signals back_btn to return to shop
+
+        reveal_view = PostRevealView(view.cog, int(user_id), all_rolls, pack_name, dummy_panel)
+        reveal_view.message = msg
+        first_embed = _card_reveal_embed(all_rolls[0], 1, len(all_rolls), pack_name)
+        try:
+            await msg.edit(embed=first_embed, view=reveal_view)
+        except Exception:
+            logger.exception("[SHOP_BUY_OPEN] failed to switch to reveal view")
 
 
 class ShopPackSelect(discord.ui.Select):
@@ -293,33 +352,24 @@ class ShopPages(discord.ui.View):
         if filtered:
             self.add_item(ShopPackSelect(self, filtered))
 
-        # Row 4 — Buy button (only if pack selected)
+        # Row 4 — Buy & Open buttons (only if pack selected)
         if self.selected_pack:
             pack = next((p for p in filtered if str(p.get("key","")) == self.selected_pack), None)
             if pack:
-                buy_btn = discord.ui.Button(
-                    label=f"🛒 Buy {pack.get('name','Pack')}",
+                buy1 = discord.ui.Button(
+                    label=f"📦 Buy 1 & Open",
                     style=discord.ButtonStyle.success,
                     row=4,
                 )
-                buy_btn.callback = self._on_buy
-                self.add_item(buy_btn)
-
-    async def _on_buy(self, interaction: discord.Interaction) -> None:
-        if str(interaction.user.id) != self.user_id:
-            await error_reply(interaction, "Not your panel.")
-            return
-        if not self.selected_pack:
-            await interaction.response.send_message("Select a pack first.", ephemeral=True)
-            return
-        filtered = self._filtered()
-        pack = next((p for p in filtered if str(p.get("key","")) == self.selected_pack), None)
-        if not pack:
-            await error_reply(interaction, "Pack not found.")
-            return
-        await interaction.response.send_modal(
-            BuyQtyModal(self, str(pack.get("key","")), str(pack.get("name","Pack")), int(pack.get("price",0)))
-        )
+                buy1.callback = lambda i, v=self, q=1: ShopBuyOpenButtons._buy_open(i, v, q)  # type: ignore
+                self.add_item(buy1)
+                buy10 = discord.ui.Button(
+                    label=f"📦 Buy 10 & Open",
+                    style=discord.ButtonStyle.primary,
+                    row=4,
+                )
+                buy10.callback = lambda i, v=self, q=10: ShopBuyOpenButtons._buy_open(i, v, q)  # type: ignore
+                self.add_item(buy10)
 
     async def _guard(self, interaction: discord.Interaction) -> bool:
         return str(interaction.user.id) == self.user_id
