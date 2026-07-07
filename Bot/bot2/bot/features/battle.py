@@ -1530,6 +1530,7 @@ class BattleCog(commands.Cog):
         if not await ensure_registered(interaction, self.bot.storage):
             return
 
+        await interaction.response.defer(ephemeral=True, thinking=True)
         uid = str(interaction.user.id)
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
