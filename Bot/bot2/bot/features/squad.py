@@ -211,8 +211,11 @@ class AssignSelect(discord.ui.Select):
         )
         data = self.cog.bot.storage.load()
         if status != "ok":
+            msg = "Could not assign that card to this slot."
+            if status == "duplicate_card":
+                msg = "That card (or a duplicate) is already assigned to another slot."
             await interaction.response.send_message(
-                embed=make_embed(data, f"{e('warning', data)} Assignment Failed", "Could not assign that card to this slot."),
+                embed=make_embed(data, f"{e('warning', data)} Assignment Failed", msg),
                 ephemeral=True,
             )
             return
@@ -513,10 +516,19 @@ class SquadCog(commands.Cog):
         if current:
             assigned.discard(current)
 
+        # Collect card_names already assigned to prevent duplicates
+        assigned_names: set[str] = set()
+        for assigned_uid in assigned:
+            inst = next((i for i in inventory if str(i.get("uid", "")) == assigned_uid), None)
+            if inst:
+                assigned_names.add(str(inst.get("card_name", "")).lower())
+
         options: list[discord.SelectOption] = []
         for item in sorted(inventory, key=lambda x: (-rarity_rank(str(x.get("rarity", "Common"))), -int(x.get("stars", 0)))):
             uid = str(item.get("uid", ""))
             if not uid or uid in assigned:
+                continue
+            if str(item.get("card_name", "")).lower() in assigned_names:
                 continue
             rarity = str(item.get("rarity", "Common"))
             stars  = int(item.get("stars", 0))
@@ -537,6 +549,17 @@ class SquadCog(commands.Cog):
             inst      = next((i for i in inventory if str(i.get("uid", "")) == uid), None)
             if not isinstance(inst, dict):
                 return "not_found", "", compute_squad_power(data, player)
+            # Reject if same card_name already in another slot
+            new_name = str(inst.get("card_name", "")).lower()
+            for i in range(NUM_SLOTS):
+                if i == slot_index:
+                    continue
+                existing_uid = _get_slot_uid(squad, i)
+                if not existing_uid:
+                    continue
+                existing = next((e for e in inventory if str(e.get("uid", "")) == existing_uid), None)
+                if existing and str(existing.get("card_name", "")).lower() == new_name:
+                    return "duplicate_card", "", compute_squad_power(data, player)
             old_uid = _get_slot_uid(squad, slot_index)
             for key in ("active", "backup"):
                 vals = squad.get(key, [])
@@ -638,9 +661,17 @@ class SquadCog(commands.Cog):
             if not cards_with_power:
                 return "not_enough", 0
             
-            # Sort by power (descending) and take top 4
+            # Sort by power (descending) and take top 4 with unique card_names
             cards_with_power.sort(key=lambda x: x[1], reverse=True)
-            top_cards = cards_with_power[:NUM_SLOTS]
+            seen_names: set[str] = set()
+            top_cards: list[tuple[dict[str, Any], int]] = []
+            for card, power in cards_with_power:
+                name = str(card.get("card_name", "")).lower()
+                if name not in seen_names:
+                    seen_names.add(name)
+                    top_cards.append((card, power))
+                    if len(top_cards) >= NUM_SLOTS:
+                        break
             
             # Clear current squad
             squad = get_squad(player)
