@@ -1,3 +1,45 @@
+# Bot2 Fix Notes
+
+## Pack Inventory and New-Card Stat Lookup Fix
+
+Date: 2026-07-07
+
+### Summary
+
+Fixed two connected runtime issues in the Lookism HXCC bot:
+
+- Pack rewards were granted into `user["owned_packs"]`, but the pack opener reads
+  `user["pack_inventory"]`, making rewarded packs invisible in the packs panel.
+- New/custom cards could show `0` power in squad and battle when the inventory
+  instance `card_name` matched the card display name but the catalog entry used a
+  different storage key.
+
+### Files Updated
+
+- `Bot/bot2/bot/utils/reward_grant.py` now grants pack rewards through
+  `pack_logic._add_packs_to_inventory()`, so reward packs are openable.
+- `Bot/bot2/bot/features/packs.py` validates pack definitions and eligible cards
+  before consuming a pack from `pack_inventory`.
+- `Bot/bot2/bot/utils/cards_logic.py` now resolves catalog cards by storage key,
+  display `name`, or legacy `card_name`, and includes `special_stat` in the scaled
+  stat cache key.
+- `Bot/bot2/bot/utils/battle_state.py`, `Bot/bot2/bot/features/battle.py`,
+  `Bot/bot2/bot/features/battle_embeds.py`, and `Bot/bot2/bot/features/squad.py`
+  now use `find_catalog_card()` for battle/squad card definition lookups instead
+  of direct `catalog.get(card_name)` access.
+
+### Verification
+
+```bash
+cd Bot/bot2
+python3 -m py_compile bot/utils/cards_logic.py bot/utils/battle_state.py bot/features/squad.py bot/features/packs.py bot/utils/reward_grant.py bot/features/battle.py bot/features/battle_embeds.py
+pytest -q
+```
+
+Output: `172 passed`
+
+---
+
 # Rank / League Ordering Fix Notes
 
 Date: 2026-06-13

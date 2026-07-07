@@ -789,7 +789,19 @@ player["achievement_points"] = int  # Sum of all earned
 
 The catalog (`data["cards"]`) is keyed by storage keys (e.g. `"Diego Kang Idol of PTJ Company"`). Card `name` fields are shorter (e.g. `"Diego Kang"`). When looking up a card by name, always use `find_catalog_card()` which:
 1. Tries exact key match first
-2. Falls back to case-insensitive name match across all card values
+2. Falls back to case-insensitive display `name` / legacy `card_name` match across all card values
+
+Battle state, battle move UI, battle embeds, squad power, squad details, and squad auto-fill all depend on this rule. Direct `catalog.get(instance["card_name"])` access can make custom cards appear with `0` stats or power when the catalog key differs from the display name.
+
+### Pack Inventory
+
+Openable packs are stored in `player["user"]["pack_inventory"]` as a list of pack entries:
+
+```python
+{"key": "newbie_pack", "name": "Newbie Pack", "acquired_at": 1234567890}
+```
+
+Reward flows should grant packs through `pack_logic._add_packs_to_inventory()` or an equivalent helper that writes this list. The legacy `owned_packs` dict is not used by the pack-opening panel.
 
 ### State File
 
@@ -821,7 +833,8 @@ The catalog (`data["cards"]`) is keyed by storage keys (e.g. `"Diego Kang Idol o
 
 | Issue | Cause | Fix |
 |---|---|---|
-| Card shows name but no stats in collection | `_get_card_def()` used `catalog.get()` which fails when catalog key ≠ card name | Use `find_catalog_card()` |
+| Card shows name but no stats/power in collection, squad, or battle | Direct `catalog.get(card_name)` fails when catalog key ≠ card display name | Use `find_catalog_card()` |
+| Rewarded packs do not appear in `/packs` | Reward code wrote to legacy `owned_packs` while opener reads `pack_inventory` | Grant via `_add_packs_to_inventory()` |
 | Trade can't find card | Searching by `"name"` but instances use `"card_name"` | Check both: `item.get("card_name", item.get("name", ""))` |
 | Storage deepcopy on every command | `server_rules.py` called `storage.load()` (full deepcopy) in `interaction_check` | Use `storage.load_readonly()` for read-only checks |
 | Upgrade consumes protected card | Dup filter didn't check `locked`, `trade_locked`, `weapon_uid` | Add all safety checks to the filter |

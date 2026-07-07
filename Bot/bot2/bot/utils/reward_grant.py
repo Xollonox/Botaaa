@@ -64,11 +64,8 @@ def grant_reward(
         pack_key = str(reward_value or "").strip()
         if not pack_key:
             return False, "no_pack_key"
-        owned_packs = user.setdefault("owned_packs", {})
-        if not isinstance(owned_packs, dict):
-            user["owned_packs"] = {}
-            owned_packs = user["owned_packs"]
-        owned_packs[pack_key] = int(owned_packs.get(pack_key, 0)) + 1
+        from bot.utils.pack_logic import _add_packs_to_inventory
+        _add_packs_to_inventory(data, str(user_id), pack_key, 1)
         return True, f"Granted pack '{pack_key}'."
 
     else:

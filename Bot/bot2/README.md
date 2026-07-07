@@ -516,4 +516,5 @@ When bot2 breaks:
 - **All writes go through `with_lock`.** The storage layer acquires a thread lock, deep-copies the data dict, passes it to the mutation closure, writes the result atomically.
 - **Cog pattern:** Each feature file exports a `setup(bot)` function that `add_cog(bot, CogClass(bot))`. The `main.py` extension loader calls `bot.load_extension()` for each.
 - **Card catalog vs card instances:** Card *definitions* live under `data["cards"]` (keyed by unique name). Card *instances* in player inventory have a `card_name` field pointing to the definition. Always use `find_catalog_card()` (not raw `catalog.get()`) to handle key/name mismatches.
+- **Pack rewards:** Openable packs live in `user["pack_inventory"]` as pack-entry dicts. Reward flows should grant packs through `pack_logic._add_packs_to_inventory()` so `/packs` can open them; do not write new rewards only to legacy `owned_packs`.
 - **Read-only paths** (like `server_rules.py` interaction checks) should use `storage.load_readonly()` to avoid the full deepcopy cost of `storage.load()`.

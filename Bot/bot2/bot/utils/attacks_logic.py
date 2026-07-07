@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from bot.utils.cards_logic import find_catalog_card
+
 ATTACK_TYPES = ["normal", "special", "ultimate", "unique_skill", "unique_path"]
 
 # Battle normalization still accepts legacy revert; the owner catalog UI does not
@@ -112,13 +114,7 @@ def card_attack_keys(data_or_card: dict[str, Any], card_name: str | None = None)
         cards = data_or_card.get("cards", {}) if isinstance(data_or_card, dict) else {}
         if not isinstance(cards, dict):
             return []
-        card = cards.get(card_name)
-        if not isinstance(card, dict):
-            target = str(card_name).strip().lower()
-            card = next(
-                (c for c in cards.values() if isinstance(c, dict) and str(c.get("name", "")).strip().lower() == target),
-                None,
-            )
+        card = find_catalog_card(cards, card_name)
         if not isinstance(card, dict):
             return []
     else:

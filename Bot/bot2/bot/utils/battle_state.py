@@ -10,7 +10,7 @@ from typing import Any
 
 from bot.utils.attacks_logic import ensure_attacks_structure
 from bot.utils.battle_engine_pdf import normalize_attack_type
-from bot.utils.cards_logic import compute_scaled_stats, normalize_mastery_list
+from bot.utils.cards_logic import compute_scaled_stats, find_catalog_card, normalize_mastery_list
 from bot.utils.squad_logic import get_player
 from bot.utils.timeutil import now_ts
 from bot.utils import achievement_logic as _ach
@@ -254,7 +254,7 @@ def _build_cpu_side(data: dict[str, Any], team_size: int = 4, min_rarity: str = 
         uid = f"cpu:{card_name.replace(' ', '_')}"
         team_uids.append(uid)
 
-        card_def = cards.get(card_name, {})
+        card_def = find_catalog_card(cards, card_name) or {}
         if not isinstance(card_def, dict):
             continue
 
@@ -340,7 +340,9 @@ def _build_player_side(data: dict[str, Any], user_id: str, team_uids: list[str])
     for uid in team_uids:
         inst = inv_map.get(uid, {})
         card_name = str(inst.get("card_name", uid[:8]))
-        card_def = cards.get(card_name, {}) if isinstance(cards.get(card_name, {}), dict) else {}
+        card_def = find_catalog_card(cards, card_name) if isinstance(cards, dict) else None
+        if not isinstance(card_def, dict):
+            card_def = {}
         stars = int(inst.get("stars", 0))
         scaled = compute_scaled_stats(card_def, stars) if isinstance(card_def, dict) else {}
         mastery = _catalog_mastery(card_def)

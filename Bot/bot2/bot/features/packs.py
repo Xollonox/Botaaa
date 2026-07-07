@@ -85,9 +85,6 @@ def _open_pack_from_inventory(data: dict[str, Any], user_id: str, pack_key: str)
     if not isinstance(user, dict):
         return False, "no_user", []
 
-    if not _remove_pack_from_inventory(data, user_id, pack_key, 1):
-        return False, "no_packs", []
-
     ensure_packs_structure(data)
     pack_defs = data.get("packs", {}).get("definitions", {})
     pack_def = pack_defs.get(pack_key)
@@ -102,6 +99,9 @@ def _open_pack_from_inventory(data: dict[str, Any], user_id: str, pack_key: str)
     available = _available_rates(rates, catalog)
     if not available:
         return False, "no_eligible_cards", []
+
+    if not _remove_pack_from_inventory(data, user_id, pack_key, 1):
+        return False, "no_packs", []
 
     inventory = user.get("inventory", [])
     if not isinstance(inventory, list):

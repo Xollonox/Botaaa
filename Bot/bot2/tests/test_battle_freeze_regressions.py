@@ -51,6 +51,52 @@ def test_apply_move_sets_real_turn_timestamp(monkeypatch) -> None:
     assert data["battle"]["active"][battle_id]["turn_started_at"] == 2_000
 
 
+def test_battle_reads_card_stats_by_display_name_when_catalog_key_differs() -> None:
+    data = {
+        "cards": {
+            "Custom Storage Key": {
+                "name": "New Custom Fighter",
+                "rarity": "Legendary",
+                "stats": {
+                    "strength": 77,
+                    "speed": 66,
+                    "endurance": 55,
+                    "technique": 44,
+                    "iq": 33,
+                    "battle_iq": 22,
+                },
+            },
+            "Opponent": {
+                "name": "Opponent",
+                "rarity": "Common",
+                "stats": {
+                    "strength": 10,
+                    "speed": 10,
+                    "endurance": 10,
+                    "technique": 10,
+                    "iq": 10,
+                    "battle_iq": 10,
+                },
+            },
+        },
+        "players": {
+            "u1": {"user": {"inventory": [_fighter("a1", "New Custom Fighter")]}},
+            "u2": {"user": {"inventory": [_fighter("b1", "Opponent")]}},
+        },
+        "battle": {"queue": [], "pending_friendly": {}, "active": {}, "active_by_user": {}},
+    }
+
+    battle_id = battle_state.create_battle_state(data, "ranked", "u1", "u2", ["a1"], ["b1"], 1_000)
+    stats = data["battle"]["active"][battle_id]["players"]["u1"]["stats"]["a1"]
+
+    assert stats["strength"] == 79
+    assert stats["speed"] == 68
+    assert stats["endurance"] == 57
+    assert stats["technique"] == 46
+    assert stats["iq"] == 35
+    assert stats["biq"] == 24
+
+
 def test_friendly_timeout_cpu_handler_exists() -> None:
     assert callable(getattr(BattleCog, "_friendly_timeout_to_cpu", None))
 

@@ -17,6 +17,7 @@ from bot.config import OWNER_GUILD_ID
 from bot.utils.attacks_logic import ensure_attacks_structure
 from bot.utils.battle_engine_pdf import normalize_attack_type
 from bot.utils.battle_state import apply_move, create_battle_state, end_battle
+from bot.utils.cards_logic import find_catalog_card
 from bot.utils.checks import ensure_registered, is_owner
 from bot.utils.squad_logic import get_player, get_squad
 from bot.utils.server_rules import check_battle_channel_allowed
@@ -290,7 +291,8 @@ class BattleCog(commands.Cog):
                     # For CPU: read moves from the card definition via fighter_names
                     names = pstate.get("fighter_names", {}) if isinstance(pstate.get("fighter_names"), dict) else {}
                     card_name = str(names.get(uid, ""))
-                    card_def = data.get("cards", {}).get(card_name) if isinstance(data.get("cards", {}), dict) else None
+                    cards = data.get("cards", {}) if isinstance(data.get("cards", {}), dict) else {}
+                    card_def = find_catalog_card(cards, card_name) if isinstance(cards, dict) else None
                     # Use normalize_card_moves (from battle_helpers)
                     if isinstance(card_def, dict):
                         cm = normalize_card_moves(card_def)
@@ -302,7 +304,8 @@ class BattleCog(commands.Cog):
                 else:
                     inst = inv_map.get(uid)
                     card_name = str(inst.get("card_name", "")) if isinstance(inst, dict) else ""
-                    card_def = data.get("cards", {}).get(card_name) if isinstance(data.get("cards", {}), dict) else None
+                    cards = data.get("cards", {}) if isinstance(data.get("cards", {}), dict) else {}
+                    card_def = find_catalog_card(cards, card_name) if isinstance(cards, dict) else None
                     attacks = card_def.get("attacks", []) if isinstance(card_def, dict) else []
                 if not isinstance(attacks, list):
                     attacks = []
@@ -453,7 +456,7 @@ class BattleCog(commands.Cog):
             names = pstate.get("fighter_names", {}) if isinstance(pstate.get("fighter_names"), dict) else {}
             card_name = str(names.get(uid, ""))
             cards = data.get("cards", {}) if isinstance(data.get("cards", {}), dict) else {}
-            maybe = cards.get(card_name, {}) if card_name else {}
+            maybe = find_catalog_card(cards, card_name) if card_name else None
             card_def = maybe if isinstance(maybe, dict) else {}
         else:
             player = get_player(data, actor_id)
@@ -466,7 +469,7 @@ class BattleCog(commands.Cog):
                         break
             card_name = str(inst.get("card_name", "")) if isinstance(inst, dict) else ""
             cards = data.get("cards", {}) if isinstance(data.get("cards", {}), dict) else {}
-            maybe = cards.get(card_name, {}) if card_name else {}
+            maybe = find_catalog_card(cards, card_name) if card_name else None
             card_def = maybe if isinstance(maybe, dict) else {}
 
         moves = normalize_card_moves(card_def)
@@ -567,7 +570,9 @@ class BattleCog(commands.Cog):
                 continue
             item = inv_map.get(u, {})
             name = str(item.get("card_name", u[:8]))
-            cdef = cards.get(name, {}) if isinstance(cards.get(name, {}), dict) else {}
+            cdef = find_catalog_card(cards, name) if isinstance(cards, dict) else None
+            if not isinstance(cdef, dict):
+                cdef = {}
             emoji = option_emoji(cdef.get("emoji", "🃏"))
             desc = f"S{idx} HP: {cur_hp}/{int(hp_max.get(u,0))}"
             out.append(discord.SelectOption(label=name[:100], description=desc[:100], value=u, emoji=emoji))
@@ -603,7 +608,9 @@ class BattleCog(commands.Cog):
         fighter_names = pstate.get("fighter_names", {}) if isinstance(pstate.get("fighter_names"), dict) else {}
         card_name = str(fighter_names.get(uid, ""))
         cards = data.get("cards", {}) if isinstance(data.get("cards", {}), dict) else {}
-        card_def = cards.get(card_name, {}) if isinstance(cards.get(card_name, {}), dict) else {}
+        card_def = find_catalog_card(cards, card_name) if isinstance(cards, dict) else None
+        if not isinstance(card_def, dict):
+            card_def = {}
         return card_image_url(card_def), card_name or None
 
     async def _send_battle_stats_embed(self, channel: Any, battle: dict) -> None:

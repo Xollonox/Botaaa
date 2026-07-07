@@ -13,6 +13,7 @@ from typing import Any
 import discord
 
 from bot.utils.battle_engine_pdf import normalize_attack_type
+from bot.utils.cards_logic import find_catalog_card
 from bot.utils.squad_logic import get_player
 from bot.utils.ui import e, make_embed
 
@@ -179,7 +180,9 @@ def build_embed_view(
         def fighter_bundle(uid: str, pstate: dict[str, Any]) -> tuple[str, dict[str, Any]]:
             names = pstate.get("fighter_names", {}) if isinstance(pstate.get("fighter_names"), dict) else {}
             card_name = str(names.get(uid, uid[:8]))
-            cdef = cards.get(card_name, {}) if isinstance(cards.get(card_name, {}), dict) else {}
+            cdef = find_catalog_card(cards, card_name) if isinstance(cards, dict) else None
+            if not isinstance(cdef, dict):
+                cdef = {}
             return card_name, cdef
 
         def hp_bar(pct: int, slots: int = 12) -> str:

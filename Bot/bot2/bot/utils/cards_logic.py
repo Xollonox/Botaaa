@@ -38,7 +38,7 @@ def compute_power(stats: dict[str, int]) -> int:
     return sum(int(stats.get(k, 0)) for k in ("strength", "speed", "endurance", "technique", "iq", "battle_iq"))
 
 
-_SCALED_CACHE: dict[tuple[frozenset, str, int], dict[str, int]] = {}
+_SCALED_CACHE: dict[tuple[frozenset, str, int, str | None], dict[str, int]] = {}
 
 def compute_scaled_stats(card: dict[str, Any], stars: int) -> dict[str, int]:
     """Return a new stats dict with flat per-star bonuses applied.
@@ -55,7 +55,7 @@ def compute_scaled_stats(card: dict[str, Any], stars: int) -> dict[str, int]:
     rarity = str(card.get("rarity", "Common"))
     special = card.get("special_stat") or None
     s = max(0, min(5, int(stars or 0)))
-    key = (frozenset(base.items()), rarity, s)
+    key = (frozenset(base.items()), rarity, s, str(special) if special else None)
     cached = _SCALED_CACHE.get(key)
     if cached is not None:
         return cached
@@ -190,17 +190,22 @@ def mastery_list_from_flags(
 
 
 def find_catalog_key(catalog: dict[str, Any], query: str) -> str | None:
-    """Find the storage key for a catalog card by key or case-insensitive card name."""
+    """Find the storage key for a catalog card by key or case-insensitive display name."""
     if not isinstance(catalog, dict):
         return None
     q = str(query).strip()
     if q in catalog and isinstance(catalog[q], dict):
         return q
-    q_lower = q.lower()
+    q_lower = q.casefold()
     for key, card in catalog.items():
         if not isinstance(card, dict):
             continue
-        if str(card.get("name", key)).strip().lower() == q_lower:
+        candidates = {
+            str(key).strip(),
+            str(card.get("name", "")).strip(),
+            str(card.get("card_name", "")).strip(),
+        }
+        if any(candidate and candidate.casefold() == q_lower for candidate in candidates):
             return str(key)
     return None
 
@@ -323,20 +328,14 @@ def validate_card_def(card: dict[str, Any]) -> tuple[bool, str]:
 
 
 def find_catalog_card(catalog: dict[str, Any], query: str) -> dict[str, Any] | None:
-    """Find a card in *catalog* by exact name or case-insensitive name match."""
+    """Find a card by storage key, display name, or legacy card_name field."""
     if not isinstance(catalog, dict):
         return None
     q = str(query).strip()
-    # Exact key match
-    if q in catalog and isinstance(catalog[q], dict):
-        return catalog[q]
-    # Case-insensitive name match
-    q_lower = q.lower()
-    for card in catalog.values():
-        if not isinstance(card, dict):
-            continue
-        if str(card.get("name", "")).lower() == q_lower:
-            return card
+    key = find_catalog_key(catalog, q)
+    if key is not None:
+        card = catalog.get(key)
+        return card if isinstance(card, dict) else None
     return None
 
 

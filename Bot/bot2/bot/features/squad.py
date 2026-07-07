@@ -9,7 +9,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from bot.utils.cards_logic import compute_power, compute_scaled_stats, normalize_mastery_list, rarity_rank
+from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card, normalize_mastery_list, rarity_rank
 from bot.utils.checks import ensure_registered
 from bot.utils.interaction_visibility import smart_reply, error_reply
 from bot.utils.squad_logic import compute_squad_power, get_inventory, get_player, get_squad
@@ -58,7 +58,8 @@ def _cleanup_slots(squad: dict[str, Any]) -> None:
         squad[key] = [str(v) for v in vals if isinstance(vals, list) and str(v)] if isinstance(vals, list) else []
 
 def _instance_hp(data: dict[str, Any], instance: dict[str, Any]) -> tuple[int, int]:
-    card_def = (data.get("cards") or {}).get(str(instance.get("card_name", "")), {})
+    catalog = data.get("cards") if isinstance(data.get("cards"), dict) else {}
+    card_def = find_catalog_card(catalog, str(instance.get("card_name", ""))) if isinstance(catalog, dict) else None
     scaled   = compute_scaled_stats(card_def if isinstance(card_def, dict) else {}, int(instance.get("stars", 0)))
     max_hp   = max(BASE_HP, math.floor(compute_power(scaled) / 5) + BASE_HP)
     return max(0, min(int(instance.get("hp", max_hp)), max_hp)), max_hp
@@ -82,7 +83,8 @@ def _build_slot_block(data: dict[str, Any], slot_index: int, instance: dict[str,
     stars     = max(0, min(5, int(instance.get("stars", 0))))
     locked    = bool(instance.get("locked") or instance.get("market_locked") or instance.get("squad_locked"))
 
-    card_def = (data.get("cards") or {}).get(card_name, {})
+    catalog = data.get("cards") if isinstance(data.get("cards"), dict) else {}
+    card_def = find_catalog_card(catalog, card_name) if isinstance(catalog, dict) else None
     scaled   = compute_scaled_stats(card_def if isinstance(card_def, dict) else {}, stars)
     power    = compute_power(scaled)
 
@@ -139,7 +141,8 @@ def _build_fighter_embed(data: dict[str, Any], instance: dict[str, Any]) -> disc
     stars     = max(0, min(5, int(instance.get("stars", 0))))
     locked    = bool(instance.get("locked") or instance.get("market_locked") or instance.get("squad_locked"))
 
-    card_def  = (data.get("cards") or {}).get(card_name, {})
+    catalog = data.get("cards") if isinstance(data.get("cards"), dict) else {}
+    card_def  = find_catalog_card(catalog, card_name) if isinstance(catalog, dict) else None
     title     = str(card_def.get("title", "")).strip() if isinstance(card_def, dict) else ""
     bio       = str(card_def.get("description", "")).strip() if isinstance(card_def, dict) else ""
     scaled    = compute_scaled_stats(card_def if isinstance(card_def, dict) else {}, stars)
@@ -623,7 +626,8 @@ class SquadCog(commands.Cog):
                 if not isinstance(item, dict):
                     continue
                 card_name = str(item.get("card_name", ""))
-                card_def = (data.get("cards") or {}).get(card_name, {})
+                catalog = data.get("cards") if isinstance(data.get("cards"), dict) else {}
+                card_def = find_catalog_card(catalog, card_name) if isinstance(catalog, dict) else None
                 if not isinstance(card_def, dict):
                     continue
                 stars = int(item.get("stars", 0))

@@ -13,6 +13,7 @@ from discord.ext import commands
 from bot.config import OWNER_GUILD_ID
 from bot.data.constants import rarity_icon as _ri
 from bot.features.market_views import BuyConfirmView, MarketPanel  # noqa: F401  (BuyConfirmView re-exported for callers)
+from bot.utils.cards_logic import find_catalog_card
 from bot.utils.checks import ensure_registered, is_owner
 from bot.utils.interaction_visibility import smart_reply
 from bot.utils.market_logic import (
@@ -98,9 +99,9 @@ class MarketCog(commands.Cog):
         def mutate(data: dict[str, Any]) -> None:
             m = market_root(data)
             cards    = data.get("cards", {})
-            card_def = cards.get(card_name) if isinstance(cards, dict) else None
+            card_def = find_catalog_card(cards, card_name) if isinstance(cards, dict) else None
             if not isinstance(card_def, dict):
-                card_def = next((v for k, v in cards.items() if str(k).lower() == card_name.lower()), {}) if isinstance(cards, dict) else {}
+                card_def = {}
             image_url = str(card_def.get("image_url", "")).strip() if isinstance(card_def, dict) else ""
             rarity    = str(card_def.get("rarity", "")).strip() if isinstance(card_def, dict) else ""
             card_arc  = str(arc).strip() or str(card_def.get("arc", "—")).strip() if isinstance(card_def, dict) else str(arc).strip()
@@ -153,9 +154,9 @@ class MarketCog(commands.Cog):
         def mutate(data: dict[str, Any]) -> None:
             m = market_root(data)
             cards    = data.get("cards", {})
-            card_def = cards.get(card_name) if isinstance(cards, dict) else None
+            card_def = find_catalog_card(cards, card_name) if isinstance(cards, dict) else None
             if not isinstance(card_def, dict):
-                card_def = next((v for k, v in cards.items() if str(k).lower() == card_name.lower()), {}) if isinstance(cards, dict) else {}
+                card_def = {}
             image_url = str(card_def.get("image_url", "")).strip() if isinstance(card_def, dict) else ""
             rarity    = str(card_def.get("rarity", "")).strip() if isinstance(card_def, dict) else ""
             card_arc  = str(arc).strip() or str(card_def.get("arc", "—")).strip() if isinstance(card_def, dict) else str(arc).strip()
