@@ -613,6 +613,22 @@ class BattleCog(commands.Cog):
             card_def = {}
         return card_image_url(card_def), card_name or None
 
+    async def _send_stats_once(self, battle_id: str, battle: dict, channel: Any) -> bool:
+        """Atomically mark stats_sent and send the embed. Returns True if sent."""
+        def _try_mark(data: dict) -> bool:
+            for entry in self._battle_root(data).get("recently_ended", []):
+                if isinstance(entry, dict) and str(entry.get("battle_id", "")) == battle_id:
+                    if entry.get("stats_sent"):
+                        return False
+                    entry["stats_sent"] = True
+                    return True
+            return False
+
+        first = self.bot.storage.with_lock(_try_mark)
+        if first:
+            await self._send_battle_stats_embed(channel, battle)
+        return first
+
     async def _send_battle_stats_embed(self, channel: Any, battle: dict) -> None:
         """Post the post-battle summary embed to the given channel."""
         try:
@@ -660,16 +676,9 @@ class BattleCog(commands.Cog):
             logger.exception("[BATTLE_REFRESH] failed to edit message battle_id=%s channel=%s message=%s", battle_id, channel_id, message_id)
 
         # Send stats summary once when the battle is freshly over
-        if bool(battle.get("ended", False)) and not bool(battle.get("stats_sent", False)):
-            def _mark_stats_sent(data: dict) -> None:
-                b = self._battle_root(data).get("recently_ended")
-                if isinstance(b, list):
-                    for entry in b:
-                        if isinstance(entry, dict) and str(entry.get("battle_id", "")) == battle_id:
-                            entry["stats_sent"] = True
-                            return
-            self.bot.storage.with_lock(_mark_stats_sent)
-            await self._send_battle_stats_embed(channel, battle)
+        if bool(battle.get("ended", False)):
+            if await self._send_stats_once(battle_id, battle, channel):
+                logger.info("[BATTLE_STATS] sent stats embed for ended battle_id=%s", battle_id)
 
     def _schedule_timeout(self, battle_id: str) -> None:
         self._schedule_cpu_stall_watchdog(battle_id)
@@ -982,14 +991,8 @@ class BattleCog(commands.Cog):
         if ended:
             logger.info("[TURN_FLOW] battle ended battle_id=%s reason=%s", battle_id, battle.get("reason", "unknown") if isinstance(battle, dict) else "unknown")
             self._cancel_battle_runtime_tasks(battle_id)
-            # Send the battle stats summary if not already sent
-            if isinstance(battle, dict) and not bool(battle.get("stats_sent", False)):
-                def _mark_stats_sent_post(d: dict) -> None:
-                    for entry in d.get("battle", {}).get("recently_ended", []):
-                        if isinstance(entry, dict) and str(entry.get("battle_id", "")) == battle_id:
-                            entry["stats_sent"] = True
-                            return
-                self.bot.storage.with_lock(_mark_stats_sent_post)
+            # Send the battle stats summary if not already sent (atomic check)
+            if isinstance(battle, dict):
                 channel = getattr(interaction, "channel", None)
                 if channel is None:
                     try:
@@ -998,7 +1001,8 @@ class BattleCog(commands.Cog):
                     except Exception:
                         channel = None
                 if channel is not None:
-                    await self._send_battle_stats_embed(channel, battle)
+                    if await self._send_stats_once(battle_id, battle, channel):
+                        logger.info("[BATTLE_STATS] sent stats embed for ended battle_id=%s", battle_id)
             return
         self._schedule_timeout(battle_id)
         await self._maybe_run_cpu_turn(battle_id)

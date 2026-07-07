@@ -24,19 +24,22 @@ logger = logging.getLogger(__name__)
 
 
 def build_battle_stats_embed(battle_state: dict, winner_name: str) -> discord.Embed:
-    """Build a post-battle scoreboard embed from the finished battle state."""
-    embed = discord.Embed(title="⚔️ Battle Summary", color=0x2B2D31)
+    """Build a premium post-battle scoreboard embed."""
+    embed = discord.Embed(
+        title="\u2694\uFE0F Battle Results",
+        color=0xFFD700,
+    )
 
     # ── Outcome label ────────────────────────────────────────────────
     reason = str(battle_state.get("reason", ""))
     outcome_map = {
-        "all_fainted":        "KO",
-        "no_active_fighter":  "KO",
-        "forfeit":            "Forfeit",
-        "timeout_abandoned":  "Timeout (No Contest)",
-        "abandoned":          "No Contest",
-        "no_contest":         "No Contest",
-        "draw":               "Draw",
+        "all_fainted":        "\u2620\uFE0F K.O.",
+        "no_active_fighter":  "\u2620\uFE0F K.O.",
+        "forfeit":            "🏳\uFE0F Forfeit",
+        "timeout_abandoned":  "\u23F3 Timeout (No Contest)",
+        "abandoned":          "🤝 No Contest",
+        "no_contest":         "🤝 No Contest",
+        "draw":               "🤝 Draw",
     }
     outcome_label = outcome_map.get(reason, reason.replace("_", " ").title() if reason else "Unknown")
 
@@ -49,8 +52,16 @@ def build_battle_stats_embed(battle_state: dict, winner_name: str) -> discord.Em
         secs = last_ts - created_at
         duration_str = f"{secs // 60}m {secs % 60}s" if secs >= 60 else f"{secs}s"
 
+    # ── Header info row ──────────────────────────────────────────────
+    header_parts = [
+        f"🏆 **{outcome_label}**",
+        f"🔄 Round {rounds}",
+        f"\u23F1\uFE0F {duration_str if duration_str else '\u2014'}",
+    ]
+    embed.description = "\u3000".join(header_parts)
+    embed.add_field(name="🏆 Winner", value=winner_name or "\u2014", inline=False)
+
     # ── Parse log for per-player damage + move counts ────────────────
-    # Log entries for attacks follow the format  "pid:move_type:damage"
     players: dict[str, Any] = battle_state.get("players", {}) if isinstance(battle_state.get("players"), dict) else {}
     pid_list = list(players.keys())
 
@@ -94,7 +105,7 @@ def build_battle_stats_embed(battle_state: dict, winner_name: str) -> discord.Em
     def side_hp_line(pid: str) -> str:
         pstate = players.get(pid, {}) if isinstance(players.get(pid), dict) else {}
         if not isinstance(pstate, dict):
-            return "—"
+            return "\u2014"
         hp = pstate.get("hp", {}) if isinstance(pstate.get("hp"), dict) else {}
         hp_max = pstate.get("hp_max", {}) if isinstance(pstate.get("hp_max"), dict) else {}
         team = pstate.get("team_uids", []) if isinstance(pstate.get("team_uids"), list) else []
@@ -102,53 +113,76 @@ def build_battle_stats_embed(battle_state: dict, winner_name: str) -> discord.Em
         total = len(team)
         rem_hp = sum(int(hp.get(uid, 0)) for uid in team)
         max_hp = sum(int(hp_max.get(uid, 1)) for uid in team)
-        return f"{alive}/{total} fighters standing · {rem_hp}/{max_hp} HP"
+        bar = _hp_bar(rem_hp, max_hp)
+        return f"{bar} {alive}/{total} alive  \u2022 {rem_hp}/{max_hp} HP"
 
-    # ── Header row ───────────────────────────────────────────────────
-    embed.add_field(name="Outcome", value=outcome_label, inline=True)
-    embed.add_field(name="Rounds", value=str(rounds), inline=True)
-    embed.add_field(name="Duration", value=duration_str if duration_str else "—", inline=True)
-    embed.add_field(name="🏆 Winner", value=winner_name or "—", inline=False)
+    # ── Trophy & coin changes ────────────────────────────────────────
+    trophy_changes = battle_state.get("pvp_trophy_changes", {})
+    cpu_trophy_change = battle_state.get("cpu_trophy_change")
+    coin_reward = battle_state.get("coin_reward")
+    trophy_lines: list[str] = []
+    if trophy_changes and isinstance(trophy_changes, dict):
+        for pid, delta in trophy_changes.items():
+            sign = "+" if delta >= 0 else ""
+            trophy_lines.append(f"<@{pid}>: {sign}{delta}")
+    elif cpu_trophy_change is not None:
+        sign = "+" if cpu_trophy_change >= 0 else ""
+        trophy_lines.append(f"🏆 {sign}{cpu_trophy_change}")
+    if coin_reward:
+        trophy_lines.append(f"💰 +{coin_reward:,} coins")
+    if trophy_lines:
+        embed.add_field(name="🏆 Rewards", value="\n".join(trophy_lines), inline=False)
 
     # ── Per-side breakdown ───────────────────────────────────────────
     for pid in pid_list:
         mc = move_counts.get(pid, {})
-        move_parts: list[str] = []
-        for label, key in (("Normal", "normal"), ("Special", "special"), ("Ultimate", "ultimate"),
-                           ("Skill", "unique_skill"), ("Path", "unique_path"), ("Defense", "defensive")):
+        move_bars: list[str] = []
+        for label, key, emoji in (
+            ("Normal", "normal", "🔷"),
+            ("Special", "special", "🔶"),
+            ("Ultimate", "ultimate", "🔥"),
+            ("Skill", "unique_skill", "\u2728"),
+            ("Path", "unique_path", "🌀"),
+            ("Defense", "defensive", "🛡\uFE0F"),
+        ):
             if mc.get(key, 0):
-                move_parts.append(f"{label} ×{mc[key]}")
+                move_bars.append(f"{emoji} {label} \u00d7{mc[key]}")
 
-        lines: list[str] = [side_hp_line(pid)]
         dmg = damage_by_pid.get(pid, 0)
+        lines: list[str] = [side_hp_line(pid)]
         if dmg > 0:
-            lines.append(f"Damage dealt: **{dmg}**")
-        if move_parts:
-            lines.append("Moves: " + "  ·  ".join(move_parts))
+            lines.append(f"🗡\uFE0F Damage: **{dmg}**")
+        if move_bars:
+            lines.append("\n".join(move_bars[:4]))
 
-        # Add milestone packs if any were granted
         packs_key = f"{pid}_milestone_packs"
         if packs_key in battle_state and isinstance(battle_state[packs_key], list):
             packs = battle_state[packs_key]
             if packs:
                 pack_names = [p.replace("_", " ").title() for p in packs]
-                lines.append(f"🎁 Milestone Pack: {', '.join(pack_names)}")
+                lines.append(f"🎁 Milestone: {', '.join(pack_names)}")
 
         embed.add_field(name=side_display(pid), value="\n".join(lines), inline=True)
 
-    # Also check winner_milestone_packs and loser_milestone_packs if used
-    if "winner_milestone_packs" in battle_state and battle_state["winner_milestone_packs"]:
-        packs = battle_state["winner_milestone_packs"]
-        pack_names = [p.replace("_", " ").title() for p in packs]
-        embed.add_field(name="🎁 Winner Milestone", value=", ".join(pack_names), inline=False)
+    # Global milestone fields
+    for key, label in (("winner_milestone_packs", "🎁 Winner Milestone"),
+                       ("loser_milestone_packs", "🎁 Loser Milestone")):
+        if key in battle_state and battle_state[key]:
+            packs = battle_state[key]
+            pack_names = [p.replace("_", " ").title() for p in packs]
+            embed.add_field(name=label, value=", ".join(pack_names), inline=False)
 
-    if "loser_milestone_packs" in battle_state and battle_state["loser_milestone_packs"]:
-        packs = battle_state["loser_milestone_packs"]
-        pack_names = [p.replace("_", " ").title() for p in packs]
-        embed.add_field(name="🎁 Loser Milestone", value=", ".join(pack_names), inline=False)
-
-    embed.set_footer(text="Battle Stats")
+    embed.set_footer(text="Battle Stats \u2022 Lookism HXCC")
     return embed
+
+
+def _hp_bar(cur: int, max_hp: int, slots: int = 10) -> str:
+    """Return a compact HP bar string."""
+    if max_hp <= 0:
+        return "\u2591" * slots
+    pct = max(0, min(100, int(cur / max_hp * 100)))
+    filled = round(pct / 100 * slots)
+    return "\u2588" * filled + "\u2591" * (slots - filled)
 
 
 def build_embed_view(
