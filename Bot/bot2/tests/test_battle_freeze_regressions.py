@@ -152,7 +152,7 @@ class FakeTask:
 
 def _make_cog(data: dict) -> tuple[BattleCog, FakeBattleService]:
     service = FakeBattleService()
-    bot = SimpleNamespace(storage=FakeStorage(data), battle_service=service)
+    bot = SimpleNamespace(storage=FakeStorage(data), battle_service=service, get_channel=lambda _: None)
     return BattleCog(bot), service  # type: ignore[arg-type]
 
 
@@ -198,24 +198,22 @@ def test_remove_pending_friendly_state_clears_json_sqlite_and_task() -> None:
     assert task.cancelled is True
 
 
-def test_recover_active_battles_after_restart_ends_battles_and_syncs_active_users() -> None:
+def test_recover_active_battles_after_restart_keeps_battles_alive() -> None:
     data = _battle_data()
     battle_id = battle_state.create_battle_state(data, "ranked", "u1", "u2", ["a1"], ["b1"], 1_000)
     data["battle"]["active_by_user"] = {"u1": battle_id, "u2": battle_id, "ghost": "missing"}
+    # No message IDs set — refresh loop will skip (channel lookup returns None)
     cog, service = _make_cog(data)
 
     summary = asyncio.run(cog.recover_active_battles_after_restart())
 
-    # After Fix 5, ended battles are moved out of active into recently_ended
-    assert battle_id not in data["battle"]["active"]
+    # Battle stays alive after restart
+    assert battle_id in data["battle"]["active"]
     recently_ended = data["battle"].get("recently_ended", [])
-    battle = next((e for e in recently_ended if isinstance(e, dict) and e.get("battle_id") == battle_id), None)
-    assert battle is not None, "ended battle not found in recently_ended"
-    assert summary == {"ended": 1, "cleared": 0, "active_by_user": 0, "affected_users": 2}
-    assert battle["ended"] is True
-    assert battle["reason"] == "abandoned"
-    assert data["battle"]["active_by_user"] == {}
-    assert service.synced_payloads[-1]["battle"]["active_by_user"] == {}
+    match = next((e for e in recently_ended if isinstance(e, dict) and e.get("battle_id") == battle_id), None)
+    assert match is None, "battle should not be ended on restart"
+    assert data["battle"]["active_by_user"] == {"u1": battle_id, "u2": battle_id}
+    assert service.synced_payloads[-1]["battle"]["active_by_user"] == {"u1": battle_id, "u2": battle_id}
 
 
 def test_forfeit_button_uses_interacting_user(monkeypatch) -> None:

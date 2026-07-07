@@ -41,10 +41,7 @@ from bot.features.battle_helpers import (
     CPU_NAMES,
     CPU_PERSONALITIES,
     CPU_TROPHY_OFFSET,
-    TURN_TIMEOUT_SECONDS,
-    TURN_VIEW_TIMEOUT_SECONDS,
     IDLE_SKIP_LIMIT_VS_CPU,
-    CPU_STALL_TIMEOUT_SECONDS,
 )
 
 from bot.features.battle_views import (
@@ -73,7 +70,6 @@ class BattleCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.turn_tasks: dict[str, asyncio.Task[Any]] = {}
-        self.battle_stall_tasks: dict[str, asyncio.Task[Any]] = {}
         self.timer_tasks: dict[str, asyncio.Task[Any]] = {}
         self.queue_cpu_tasks: dict[str, asyncio.Task[Any]] = {}
         self.friendly_cpu_tasks: dict[str, asyncio.Task[Any]] = {}
@@ -109,7 +105,7 @@ class BattleCog(commands.Cog):
 
     def _cancel_battle_runtime_tasks(self, battle_id: str) -> None:
         current_task = asyncio.current_task()
-        for bucket in (self.turn_tasks, self.battle_stall_tasks, self.timer_tasks):
+        for bucket in (self.turn_tasks, self.timer_tasks):
             task = bucket.pop(str(battle_id), None)
             if task and task is not current_task and not task.done():
                 task.cancel()
@@ -681,58 +677,7 @@ class BattleCog(commands.Cog):
                 logger.info("[BATTLE_STATS] sent stats embed for ended battle_id=%s", battle_id)
 
     def _schedule_timeout(self, battle_id: str) -> None:
-        self._schedule_cpu_stall_watchdog(battle_id)
-
-    def _schedule_cpu_stall_watchdog(self, battle_id: str) -> None:
-        old = self.battle_stall_tasks.get(battle_id)
-        current_task = asyncio.current_task()
-        if old and old is not current_task and not old.done():
-            old.cancel()
-
-        data = self.bot.storage.load()
-        battle = self._battle_root(data).get("active", {}).get(battle_id)
-        if not isinstance(battle, dict):
-            return
-        players = battle.get("players", {}) if isinstance(battle.get("players"), dict) else {}
-        if not any(isinstance(p, dict) and bool(p.get("is_cpu", False)) for p in players.values()):
-            return
-
-        turn_snapshot = int(battle.get("turn_started_at", 0))
-
-        async def watchdog() -> None:
-            await asyncio.sleep(CPU_STALL_TIMEOUT_SECONDS)
-
-            def mutate(d: dict[str, Any]) -> dict[str, Any]:
-                b = self._battle_root(d).get("active", {}).get(battle_id)
-                if not isinstance(b, dict) or bool(b.get("ended", False)):
-                    return {"ok": False}
-                if int(b.get("turn_started_at", 0)) != turn_snapshot:
-                    return {"ok": False}
-                players_now = b.get("players", {}) if isinstance(b.get("players"), dict) else {}
-                if not any(isinstance(p, dict) and bool(p.get("is_cpu", False)) for p in players_now.values()):
-                    return {"ok": False}
-                current = str(b.get("turn_user_id", ""))
-                if not current:
-                    return {"ok": False}
-                loser = current
-                winner = next((str(pid) for pid in players_now.keys() if str(pid) != current), "")
-                if not winner:
-                    return {"ok": False}
-                return end_battle(d, battle_id, "", "", "timeout_abandoned")
-
-            result = self.bot.storage.with_lock(mutate)
-            if result.get("ok"):
-                await self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
-                await self._refresh_battle_message(battle_id)
-                logger.info("[CPU_STALL] ended battle_id=%s reason=%s", battle_id, result.get("reason", "unknown"))
-                self._cancel_battle_runtime_tasks(battle_id)
-
-        self._track_background_task(
-            self.battle_stall_tasks,
-            battle_id,
-            asyncio.create_task(watchdog()),
-            "cpu_stall_watchdog",
-        )
+        pass
 
     async def _start_battle(self, channel: discord.abc.Messageable, battle_id: str) -> None:
         data = self.bot.storage.load()
@@ -1409,7 +1354,7 @@ class BattleCog(commands.Cog):
         }
 
     async def recover_active_battles_after_restart(self) -> dict[str, int]:
-        for bucket in (self.turn_tasks, self.battle_stall_tasks, self.queue_cpu_tasks, self.friendly_cpu_tasks):
+        for bucket in (self.turn_tasks, self.queue_cpu_tasks, self.friendly_cpu_tasks):
             for key, task in list(bucket.items()):
                 if not task.done():
                     task.cancel()
@@ -1425,7 +1370,6 @@ class BattleCog(commands.Cog):
 
             ended = 0
             cleared = 0
-            affected_users: set[str] = set()
 
             for battle_id, battle in list(active.items()):
                 if not isinstance(battle, dict):
@@ -1438,16 +1382,9 @@ class BattleCog(commands.Cog):
                     active.pop(battle_id, None)
                     cleared += 1
                     continue
+                # Keep active battles alive — do not end them on restart
                 if bool(battle.get("ended", False)):
                     continue
-                result = end_battle(data, str(battle_id), "", "", "abandoned")
-                if result.get("ok"):
-                    ended += 1
-                    affected_users.update(player_ids)
-                else:
-                    active.pop(battle_id, None)
-                    cleared += 1
-                    affected_users.update(player_ids)
 
             rebuilt_active_by_user: dict[str, str] = {}
             for battle_id, battle in active.items():
@@ -1464,23 +1401,53 @@ class BattleCog(commands.Cog):
                 "ended": ended,
                 "cleared": cleared,
                 "active_by_user": len(rebuilt_active_by_user),
-                "affected_users": len(affected_users),
             }
 
         summary = self.bot.storage.with_lock(mutate)
         refreshed = await self._load_battle_data()
         await self.bot.battle_service.sync_active_by_user_from_data(refreshed)
-        if summary["ended"] or summary["cleared"] or summary["affected_users"]:
-            logger.warning(
-                "[BATTLE_STARTUP_RECOVERY] ended=%s cleared=%s affected_users=%s active_by_user=%s",
-                summary["ended"],
-                summary["cleared"],
-                summary["affected_users"],
-                summary["active_by_user"],
+
+        # Rebuild fresh views for every active battle
+        data = self.bot.storage.load()
+        active = self._battle_root(data).get("active", {}) if isinstance(self._battle_root(data).get("active"), dict) else {}
+        refreshed_count = 0
+        for battle_id, battle in list(active.items()):
+            if not isinstance(battle, dict) or bool(battle.get("ended", False)):
+                continue
+            channel_id = int(str(battle.get("message_channel_id", "0")) or 0)
+            channel = self.bot.get_channel(channel_id)
+            if channel is None:
+                continue
+            embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
+            if view is not None:
+                style_view(view, data)
+            msg = await channel.send(
+                embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None],
+                view=view,
+            )
+            if view is not None and hasattr(view, "message"):
+                view.message = msg
+
+            # Persist new message IDs
+            def persist(bid: str = battle_id, cid: int = channel.id, mid: int = msg.id) -> None:
+                def _save(d: dict[str, Any]) -> None:
+                    b = self._battle_root(d).get("active", {}).get(bid)
+                    if isinstance(b, dict):
+                        b["message_channel_id"] = str(cid)
+                        b["message_id"] = str(mid)
+                return _save
+
+            self.bot.storage.with_lock(persist(battle_id, channel.id, msg.id))
+            refreshed_count += 1
+
+        if summary["ended"] or summary["cleared"] or refreshed_count:
+            logger.info(
+                "[BATTLE_RECOVER] ended=%s cleared=%s refreshed=%s active_by_user=%s",
+                summary["ended"], summary["cleared"], refreshed_count, summary["active_by_user"],
             )
         else:
             logger.info("[BATTLE_STARTUP_RECOVERY] no stale active battle state found")
-        return summary
+        return {**summary, "refreshed": refreshed_count}
 
     async def _leave_ranked_queue(self, interaction: discord.Interaction, user_id: str, *, message: str = "You've been removed from the ranked queue.") -> bool:
         removed = (await self._remove_ranked_queue_state(user_id))["removed"]
