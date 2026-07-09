@@ -290,8 +290,6 @@ class RankedQueueView(discord.ui.View):
         if self.message is not None:
             try:
                 await self.message.edit(view=self)
-            except discord.NotFound:
-                logger.warning("[RANKED_QUEUE_VIEW_TIMEOUT] message gone user=%s", self.user_id)
             except Exception:
                 logger.exception("[RANKED_QUEUE_VIEW_TIMEOUT] failed to disable queue view user=%s", self.user_id)
 
@@ -308,8 +306,6 @@ class RankedQueueView(discord.ui.View):
             if interaction.message is not None:
                 try:
                     await interaction.message.edit(view=self)
-                except discord.NotFound:
-                    logger.warning("[RANKED_QUEUE_VIEW] message gone user=%s", self.user_id)
                 except Exception:
                     logger.exception("[RANKED_QUEUE_VIEW] failed to disable CPU button view user=%s", self.user_id)
 
@@ -326,7 +322,5 @@ class RankedQueueView(discord.ui.View):
             if interaction.message is not None:
                 try:
                     await interaction.message.edit(view=self)
-                except discord.NotFound:
-                    logger.warning("[RANKED_QUEUE_VIEW] message gone user=%s", self.user_id)
                 except Exception:
                     logger.exception("[RANKED_QUEUE_VIEW] failed to disable forfeit view user=%s", self.user_id)

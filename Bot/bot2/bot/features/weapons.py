@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from bot.data.constants import rarity_icon, RARITY_RANK
@@ -312,16 +313,16 @@ class WeaponsCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @commands.command(name="weapon")
-    async def weapon(self, ctx: commands.Context) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @app_commands.command(name="weapon", description="View and manage your weapon inventory.")
+    async def weapon(self, interaction: discord.Interaction) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
             return
 
-        user_id = str(ctx.author.id)
+        user_id = str(interaction.user.id)
         data = self.bot.storage.load()
         view = WeaponGalleryView(self.bot, user_id)
         view._rebuild_select(data)
-        await smart_reply(ctx, embed=view.build_embed(data), view=view)
+        await smart_reply(interaction, embed=view.build_embed(data), view=view)
 
 
 async def setup(bot: commands.Bot) -> None:

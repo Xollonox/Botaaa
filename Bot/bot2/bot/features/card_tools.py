@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card, normalize_mastery_list
@@ -35,6 +36,34 @@ def _resolve_unique_skills(card: dict[str, Any]) -> tuple[str, str]:
         if names:
             return ", ".join(names), "—"
     return _resolve_field(card.get("unique_skill"), card.get("unique_skill_description"))
+
+
+def _card_name_choices(data: dict[str, Any], current: str) -> list[app_commands.Choice[str]]:
+    cards = data.get("cards", {})
+    if not isinstance(cards, dict):
+        return []
+
+    token = str(current or "").casefold()
+    choices: list[app_commands.Choice[str]] = []
+    for key, card in cards.items():
+        if not isinstance(card, dict):
+            continue
+        name = str(card.get("name") or key)
+        title = str(card.get("title") or "").strip()
+        rarity = str(card.get("rarity") or "").strip()
+        searchable = f"{key} {name} {title} {rarity}".casefold()
+        if token and token not in searchable:
+            continue
+
+        label_parts = [str(key)]
+        if rarity:
+            label_parts.append(f"[{rarity}]")
+        if title:
+            label_parts.append(f"- {title}")
+        choices.append(app_commands.Choice(name=" ".join(label_parts)[:100], value=str(key)))
+        if len(choices) >= 25:
+            break
+    return choices
 
 
 def _build_catalog_card_embed(data: dict[str, Any], card: dict[str, Any]) -> discord.Embed:
@@ -98,29 +127,37 @@ class CardToolsCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @commands.command(name="card_info")
-    async def card_info(self, ctx: commands.Context, card_name: str) -> None:
+    @app_commands.command(name="card_info", description="View information about a catalog card.")
+    async def card_info(self, interaction: discord.Interaction, card_name: str) -> None:
         data = self.bot.storage.load()
         catalog = data.get("cards", {})
         card = find_catalog_card(catalog, card_name)
         if card is None:
             await smart_reply(
-                ctx,
+                interaction,
                 embed=make_embed(data, f"{e('warning', data)} Card Not Found", "No matching card exists in the catalog."),
                 ephemeral=True,
             )
             return
 
         embed = _build_catalog_card_embed(data, card)
-        await smart_reply(ctx, embed=embed)
+        await smart_reply(interaction, embed=embed)
 
-    async def _set_flag(self, ctx: commands.Context, query: str, key: str, value: bool, title_key: str) -> None:
+    @card_info.autocomplete("card_name")
+    async def card_info_autocomplete(
+        self,
+        interaction: discord.Interaction,
+        current: str,
+    ) -> list[app_commands.Choice[str]]:
+        return _card_name_choices(self.bot.storage.load(), current)
+
+    async def _set_flag(self, interaction: discord.Interaction, query: str, key: str, value: bool, title_key: str) -> None:
         from bot.utils.checks import ensure_registered
         from bot.utils.cards_logic import find_owned_instance
-        if not await ensure_registered(ctx, self.bot.storage):
+        if not await ensure_registered(interaction, self.bot.storage):
             return
 
-        user_id = str(ctx.author.id)
+        user_id = str(interaction.user.id)
 
         def mutate(state: dict[str, Any]) -> tuple[dict[str, Any], bool]:
             inv = state["players"][user_id]["user"].setdefault("inventory", [])
@@ -133,21 +170,21 @@ class CardToolsCog(commands.Cog):
         data, updated = self.bot.storage.with_lock(mutate)
         if not updated:
             await smart_reply(
-                ctx,
+                interaction,
                 embed=make_embed(data, f"{e('warning', data)} Instance Not Found", "No matching owned card found."),
                 ephemeral=True,
             )
             return
 
         await smart_reply(
-            ctx,
+            interaction,
             embed=make_embed(data, f"{e(title_key, data)} Updated", "Card instance flag updated."),
             ephemeral=True,
         )
 
-    @commands.command(name="card_lock")
-    async def card_lock(self, ctx: commands.Context, query: str) -> None:
-        await self._set_flag(ctx, query, "locked", True, "lock")
+    @app_commands.command(name="card_lock", description="Lock an owned card instance.")
+    async def card_lock(self, interaction: discord.Interaction, query: str) -> None:
+        await self._set_flag(interaction, query, "locked", True, "lock")
 
 
 async def setup(bot: commands.Bot) -> None:

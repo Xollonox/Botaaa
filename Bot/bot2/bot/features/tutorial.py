@@ -94,7 +94,7 @@ def advance_tutorial(user: dict, action: str) -> dict | None:
 def build_tutorial_embed(step: int) -> discord.Embed:
     """Build tutorial progress embed."""
     if step == 0:
-        info = {"title": "Welcome! Let's Start", "desc": "Use `!start` to begin your journey!"}
+        info = {"title": "Welcome! Let's Start", "desc": "Use `/start` to begin your journey!"}
     elif step > 5:
         return discord.Embed(
             title="✅ Tutorial Complete!",
@@ -115,19 +115,19 @@ class TutorialCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @commands.command(name="tutorial")
-    async def tutorial_cmd(self, ctx: commands.Context) -> None:
+    @discord.app_commands.command(name="tutorial", description="View your tutorial progress.")
+    async def tutorial_cmd(self, interaction: discord.Interaction) -> None:
         data = self.bot.storage.load()
-        player = data.get("players", {}).get(str(ctx.author.id))
+        player = data.get("players", {}).get(str(interaction.user.id))
         if not player:
-            await ctx.send("Use `!start` first!")
+            await interaction.response.send_message("Use `/start` first!", ephemeral=True)
             return
         user = player.get("user", {})
         step = get_tutorial_step(user)
 
         if step == 4:
             def mutate(d: dict[str, Any]) -> dict[str, Any]:
-                p = d.get("players", {}).get(str(ctx.author.id), {})
+                p = d.get("players", {}).get(str(interaction.user.id), {})
                 u = p.get("user", {})
                 advance_tutorial(u, "view_achievements")
                 return d
@@ -135,7 +135,7 @@ class TutorialCog(commands.Cog):
             step = 5
 
         embed = build_tutorial_embed(step if step < 6 else 6)
-        await ctx.send(embed=embed)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 async def setup(bot: commands.Bot) -> None:

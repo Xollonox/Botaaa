@@ -5,6 +5,7 @@ import datetime
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from bot.utils.checks import ensure_registered
@@ -12,6 +13,9 @@ from bot.utils.timeutil import now_ts
 from bot.utils.ui import e, make_embed
 from bot.utils.xp_logic import make_bar, xp_progress
 from bot.utils.interaction_visibility import smart_reply, error_reply
+from bot.config import OWNER_GUILD_ID
+
+OWNER_GUILD  = discord.Object(id=OWNER_GUILD_ID)
 PASS_COST    = 200   # gems
 SEP          = "━" * 32
 
@@ -556,22 +560,22 @@ class SeasonCog(commands.Cog):
         except Exception:
             pass
 
-    @commands.command(name="season")
-    async def season(self, ctx: commands.Context) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @app_commands.command(name="season", description="View current season info, pass, and missions.")
+    async def season(self, interaction: discord.Interaction) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
             return
         def mutate(data: dict) -> None:
-            self._check_daily_login(data, str(ctx.author.id))
+            self._check_daily_login(data, str(interaction.user.id))
         self.bot.storage.with_lock(mutate)
         data = self.bot.storage.load()
         s    = _season_root(data)
         if not s.get("active"):
-            await smart_reply(ctx, embed=_inf(
+            await smart_reply(interaction, embed=_inf(
                 f"{_hdr('🌟  SEASON')}\n\n"
                 "╭─ No Active Season\n│  No season is running right now.\n│  Check back soon!\n╰────────────────────────────────"
             ))
             return
-        uid = str(ctx.author.id)
+        uid = str(interaction.user.id)
 
         class SeasonNav(discord.ui.View):
             def __init__(nav_self) -> None:
@@ -595,54 +599,44 @@ class SeasonCog(commands.Cog):
                 await i.response.edit_message(embed=panel.build_embed(data2), view=panel)
                 panel.message = await i.original_response()
 
-        await smart_reply(ctx, embed=_build_season_embed(data, uid), view=SeasonNav())
+        await smart_reply(interaction, embed=_build_season_embed(data, uid), view=SeasonNav())
 
-    @commands.command(name="season_pass")
-    async def season_pass(self, ctx: commands.Context) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @app_commands.command(name="season_pass", description="View and claim your season pass rewards.")
+    async def season_pass(self, interaction: discord.Interaction) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
             return
         data = self.bot.storage.load()
         s    = _season_root(data)
         if not s.get("active"):
-            await error_reply(ctx, embed=_err("╭─ ❌ No Active Season\n╰────────────────────────────────"))
+            await error_reply(interaction, embed=_err("╭─ ❌ No Active Season\n╰────────────────────────────────"))
             return
-        panel = PassPanel(self, str(ctx.author.id))
-        await smart_reply(ctx, embed=panel._build_embed(), view=panel)
-        try:
-            panel.message = await ctx.send("‑")
-            await panel.message.delete()
-        except discord.HTTPException:
-            pass
+        panel = PassPanel(self, str(interaction.user.id))
+        await smart_reply(interaction, embed=panel._build_embed(), view=panel)
+        panel.message = await interaction.original_response()
 
-    @commands.command(name="season_missions")
-    async def season_missions(self, ctx: commands.Context) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @app_commands.command(name="season_missions", description="View daily, weekly and monthly missions.")
+    async def season_missions(self, interaction: discord.Interaction) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
             return
         def mutate(data: dict) -> None:
-            self._check_daily_login(data, str(ctx.author.id))
+            self._check_daily_login(data, str(interaction.user.id))
         self.bot.storage.with_lock(mutate)
         data = self.bot.storage.load()
         s    = _season_root(data)
         if not s.get("active"):
-            await error_reply(ctx, embed=_err("╭─ ❌ No Active Season\n╰────────────────────────────────"))
+            await error_reply(interaction, embed=_err("╭─ ❌ No Active Season\n╰────────────────────────────────"))
             return
-        panel = MissionPanel(self, str(ctx.author.id))
-        await smart_reply(ctx, embed=panel.build_embed(data), view=panel)
-        try:
-            panel.message = await ctx.send("‑")
-            await panel.message.delete()
-        except discord.HTTPException:
-            pass
+        panel = MissionPanel(self, str(interaction.user.id))
+        await smart_reply(interaction, embed=panel.build_embed(data), view=panel)
+        panel.message = await interaction.original_response()
 
     # ── Owner commands ─────────────────────────────────────────────
 
-    @commands.command(name="o_season_create")
-    async def o_season_create(self, ctx: commands.Context, name: str, duration_days: int = 90, reset: str = "both") -> None:
-        if duration_days < 1 or duration_days > 365:
-            await error_reply(ctx, embed=_err("❌ Duration must be 1–365 days."))
-            return
+    @app_commands.command(name="o_season_create", description="Owner: start a new season.")
+    @app_commands.guilds(OWNER_GUILD)
+    async def o_season_create(self, interaction: discord.Interaction, name: str, duration_days: app_commands.Range[int, 1, 365] = 90, reset: str = "both") -> None:
         from bot.utils.checks import is_owner
-        if not is_owner(ctx): await error_reply(ctx, embed=_err("❌ Owner only.")); return
+        if not is_owner(interaction): await error_reply(interaction, embed=_err("❌ Owner only.")); return
         def mutate(data: dict) -> None:
             s = _season_root(data)
             s["active"] = True; s["name"] = name.strip()
@@ -652,14 +646,15 @@ class SeasonCog(commands.Cog):
             s["missions"]   = s.get("missions") or {}
         self.bot.storage.with_lock(mutate)
         data = self.bot.storage.load(); s = _season_root(data)
-        await smart_reply(ctx, embed=_ok(
+        await smart_reply(interaction, embed=_ok(
             f"╭─ ✅ Season Created!\n│  📅 {name}\n│  Start: {_fmt_date(int(s['start_time']))}\n│  End:   {_fmt_date(int(s['end_time']))}\n│  🔄 Reset: {reset.title()}\n│  ⏳ {duration_days} days\n╰────────────────────────────────"
         ), ephemeral=True)
 
-    @commands.command(name="o_season_end")
-    async def o_season_end(self, ctx: commands.Context) -> None:
+    @app_commands.command(name="o_season_end", description="Owner: end the current season.")
+    @app_commands.guilds(OWNER_GUILD)
+    async def o_season_end(self, interaction: discord.Interaction) -> None:
         from bot.utils.checks import is_owner
-        if not is_owner(ctx): await error_reply(ctx, embed=_err("❌ Owner only.")); return
+        if not is_owner(interaction): await error_reply(interaction, embed=_err("❌ Owner only.")); return
         def mutate(data: dict) -> tuple[bool, int]:
             s = _season_root(data)
             if not s.get("active"): return False, 0
@@ -675,31 +670,24 @@ class SeasonCog(commands.Cog):
             s["active"] = False; s["current_season"] = int(snum) + 1
             return True, count
         ok, count = self.bot.storage.with_lock(mutate)
-        if not ok: await error_reply(ctx, embed=_err("❌ No active season.")); return
-        await smart_reply(ctx, embed=_ok(f"╭─ 🏁 Season Ended!\n│  🔄 {count} players reset\n│  💾 Archived\n╰────────────────────────────────"), ephemeral=True)
+        if not ok: await error_reply(interaction, embed=_err("❌ No active season.")); return
+        await smart_reply(interaction, embed=_ok(f"╭─ 🏁 Season Ended!\n│  🔄 {count} players reset\n│  💾 Archived\n╰────────────────────────────────"), ephemeral=True)
 
-    @commands.command(name="o_season_pass_setup")
-    async def o_season_pass_setup(self, ctx: commands.Context, tier: int, cp_required: int, free_reward: str, paid_reward: str) -> None:
-        if tier < 1 or tier > 100:
-            await error_reply(ctx, embed=_err("❌ Tier must be 1–100."))
-            return
-        if cp_required < 0:
-            await error_reply(ctx, embed=_err("❌ CP required must be >= 0."))
-            return
+    @app_commands.command(name="o_season_pass_setup", description="Owner: configure a season pass tier.")
+    @app_commands.guilds(OWNER_GUILD)
+    async def o_season_pass_setup(self, interaction: discord.Interaction, tier: app_commands.Range[int, 1, 100], cp_required: app_commands.Range[int, 0, 9_999_999], free_reward: str, paid_reward: str) -> None:
         from bot.utils.checks import is_owner
-        if not is_owner(ctx): await error_reply(ctx, embed=_err("❌ Owner only.")); return
+        if not is_owner(interaction): await error_reply(interaction, embed=_err("❌ Owner only.")); return
         def mutate(data: dict) -> None:
             _season_root(data).setdefault("pass_tiers", {})[str(tier)] = {"cp_required": cp_required, "free_reward": free_reward, "paid_reward": paid_reward}
         self.bot.storage.with_lock(mutate)
-        await smart_reply(ctx, embed=_ok(f"╭─ ✅ Pass Tier Set\n│  Tier {tier}  •  {cp_required:,} CP\n│  🆓 Free: {free_reward}\n│  💎 Paid: {paid_reward}\n╰────────────────────────────────"), ephemeral=True)
+        await smart_reply(interaction, embed=_ok(f"╭─ ✅ Pass Tier Set\n│  Tier {tier}  •  {cp_required:,} CP\n│  🆓 Free: {free_reward}\n│  💎 Paid: {paid_reward}\n╰────────────────────────────────"), ephemeral=True)
 
-    @commands.command(name="o_season_add_cp")
-    async def o_season_add_cp(self, ctx: commands.Context, player: discord.User, amount: int) -> None:
+    @app_commands.command(name="o_season_add_cp", description="Owner: manually add season CP to a player.")
+    @app_commands.guilds(OWNER_GUILD)
+    async def o_season_add_cp(self, interaction: discord.Interaction, player: discord.User, amount: app_commands.Range[int, -9_999_999, 9_999_999]) -> None:
         from bot.utils.checks import is_owner
-        if not is_owner(ctx): await error_reply(ctx, embed=_err("❌ Owner only.")); return
-        if amount < -9_999_999 or amount > 9_999_999:
-            await error_reply(ctx, embed=_err("❌ Amount must be between -9,999,999 and 9,999,999."))
-            return
+        if not is_owner(interaction): await error_reply(interaction, embed=_err("❌ Owner only.")); return
         uid = str(player.id)
         def mutate(data: dict) -> tuple[bool, int]:
             s = _season_root(data); sn = str(s.get("current_season", 1))
@@ -708,39 +696,40 @@ class SeasonCog(commands.Cog):
             scp = u.setdefault("season_cp", {}); scp[sn] = int(scp.get(sn, 0)) + amount
             return True, int(scp[sn])
         ok, total = self.bot.storage.with_lock(mutate)
-        if not ok: await error_reply(ctx, embed=_err("❌ Player not found.")); return
-        await smart_reply(ctx, embed=_ok(f"╭─ ✅ CP Added\n│  {player.mention}  +{amount:,} CP\n│  Total CP: {total:,}\n╰────────────────────────────────"), ephemeral=True)
+        if not ok: await error_reply(interaction, embed=_err("❌ Player not found.")); return
+        await smart_reply(interaction, embed=_ok(f"╭─ ✅ CP Added\n│  {player.mention}  +{amount:,} CP\n│  Total CP: {total:,}\n╰────────────────────────────────"), ephemeral=True)
 
-    @commands.command(name="o_season_mission_create")
-    async def o_season_mission_create(self, ctx: commands.Context, title: str, mission_type: str, period: str, requirement: str, target: int, reward_cp: int) -> None:
-        if target < 1:
-            await error_reply(ctx, embed=_err("❌ Target must be >= 1."))
-            return
-        if reward_cp < 0:
-            await error_reply(ctx, embed=_err("❌ Reward CP must be >= 0."))
-            return
-        if mission_type not in ("free", "paid"):
-            await error_reply(ctx, embed=_err("❌ Mission type must be 'free' or 'paid'."))
-            return
-        if period not in ("daily", "weekly", "monthly", "season"):
-            await error_reply(ctx, embed=_err("❌ Period must be daily/weekly/monthly/season."))
-            return
-        valid_reqs = {"daily_login", "battles_played", "ranked_wins", "tournament_wins", "packs_opened", "trades_completed", "trophies_earned"}
-        if requirement not in valid_reqs:
-            await error_reply(ctx, embed=_err("❌ Invalid requirement."))
-            return
+    @app_commands.command(name="o_season_mission_create", description="Owner: create a season mission.")
+    @app_commands.guilds(OWNER_GUILD)
+    @app_commands.choices(mission_type=[app_commands.Choice(name="🆓 Free", value="free"), app_commands.Choice(name="💎 Paid", value="paid")])
+    @app_commands.choices(period=[
+        app_commands.Choice(name="🌅 Daily",   value="daily"),
+        app_commands.Choice(name="📅 Weekly",  value="weekly"),
+        app_commands.Choice(name="🗓️ Monthly", value="monthly"),
+        app_commands.Choice(name="🌟 Season",  value="season"),
+    ])
+    @app_commands.choices(requirement=[
+        app_commands.Choice(name="Daily Login",          value="daily_login"),
+        app_commands.Choice(name="Play battles",         value="battles_played"),
+        app_commands.Choice(name="Win ranked battles",   value="ranked_wins"),
+        app_commands.Choice(name="Win tournament battles", value="tournament_wins"),
+        app_commands.Choice(name="Open packs",           value="packs_opened"),
+        app_commands.Choice(name="Complete trades",      value="trades_completed"),
+        app_commands.Choice(name="Earn trophies",        value="trophies_earned"),
+    ])
+    async def o_season_mission_create(self, interaction: discord.Interaction, title: str, mission_type: app_commands.Choice[str], period: app_commands.Choice[str], requirement: app_commands.Choice[str], target: app_commands.Range[int, 1, 9_999_999], reward_cp: app_commands.Range[int, 0, 9_999_999]) -> None:
         from bot.utils.checks import is_owner
-        if not is_owner(ctx): await error_reply(ctx, embed=_err("❌ Owner only.")); return
+        if not is_owner(interaction): await error_reply(interaction, embed=_err("❌ Owner only.")); return
         mid = str(uuid.uuid4())[:8]
         def mutate(data: dict) -> None:
             _season_root(data).setdefault("missions", {})[mid] = {
-                "title": title.strip(), "type": mission_type, "period": period,
-                "requirement": requirement, "target": int(target), "reward_cp": int(reward_cp),
+                "title": title.strip(), "type": mission_type.value, "period": period.value,
+                "requirement": requirement.value, "target": int(target), "reward_cp": int(reward_cp),
             }
         self.bot.storage.with_lock(mutate)
-        icon = "🆓" if mission_type == "free" else "💎"
-        await smart_reply(ctx, embed=_ok(
-            f"╭─ ✅ Mission Created\n│  {icon} [{period}] {title}\n│  Req: {requirement} × {target}\n│  Reward: +{reward_cp:,} CP\n╰────────────────────────────────"
+        icon = "🆓" if mission_type.value == "free" else "💎"
+        await smart_reply(interaction, embed=_ok(
+            f"╭─ ✅ Mission Created\n│  {icon} [{period.name}] {title}\n│  Req: {requirement.name} × {target}\n│  Reward: +{reward_cp:,} CP\n╰────────────────────────────────"
         ), ephemeral=True)
 
 

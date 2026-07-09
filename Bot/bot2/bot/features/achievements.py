@@ -6,13 +6,16 @@ import math
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
+from bot.config import OWNER_GUILD_ID
 from bot.utils.achievement_logic import TIER_EMOJI_KEY, ensure_player_achievements, format_entries, grant, list_catalog, remove, reset
 from bot.utils.checks import is_owner
 from bot.utils.ui import box, e, make_embed
 from bot.utils.interaction_visibility import smart_reply, error_reply
 
+OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
 
 class AchievementsView(discord.ui.View):
@@ -99,15 +102,15 @@ class AchievementsCog(commands.Cog):
     def _owner_embed(self, data: dict[str, Any]) -> discord.Embed:
         return make_embed(data, f"{e('no', data)} Owner Only", "You are not allowed to use this command.")
 
-    @commands.command(name="achievements")
-    async def achievements(self, ctx: commands.Context, user: discord.User | None = None) -> None:
+    @app_commands.command(name="achievements", description="View earned and locked achievements.")
+    async def achievements(self, interaction: discord.Interaction, user: discord.User | None = None) -> None:
         data = self.bot.storage.load()
-        target = user or ctx.author
+        target = user or interaction.user
         target_id = str(target.id)
 
         players = data.get("players", {})
         if not isinstance(players, dict) or target_id not in players:
-            await smart_reply(ctx,
+            await smart_reply(interaction, 
                 embed=make_embed(data, f"{e('warning', data)} Profile Missing", "Target user is not registered."),
                 ephemeral=True,
             )
@@ -115,7 +118,7 @@ class AchievementsCog(commands.Cog):
 
         player = players[target_id]
         if not isinstance(player, dict):
-            await smart_reply(ctx,
+            await smart_reply(interaction, 
                 embed=make_embed(data, f"{e('warning', data)} Profile Missing", "Target user data is invalid."),
                 ephemeral=True,
             )
@@ -144,7 +147,7 @@ class AchievementsCog(commands.Cog):
             target_name=target.display_name,
             earned_lines=earned_lines,
             locked_lines=locked_lines,
-            invoker_id=str(ctx.author.id),
+            invoker_id=str(interaction.user.id),
         )
 
         total_earned = len(earned_dict)
@@ -152,19 +155,20 @@ class AchievementsCog(commands.Cog):
         embed = view._build_embed()
         embed.insert_field_at(0, name=f"{e('earned', data)} Progress", value=f"{total_earned}/{total_catalog}", inline=True)
 
-        await smart_reply(ctx, embed=embed, view=view, ephemeral=True)
+        await smart_reply(interaction, embed=embed, view=view, ephemeral=True)
 
-    @commands.command(name="o_achievement_grant")
+    @app_commands.command(name="o_achievement_grant", description="Owner: grant an achievement to a user.")
+    @app_commands.guilds(OWNER_GUILD)
     async def o_achievement_grant(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         user: discord.User,
         achievement_id: str,
         note: str | None = None,
     ) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=self._owner_embed(data), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=self._owner_embed(data), ephemeral=True)
             return
 
         def mutate(state: dict[str, Any]) -> tuple[bool, str]:
@@ -181,37 +185,67 @@ class AchievementsCog(commands.Cog):
 
         title = f"{e('grant', data)} Achievement Granted" if ok else f"{e('warning', data)} Grant Failed"
         desc = f"{icon} {achievement_id}\n{tier_icon} {tier}\n{message}"
-        await smart_reply(ctx, embed=make_embed(data, title, desc), ephemeral=True)
+        await smart_reply(interaction, embed=make_embed(data, title, desc), ephemeral=True)
 
-    @commands.command(name="o_achievement_remove")
-    async def o_achievement_remove(self, ctx: commands.Context, user: discord.User, achievement_id: str) -> None:
+    @app_commands.command(name="o_achievement_remove", description="Owner: remove an achievement from a user.")
+    @app_commands.guilds(OWNER_GUILD)
+    async def o_achievement_remove(self, interaction: discord.Interaction, user: discord.User, achievement_id: str) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=self._owner_embed(data), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=self._owner_embed(data), ephemeral=True)
             return
 
         ok, message = self.bot.storage.with_lock(lambda state: remove(state, str(user.id), achievement_id))
         data = self.bot.storage.load()
         title = f"{e('remove', data)} Achievement Removed" if ok else f"{e('warning', data)} Remove Failed"
-        await smart_reply(ctx, embed=make_embed(data, title, message), ephemeral=True)
+        await smart_reply(interaction, embed=make_embed(data, title, message), ephemeral=True)
 
-    @commands.command(name="o_achievement_reset")
+    @app_commands.command(name="o_achievement_reset", description="Owner: reset user achievements.")
+    @app_commands.guilds(OWNER_GUILD)
+    @app_commands.choices(
+        mode=[
+            app_commands.Choice(name="earned_only", value="earned_only"),
+            app_commands.Choice(name="all", value="all"),
+        ]
+    )
     async def o_achievement_reset(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         user: discord.User,
-        mode: str | None = None,
+        mode: app_commands.Choice[str] | None = None,
     ) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=self._owner_embed(data), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=self._owner_embed(data), ephemeral=True)
             return
 
-        reset_mode = mode if mode else "earned_only"
+        reset_mode = mode.value if isinstance(mode, app_commands.Choice) else "earned_only"
         ok, message = self.bot.storage.with_lock(lambda state: reset(state, str(user.id), reset_mode))
         data = self.bot.storage.load()
         title = f"{e('reset', data)} Achievement Reset" if ok else f"{e('warning', data)} Reset Failed"
-        await smart_reply(ctx, embed=make_embed(data, title, message), ephemeral=True)
+        await smart_reply(interaction, embed=make_embed(data, title, message), ephemeral=True)
+
+    async def _achievement_id_autocomplete(self, current: str, data: dict[str, Any]) -> list[app_commands.Choice[str]]:
+        cur = current.lower().strip()
+        rows = list_catalog(data)
+        out: list[app_commands.Choice[str]] = []
+        for row in rows:
+            achv_id = str(row.get("id", ""))
+            name = str(row.get("name", achv_id))
+            tier = str(row.get("tier", "Bronze"))
+            if cur and cur not in achv_id.lower() and cur not in name.lower():
+                continue
+            out.append(app_commands.Choice(name=f"{tier} • {name} ({achv_id})"[:100], value=achv_id))
+            if len(out) >= 25:
+                break
+        return out
+
+    @o_achievement_grant.autocomplete("achievement_id")
+    @o_achievement_remove.autocomplete("achievement_id")
+    async def achievement_id_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        data = self.bot.storage.load()
+        return await self._achievement_id_autocomplete(current, data)
+
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(AchievementsCog(bot))

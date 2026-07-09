@@ -5,13 +5,16 @@ from __future__ import annotations
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
+from bot.config import OWNER_GUILD_ID
 
 from bot.utils.checks import ensure_registered, is_owner, is_registered
 from bot.utils.economy_logic import add_balance, add_premium, cooldown_remaining, fmt_duration
 from bot.utils.timeutil import now_ts
 from bot.utils.ui import e, make_embed
 from bot.utils.interaction_visibility import smart_reply, error_reply
+OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
 
 BALANCE_COLOR = 0xE11D48
@@ -36,13 +39,13 @@ class EconomyCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @commands.command(name="balance")
-    async def balance(self, ctx: commands.Context) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @app_commands.command(name="balance", description="Show your coin and premium balances.")
+    async def balance(self, interaction: discord.Interaction) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
             return
 
         data = self.bot.storage.load()
-        user_data = data.get("players", {}).get(str(ctx.author.id), {}).get("user", {})
+        user_data = data.get("players", {}).get(str(interaction.user.id), {}).get("user", {})
 
         coins = int(user_data.get("balance", 0))
         gems = int(user_data.get("premium_balance", 0))
@@ -53,7 +56,7 @@ class EconomyCog(commands.Cog):
             None,
             "LOOKISM HXCC • WALLET",
             (
-                f"**WALLET — {ctx.author.display_name}**\n\n"
+                f"**WALLET — {interaction.user.display_name}**\n\n"
                 "╭─ Currency\n"
                 f"│ Coins: {coins:,}\n"
                 f"│ Gems: {gems:,}\n"
@@ -62,25 +65,26 @@ class EconomyCog(commands.Cog):
             color=BALANCE_COLOR,
             footer="Economy",
         )
-        await smart_reply(ctx, embed=embed, ephemeral=True)
+        await smart_reply(interaction, embed=embed, ephemeral=True)
 
     # ─── Owner Commands ──────────────────────────────────────────────────────
 
-    @commands.command(name="o_add_balance")
+    @app_commands.command(name="o_add_balance", description="Owner: add coin balance to a registered user.")
+    @app_commands.guilds(OWNER_GUILD)
     async def o_add_balance(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         target: discord.User,
-        amount: int,
+        amount: app_commands.Range[int, 1, None],
     ) -> None:
-        if not is_owner(ctx):
+        if not is_owner(interaction):
             data = self.bot.storage.load()
             embed = make_embed(
                 data,
                 f"{e('no', data)} Access Denied",
                 "This command is restricted to bot owners only.",
             )
-            await smart_reply(ctx, embed=embed, ephemeral=True)
+            await smart_reply(interaction, embed=embed, ephemeral=True)
             return
 
         target_id = str(target.id)
@@ -100,9 +104,9 @@ class EconomyCog(commands.Cog):
             embed = make_embed(
                 data,
                 f"{e('warning', data)} User Not Registered",
-                f"{target.mention} must run `!start` before receiving balance adjustments.",
+                f"{target.mention} must run `/start` before receiving balance adjustments.",
             )
-            await smart_reply(ctx, embed=embed, ephemeral=True)
+            await smart_reply(interaction, embed=embed, ephemeral=True)
             return
 
         embed = make_embed(
@@ -116,23 +120,24 @@ class EconomyCog(commands.Cog):
             ],
         )
         embed.set_footer(text="Admin Control")
-        await smart_reply(ctx, embed=embed, ephemeral=True)
+        await smart_reply(interaction, embed=embed, ephemeral=True)
 
-    @commands.command(name="o_remove_balance")
+    @app_commands.command(name="o_remove_balance", description="Owner: remove coin balance from a registered user.")
+    @app_commands.guilds(OWNER_GUILD)
     async def o_remove_balance(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         target: discord.User,
-        amount: int,
+        amount: app_commands.Range[int, 1, None],
     ) -> None:
-        if not is_owner(ctx):
+        if not is_owner(interaction):
             data = self.bot.storage.load()
             embed = make_embed(
                 data,
                 f"{e('no', data)} Access Denied",
                 "This command is restricted to bot owners only.",
             )
-            await smart_reply(ctx, embed=embed, ephemeral=True)
+            await smart_reply(interaction, embed=embed, ephemeral=True)
             return
 
         target_id = str(target.id)
@@ -153,9 +158,9 @@ class EconomyCog(commands.Cog):
             embed = make_embed(
                 data,
                 f"{e('warning', data)} User Not Registered",
-                f"{target.mention} must run `!start` before balance adjustments.",
+                f"{target.mention} must run `/start` before balance adjustments.",
             )
-            await smart_reply(ctx, embed=embed, ephemeral=True)
+            await smart_reply(interaction, embed=embed, ephemeral=True)
             return
 
         embed = make_embed(
@@ -169,23 +174,24 @@ class EconomyCog(commands.Cog):
             ],
         )
         embed.set_footer(text="Admin Control")
-        await smart_reply(ctx, embed=embed, ephemeral=True)
+        await smart_reply(interaction, embed=embed, ephemeral=True)
 
-    @commands.command(name="o_add_premium")
+    @app_commands.command(name="o_add_premium", description="Owner: add premium currency to a registered user.")
+    @app_commands.guilds(OWNER_GUILD)
     async def o_add_premium(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         target: discord.User,
-        amount: int,
+        amount: app_commands.Range[int, 1, None],
     ) -> None:
-        if not is_owner(ctx):
+        if not is_owner(interaction):
             data = self.bot.storage.load()
             embed = make_embed(
                 data,
                 f"{e('no', data)} Access Denied",
                 "This command is restricted to bot owners only.",
             )
-            await smart_reply(ctx, embed=embed, ephemeral=True)
+            await smart_reply(interaction, embed=embed, ephemeral=True)
             return
 
         target_id = str(target.id)
@@ -205,9 +211,9 @@ class EconomyCog(commands.Cog):
             embed = make_embed(
                 data,
                 f"{e('warning', data)} User Not Registered",
-                f"{target.mention} must run `!start` before receiving premium adjustments.",
+                f"{target.mention} must run `/start` before receiving premium adjustments.",
             )
-            await smart_reply(ctx, embed=embed, ephemeral=True)
+            await smart_reply(interaction, embed=embed, ephemeral=True)
             return
 
         embed = make_embed(
@@ -221,7 +227,7 @@ class EconomyCog(commands.Cog):
             ],
         )
         embed.set_footer(text="Admin Control")
-        await smart_reply(ctx, embed=embed, ephemeral=True)
+        await smart_reply(interaction, embed=embed, ephemeral=True)
 
 
 async def setup(bot: commands.Bot) -> None:

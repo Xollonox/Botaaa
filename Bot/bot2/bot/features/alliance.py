@@ -6,6 +6,7 @@ import uuid
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from bot.utils.alliance_logic import (
@@ -124,23 +125,49 @@ class AllianceInviteView(discord.ui.View):
 # ── Cog ───────────────────────────────────────────────────────────
 
 class AllianceCog(commands.Cog):
-    @commands.group(name="alliance", invoke_without_subcommand=True)
-    async def alliance(self, ctx: commands.Context) -> None:
-        if ctx.invoked_subcommand is None:
-            await ctx.send_help(ctx.command)
+    alliance = app_commands.Group(name="alliance", description="Alliance commands")
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
+    def _gang_choices(self, data: dict[str, Any], current: str) -> list[app_commands.Choice[str]]:
+        gangs = data.get("gangs", {})
+        token = current.lower()
+        out: list[app_commands.Choice[str]] = []
+        for gang in (gangs.values() if isinstance(gangs, dict) else []):
+            if not isinstance(gang, dict):
+                continue
+            name = str(gang.get("name", "")).strip()
+            if not name or (token and token not in name.lower()):
+                continue
+            out.append(app_commands.Choice(name=name[:100], value=name))
+            if len(out) >= 25:
+                break
+        return out
+
+    def _alliance_choices(self, data: dict[str, Any], current: str) -> list[app_commands.Choice[str]]:
+        alliances = data.get("alliances", {})
+        token = current.lower()
+        out: list[app_commands.Choice[str]] = []
+        for a in (alliances.values() if isinstance(alliances, dict) else []):
+            if not isinstance(a, dict):
+                continue
+            name = str(a.get("name", "")).strip()
+            if not name or (token and token not in name.lower()):
+                continue
+            out.append(app_commands.Choice(name=name[:100], value=name))
+            if len(out) >= 25:
+                break
+        return out
 
     # ── /alliance create ──────────────────────────────────────────
 
-    @alliance.command(name="create")
-    async def alliance_create(self, ctx: commands.Context,
+    @alliance.command(name="create", description="Create an alliance (Head only).")
+    async def alliance_create(self, interaction: discord.Interaction,
                                name: str, description: str = "—") -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+        if not await ensure_registered(interaction, self.bot.storage):
             return
-        uid = str(ctx.author.id)
+        uid = str(interaction.user.id)
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             gid, gang = get_user_gang(data, uid)
@@ -177,11 +204,11 @@ class AllianceCog(commands.Cog):
 
         ok, result = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(ctx, embed=_err(f"╭─ ❌ Alliance Create Failed\n│ {result}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"╭─ ❌ Alliance Create Failed\n│ {result}\n╰────────────────"))
             return
         data = self.bot.storage.load()
         gid, gang = get_user_gang(data, uid)
-        await smart_reply(ctx, embed=_ok(
+        await smart_reply(interaction, embed=_ok(
             f"╭─ 🤝 Alliance Created!\n"
             f"│ Name: **{result}**\n"
             f"│ 📝 {description}\n"
@@ -192,9 +219,9 @@ class AllianceCog(commands.Cog):
 
     # ── /alliance info ────────────────────────────────────────────
 
-    @alliance.command(name="info")
-    async def alliance_info(self, ctx: commands.Context, alliance_name: str | None = None) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @alliance.command(name="info", description="Show alliance info.")
+    async def alliance_info(self, interaction: discord.Interaction, alliance_name: str | None = None) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
             return
         data = self.bot.storage.load()
 
@@ -203,14 +230,14 @@ class AllianceCog(commands.Cog):
         if alliance_name:
             aid, alliance = find_alliance_by_name(data, alliance_name)
         else:
-            gid, _ = get_user_gang(data, str(ctx.author.id))
+            gid, _ = get_user_gang(data, str(interaction.user.id))
             if gid:
                 aid = get_gang_alliance_id(data, gid)
                 if aid:
                     alliance = data.get("alliances", {}).get(aid)
 
         if not aid or not isinstance(alliance, dict):
-            await error_reply(ctx, embed=_err("╭─ ❌ Not Found\n│ Alliance not found.\n╰────────────────"))
+            await error_reply(interaction, embed=_err("╭─ ❌ Not Found\n│ Alliance not found.\n╰────────────────"))
             return
 
         gangs     = data.get("gangs", {})
@@ -238,15 +265,15 @@ class AllianceCog(commands.Cog):
             + "\n".join(gang_lines)
             + "\n╰────────────────"
         )
-        await smart_reply(ctx, embed=_inf(body))
+        await smart_reply(interaction, embed=_inf(body))
 
     # ── /alliance invite ──────────────────────────────────────────
 
-    @alliance.command(name="invite")
-    async def alliance_invite(self, ctx: commands.Context, gang_name: str) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @alliance.command(name="invite", description="Invite a gang to your alliance (Head only).")
+    async def alliance_invite(self, interaction: discord.Interaction, gang_name: str) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
             return
-        uid = str(ctx.author.id)
+        uid = str(interaction.user.id)
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str, str | None, str | None, str]:
             my_gid, my_gang = get_user_gang(data, uid)
@@ -289,7 +316,7 @@ class AllianceCog(commands.Cog):
 
         ok, msg, iid, target_head_id, a_name = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(ctx, embed=_err(f"╭─ ❌ Invite Failed\n│ {msg}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"╭─ ❌ Invite Failed\n│ {msg}\n╰────────────────"))
             return
 
         data = self.bot.storage.load()
@@ -308,10 +335,10 @@ class AllianceCog(commands.Cog):
             user = await self.bot.fetch_user(int(target_head_id))
             await user.send(embed=embed, view=view)
         except Exception:
-            if ctx.channel:
-                await ctx.channel.send(content=f"<@{target_head_id}>", embed=embed, view=view)
+            if interaction.channel:
+                await interaction.channel.send(content=f"<@{target_head_id}>", embed=embed, view=view)
 
-        await smart_reply(ctx, embed=_ok(
+        await smart_reply(interaction, embed=_ok(
             f"╭─ 📨 Alliance Invite Sent\n"
             f"│ To: **{gang_name}**\n"
             f"│ Alliance: **{a_name}**\n"
@@ -321,11 +348,11 @@ class AllianceCog(commands.Cog):
 
     # ── /alliance leave ───────────────────────────────────────────
 
-    @alliance.command(name="leave")
-    async def alliance_leave(self, ctx: commands.Context) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @alliance.command(name="leave", description="Leave your alliance (Head only).")
+    async def alliance_leave(self, interaction: discord.Interaction) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
             return
-        uid = str(ctx.author.id)
+        uid = str(interaction.user.id)
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str, str]:
             gid, gang = get_user_gang(data, uid)
@@ -353,14 +380,24 @@ class AllianceCog(commands.Cog):
 
         ok, a_name, gang_name = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(ctx, embed=_err(f"╭─ ❌ Leave Failed\n│ {a_name}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"╭─ ❌ Leave Failed\n│ {a_name}\n╰────────────────"))
             return
-        await smart_reply(ctx, embed=_inf(
+        await smart_reply(interaction, embed=_inf(
             f"╭─ 👋 Left Alliance\n"
             f"│ **{gang_name}** left **{a_name}**\n"
             f"│ ⚠️ Cannot join any alliance for 24h\n"
             "╰────────────────"
         ))
+
+    # ── Autocomplete ──────────────────────────────────────────────
+
+    @alliance_invite.autocomplete("gang_name")
+    async def alliance_invite_ac(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return self._gang_choices(self.bot.storage.load(), current)
+
+    @alliance_info.autocomplete("alliance_name")
+    async def alliance_info_ac(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return self._alliance_choices(self.bot.storage.load(), current)
 
 
 async def setup(bot: commands.Bot) -> None:

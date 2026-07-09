@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import logging
 import os
 import sys
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 # ---------------------------------------------------------------------------
@@ -16,7 +18,7 @@ from discord.ext import commands
 # ---------------------------------------------------------------------------
 sys.path.insert(0, os.path.dirname(__file__))
 
-from bot.config import BOT_TOKEN, DATA_PATH, SQLITE_PATH, assert_runtime_config
+from bot.config import BOT_TOKEN, DATA_PATH, OWNER_GUILD_ID, SQLITE_PATH, assert_runtime_config
 from bot.features.onboarding import TermsGateView, build_terms_embed, has_user_accepted_terms
 from bot.data.storage import Storage
 from bot.data.sqlite_store import SQLiteBattleRepository, SQLiteMarketRepository, SQLiteTradeRepository
@@ -33,6 +35,65 @@ logger = logging.getLogger(__name__)
 # Present after a graceful close(); absent means the previous process
 # died without running the shutdown path.
 CLEAN_SHUTDOWN_MARKER = os.path.join(os.path.dirname(DATA_PATH), ".clean_shutdown")
+
+# Marker file for one-shot global commands clear.
+# Prevents re-running the clear on every restart if HXCC_CLEAR_GLOBAL_COMMANDS_ONCE is left set.
+CLEARED_GLOBAL_COMMANDS_MARKER = os.path.join(DATA_PATH, ".cleared_global_commands")
+
+
+# ---------------------------------------------------------------------------
+# One-shot clear global commands helpers
+# ---------------------------------------------------------------------------
+def _get_env_token(env_value: str) -> str:
+    """Compute a stable hash token for the current env value."""
+    return hashlib.sha256(env_value.encode("utf-8")).hexdigest()[:16]
+
+
+def _should_clear_global_commands() -> bool:
+    """Check if global commands should be cleared based on env and marker file.
+
+    Returns True if:
+    - Env var is set AND marker doesn't exist (first run)
+    - Env var is set AND marker exists but with different token (value changed)
+
+    Returns False if:
+    - Env var not set
+    - Env var is set AND marker exists with matching token (already cleared for this value)
+    """
+    env_value = os.getenv("HXCC_CLEAR_GLOBAL_COMMANDS_ONCE", "").strip()
+
+    if not env_value:
+        return False
+
+    current_token = _get_env_token(env_value)
+
+    # If marker exists, check if token matches
+    if os.path.isfile(CLEARED_GLOBAL_COMMANDS_MARKER):
+        try:
+            with open(CLEARED_GLOBAL_COMMANDS_MARKER, "r", encoding="utf-8") as fh:
+                stored_token = fh.read().strip()
+            if stored_token == current_token:
+                logger.info(
+                    "[BOOT] Global commands already cleared for this env value (token: %s). Skipping.",
+                    current_token
+                )
+                return False
+        except OSError as exc:
+            logger.warning("[BOOT] Could not read global commands marker: %s", exc)
+
+    return True
+
+
+def _write_global_commands_marker(env_value: str) -> None:
+    """Write marker file with a token of the current env value."""
+    try:
+        os.makedirs(DATA_PATH, exist_ok=True)
+        token = _get_env_token(env_value)
+        with open(CLEARED_GLOBAL_COMMANDS_MARKER, "w", encoding="utf-8") as fh:
+            fh.write(token)
+        logger.info("[BOOT] Wrote global commands marker with token: %s", token)
+    except OSError as exc:
+        logger.warning("[BOOT] Could not write global commands marker: %s", exc)
 
 # ---------------------------------------------------------------------------
 # All feature cogs to load
@@ -90,6 +151,7 @@ class LookismBot(commands.Bot):
             intents=intents,
             owner_ids=effective_owner_ids(),
             help_command=None,
+            tree_cls=LookismCommandTree,
         )
         self.storage = Storage(DATA_PATH)
         # In-memory set of user IDs who have accepted terms — avoids a
@@ -177,17 +239,19 @@ class LookismBot(commands.Bot):
         self._write_clean_shutdown_marker()
         await super().close()
 
-    async def _global_terms_gate(self, obj: Any) -> bool:
-        """Check if the user has accepted the Terms of Service.
-
-        Accepts both discord.Interaction and commands.Context.
-        Returns False and sends the terms embed if not accepted.
-        """
-        user = getattr(obj, "user", None) or getattr(obj, "author", None)
-        if user is None:
+    async def _global_terms_gate(self, interaction: discord.Interaction) -> bool:
+        command = getattr(interaction, "command", None)
+        if command is None:
             return True
 
-        user_id = int(user.id)
+        # Autocomplete interactions can only be answered with response type 8
+        # (autocomplete result). Sending an embed/message here raises a 400.
+        # Let autocomplete through; the actual command invocation will still be
+        # gated below.
+        if interaction.type is discord.InteractionType.autocomplete:
+            return True
+
+        user_id = int(interaction.user.id)
         if user_id in self._terms_cache:
             return True
 
@@ -197,28 +261,18 @@ class LookismBot(commands.Bot):
             return True
 
         embed = build_terms_embed()
-        view = TermsGateView(self, user_id)
-
-        # Context path (prefix command)
-        if not hasattr(obj, "response"):
-            try:
-                await obj.author.send(embed=embed, view=view)
-            except discord.HTTPException:
-                pass
-            return False
-
-        # Interaction path (legacy)
+        view = TermsGateView(self, interaction.user.id)
         try:
-            if obj.response.is_done():
-                await obj.followup.send(embed=embed, view=view, ephemeral=True)
+            if interaction.response.is_done():
+                await interaction.followup.send(embed=embed, view=view, ephemeral=True)
             else:
-                await obj.response.send_message(embed=embed, view=view, ephemeral=True)
+                await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
         except discord.NotFound:
             pass
         return False
 
     async def setup_hook(self) -> None:
-        """Load all cogs and bootstrap services."""
+        """Load all cogs and sync slash commands."""
         # Bootstrap SQLite repos from JSON (must run before cogs start handling commands)
         await self.market_service.bootstrap_from_json()
         await self.trade_service.bootstrap_from_json()
@@ -237,6 +291,33 @@ class LookismBot(commands.Bot):
             logger.warning("[BOOT] %d extension(s) failed to load: %s", len(failed), failed)
             raise RuntimeError(f"Failed to load required extension(s): {failed}")
 
+        # Sync slash commands
+        owner_guild = discord.Object(id=OWNER_GUILD_ID)
+
+        # Optional one-time cleanup for stale global command registry.
+        # Set HXCC_CLEAR_GLOBAL_COMMANDS_ONCE=1 to trigger a wipe. On success, a marker file
+        # is written with a token of the env value. Subsequent restarts with the same env value
+        # will skip the wipe (idempotent). If the env value changes, the wipe runs again.
+        if _should_clear_global_commands():
+            env_value = os.getenv("HXCC_CLEAR_GLOBAL_COMMANDS_ONCE", "").strip()
+            self.tree.clear_commands(guild=None)
+            await self.tree.sync()
+            _write_global_commands_marker(env_value)
+            logger.info("[BOOT] Cleared and synced empty global command registry.")
+
+        # Per-guild dev sync removed: GUILD_IDS was always None (global sync only).
+
+        # Sync owner-guild-only commands (o_ commands registered via @app_commands.guilds(OWNER_GUILD)).
+        # Do NOT use copy_global_to here — that would push all 100+ global commands into the guild.
+        await self.tree.sync(guild=owner_guild)
+        logger.info("[BOOT] Synced owner-guild commands to guild %s", OWNER_GUILD_ID)
+
+        # Sync global public command registry (excludes o_ commands, which are guild-scoped).
+        await self.tree.sync()
+        logger.info("[BOOT] Synced commands globally.")
+
+        self._log_registered_slash_commands()
+
         # Unlock any cards left trade_locked from a crash
         await self._unlock_stale_trades()
 
@@ -251,43 +332,93 @@ class LookismBot(commands.Bot):
                 summary.get("affected_users", 0),
             )
 
-    async def bot_check(self, ctx: commands.Context) -> bool:
-        """Global check that runs before every prefix command.
+    def _log_registered_slash_commands(self) -> None:
+        commands_list = self.tree.get_commands()
+        logger.info("=== REGISTERED SLASH COMMANDS ===")
+        total = 0
 
-        Enforces terms-of-service acceptance and channel locking.
-        """
-        if not await self._global_terms_gate(ctx):
+        def walk(cmd: object, parent: str = "") -> None:
+            nonlocal total
+            name = getattr(cmd, "name", "")
+            if not name:
+                return
+            line = f"{parent} {name}" if parent else f"/{name}"
+            logger.info(line)
+            total += 1
+            children = getattr(cmd, "commands", None)
+            if children:
+                for sub in children:
+                    walk(sub, line)
+
+        for command in commands_list:
+            walk(command)
+        logger.info("=== TOTAL COMMANDS: %d ===", total)
+
+    async def on_ready(self) -> None:
+        logger.info("[READY] Logged in as %s (ID: %s)", self.user, self.user.id if self.user else "?")
+        activity = discord.Activity(type=discord.ActivityType.watching, name="Lookism | /help")
+        await self.change_presence(status=discord.Status.online, activity=activity)
+
+    async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
+        logger.warning("[CMD_ERROR] %s: %s", ctx.command, error)
+
+
+class LookismCommandTree(app_commands.CommandTree["LookismBot"]):
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if not isinstance(self.client, LookismBot):
+            return True
+        if not await self.client._global_terms_gate(interaction):
             return False
+
+        if interaction.type is discord.InteractionType.autocomplete:
+            return True
 
         from bot.utils.server_rules import check_single_mode_allowed, is_admin
         from bot.utils.ui import e, make_embed
 
-        command_name = str(ctx.command.name) if ctx.command else ""
+        command = getattr(interaction, "command", None)
+        command_name = str(getattr(command, "name", "") or "")
         if command_name.startswith(("o_", "server_")) or command_name in {"help", "start"}:
             return True
-        if is_admin(ctx):
+        if is_admin(interaction):
             return True
 
-        allowed, _mode, locked_channel_id = check_single_mode_allowed(ctx)
+        allowed, _mode, locked_channel_id = check_single_mode_allowed(interaction)
         if allowed:
             return True
 
-        data = self.storage.load_readonly()
+        # Read-only fast path: only passed to make_embed/e which read only.
+        data = self.client.storage.load_readonly()
         embed = make_embed(
             data,
             f"{e('warning', data)} Wrong Channel",
             f"Use <#{locked_channel_id}> for bot commands.",
         )
-        await ctx.send(embed=embed)
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send(embed=embed, ephemeral=True)
+            else:
+                await interaction.response.send_message(embed=embed, ephemeral=True)
+        except discord.HTTPException:
+            pass
         return False
 
-    async def on_ready(self) -> None:
-        logger.info("[READY] Logged in as %s (ID: %s)", self.user, self.user.id if self.user else "?")
-        activity = discord.Activity(type=discord.ActivityType.watching, name="Lookism | !help")
-        await self.change_presence(status=discord.Status.online, activity=activity)
-
-    async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
-        logger.warning("[CMD_ERROR] %s: %s", ctx.command, error)
+    async def on_error(
+        self,
+        interaction: discord.Interaction,
+        error: app_commands.AppCommandError,
+    ) -> None:
+        if isinstance(error, app_commands.CommandOnCooldown):
+            msg = f"⏳ Command on cooldown. Try again in **{error.retry_after:.0f}s**."
+            try:
+                if interaction.response.is_done():
+                    await interaction.followup.send(msg, ephemeral=True)
+                else:
+                    await interaction.response.send_message(msg, ephemeral=True)
+            except discord.HTTPException:
+                pass
+            return
+        await super().on_error(interaction, error)
 
 
 # ---------------------------------------------------------------------------

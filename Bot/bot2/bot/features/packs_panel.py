@@ -7,6 +7,7 @@ import logging
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from bot.utils.checks import ensure_registered
@@ -637,17 +638,19 @@ class PacksPanelCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @commands.command(name="packs")
-    async def packs(self, ctx: commands.Context) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @app_commands.command(name="packs", description="Open your pack inventory.")
+    async def packs(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
+        if not await ensure_registered(interaction, self.bot.storage):
             return
         data   = self.bot.storage.load()
-        uid    = str(ctx.author.id)
+        uid    = str(interaction.user.id)
         player = get_player(data, uid)
         inv    = _get_player_pack_inventory(player) if player else []
-        panel  = PacksPanel(self, ctx.author.id)
+        panel  = PacksPanel(self, interaction.user.id)
         embed  = _panel_embed(uid, 0, inv, player)
-        panel.message = await ctx.send(embed=embed, view=panel)
+        await interaction.followup.send(embed=embed, view=panel)
+        panel.message = await interaction.original_response()
 
 
 async def setup(bot: commands.Bot) -> None:

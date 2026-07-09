@@ -5,11 +5,15 @@ from __future__ import annotations
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
+from bot.config import OWNER_GUILD_ID
+
 from bot.utils.checks import is_owner, is_registered
 from bot.utils.ui import e, make_embed
 from bot.utils.interaction_visibility import smart_reply
 
+OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
 
 class ModerationOwnerCog(commands.Cog):
@@ -18,16 +22,17 @@ class ModerationOwnerCog(commands.Cog):
 
     # ─── Ban ────────────────────────────────────────────────────────────────
 
-    @commands.command(name="o_ban")
+    @app_commands.command(name="o_ban", description="Owner: ban a user from using the bot (game level).")
+    @app_commands.guilds(OWNER_GUILD)
     async def o_ban(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         target: discord.User,
         reason: str = "No reason provided.",
     ) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=make_embed(data, f"{e('no', data)} Access Denied", "This command is restricted to bot owners only."), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Access Denied", "This command is restricted to bot owners only."), ephemeral=True)
             return
 
         target_id = str(target.id)
@@ -45,7 +50,7 @@ class ModerationOwnerCog(commands.Cog):
 
         if not ok:
             await smart_reply(
-                ctx,
+                interaction,
                 embed=make_embed(data, f"{e('warning', data)} User Not Registered", f"{target.mention} is not registered in the bot."),
                 ephemeral=True,
             )
@@ -67,19 +72,20 @@ class ModerationOwnerCog(commands.Cog):
             ],
         )
         embed.set_footer(text="Admin Control")
-        await smart_reply(ctx, embed=embed, ephemeral=True)
+        await smart_reply(interaction, embed=embed, ephemeral=True)
 
     # ─── Unban ──────────────────────────────────────────────────────────────
 
-    @commands.command(name="o_unban")
+    @app_commands.command(name="o_unban", description="Owner: unban a user from the bot.")
+    @app_commands.guilds(OWNER_GUILD)
     async def o_unban(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         target: discord.User,
     ) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=make_embed(data, f"{e('no', data)} Access Denied", "This command is restricted to bot owners only."), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Access Denied", "This command is restricted to bot owners only."), ephemeral=True)
             return
 
         target_id = str(target.id)
@@ -98,7 +104,7 @@ class ModerationOwnerCog(commands.Cog):
 
         if not ok:
             await smart_reply(
-                ctx,
+                interaction,
                 embed=make_embed(data, f"{e('warning', data)} User Not Registered", f"{target.mention} is not registered in the bot."),
                 ephemeral=True,
             )
@@ -115,20 +121,21 @@ class ModerationOwnerCog(commands.Cog):
             ],
         )
         embed.set_footer(text="Admin Control")
-        await smart_reply(ctx, embed=embed, ephemeral=True)
+        await smart_reply(interaction, embed=embed, ephemeral=True)
 
     # ─── Mute ───────────────────────────────────────────────────────────────
 
-    @commands.command(name="o_mute")
+    @app_commands.command(name="o_mute", description="Owner: mute a user (restrict bot interactions at game level).")
+    @app_commands.guilds(OWNER_GUILD)
     async def o_mute(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         target: discord.User,
         reason: str = "No reason provided.",
     ) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=make_embed(data, f"{e('no', data)} Access Denied", "This command is restricted to bot owners only."), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Access Denied", "This command is restricted to bot owners only."), ephemeral=True)
             return
 
         target_id = str(target.id)
@@ -146,7 +153,7 @@ class ModerationOwnerCog(commands.Cog):
 
         if not ok:
             await smart_reply(
-                ctx,
+                interaction,
                 embed=make_embed(data, f"{e('warning', data)} User Not Registered", f"{target.mention} is not registered in the bot."),
                 ephemeral=True,
             )
@@ -162,19 +169,20 @@ class ModerationOwnerCog(commands.Cog):
             ],
         )
         embed.set_footer(text="Admin Control")
-        await smart_reply(ctx, embed=embed, ephemeral=True)
+        await smart_reply(interaction, embed=embed, ephemeral=True)
 
     # ─── Unmute ─────────────────────────────────────────────────────────────
 
-    @commands.command(name="o_unmute")
+    @app_commands.command(name="o_unmute", description="Owner: unmute a user.")
+    @app_commands.guilds(OWNER_GUILD)
     async def o_unmute(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         target: discord.User,
     ) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=make_embed(data, f"{e('no', data)} Access Denied", "This command is restricted to bot owners only."), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Access Denied", "This command is restricted to bot owners only."), ephemeral=True)
             return
 
         target_id = str(target.id)
@@ -193,7 +201,7 @@ class ModerationOwnerCog(commands.Cog):
 
         if not ok:
             await smart_reply(
-                ctx,
+                interaction,
                 embed=make_embed(data, f"{e('warning', data)} User Not Registered", f"{target.mention} is not registered in the bot."),
                 ephemeral=True,
             )
@@ -210,7 +218,7 @@ class ModerationOwnerCog(commands.Cog):
             ],
         )
         embed.set_footer(text="Admin Control")
-        await smart_reply(ctx, embed=embed, ephemeral=True)
+        await smart_reply(interaction, embed=embed, ephemeral=True)
 
 
 async def setup(bot: commands.Bot) -> None:

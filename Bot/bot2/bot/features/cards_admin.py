@@ -6,10 +6,15 @@ from copy import deepcopy
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
+
+from bot.config import OWNER_GUILD_ID
 from bot.utils.attacks_logic import (
     CATALOG_ATTACK_TYPES,
+    OWNER_DEFENSE_TYPES,
     add_attack_to_catalog,
+    assigned_cards_for_attack,
     assign_attack_to_card,
     card_attack_keys,
     create_attack_entry,
@@ -28,8 +33,10 @@ from bot.utils.cards_logic import (
     mastery_list_from_flags,
     normalize_mastery_list,
 )
+from bot.utils.checks import is_owner
 from bot.utils.ui import make_embed
 from bot.utils.typing_matchup import TYPES as TYPING_TYPES, normalize_typing as _norm_typing_list, parse_typing_input
+OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
 
 RARITY_CHOICES = ["Common", "Rare", "Epic", "Legendary", "Mythical", "Infernal", "Abyssal"]
@@ -773,27 +780,77 @@ class CardEditorPanel(discord.ui.View):
 
 
 class CardsAdminCog(commands.Cog):
+    o = app_commands.Group(name="o", description="Owner card and attack admin commands.", guild_ids=[OWNER_GUILD_ID])
+
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @commands.group(name="o", invoke_without_subcommand=True)
-    @commands.is_owner()
-    async def o(self, ctx: commands.Context) -> None:
-        if ctx.invoked_subcommand is None:
-            await ctx.send_help(ctx.command)
+    async def _card_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        data = self.bot.storage.load()
+        cards = data.get("cards", {})
+        if not isinstance(cards, dict):
+            return []
+        text = current.strip().lower()
+        out: list[app_commands.Choice[str]] = []
+        for key, card in sorted(cards.items(), key=lambda pair: str(pair[0]).lower()):
+            if not isinstance(card, dict):
+                continue
+            name = str(card.get("name", key))
+            if text and text not in key.lower() and text not in name.lower():
+                continue
+            rarity = str(card.get("rarity", ""))
+            label = f"{name} • {rarity}" if rarity else name
+            out.append(app_commands.Choice(name=label[:100], value=str(key)))
+            if len(out) >= 25:
+                break
+        return out
 
-    @o.command(name="add_card")
-    async def o_add_card(
+    async def _attack_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        data = self.bot.storage.load()
+        ensure_attacks_structure(data)
+        catalog = data["attacks"]["catalog"]
+        text = current.strip().lower()
+        out: list[app_commands.Choice[str]] = []
+        for key, entry in list_attacks(data):
+            name = str(entry.get("name", key))
+            if text and text not in key.lower() and text not in name.lower():
+                continue
+            out.append(app_commands.Choice(name=f"{name} • {entry.get('type', '')}"[:100], value=key))
+            if len(out) >= 25:
+                break
+        return out
+
+    async def _assigned_attack_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        data = self.bot.storage.load()
+        card_name = str(getattr(interaction.namespace, "card_name", ""))
+        keys = card_attack_keys(data, card_name)
+        catalog = data.get("attacks", {}).get("catalog", {}) if isinstance(data.get("attacks", {}), dict) else {}
+        text = current.strip().lower()
+        out: list[app_commands.Choice[str]] = []
+        for key in keys:
+            entry = catalog.get(key, {}) if isinstance(catalog, dict) else {}
+            name = str(entry.get("name", key)) if isinstance(entry, dict) else str(key)
+            if text and text not in key.lower() and text not in name.lower():
+                continue
+            typ = str(entry.get("type", "")) if isinstance(entry, dict) else ""
+            out.append(app_commands.Choice(name=f"{name} • {typ}"[:100], value=str(key)))
+            if len(out) >= 25:
+                break
+        return out
+
+    @o.command(name="add_card", description="Owner: create a fighter card from fields.")
+    @app_commands.choices(rarity=[app_commands.Choice(name=r, value=r) for r in RARITY_CHOICES])
+    async def add_card(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         name: str,
-        rarity: str,
-        strength: int,
-        speed: int,
-        endurance: int,
-        technique: int,
-        iq: int,
-        biq: int,
+        rarity: app_commands.Choice[str],
+        strength: app_commands.Range[int, 0, None],
+        speed: app_commands.Range[int, 0, None],
+        endurance: app_commands.Range[int, 0, None],
+        technique: app_commands.Range[int, 0, None],
+        iq: app_commands.Range[int, 0, None],
+        biq: app_commands.Range[int, 0, None],
         title: str | None = None,
         description: str | None = None,
         image_url: str | None = None,
@@ -810,11 +867,14 @@ class CardsAdminCog(commands.Cog):
         special_stat: str | None = None,
         keystone_name: str | None = None,
     ) -> None:
+        if not is_owner(interaction):
+            await interaction.response.send_message("Owner only command.", ephemeral=True)
+            return
         card = build_card_def(
             name=name,
             title=title or "",
             description=description or "",
-            rarity=rarity,
+            rarity=rarity.value,
             strength=int(strength),
             speed=int(speed),
             endurance=int(endurance),
@@ -843,23 +903,24 @@ class CardsAdminCog(commands.Cog):
 
         ok, msg = self.bot.storage.with_lock(mutate)
         if not ok:
-            await ctx.send(msg)
+            await interaction.response.send_message(msg, ephemeral=True)
             return
-        await ctx.send(f"Created card **{msg}**.")
+        await interaction.response.send_message(f"Created card **{msg}**.", ephemeral=True)
 
-    @o.command(name="edit_card")
-    async def o_edit_card(
+    @o.command(name="edit_card", description="Owner: edit provided fields on a fighter card.")
+    @app_commands.choices(rarity=[app_commands.Choice(name=r, value=r) for r in RARITY_CHOICES])
+    async def edit_card(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         card_name: str,
         name: str | None = None,
-        rarity: str | None = None,
-        strength: int | None = None,
-        speed: int | None = None,
-        endurance: int | None = None,
-        technique: int | None = None,
-        iq: int | None = None,
-        biq: int | None = None,
+        rarity: app_commands.Choice[str] | None = None,
+        strength: app_commands.Range[int, 0, None] | None = None,
+        speed: app_commands.Range[int, 0, None] | None = None,
+        endurance: app_commands.Range[int, 0, None] | None = None,
+        technique: app_commands.Range[int, 0, None] | None = None,
+        iq: app_commands.Range[int, 0, None] | None = None,
+        biq: app_commands.Range[int, 0, None] | None = None,
         title: str | None = None,
         description: str | None = None,
         image_url: str | None = None,
@@ -876,6 +937,9 @@ class CardsAdminCog(commands.Cog):
         special_stat: str | None = None,
         keystone_name: str | None = None,
     ) -> None:
+        if not is_owner(interaction):
+            await interaction.response.send_message("Owner only command.", ephemeral=True)
+            return
         data = self.bot.storage.load()
         cards = data.get("cards", {}) if isinstance(data.get("cards", {}), dict) else {}
         key = find_catalog_key(cards, card_name)
@@ -904,7 +968,7 @@ class CardsAdminCog(commands.Cog):
             "title": title,
             "description": description,
             "image_url": image_url,
-            "rarity": rarity,
+            "rarity": rarity.value if rarity is not None else None,
             "unique_path": unique_path,
             "unique_path_description": unique_path_description,
             "unique_skill": unique_skill,
@@ -929,19 +993,27 @@ class CardsAdminCog(commands.Cog):
 
         ok, msg = self.bot.storage.with_lock(mutate)
         if not ok:
-            await ctx.send(msg)
+            await interaction.response.send_message(msg, ephemeral=True)
             return
-        await ctx.send(f"Updated card **{msg}**.")
+        await interaction.response.send_message(f"Updated card **{msg}**.", ephemeral=True)
 
-    @o.command(name="add_keystone")
-    async def o_add_keystone(
+    @edit_card.autocomplete("card_name")
+    async def edit_card_name_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return await self._card_autocomplete(interaction, current)
+
+    @o.command(name="add_keystone", description="Owner: create a keystone for a specific character.")
+    async def add_keystone(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         name: str,
         character: str,
         effect: str,
         active: bool = True,
     ) -> None:
+        if not is_owner(interaction):
+            await interaction.response.send_message("Owner only command.", ephemeral=True)
+            return
+
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             keystones = data.setdefault("keystones", {})
             key = str(name).strip().lower()
@@ -960,16 +1032,21 @@ class CardsAdminCog(commands.Cog):
 
         ok, msg = self.bot.storage.with_lock(mutate)
         if not ok:
-            await ctx.send(msg)
+            await interaction.response.send_message(msg, ephemeral=True)
             return
-        await ctx.send(f"Created keystone **{msg}**.")
+        await interaction.response.send_message(f"Created keystone **{msg}**.", ephemeral=True)
 
-    @o.command(name="add_weapon")
-    async def o_add_weapon(
+    @add_keystone.autocomplete("character")
+    async def add_keystone_char_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return await self._card_autocomplete(interaction, current)
+
+    @o.command(name="add_weapon", description="Owner: create a weapon for weapon-user cards.")
+    @app_commands.choices(rarity=[app_commands.Choice(name=r, value=r) for r in RARITY_CHOICES])
+    async def add_weapon(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         name: str,
-        rarity: str,
+        rarity: app_commands.Choice[str],
         compatible_cards: str,
         effect: str,
         effect_active: bool = True,
@@ -982,9 +1059,13 @@ class CardsAdminCog(commands.Cog):
         stat_iq: int = 0,
         stat_biq: int = 0,
     ) -> None:
+        if not is_owner(interaction):
+            await interaction.response.send_message("Owner only command.", ephemeral=True)
+            return
+
         cards_list = [c.strip() for c in compatible_cards.split(",") if c.strip()]
         if not cards_list:
-            await ctx.send("compatible_cards must list at least one card name.")
+            await interaction.response.send_message("compatible_cards must list at least one card name.", ephemeral=True)
             return
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
@@ -994,7 +1075,7 @@ class CardsAdminCog(commands.Cog):
                 return False, "A weapon with that name already exists."
             weapons[key] = {
                 "name": str(name).strip(),
-                "rarity": rarity,
+                "rarity": rarity.value,
                 "image_url": str(image_url).strip() if image_url else "",
                 "emoji": str(emoji).strip() if emoji else "",
                 "compatible_cards": cards_list,
@@ -1013,56 +1094,72 @@ class CardsAdminCog(commands.Cog):
 
         ok, msg = self.bot.storage.with_lock(mutate)
         if not ok:
-            await ctx.send(msg)
+            await interaction.response.send_message(msg, ephemeral=True)
             return
-        await ctx.send(f"Created weapon **{msg}**.")
+        await interaction.response.send_message(f"Created weapon **{msg}**.", ephemeral=True)
 
-    @o.command(name="delete_card")
-    async def o_delete_card(self, ctx: commands.Context, card_name: str, confirm: str) -> None:
+    @o.command(name="delete_card", description="Owner: delete a fighter card. Confirmation must be DELETE.")
+    async def delete_card(self, interaction: discord.Interaction, card_name: str, confirm: str) -> None:
+        if not is_owner(interaction):
+            await interaction.response.send_message("Owner only command.", ephemeral=True)
+            return
+
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             return delete_card_def(data, card_name, confirm)
 
         ok, msg = self.bot.storage.with_lock(mutate)
         if not ok:
-            await ctx.send(msg)
+            await interaction.response.send_message(msg, ephemeral=True)
             return
-        await ctx.send(f"Deleted card **{msg}**.")
+        await interaction.response.send_message(f"Deleted card **{msg}**.", ephemeral=True)
 
-    @o.command(name="add_attack")
-    async def o_add_attack(
+    @delete_card.autocomplete("card_name")
+    async def delete_card_name_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return await self._card_autocomplete(interaction, current)
+
+    @o.command(name="add_attack", description="Owner: add an attack or defense to the catalog.")
+    @app_commands.choices(type=[app_commands.Choice(name=t, value=t) for t in CATALOG_ATTACK_TYPES])
+    async def add_attack(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         name: str,
-        type: str,
-        power: int,
+        type: app_commands.Choice[str],
+        power: app_commands.Range[int, 0, None],
         description: str,
-        uses_per_battle: int | None = None,
+        uses_per_battle: app_commands.Range[int, -1, 99] | None = None,
     ) -> None:
-        entry = create_attack_entry(name, type, int(power), description, uses_per_battle)
+        if not is_owner(interaction):
+            await interaction.response.send_message("Owner only command.", ephemeral=True)
+            return
+        entry = create_attack_entry(name, type.value, int(power), description, uses_per_battle)
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             return add_attack_to_catalog(data, entry)
 
         ok, msg = self.bot.storage.with_lock(mutate)
         if not ok:
-            await ctx.send(msg)
+            await interaction.response.send_message(msg, ephemeral=True)
             return
-        await ctx.send(f"Created attack **{entry['name']}** (`{msg}`).")
+        await interaction.response.send_message(f"Created attack **{entry['name']}** (`{msg}`).", ephemeral=True)
 
-    @o.command(name="edit_attack")
-    async def o_edit_attack(
+    @o.command(name="edit_attack", description="Owner: edit provided fields on a catalog attack.")
+    @app_commands.choices(type=[app_commands.Choice(name=t, value=t) for t in CATALOG_ATTACK_TYPES])
+    async def edit_attack(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         attack_name: str,
         name: str | None = None,
-        type: str | None = None,
-        power: int | None = None,
+        type: app_commands.Choice[str] | None = None,
+        power: app_commands.Range[int, 0, None] | None = None,
         description: str | None = None,
-        uses_per_battle: int | None = None,
+        uses_per_battle: app_commands.Range[int, -1, 99] | None = None,
     ) -> None:
+        if not is_owner(interaction):
+            await interaction.response.send_message("Owner only command.", ephemeral=True)
+            return
         updates = {
             "name": name,
-            "type": type,
+            "type": type.value if type is not None else None,
             "power": power,
             "description": description,
             "uses_per_battle": uses_per_battle,
@@ -1073,12 +1170,20 @@ class CardsAdminCog(commands.Cog):
 
         ok, msg = self.bot.storage.with_lock(mutate)
         if not ok:
-            await ctx.send(msg)
+            await interaction.response.send_message(msg, ephemeral=True)
             return
-        await ctx.send(f"Updated attack `{msg}`.")
+        await interaction.response.send_message(f"Updated attack `{msg}`.", ephemeral=True)
 
-    @o.command(name="delete_attack")
-    async def o_delete_attack(self, ctx: commands.Context, attack_name: str) -> None:
+    @edit_attack.autocomplete("attack_name")
+    async def edit_attack_name_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return await self._attack_autocomplete(interaction, current)
+
+    @o.command(name="delete_attack", description="Owner: delete an attack and remove it from all cards.")
+    async def delete_attack(self, interaction: discord.Interaction, attack_name: str) -> None:
+        if not is_owner(interaction):
+            await interaction.response.send_message("Owner only command.", ephemeral=True)
+            return
+
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             ensure_attacks_structure(data)
             catalog = data["attacks"]["catalog"]
@@ -1091,53 +1196,87 @@ class CardsAdminCog(commands.Cog):
 
         ok, msg = self.bot.storage.with_lock(mutate)
         if not ok:
-            await ctx.send(msg)
+            await interaction.response.send_message(msg, ephemeral=True)
             return
-        await ctx.send(msg)
+        await interaction.response.send_message(msg, ephemeral=True)
 
-    @o.command(name="list_attacks")
-    async def o_list_attacks(self, ctx: commands.Context) -> None:
+    @delete_attack.autocomplete("attack_name")
+    async def delete_attack_name_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return await self._attack_autocomplete(interaction, current)
+
+    @o.command(name="list_attacks", description="Owner: list catalog attacks.")
+    async def list_attacks(self, interaction: discord.Interaction) -> None:
+        if not is_owner(interaction):
+            await interaction.response.send_message("Owner only command.", ephemeral=True)
+            return
         data = self.bot.storage.load()
         rows = list_attacks(data)
         if not rows:
-            await ctx.send("Attack catalog is empty.")
+            await interaction.response.send_message("Attack catalog is empty.", ephemeral=True)
             return
         lines: list[str] = []
         for key, entry in rows[:40]:
             uses = int(entry.get("uses_per_battle", -1))
             uses_text = "∞" if uses == -1 else str(uses)
             lines.append(f"`{key}` • {entry.get('name', key)} • {entry.get('type', '')} • P:{entry.get('power', 0)} • U:{uses_text}")
-        await ctx.send("\n".join(lines))
+        await interaction.response.send_message("\n".join(lines), ephemeral=True)
 
-    @o.command(name="assign_attack")
-    async def o_assign_attack(self, ctx: commands.Context, card_name: str, attack_name: str) -> None:
+    @o.command(name="assign_attack", description="Owner: assign a catalog attack to a card.")
+    async def assign_attack(self, interaction: discord.Interaction, card_name: str, attack_name: str) -> None:
+        if not is_owner(interaction):
+            await interaction.response.send_message("Owner only command.", ephemeral=True)
+            return
+
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             return assign_attack_to_card(data, card_name, attack_name)
 
         ok, msg = self.bot.storage.with_lock(mutate)
         if not ok:
-            await ctx.send(msg)
+            await interaction.response.send_message(msg, ephemeral=True)
             return
-        await ctx.send(msg)
+        await interaction.response.send_message(msg, ephemeral=True)
 
-    @o.command(name="remove_attack")
-    async def o_remove_attack(self, ctx: commands.Context, card_name: str, attack_name: str) -> None:
+    @assign_attack.autocomplete("card_name")
+    async def assign_card_name_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return await self._card_autocomplete(interaction, current)
+
+    @assign_attack.autocomplete("attack_name")
+    async def assign_attack_name_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return await self._attack_autocomplete(interaction, current)
+
+    @o.command(name="remove_attack", description="Owner: remove an assigned attack from a card.")
+    async def remove_attack(self, interaction: discord.Interaction, card_name: str, attack_name: str) -> None:
+        if not is_owner(interaction):
+            await interaction.response.send_message("Owner only command.", ephemeral=True)
+            return
+
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             return remove_attack_from_card(data, card_name, attack_name)
 
         ok, msg = self.bot.storage.with_lock(mutate)
         if not ok:
-            await ctx.send(msg)
+            await interaction.response.send_message(msg, ephemeral=True)
             return
-        await ctx.send(msg)
+        await interaction.response.send_message(msg, ephemeral=True)
 
-    @o.command(name="view_card_attacks")
-    async def o_view_card_attacks(self, ctx: commands.Context, card_name: str) -> None:
+    @remove_attack.autocomplete("card_name")
+    async def remove_card_name_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return await self._card_autocomplete(interaction, current)
+
+    @remove_attack.autocomplete("attack_name")
+    async def remove_attack_name_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return await self._assigned_attack_autocomplete(interaction, current)
+
+    @o.command(name="view_card_attacks", description="Owner: view attacks assigned to a card.")
+    async def view_card_attacks(self, interaction: discord.Interaction, card_name: str) -> None:
+        if not is_owner(interaction):
+            await interaction.response.send_message("Owner only command.", ephemeral=True)
+            return
         data = self.bot.storage.load()
         keys = card_attack_keys(data, card_name)
         catalog = data.get("attacks", {}).get("catalog", {}) if isinstance(data.get("attacks", {}), dict) else {}
         if not keys:
-            await ctx.send("No attacks assigned.")
+            await interaction.response.send_message("No attacks assigned.", ephemeral=True)
             return
         grouped: dict[str, list[str]] = {}
         for key in keys:
@@ -1153,7 +1292,11 @@ class CardsAdminCog(commands.Cog):
                 continue
             lines.append(f"**{typ}**")
             lines.extend(grouped[typ])
-        await ctx.send("\n".join(lines))
+        await interaction.response.send_message("\n".join(lines), ephemeral=True)
+
+    @view_card_attacks.autocomplete("card_name")
+    async def view_card_attacks_name_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return await self._card_autocomplete(interaction, current)
 
 
 async def setup(bot: commands.Bot) -> None:

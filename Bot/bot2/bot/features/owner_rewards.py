@@ -5,12 +5,16 @@ from __future__ import annotations
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
+from bot.config import OWNER_GUILD_ID
+
 from bot.utils.checks import is_owner
 from bot.utils.reward_logic import build_rates, format_rates_block, validate_rates
 from bot.utils.ui import box, e, make_embed
 from bot.utils.interaction_visibility import smart_reply
 
+OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
 
 class OwnerRewardsCog(commands.Cog):
@@ -19,7 +23,7 @@ class OwnerRewardsCog(commands.Cog):
 
     async def _set_reward(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         reward_type: str,
         amount: int,
         bonus_enabled: bool,
@@ -32,9 +36,9 @@ class OwnerRewardsCog(commands.Cog):
         rates_abyssal: int,
     ) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
+        if not is_owner(interaction):
             embed = make_embed(data, f"{e('no', data)} Owner Only", "You are not allowed to use this command.")
-            await smart_reply(ctx, embed=embed, ephemeral=True)
+            await smart_reply(interaction, embed=embed, ephemeral=True)
             return
 
         rates = build_rates(
@@ -56,7 +60,7 @@ class OwnerRewardsCog(commands.Cog):
                     message,
                     fields=[(f"{e('info', data)} Provided Rates", format_rates_block(rates), False)],
                 )
-                await smart_reply(ctx, embed=error_embed, ephemeral=True)
+                await smart_reply(interaction, embed=error_embed, ephemeral=True)
                 return
 
         def mutate(state: dict[str, Any]) -> tuple[int, dict[str, Any]]:
@@ -85,24 +89,25 @@ class OwnerRewardsCog(commands.Cog):
                 (f"{e('info', updated_data)} Rarity Rates", format_rates_block(rates), False),
             ],
         )
-        await smart_reply(ctx, embed=embed, ephemeral=True)
+        await smart_reply(interaction, embed=embed, ephemeral=True)
 
-    @commands.command(name="o_set_hourly")
+    @app_commands.command(name="o_set_hourly", description="Owner: set hourly reward coins and card bonus rates.")
+    @app_commands.guilds(OWNER_GUILD)
     async def o_set_hourly(
         self,
-        ctx: commands.Context,
-        amount: int,
+        interaction: discord.Interaction,
+        amount: app_commands.Range[int, 1, None],
         bonus_enabled: bool = False,
-        rates_common: int = 100,
-        rates_rare: int = 0,
-        rates_epic: int = 0,
-        rates_legendary: int = 0,
-        rates_mythical: int = 0,
-        rates_infernal: int = 0,
-        rates_abyssal: int = 0,
+        rates_common: app_commands.Range[int, 0, None] = 100,
+        rates_rare: app_commands.Range[int, 0, None] = 0,
+        rates_epic: app_commands.Range[int, 0, None] = 0,
+        rates_legendary: app_commands.Range[int, 0, None] = 0,
+        rates_mythical: app_commands.Range[int, 0, None] = 0,
+        rates_infernal: app_commands.Range[int, 0, None] = 0,
+        rates_abyssal: app_commands.Range[int, 0, None] = 0,
     ) -> None:
         await self._set_reward(
-            ctx,
+            interaction,
             "hourly",
             amount,
             bonus_enabled,
@@ -115,22 +120,23 @@ class OwnerRewardsCog(commands.Cog):
             rates_abyssal,
         )
 
-    @commands.command(name="o_set_daily")
+    @app_commands.command(name="o_set_daily", description="Owner: set daily reward coins and card bonus rates.")
+    @app_commands.guilds(OWNER_GUILD)
     async def o_set_daily(
         self,
-        ctx: commands.Context,
-        amount: int,
+        interaction: discord.Interaction,
+        amount: app_commands.Range[int, 1, None],
         bonus_enabled: bool = False,
-        rates_common: int = 100,
-        rates_rare: int = 0,
-        rates_epic: int = 0,
-        rates_legendary: int = 0,
-        rates_mythical: int = 0,
-        rates_infernal: int = 0,
-        rates_abyssal: int = 0,
+        rates_common: app_commands.Range[int, 0, None] = 100,
+        rates_rare: app_commands.Range[int, 0, None] = 0,
+        rates_epic: app_commands.Range[int, 0, None] = 0,
+        rates_legendary: app_commands.Range[int, 0, None] = 0,
+        rates_mythical: app_commands.Range[int, 0, None] = 0,
+        rates_infernal: app_commands.Range[int, 0, None] = 0,
+        rates_abyssal: app_commands.Range[int, 0, None] = 0,
     ) -> None:
         await self._set_reward(
-            ctx,
+            interaction,
             "daily",
             amount,
             bonus_enabled,
@@ -143,22 +149,23 @@ class OwnerRewardsCog(commands.Cog):
             rates_abyssal,
         )
 
-    @commands.command(name="o_set_weekly")
+    @app_commands.command(name="o_set_weekly", description="Owner: set weekly reward coins and card bonus rates.")
+    @app_commands.guilds(OWNER_GUILD)
     async def o_set_weekly(
         self,
-        ctx: commands.Context,
-        amount: int,
+        interaction: discord.Interaction,
+        amount: app_commands.Range[int, 1, None],
         bonus_enabled: bool = False,
-        rates_common: int = 100,
-        rates_rare: int = 0,
-        rates_epic: int = 0,
-        rates_legendary: int = 0,
-        rates_mythical: int = 0,
-        rates_infernal: int = 0,
-        rates_abyssal: int = 0,
+        rates_common: app_commands.Range[int, 0, None] = 100,
+        rates_rare: app_commands.Range[int, 0, None] = 0,
+        rates_epic: app_commands.Range[int, 0, None] = 0,
+        rates_legendary: app_commands.Range[int, 0, None] = 0,
+        rates_mythical: app_commands.Range[int, 0, None] = 0,
+        rates_infernal: app_commands.Range[int, 0, None] = 0,
+        rates_abyssal: app_commands.Range[int, 0, None] = 0,
     ) -> None:
         await self._set_reward(
-            ctx,
+            interaction,
             "weekly",
             amount,
             bonus_enabled,
@@ -171,22 +178,23 @@ class OwnerRewardsCog(commands.Cog):
             rates_abyssal,
         )
 
-    @commands.command(name="o_set_monthly")
+    @app_commands.command(name="o_set_monthly", description="Owner: set monthly reward coins and card bonus rates.")
+    @app_commands.guilds(OWNER_GUILD)
     async def o_set_monthly(
         self,
-        ctx: commands.Context,
-        amount: int,
+        interaction: discord.Interaction,
+        amount: app_commands.Range[int, 1, None],
         bonus_enabled: bool = True,
-        rates_common: int = 50,
-        rates_rare: int = 30,
-        rates_epic: int = 15,
-        rates_legendary: int = 4,
-        rates_mythical: int = 1,
-        rates_infernal: int = 0,
-        rates_abyssal: int = 0,
+        rates_common: app_commands.Range[int, 0, None] = 50,
+        rates_rare: app_commands.Range[int, 0, None] = 30,
+        rates_epic: app_commands.Range[int, 0, None] = 15,
+        rates_legendary: app_commands.Range[int, 0, None] = 4,
+        rates_mythical: app_commands.Range[int, 0, None] = 1,
+        rates_infernal: app_commands.Range[int, 0, None] = 0,
+        rates_abyssal: app_commands.Range[int, 0, None] = 0,
     ) -> None:
         await self._set_reward(
-            ctx,
+            interaction,
             "monthly",
             amount,
             bonus_enabled,

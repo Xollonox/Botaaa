@@ -7,8 +7,10 @@ import logging
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
+from bot.config import OWNER_GUILD_ID
 from bot.utils.checks import is_owner
 from bot.utils.pack_logic import ensure_packs_structure, format_rates_table, get_pack_by_name
 from bot.utils.ui import box, e, make_embed
@@ -23,6 +25,8 @@ from bot.features.packs_panel import (
 )
 
 logger = logging.getLogger(__name__)
+
+OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
 
 PRICE_FILTERS = {
@@ -489,9 +493,30 @@ class ShopCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
+    def _pack_choices(self, data: dict[str, Any], current: str) -> list[app_commands.Choice[str]]:
+        ensure_packs_structure(data)
+        definitions = data.get("packs", {}).get("definitions", {})
+        out: list[app_commands.Choice[str]] = []
+        token = str(current or "").lower()
+        if not isinstance(definitions, dict):
+            return out
+        for key, pack in definitions.items():
+            if not isinstance(pack, dict):
+                continue
+            enabled = bool(pack.get("enabled", True))
+            price = int(pack.get("price", 0))
+            name = str(pack.get("name", key))
+            status = e("enabled", data) if enabled else e("disabled", data)
+            label = f"{name} • {status} • {e('coin', data)} {price}"
+            if token and token not in label.lower() and token not in str(key).lower():
+                continue
+            out.append(app_commands.Choice(name=label[:100], value=name))
+            if len(out) >= 25:
+                break
+        return out
 
-    @commands.command(name="shop")
-    async def shop(self, ctx: commands.Context) -> None:
+    @app_commands.command(name="shop", description="Show enabled packs and their drop-rate tables.")
+    async def shop(self, interaction: discord.Interaction) -> None:
         data = self.bot.storage.load()
         ensure_packs_structure(data)
         definitions = data.get("packs", {}).get("definitions", {})
@@ -503,14 +528,15 @@ class ShopCog(commands.Cog):
                 if not is_public_shop_pack(str(key), pack):
                     continue
                 packs.append({"key": key, **pack})
-        view = ShopPages(self, str(ctx.author.id), packs, f"{e('shop', data)} Shop")
-        await smart_reply(ctx, embed=view.embed(data), view=view)
+        view = ShopPages(self, str(interaction.user.id), packs, f"{e('shop', data)} Shop")
+        await smart_reply(interaction, embed=view.embed(data), view=view)
 
-    @commands.command(name="o_shop_pack_list")
-    async def o_shop_pack_list(self, ctx: commands.Context) -> None:
+    @app_commands.command(name="o_shop_pack_list", description="Owner: list all packs including disabled.")
+    @app_commands.guilds(OWNER_GUILD)
+    async def o_shop_pack_list(self, interaction: discord.Interaction) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
         ensure_packs_structure(data)
         definitions = data.get("packs", {}).get("definitions", {})
@@ -529,14 +555,15 @@ class ShopCog(commands.Cog):
                 )
                 lines.append(f"{name} • {status} • {e('coin', data)} {price} • {short}")
 
-        view = OwnerPackListPages(self, str(ctx.author.id), lines)
-        await smart_reply(ctx, embed=view.embed(data), view=view, ephemeral=True)
+        view = OwnerPackListPages(self, str(interaction.user.id), lines)
+        await smart_reply(interaction, embed=view.embed(data), view=view, ephemeral=True)
 
-    @commands.command(name="o_shop_pack_set_enabled")
-    async def o_shop_pack_set_enabled(self, ctx: commands.Context, pack_name: str, enabled: bool) -> None:
+    @app_commands.command(name="o_shop_pack_set_enabled", description="Owner: enable/disable a pack.")
+    @app_commands.guilds(OWNER_GUILD)
+    async def o_shop_pack_set_enabled(self, interaction: discord.Interaction, pack_name: str, enabled: bool) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
 
         def mutate(d: dict[str, Any]):
@@ -550,14 +577,18 @@ class ShopCog(commands.Cog):
         ok, reason, pack = self.bot.storage.with_lock(mutate)
         data = self.bot.storage.load()
         if not ok:
-            await smart_reply(ctx, embed=make_embed(data, f"{e('warning', data)} Update Failed", str(reason)), ephemeral=True)
+            await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Update Failed", str(reason)), ephemeral=True)
             return
 
         status = e("enabled", data) if bool(pack.get("enabled", True)) else e("disabled", data)
-        await smart_reply(ctx,
+        await smart_reply(interaction, 
             embed=make_embed(data, f"{e('ok', data)} Pack Visibility Updated", f"{pack.get('name')} • {status}"),
             ephemeral=True,
         )
+
+    @o_shop_pack_set_enabled.autocomplete("pack_name")
+    async def o_shop_pack_set_enabled_pack_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return self._pack_choices(self.bot.storage.load(), current)
 
 
 async def setup(bot: commands.Bot) -> None:

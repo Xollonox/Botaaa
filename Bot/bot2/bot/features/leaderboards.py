@@ -7,6 +7,7 @@ from math import ceil
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from bot.utils.checks import ensure_registered
@@ -123,10 +124,7 @@ class LeaderboardPanel(discord.ui.View):
 
 
 class LeaderboardsCog(commands.Cog):
-    @commands.group(name="lb", invoke_without_subcommand=True)
-    async def lb(self, ctx: commands.Context) -> None:
-        if ctx.invoked_subcommand is None:
-            await ctx.send_help(ctx.command)
+    lb = app_commands.Group(name="lb", description="Leaderboard commands")
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
@@ -152,57 +150,63 @@ class LeaderboardsCog(commands.Cog):
         out.sort(key=lambda x: x["trophies"], reverse=True)
         return out
 
-    async def _send_player_page(self, ctx: commands.Context, data: dict[str, Any], rows: list[dict[str, Any]], title: str, page: int) -> None:
-        panel = LeaderboardPanel(self, ctx.author.id, rows, title, e("leaderboard", data), data)
+    async def _send_player_page(self, interaction: discord.Interaction, data: dict[str, Any], rows: list[dict[str, Any]], title: str, page: int) -> None:
+        panel = LeaderboardPanel(self, interaction.user.id, rows, title, e("leaderboard", data), data)
         panel.page = max(1, min(int(page), panel.total_pages))
         panel._sync()
         if not rows:
-            await smart_reply(ctx, embed=make_embed(data, f"{e('leaderboard', data)} {title}", "No data yet."))
+            await smart_reply(interaction, embed=make_embed(data, f"{e('leaderboard', data)} {title}", "No data yet."))
             return
-        panel.message = await smart_reply(ctx, embed=panel.build_embed(data), view=panel)
+        await smart_reply(interaction, embed=panel.build_embed(data), view=panel)
+        panel.message = await interaction.original_response()
 
     async def _send_simple_rows(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         data: dict[str, Any],
         rows: list[dict[str, Any]],
         title: str,
         icon: str,
         page: int,
     ) -> None:
-        panel = LeaderboardPanel(self, ctx.author.id, rows, title, icon, data)
+        panel = LeaderboardPanel(self, interaction.user.id, rows, title, icon, data)
         panel.page = max(1, min(int(page), panel.total_pages))
         panel._sync()
         if not rows:
-            await smart_reply(ctx, embed=make_embed(data, f"{icon} {title}", "No data yet."))
+            await smart_reply(interaction, embed=make_embed(data, f"{icon} {title}", "No data yet."))
             return
-        panel.message = await smart_reply(ctx, embed=panel.build_embed(data), view=panel)
+        await smart_reply(interaction, embed=panel.build_embed(data), view=panel)
+        panel.message = await interaction.original_response()
 
-    @lb.command(name="global")
-    async def lb_global(self, ctx: commands.Context, page: int = 1) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @lb.command(name="global", description="Global trophy leaderboard")
+    async def lb_global(self, interaction: discord.Interaction, page: app_commands.Range[int, 1, None] = 1) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
             return
         data = self.bot.storage.load()
-        await self._send_player_page(ctx, data, self._player_rows(data), "Global", page)
+        await self._send_player_page(interaction, data, self._player_rows(data), "Global", int(page))
 
-    @lb.command(name="league")
-    async def lb_league(self, ctx: commands.Context, league_name: str, page: int = 1) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @lb.command(name="league", description="League leaderboard")
+    async def lb_league(self, interaction: discord.Interaction, league_name: str, page: app_commands.Range[int, 1, None] = 1) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
             return
         data = self.bot.storage.load()
         league = str(league_name).strip()
         rows = [row for row in self._player_rows(data) if row.get("rank") == league]
-        await self._send_player_page(ctx, data, rows, f"League: {league}", page)
+        await self._send_player_page(interaction, data, rows, f"League: {league}", int(page))
 
-    @lb.command(name="gang")
-    async def lb_gang(self, ctx: commands.Context, page: int = 1) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @lb_league.autocomplete("league_name")
+    async def _league_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return [app_commands.Choice(name=name, value=name) for name in LEAGUE_ORDER if current.lower() in name.lower()][:25]
+
+    @lb.command(name="gang", description="Gang leaderboard")
+    async def lb_gang(self, interaction: discord.Interaction, page: app_commands.Range[int, 1, None] = 1) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
             return
         data = self.bot.storage.load()
 
         gangs = data.get("gangs", {})
         if not isinstance(gangs, dict) or not gangs:
-            await smart_reply(ctx,
+            await smart_reply(interaction, 
                 embed=make_embed(data, f"{e('gang', data)} Gang Leaderboard", "No gang data yet."), ephemeral=True
             )
             return
@@ -224,17 +228,17 @@ class LeaderboardsCog(commands.Cog):
             rows.append({"name": str(gang.get("name", gang_id)), "trophies": total})
 
         rows.sort(key=lambda x: x["trophies"], reverse=True)
-        await self._send_simple_rows(ctx, data, rows, "Gang", e("gang", data), page)
+        await self._send_simple_rows(interaction, data, rows, "Gang", e("gang", data), int(page))
 
-    @lb.command(name="alliance")
-    async def lb_alliance(self, ctx: commands.Context, page: int = 1) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @lb.command(name="alliance", description="Alliance leaderboard")
+    async def lb_alliance(self, interaction: discord.Interaction, page: app_commands.Range[int, 1, None] = 1) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
             return
         data = self.bot.storage.load()
 
         alliances = data.get("alliances", {})
         if not isinstance(alliances, dict) or not alliances:
-            await smart_reply(ctx,
+            await smart_reply(interaction, 
                 embed=make_embed(data, f"{e('alliance', data)} Alliance Leaderboard", "No alliance data yet."), ephemeral=True
             )
             return
@@ -262,8 +266,9 @@ class LeaderboardsCog(commands.Cog):
             rows.append({"name": str(alliance.get("name", alliance_id)), "trophies": total})
 
         rows.sort(key=lambda x: x["trophies"], reverse=True)
-        await self._send_simple_rows(ctx, data, rows, "Alliance", e("alliance", data), page)
+        await self._send_simple_rows(interaction, data, rows, "Alliance", e("alliance", data), int(page))
 
 
 async def setup(bot: commands.Bot) -> None:
+    # NOTE: do NOT call bot.tree.add_command(cog.lb) here — add_cog auto-registers it.
     await bot.add_cog(LeaderboardsCog(bot))

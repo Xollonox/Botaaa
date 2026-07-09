@@ -3,15 +3,18 @@
 from __future__ import annotations
 
 import discord
+from discord import app_commands
 from discord.ext import commands, tasks
 from datetime import datetime
 import random
 
+from bot.config import OWNER_GUILD_ID
 from bot.utils.checks import is_owner
 from bot.utils.ui import e, make_embed
 from bot.utils.interaction_visibility import smart_reply
 from bot.utils.timeutil import now_ts
 
+OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
 
 class AnnounceOwnerCog(commands.Cog):
@@ -166,34 +169,35 @@ class AnnounceOwnerCog(commands.Cog):
         """Wait for bot to be ready before starting the task."""
         await self.bot.wait_until_ready()
 
-    @commands.command(name="o_announce")
+    @app_commands.command(name="o_announce", description="Owner: manually post an announcement.")
+    @app_commands.guilds(OWNER_GUILD)
     async def o_announce(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         message: str,
         title: str | None = None,
         image_url: str | None = None,
         ping_role: discord.Role | None = None,
     ) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
 
         settings = data.get("server_settings", {}) if isinstance(data.get("server_settings"), dict) else {}
         announce_channel_id = int(settings.get("announce_channel_id", 0) or 0)
 
-        target_channel = ctx.channel
+        target_channel = interaction.channel
         if announce_channel_id > 0:
             target_channel = self.bot.get_channel(announce_channel_id)
             if target_channel is None:
                 try:
                     target_channel = await self.bot.fetch_channel(announce_channel_id)
                 except Exception:
-                    target_channel = ctx.channel
+                    target_channel = interaction.channel
 
         if not isinstance(target_channel, (discord.TextChannel, discord.Thread)):
-            await smart_reply(ctx,
+            await smart_reply(interaction,
                 embed=make_embed(data, f"{e('warning', data)} Announcement Failed", "Target channel unavailable."),
                 ephemeral=True,
             )
@@ -211,7 +215,7 @@ class AnnounceOwnerCog(commands.Cog):
         content = ping_role.mention if ping_role is not None else None
         posted = await target_channel.send(content=content, embed=embed)
 
-        await smart_reply(ctx,
+        await smart_reply(interaction,
             embed=make_embed(
                 data,
                 f"{e('ok', data)} Announcement Posted",
@@ -220,23 +224,28 @@ class AnnounceOwnerCog(commands.Cog):
             ephemeral=True,
         )
 
-    @commands.command(name="o_event")
+    @app_commands.command(name="o_event", description="Owner: activate double XP/coins event.")
+    @app_commands.guilds(OWNER_GUILD)
+    @app_commands.describe(
+        event_type="Event type: double_xp or double_coins",
+        duration_hours="Duration in hours",
+    )
     async def o_event(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         event_type: str = "double_xp",
         duration_hours: int = 24,
     ) -> None:
         """Activate a timed event for double XP or coins."""
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
 
         event_type = event_type.lower().strip()
         if event_type not in ("double_xp", "double_coins"):
             await smart_reply(
-                ctx,
+                interaction,
                 embed=make_embed(data, f"{e('no', data)} Invalid Event", "Use: double_xp or double_coins"),
                 ephemeral=True,
             )
@@ -282,7 +291,7 @@ class AnnounceOwnerCog(commands.Cog):
                 pass
 
         await smart_reply(
-            ctx,
+            interaction,
             embed=make_embed(
                 data,
                 f"{e('ok', data)} Event Started",

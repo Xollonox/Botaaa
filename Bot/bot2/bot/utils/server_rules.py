@@ -5,51 +5,32 @@ from __future__ import annotations
 from typing import Any
 
 import discord
-from discord.ext import commands
 
 
-def _get_user(obj: Any) -> discord.User | discord.Member | None:
-    return getattr(obj, "user", None) or getattr(obj, "author", None)
-
-
-def _get_bot(obj: Any) -> commands.Bot | None:
-    return getattr(obj, "client", None) or getattr(obj, "bot", None)
-
-
-def _get_channel_id(obj: Any) -> int:
-    channel = getattr(obj, "channel", None)
-    if channel is not None:
-        return int(getattr(channel, "id", 0))
-    return int(getattr(obj, "channel_id", 0))
-
-
-def is_admin(obj: Any) -> bool:
-    """Return True if the user has Administrator permission.
-
-    Accepts both discord.Interaction and commands.Context.
-    """
+def is_admin(interaction: discord.Interaction) -> bool:
+    """Return True if the interaction user has Administrator permission."""
     from bot.utils.checks import is_owner
-    if is_owner(obj):
+    if is_owner(interaction):
         return True
-    user = _get_user(obj)
-    if user is None:
-        return False
-    if hasattr(user, "guild_permissions"):
-        return bool(user.guild_permissions.administrator)  # type: ignore[union-attr]
+    member = interaction.user
+    if hasattr(member, "guild_permissions"):
+        return bool(member.guild_permissions.administrator)  # type: ignore[union-attr]
     return False
 
 
 def check_single_mode_allowed(
-    obj: Any,
+    interaction: discord.Interaction,
 ) -> tuple[bool, str, int]:
-    """Check if the command is allowed under the current server mode.
-
-    Accepts both discord.Interaction and commands.Context.
+    """
+    Check whether the interaction is allowed under the current server mode.
 
     Returns (allowed, mode, redirect_channel_id).
+    - If mode is "all" or no mode is configured, allowed=True.
+    - If mode is "single", allowed=True only when the interaction channel
+      matches the locked_channel_id.
     """
-    bot = _get_bot(obj)
-    storage = getattr(bot, "storage", None) if bot is not None else None
+    bot = interaction.client
+    storage = getattr(bot, "storage", None)
     if storage is None:
         return True, "all", 0
 
@@ -66,24 +47,24 @@ def check_single_mode_allowed(
     if locked_id == 0:
         return True, mode, 0
 
-    channel_id = _get_channel_id(obj)
-    if channel_id == locked_id:
+    channel_id = interaction.channel_id or 0
+    if int(channel_id) == locked_id:
         return True, mode, locked_id
 
     return False, mode, locked_id
 
 
 def check_battle_channel_allowed(
-    obj: Any,
+    interaction: discord.Interaction,
 ) -> tuple[bool, str | None, int | None]:
-    """Check if the command channel is allowed for battle commands.
-
-    Accepts both discord.Interaction and commands.Context.
+    """
+    Check whether the interaction channel is allowed for battle commands.
 
     Returns (allowed, reason, battle_channel_id).
+    If battle_channel_id is None/0, any channel is allowed.
     """
-    bot = _get_bot(obj)
-    storage = getattr(bot, "storage", None) if bot is not None else None
+    bot = interaction.client
+    storage = getattr(bot, "storage", None)
     if storage is None:
         return True, None, None
 
@@ -96,7 +77,7 @@ def check_battle_channel_allowed(
     if battle_id == 0:
         return True, None, None
 
-    channel_id = _get_channel_id(obj)
+    channel_id = int(interaction.channel_id or 0)
     if channel_id == battle_id:
         return True, None, battle_id
     return False, "not_allowed", battle_id

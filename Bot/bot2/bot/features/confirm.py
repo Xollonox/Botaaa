@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from bot.utils.confirm_pipeline import pop_and_validate_action
@@ -28,10 +29,10 @@ class ConfirmCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @commands.command(name="confirm")
-    async def confirm(self, ctx: commands.Context, action_id: str) -> None:
+    @app_commands.command(name="confirm", description="Confirm a pending action by action ID.")
+    async def confirm(self, interaction: discord.Interaction, action_id: str) -> None:
         ts = now_ts()
-        owner_id = str(ctx.author.id)
+        owner_id = str(interaction.user.id)
 
         def mutate(d: dict[str, Any]):
             ok, result = pop_and_validate_action(d, owner_id, action_id, ts)
@@ -51,12 +52,12 @@ class ConfirmCog(commands.Cog):
         ok, msg = self.bot.storage.with_lock(mutate)
         data = self.bot.storage.load()
         if not ok:
-            await smart_reply(ctx, 
+            await smart_reply(interaction, 
                 embed=make_embed(data, f"{e('warning', data)} Confirm Failed", str(msg)),
                 ephemeral=True,
             )
             return
-        await smart_reply(ctx, 
+        await smart_reply(interaction, 
             embed=make_embed(data, f"{e('ok', data)} Confirmed", str(msg)),
             ephemeral=True,
         )

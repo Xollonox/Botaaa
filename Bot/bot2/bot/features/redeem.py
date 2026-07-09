@@ -7,14 +7,18 @@ from collections import defaultdict
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
+from bot.config import OWNER_GUILD_ID
 from bot.utils.checks import ensure_registered, is_owner
 from bot.utils.redeem_logic import can_use, format_reward, is_expired, list_codes_lines, normalize_code, validate_code_format
 from bot.utils.reward_grant import grant_reward
 from bot.utils.timeutil import now_ts
 from bot.utils.ui import box, e, make_embed
-from bot.utils.interaction_visibility import smart_reply
+from bot.utils.interaction_visibility import smart_reply, error_reply
+
+OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
 
 class RedeemListView(discord.ui.View):
@@ -81,16 +85,16 @@ class RedeemCog(commands.Cog):
     def _owner_embed(self, data: dict[str, Any]) -> discord.Embed:
         return make_embed(data, f"{e('no', data)} Owner Only", "You are not allowed to use this command.")
 
-    @commands.command(name="redeem")
-    async def redeem(self, ctx: commands.Context, *, code: str) -> None:
-        if not await ensure_registered(ctx, self.bot.storage):
+    @app_commands.command(name="redeem", description="Redeem a reward code.")
+    async def redeem(self, interaction: discord.Interaction, code: str) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
             return
 
-        user_id = str(ctx.author.id)
+        user_id = str(interaction.user.id)
         limited, retry_in = self._rate_limited(user_id)
         data = self.bot.storage.load()
         if limited:
-            await smart_reply(ctx,
+            await smart_reply(interaction, 
                 embed=make_embed(
                     data,
                     f"{e('limit', data)} Redeem Rate Limited",
@@ -160,7 +164,7 @@ class RedeemCog(commands.Cog):
         data = self.bot.storage.load()
 
         if not ok:
-            await smart_reply(ctx,
+            await smart_reply(interaction, 
                 embed=make_embed(data, f"{e('warning', data)} Redeem Failed", message),
                 ephemeral=True,
             )
@@ -171,32 +175,41 @@ class RedeemCog(commands.Cog):
         if remaining is not None:
             fields.append((f"{e('uses', data)} Remaining", str(max(0, int(remaining))), False))
 
-        await smart_reply(ctx,
+        await smart_reply(interaction, 
             embed=make_embed(data, f"{e('redeem', data)} Redeem",
                 box("Claimed", [f"✅ {reward_text}"] + [f"{n}: {v}" for n, v, _ in (fields or [])])),
             ephemeral=True,
         )
 
-    @commands.command(name="o_redeem_create")
+    @app_commands.command(name="o_redeem_create", description="Owner: create redeem code.")
+    @app_commands.guilds(OWNER_GUILD)
+    @app_commands.choices(
+        reward_type=[
+            app_commands.Choice(name="coins", value="coins"),
+            app_commands.Choice(name="premium", value="premium"),
+            app_commands.Choice(name="pack", value="pack"),
+            app_commands.Choice(name="card", value="card"),
+        ]
+    )
     async def o_redeem_create(
         self,
-        ctx: commands.Context,
+        interaction: discord.Interaction,
         code: str,
-        reward_type: str,
+        reward_type: app_commands.Choice[str],
         reward_value: str,
-        expires_in_hours: int = 0,
-        max_uses: int = 0,
+        expires_in_hours: app_commands.Range[int, 0, None] = 0,
+        max_uses: app_commands.Range[int, 0, None] = 0,
         note: str | None = None,
     ) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=self._owner_embed(data), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=self._owner_embed(data), ephemeral=True)
             return
 
         normalized = normalize_code(code)
         valid, error = validate_code_format(normalized)
         if not valid:
-            await smart_reply(ctx,
+            await smart_reply(interaction, 
                 embed=make_embed(data, f"{e('warning', data)} Invalid Code", error),
                 ephemeral=True,
             )
@@ -220,7 +233,7 @@ class RedeemCog(commands.Cog):
                 "expires_at": int(expires_at),
                 "max_uses": int(max_uses),
                 "uses": 0,
-                "reward": {"type": str(reward_type), "value": reward_value},
+                "reward": {"type": str(reward_type.value), "value": reward_value},
                 "note": str(note or ""),
             }
             return True, "Code created."
@@ -228,16 +241,16 @@ class RedeemCog(commands.Cog):
         ok, message = self.bot.storage.with_lock(mutate)
         data = self.bot.storage.load()
         if not ok:
-            await smart_reply(ctx,
+            await smart_reply(interaction, 
                 embed=make_embed(data, f"{e('warning', data)} Create Failed", message),
                 ephemeral=True,
             )
             return
 
-        reward_preview = format_reward(data, {"type": reward_type, "value": reward_value})
+        reward_preview = format_reward(data, {"type": reward_type.value, "value": reward_value})
         expiry_text = "never" if expires_at == 0 else f"<t:{expires_at}:R>"
         uses_text = "unlimited" if int(max_uses) == 0 else str(int(max_uses))
-        await smart_reply(ctx,
+        await smart_reply(interaction, 
             embed=make_embed(
                 data,
                 f"{e('create', data)} Redeem Code Created",
@@ -251,11 +264,12 @@ class RedeemCog(commands.Cog):
             ephemeral=True,
         )
 
-    @commands.command(name="o_redeem_delete")
-    async def o_redeem_delete(self, ctx: commands.Context, *, code: str) -> None:
+    @app_commands.command(name="o_redeem_delete", description="Owner: delete redeem code.")
+    @app_commands.guilds(OWNER_GUILD)
+    async def o_redeem_delete(self, interaction: discord.Interaction, code: str) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=self._owner_embed(data), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=self._owner_embed(data), ephemeral=True)
             return
 
         normalized = normalize_code(code)
@@ -271,13 +285,14 @@ class RedeemCog(commands.Cog):
         data = self.bot.storage.load()
         title = f"{e('delete', data)} Code Deleted" if deleted else f"{e('warning', data)} Delete Failed"
         desc = f"{e('code', data)} `{normalized}` removed." if deleted else "Code not found."
-        await smart_reply(ctx, embed=make_embed(data, title, desc), ephemeral=True)
+        await smart_reply(interaction, embed=make_embed(data, title, desc), ephemeral=True)
 
-    @commands.command(name="o_redeem_list")
-    async def o_redeem_list(self, ctx: commands.Context, *, filter: str | None = None) -> None:
+    @app_commands.command(name="o_redeem_list", description="Owner: list redeem codes.")
+    @app_commands.guilds(OWNER_GUILD)
+    async def o_redeem_list(self, interaction: discord.Interaction, filter: str | None = None) -> None:
         data = self.bot.storage.load()
-        if not is_owner(ctx):
-            await smart_reply(ctx, embed=self._owner_embed(data), ephemeral=True)
+        if not is_owner(interaction):
+            await smart_reply(interaction, embed=self._owner_embed(data), ephemeral=True)
             return
 
         lines = list_codes_lines(data)
@@ -285,8 +300,28 @@ class RedeemCog(commands.Cog):
             needle = normalize_code(filter)
             lines = [line for line in lines if needle in line.upper()]
 
-        view = RedeemListView(data, lines, str(ctx.author.id))
-        await smart_reply(ctx, embed=view._embed(), view=view, ephemeral=True)
+        view = RedeemListView(data, lines, str(interaction.user.id))
+        await smart_reply(interaction, embed=view._embed(), view=view, ephemeral=True)
+
+    async def _code_choices(self, current: str) -> list[app_commands.Choice[str]]:
+        data = self.bot.storage.load()
+        redeem_codes = data.get("redeem_codes", {})
+        if not isinstance(redeem_codes, dict):
+            return []
+        cur = normalize_code(current)
+        out: list[app_commands.Choice[str]] = []
+        for code in sorted(redeem_codes.keys()):
+            if cur and cur not in str(code).upper():
+                continue
+            out.append(app_commands.Choice(name=str(code)[:100], value=str(code)))
+            if len(out) >= 25:
+                break
+        return out
+
+    @o_redeem_delete.autocomplete("code")
+    @o_redeem_list.autocomplete("filter")
+    async def code_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return await self._code_choices(current)
 
 
 async def setup(bot: commands.Bot) -> None:
