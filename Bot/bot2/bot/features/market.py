@@ -71,11 +71,6 @@ async def _fee_percent_for(cog: "MarketCog") -> int:
 class MarketCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.market_group = MarketGroup(self)
-        self.bot.tree.add_command(self.market_group)
-
-    async def cog_unload(self) -> None:
-        self.bot.tree.remove_command(self.market_group.name, type=self.market_group.type)
 
     async def _load_market_data(self) -> dict[str, Any]:
         data = self.bot.storage.load()
@@ -241,35 +236,33 @@ class MarketCog(commands.Cog):
         await smart_reply(interaction, embed=make_embed(None, "✅ Updated", f"{rarity} quick sell → {value:,} coins"), ephemeral=True)
 
 
-class MarketGroup(app_commands.Group):
-    def __init__(self, cog: "MarketCog") -> None:
-        super().__init__(name="market", description="Market commands")
-        self.cog = cog
+    @commands.group(name="market", invoke_without_subcommand=True)
+    async def market(self, ctx: commands.Context) -> None:
+        if ctx.invoked_subcommand is None:
+            await ctx.send_help(ctx.command)
 
-    @app_commands.command(name="browse", description="Browse the market.")
-    async def browse(self, interaction: discord.Interaction) -> None:
-        if not await ensure_registered(interaction, self.cog.bot.storage):
+    @market.command(name="browse")
+    async def market_browse(self, ctx: commands.Context) -> None:
+        if not await ensure_registered(ctx, self.bot.storage):
             return
-        data = await self.cog._load_market_data()
-        panel = MarketPanel(self.cog, interaction.user.id, data)
+        data = await self._load_market_data()
+        panel = MarketPanel(self, ctx.author.id, data)
         embed, _ = build_market_embed(data, 0, "latest", None)
-        await interaction.response.send_message(embed=embed, view=panel)
-        panel.message = await interaction.original_response()
+        panel.message = await ctx.send(embed=embed, view=panel)
 
-    @app_commands.command(name="add", description="List a card from your inventory for sale.")
-    async def add(
+    @market.command(name="add")
+    async def market_add(
         self,
-        interaction: discord.Interaction,
+        ctx: commands.Context,
         card_name: str,
-        price: app_commands.Range[int, 1, 999_999_999],
+        price: int,
         arc: str = "—",
     ) -> None:
-        if not await ensure_registered(interaction, self.cog.bot.storage):
+        if not await ensure_registered(ctx, self.bot.storage):
             return
 
-        user_id = str(interaction.user.id)
-        # Pre-fetch settings so the sync with_lock closure doesn't call async code
-        mkt_settings = await _market_settings(self.cog)
+        user_id = str(ctx.author.id)
+        mkt_settings = await _market_settings(self)
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str, str, dict[str, Any] | None]:
             player = get_player(data, user_id)
@@ -323,10 +316,10 @@ class MarketGroup(app_commands.Group):
             m["listings"][lid] = listing_payload
             return True, rarity, lid, listing_payload
 
-        ok, result, listing_id, listing_payload = self.cog.bot.storage.with_lock(mutate)
+        ok, result, listing_id, listing_payload = self.bot.storage.with_lock(mutate)
         if ok and listing_payload is not None:
             try:
-                await self.cog.bot.market_service.upsert_listing(listing_id, listing_payload)
+                await self.bot.market_service.upsert_listing(listing_id, listing_payload)
             except Exception:
                 logger.exception("Failed to persist market listing %s to SQLite; rolling back JSON state", listing_id)
 
@@ -344,11 +337,10 @@ class MarketGroup(app_commands.Group):
                             item["market_locked"] = False
                             break
 
-                self.cog.bot.storage.with_lock(rollback)
+                self.bot.storage.with_lock(rollback)
                 await smart_reply(
-                    interaction,
+                    ctx,
                     embed=make_embed(None, "❌ Listing Failed", "Market storage failed. Your card was not listed."),
-                    ephemeral=True,
                 )
                 return
         if not ok:
@@ -360,7 +352,7 @@ class MarketGroup(app_commands.Group):
             if result.startswith("price_range:"):
                 _, rarity, lo, hi = result.split(":")
                 msg = f"Price must be between **{int(lo):,}** and **{int(hi):,}** coins for **{rarity}** cards."
-            await smart_reply(interaction, embed=make_embed(None, "❌ Listing Failed", msg), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(None, "❌ Listing Failed", msg))
             return
 
         body = (
@@ -368,55 +360,19 @@ class MarketGroup(app_commands.Group):
             f"│ {card_name}  [{result}]\n"
             f"│ 💰 {price:,} coins\n"
             f"│ 🌍 Arc: {arc}\n"
-            "│ Use /market browse to view\n"
+            "│ Use !market browse to view\n"
             "╰────────────────"
         )
         embed = make_embed(None, "LOOKISM HXCC • MARKET", body, color=0x2ECC71)
-        await smart_reply(interaction, embed=embed, ephemeral=True)
+        await smart_reply(ctx, embed=embed)
 
-    @add.autocomplete("card_name")
-    async def add_card_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        user_id = str(interaction.user.id)
-        data = await self.cog._load_market_data()
-        mkt_settings = await _market_settings(self.cog)
-        player  = get_player(data, user_id)
-        if not isinstance(player, dict):
-            return []
-        inv = player.get("user", {}).get("inventory", [])
-        if not isinstance(inv, list):
-            return []
-        token = current.lower()
-        seen: set[str] = set()
-        out: list[app_commands.Choice[str]] = []
-        for item in inv:
-            if not isinstance(item, dict):
-                continue
-            if item.get("locked") or item.get("squad_locked") or item.get("market_locked") or item.get("trade_locked"):
-                continue
-            name   = str(item.get("card_name", ""))
-            rarity = str(item.get("rarity", ""))
-            if not name or name in seen:
-                continue
-            if token and token not in name.lower():
-                continue
-            seen.add(name)
-            lo, hi = price_range_for_settings(mkt_settings, rarity)
-            out.append(app_commands.Choice(
-                name=f"{_ri(rarity)} {name}  [{rarity}]  ({lo:,}–{hi:,})"[:100],
-                value=name,
-            ))
-            if len(out) >= 25:
-                break
-        return out
-
-    @app_commands.command(name="remove", description="Remove your market listing.")
-    async def remove(self, interaction: discord.Interaction, card_name: str) -> None:
-        if not await ensure_registered(interaction, self.cog.bot.storage):
+    @market.command(name="remove")
+    async def market_remove(self, ctx: commands.Context, card_name: str) -> None:
+        if not await ensure_registered(ctx, self.bot.storage):
             return
-        user_id = str(interaction.user.id)
+        user_id = str(ctx.author.id)
 
-        # Pre-fetch active listings so the sync with_lock closure doesn't call async code
-        active_listings = await self.cog.bot.market_service.get_active_listings()
+        active_listings = await self.bot.market_service.get_active_listings()
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str, str]:
             m        = market_root(data)
@@ -446,41 +402,13 @@ class MarketGroup(app_commands.Group):
                         break
             return True, str(l.get("card_name", card_name)), str(lid)
 
-        ok, result, removed_lid = self.cog.bot.storage.with_lock(mutate)
+        ok, result, removed_lid = self.bot.storage.with_lock(mutate)
         if ok and removed_lid:
-            await self.cog.bot.market_service.delete_listing(removed_lid)
+            await self.bot.market_service.delete_listing(removed_lid)
         if not ok:
-            await smart_reply(interaction, embed=make_embed(None, "❌ Not Found", f"No active listing found for **{card_name}**."), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(None, "❌ Not Found", f"No active listing found for **{card_name}**."))
             return
-        await smart_reply(interaction, embed=make_embed(None, "✅ Removed", f"**{result}** removed from market."), ephemeral=True)
-
-    @remove.autocomplete("card_name")
-    async def remove_card_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        user_id = str(interaction.user.id)
-        data = await self.cog._load_market_data()
-        m        = market_root(data)
-        listings = m.get("listings", {})
-        if not isinstance(listings, dict):
-            return []
-        token = current.lower()
-        out: list[app_commands.Choice[str]] = []
-        for lid, l in listings.items():
-            if not isinstance(l, dict):
-                continue
-            if str(l.get("seller_id", "")) != user_id:
-                continue
-            if l.get("sold"):
-                continue
-            name   = str(l.get("card_name", ""))
-            rarity = str(l.get("rarity", ""))
-            price  = int(l.get("price", 0))
-            if token and token not in name.lower():
-                continue
-            label = f"{_ri(rarity)} {name}  [{rarity}]  •  {price:,} coins"
-            out.append(app_commands.Choice(name=label[:100], value=name))
-            if len(out) >= 25:
-                break
-        return out
+        await smart_reply(ctx, embed=make_embed(None, "✅ Removed", f"**{result}** removed from market."))
 
 
 async def setup(bot: commands.Bot) -> None:

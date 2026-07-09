@@ -3,15 +3,12 @@ from __future__ import annotations
 from typing import Any
 
 import discord
-from discord import app_commands
 from discord.ext import commands
 
-from bot.config import OWNER_GUILD_ID
 from bot.utils.checks import is_owner
 from bot.utils.ui import box, e, list_keys, make_embed, reset_emoji, set_emoji, reset_all_emojis
 from bot.utils.interaction_visibility import smart_reply
 
-OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 PAGE_SIZE   = 20
 
 
@@ -192,57 +189,43 @@ class EmojiPanelCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @app_commands.command(name="o_emoji_panel", description="Owner: interactive emoji panel.")
-    @app_commands.guilds(OWNER_GUILD)
-    async def o_emoji_panel(self, interaction: discord.Interaction) -> None:
-        if not is_owner(interaction):
-            await interaction.response.send_message("Owner only.", ephemeral=True)
+    @commands.command(name="o_emoji_panel")
+    async def o_emoji_panel(self, ctx: commands.Context) -> None:
+        if not is_owner(ctx):
+            await ctx.send("Owner only.")
             return
         data = self.bot.storage.load()
-        view = EmojiPanelView(self, str(interaction.user.id), data, interaction.guild)
-        await smart_reply(interaction, embed=view._embed(data), view=view, ephemeral=True)
+        view = EmojiPanelView(self, str(ctx.author.id), data, ctx.guild)
+        await smart_reply(ctx, embed=view._embed(data), view=view, ephemeral=True)
 
-    @app_commands.command(name="o_emoji_set", description="Owner: set emoji value for a key.")
-    @app_commands.guilds(OWNER_GUILD)
-    async def o_emoji_set(self, interaction: discord.Interaction, key: str, emoji: str) -> None:
-        if not is_owner(interaction):
-            await interaction.response.send_message("Owner only.", ephemeral=True)
+    @commands.command(name="o_emoji_set")
+    async def o_emoji_set(self, ctx: commands.Context, key: str, emoji: str) -> None:
+        if not is_owner(ctx):
+            await ctx.send("Owner only.")
             return
         k, v = str(key).strip().lower(), str(emoji).strip()
         self.bot.storage.with_lock(lambda d: set_emoji(d, k, v))
         data = self.bot.storage.load()
-        await smart_reply(interaction, embed=make_embed(data, f"{e('ok',data)} Emoji Updated", f"Set `{k}` → {v}"), ephemeral=True)
+        await smart_reply(ctx, embed=make_embed(data, f"{e('ok',data)} Emoji Updated", f"Set `{k}` → {v}"), ephemeral=True)
 
-    @o_emoji_set.autocomplete("key")
-    async def _key_ac(self, _: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        token = current.lower()
-        return [app_commands.Choice(name=k, value=k) for k in sorted(list_keys(self.bot.storage.load())) if token in k][:25]
-
-    @app_commands.command(name="o_emoji_reset", description="Owner: reset one emoji key to default.")
-    @app_commands.guilds(OWNER_GUILD)
-    async def o_emoji_reset(self, interaction: discord.Interaction, key: str) -> None:
-        if not is_owner(interaction):
-            await interaction.response.send_message("Owner only.", ephemeral=True)
+    @commands.command(name="o_emoji_reset")
+    async def o_emoji_reset(self, ctx: commands.Context, key: str) -> None:
+        if not is_owner(ctx):
+            await ctx.send("Owner only.")
             return
         k = str(key).strip().lower()
         self.bot.storage.with_lock(lambda d: reset_emoji(d, k))
         data = self.bot.storage.load()
-        await smart_reply(interaction, embed=make_embed(data, f"{e('ok',data)} Emoji Reset", f"Reset `{k}` → {e(k,data)}"), ephemeral=True)
+        await smart_reply(ctx, embed=make_embed(data, f"{e('ok',data)} Emoji Reset", f"Reset `{k}` → {e(k,data)}"), ephemeral=True)
 
-    @o_emoji_reset.autocomplete("key")
-    async def _reset_ac(self, _: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        token = current.lower()
-        return [app_commands.Choice(name=k, value=k) for k in sorted(list_keys(self.bot.storage.load())) if token in k][:25]
-
-    @app_commands.command(name="o_emoji_reset_all", description="Owner: reset all emoji keys to defaults.")
-    @app_commands.guilds(OWNER_GUILD)
-    async def o_emoji_reset_all(self, interaction: discord.Interaction) -> None:
-        if not is_owner(interaction):
-            await interaction.response.send_message("Owner only.", ephemeral=True)
+    @commands.command(name="o_emoji_reset_all")
+    async def o_emoji_reset_all(self, ctx: commands.Context) -> None:
+        if not is_owner(ctx):
+            await ctx.send("Owner only.")
             return
         count = self.bot.storage.with_lock(lambda d: reset_all_emojis(d))
         data  = self.bot.storage.load()
-        await smart_reply(interaction, embed=make_embed(data, f"{e('ok',data)} All Reset", f"Reset {count} keys to defaults."), ephemeral=True)
+        await smart_reply(ctx, embed=make_embed(data, f"{e('ok',data)} All Reset", f"Reset {count} keys to defaults."), ephemeral=True)
 
 
 async def setup(bot: commands.Bot) -> None:

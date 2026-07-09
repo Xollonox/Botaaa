@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Any
 
 import discord
-from discord import app_commands
 from discord.ext import commands
 
 from bot.utils.interaction_visibility import smart_reply
@@ -186,21 +185,24 @@ class StatsPreviewView(discord.ui.View):
 
 
 class StatsCog(commands.Cog):
-    stats = app_commands.Group(name="stats", description="Stats reference commands.")
+    @commands.group(name="stats", invoke_without_subcommand=True)
+    async def stats(self, ctx: commands.Context) -> None:
+        if ctx.invoked_subcommand is None:
+            await ctx.send_help(ctx.command)
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @stats.command(name="load", description="Preview the STATS.md card reference.")
-    async def stats_load(self, interaction: discord.Interaction) -> None:
+    @stats.command(name="load")
+    async def stats_load(self, ctx: commands.Context) -> None:
         path = _stats_doc_path()
         if not path.exists():
-            await smart_reply(interaction, content="`docs/STATS.md` was not found.", ephemeral=True)
+            await smart_reply(ctx, content="`docs/STATS.md` was not found.", ephemeral=True)
             return
 
         pages = build_stats_pages(path.read_text(encoding="utf-8"))
-        view = StatsPreviewView(int(interaction.user.id), pages)
-        await smart_reply(interaction, embed=view.build_embed(), view=view)
+        view = StatsPreviewView(int(ctx.author.id), pages)
+        await smart_reply(ctx, embed=view.build_embed(), view=view)
 
 
 async def setup(bot: commands.Bot) -> None:

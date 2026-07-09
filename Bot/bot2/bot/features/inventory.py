@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 import discord
-from discord import app_commands
 from discord.ext import commands
 
 from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card, get_flat_stat_bonus, normalize_mastery_list, rarity_rank
@@ -883,27 +882,26 @@ class InventoryCog(commands.Cog):
 
         return self.bot.storage.with_lock(mutate)
 
-    @app_commands.command(name="collection", description="Browse your card collection.")
-    async def collection(self, interaction: discord.Interaction) -> None:
-        if not await ensure_registered(interaction, self.bot.storage):
+    @commands.command(name="collection")
+    async def collection(self, ctx: commands.Context) -> None:
+        if not await ensure_registered(ctx, self.bot.storage):
             return
 
-        user_id = str(interaction.user.id)
+        user_id = str(ctx.author.id)
         data = self.bot.storage.load()
 
         if user_id not in data.get("players", {}):
-            await interaction.response.send_message("Could not load your player data. Please try again.", ephemeral=True)
+            await smart_reply(ctx, "Could not load your player data. Please try again.")
             return
 
-        view = CollectionGalleryView(self, interaction.user.id, "All Fighters", "Power Desc", 1)
+        view = CollectionGalleryView(self, ctx.author.id, "All Fighters", "Power Desc", 1)
         entries = self._get_entries(data, user_id, "All Fighters", "Power Desc")
         embed = view.build_embed(data, entries)
         if not entries:
-            await interaction.response.send_message(embed=embed)
+            await ctx.send(embed=embed)
             return
         _sanitize_view(view)
-        await interaction.response.send_message(embed=embed, view=view)
-        view.message = await interaction.original_response()
+        view.message = await ctx.send(embed=embed, view=view)
 
 
 

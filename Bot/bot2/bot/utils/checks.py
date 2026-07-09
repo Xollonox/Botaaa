@@ -21,9 +21,15 @@ def effective_owner_ids() -> set[int]:
     return _config.OWNER_IDS
 
 
-def is_owner(interaction: discord.Interaction) -> bool:
-    """Return True if the interaction user is a bot owner."""
-    return interaction.user.id in effective_owner_ids()
+def is_owner(obj: Any) -> bool:
+    """Return True if the user is a bot owner.
+
+    Accepts both discord.Interaction and commands.Context.
+    """
+    user = getattr(obj, "user", None) or getattr(obj, "author", None)
+    if user is None:
+        return False
+    return user.id in effective_owner_ids()
 
 
 def is_registered(data: dict[str, Any], user_id: str) -> bool:
@@ -33,42 +39,40 @@ def is_registered(data: dict[str, Any], user_id: str) -> bool:
 
 
 async def ensure_registered(
-    interaction: discord.Interaction,
+    obj: Any,
     storage: Any,
 ) -> bool:
-    """
-    Check if the interacting user is registered.
-    If not, send an ephemeral error message and return False.
+    """Check if the user is registered.
+
+    Accepts both discord.Interaction and commands.Context.
+    If not registered, sends an error and returns False.
     """
     from bot.utils.ui import e, make_embed
 
-    user_id = str(interaction.user.id)
-    # Read-only fast path: ensure_registered only inspects players/user_row.
+    user = getattr(obj, "user", None) or getattr(obj, "author", None)
+    if user is None:
+        return False
+    user_id = str(user.id)
     data = storage.load_readonly()
 
     if is_registered(data, user_id):
-        # Block banned users from all bot commands
         player = data.get("players", {}).get(user_id, {})
         user_row = player.get("user", {}) if isinstance(player, dict) else {}
         if isinstance(user_row, dict) and bool(user_row.get("is_banned", False)):
-            from bot.utils.ui import e, make_embed
             ban_reason = str(user_row.get("ban_reason", "No reason provided."))
             embed = make_embed(
                 data,
                 f"{e('no', data)} You Are Banned",
                 f"You have been banned from using this bot.\n**Reason:** {ban_reason}",
             )
-            await smart_reply(interaction, embed=embed, ephemeral=True)
+            await smart_reply(obj, embed=embed, ephemeral=True)
             return False
         return True
 
     embed = make_embed(
         data,
         f"{e('warning', data)} Not Registered",
-        "You need to run `/start` to register your account first.",
+        "You need to run `!start` to register your account first.",
     )
-    if interaction.response.is_done():
-        await smart_reply(interaction, embed=embed, ephemeral=True)
-    else:
-        await smart_reply(interaction, embed=embed, ephemeral=True)
+    await smart_reply(obj, embed=embed, ephemeral=True)
     return False

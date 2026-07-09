@@ -7,7 +7,6 @@ from datetime import datetime
 from typing import Any
 
 import discord
-from discord import app_commands
 from discord.ext import commands
 
 from bot.utils.cards_logic import build_card_instance
@@ -244,12 +243,12 @@ class RewardsCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    async def _handle_hourly(self, interaction: discord.Interaction) -> None:
-        if not await ensure_registered(interaction, self.bot.storage):
+    async def _handle_hourly(self, ctx: commands.Context) -> None:
+        if not await ensure_registered(ctx, self.bot.storage):
             return
-        await interaction.response.defer()
+        await ctx.defer()
 
-        user_id = str(interaction.user.id)
+        user_id = str(ctx.author.id)
         now = now_ts()
 
         def mutate(data: dict[str, Any]) -> tuple[bool, int, int]:
@@ -279,7 +278,7 @@ class RewardsCog(commands.Cog):
                 ),
                 color=HOURLY_COLOR,
             )
-            await interaction.followup.send(embed=embed)
+            await ctx.send(embed=embed)
             return
 
         embed = _reward_embed(
@@ -295,19 +294,19 @@ class RewardsCog(commands.Cog):
             ),
             color=HOURLY_COLOR,
         )
-        await interaction.followup.send(embed=embed)
+        await ctx.send(embed=embed)
 
-    async def _handle_card_reward(self, interaction: discord.Interaction, reward_type: str) -> None:
-        if not await ensure_registered(interaction, self.bot.storage):
+    async def _handle_card_reward(self, ctx: commands.Context, reward_type: str) -> None:
+        if not await ensure_registered(ctx, self.bot.storage):
             return
         # Defer immediately — with_lock can be slow and Discord expects <3s
-        await interaction.response.defer()
+        await ctx.defer()
 
         rates       = REWARD_RATES.get(reward_type, {REWARD_CARD_RARITY[reward_type]: 1})
         coin_amount = int(REWARD_COIN_BONUS.get(reward_type, 0))
         coin_chance = float(REWARD_COIN_CHANCE.get(reward_type, 0.5))
         now = now_ts()
-        user_id = str(interaction.user.id)
+        user_id = str(ctx.author.id)
 
         def mutate(data: dict[str, Any]) -> tuple[bool, int, dict[str, Any] | None, dict[str, Any] | None, str, int, bool, int, int, float]:
             player = data["players"][user_id]
@@ -403,7 +402,7 @@ class RewardsCog(commands.Cog):
                 ),
                 color=color,
             )
-            await interaction.followup.send(embed=embed)
+            await ctx.send(embed=embed)
             return
 
         if coins_path:
@@ -431,7 +430,7 @@ class RewardsCog(commands.Cog):
                 ),
                 color=color,
             )
-            await interaction.followup.send(embed=embed)
+            await ctx.send(embed=embed)
             return
 
         card_name = str((card_def or {}).get("name", "Unknown Card"))
@@ -467,23 +466,23 @@ class RewardsCog(commands.Cog):
         embed.set_image(url=image_url)
 
         view = RewardCardActionView(self.bot, user_id, str((card_instance or {}).get("uid", "")))
-        await interaction.followup.send(embed=embed, view=view)
+        await ctx.send(embed=embed, view=view)
 
-    @app_commands.command(name="hourly", description="Claim your hourly reward.")
-    async def hourly(self, interaction: discord.Interaction) -> None:
-        await self._handle_hourly(interaction)
+    @commands.command(name="hourly")
+    async def hourly(self, ctx: commands.Context) -> None:
+        await self._handle_hourly(ctx)
 
-    @app_commands.command(name="daily", description="Claim your daily reward.")
-    async def daily(self, interaction: discord.Interaction) -> None:
-        await self._handle_card_reward(interaction, "daily")
+    @commands.command(name="daily")
+    async def daily(self, ctx: commands.Context) -> None:
+        await self._handle_card_reward(ctx, "daily")
 
-    @app_commands.command(name="weekly", description="Claim your weekly reward.")
-    async def weekly(self, interaction: discord.Interaction) -> None:
-        await self._handle_card_reward(interaction, "weekly")
+    @commands.command(name="weekly")
+    async def weekly(self, ctx: commands.Context) -> None:
+        await self._handle_card_reward(ctx, "weekly")
 
-    @app_commands.command(name="monthly", description="Claim your monthly reward.")
-    async def monthly(self, interaction: discord.Interaction) -> None:
-        await self._handle_card_reward(interaction, "monthly")
+    @commands.command(name="monthly")
+    async def monthly(self, ctx: commands.Context) -> None:
+        await self._handle_card_reward(ctx, "monthly")
 
 
 async def setup(bot: commands.Bot) -> None:

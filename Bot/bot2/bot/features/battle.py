@@ -10,10 +10,7 @@ from collections import defaultdict
 from typing import Any
 
 import discord
-from discord import app_commands
 from discord.ext import commands
-from bot.config import OWNER_GUILD_ID
-
 from bot.utils.attacks_logic import ensure_attacks_structure
 from bot.utils.battle_engine_pdf import normalize_attack_type
 from bot.utils.battle_state import apply_move, create_battle_state, end_battle
@@ -61,7 +58,6 @@ from bot.features.battle_embeds import (
 )
 
 logger = logging.getLogger(__name__)
-OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 RANKED_QUEUE_TIMEOUT_SECONDS = 60
 
 
@@ -1223,7 +1219,7 @@ class BattleCog(commands.Cog):
             await self.bot.battle_service.sync_active_by_user_from_data(self.bot.storage.load())
             return False, f"start_failed: {type(exc).__name__}"
 
-    async def _try_match(self, interaction: discord.Interaction, user_id: str) -> bool:
+    async def _try_match(self, ctx: commands.Context, user_id: str) -> bool:
         def mutate_pick(data: dict[str, Any]) -> dict[str, Any]:
             root = self._battle_root(data)
             self._cleanup_expired(data)
@@ -1267,11 +1263,11 @@ class BattleCog(commands.Cog):
             return False
 
         opp_id = str(picked.get("opp_id", ""))
-        ok, reason = await self.start_battle_or_fail(interaction, str(user_id), opp_id, "ranked")
+        ok, reason = await self.start_battle_or_fail(ctx, str(user_id), opp_id, "ranked")
         if not ok:
             logger.warning("[RANKED_MATCH_START] failed user=%s opp=%s reason=%s", user_id, opp_id, reason)
             data = await self._load_battle_data()
-            await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Failed", str(reason)), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(data, f"{e('warning', data)} Battle Failed", str(reason)), ephemeral=True)
             return False
         for qid in (str(user_id), str(opp_id)):
             task = self.queue_cpu_tasks.pop(qid, None)
@@ -1279,7 +1275,7 @@ class BattleCog(commands.Cog):
                 task.cancel()
         return True
 
-    async def _queue_loop(self, interaction: discord.Interaction, user_id: str) -> None:
+    async def _queue_loop(self, ctx: commands.Context, user_id: str) -> None:
         """Periodically re-check for a match every 10s. Falls back to CPU after timeout."""
         remaining = RANKED_QUEUE_TIMEOUT_SECONDS
         while remaining > 0:
@@ -1288,7 +1284,7 @@ class BattleCog(commands.Cog):
 
             # Try to find a match
             try:
-                matched = await self._try_match(interaction, user_id)
+                matched = await self._try_match(ctx, user_id)
                 if matched:
                     # Battle started — task is done
                     return
@@ -1308,7 +1304,7 @@ class BattleCog(commands.Cog):
 
         # Timeout reached — start CPU battle
         try:
-            await self._start_ranked_cpu_battle(interaction, user_id)
+            await self._start_ranked_cpu_battle(ctx, user_id)
         except Exception:
             logger.error("[RANKED_CPU_FALLBACK] failed user=%s\n%s", user_id, traceback.format_exc())
         finally:
@@ -1449,16 +1445,16 @@ class BattleCog(commands.Cog):
             logger.info("[BATTLE_STARTUP_RECOVERY] no stale active battle state found")
         return {**summary, "refreshed": refreshed_count}
 
-    async def _leave_ranked_queue(self, interaction: discord.Interaction, user_id: str, *, message: str = "You've been removed from the ranked queue.") -> bool:
+    async def _leave_ranked_queue(self, ctx: commands.Context, user_id: str, *, message: str = "You've been removed from the ranked queue.") -> bool:
         removed = (await self._remove_ranked_queue_state(user_id))["removed"]
         data = await self._load_battle_data()
         if not removed:
-            await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)
             return False
-        await smart_reply(interaction, embed=make_embed(data, f"{e('ok', data)} Queue Updated", message), ephemeral=True)
+        await smart_reply(ctx, embed=make_embed(data, f"{e('ok', data)} Queue Updated", message), ephemeral=True)
         return True
 
-    async def _start_ranked_cpu_battle(self, interaction: discord.Interaction, user_id: str) -> bool:
+    async def _start_ranked_cpu_battle(self, ctx: commands.Context, user_id: str) -> bool:
         def mutate(data: dict[str, Any]) -> dict[str, Any]:
             root = self._battle_root(data)
             queue = root.get("queue", [])
@@ -1473,32 +1469,32 @@ class BattleCog(commands.Cog):
         popped = self.bot.storage.with_lock(mutate)
         if not popped.get("ok"):
             data = await self._load_battle_data()
-            await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)
             return False
 
         await self.bot.battle_service.remove_queue_user(str(user_id))
         self._cancel_ranked_queue_task(user_id)
         data = await self._load_battle_data()
         cpu = self._make_cpu_participant(data, self._player_trophies(data, user_id))
-        ok, reason = await self.start_battle_or_fail(interaction, str(user_id), cpu["cpu_key"], "ranked", cpu_opponent=cpu)
+        ok, reason = await self.start_battle_or_fail(ctx, str(user_id), cpu["cpu_key"], "ranked", cpu_opponent=cpu)
         if not ok:
             logger.warning("[RANKED_CPU_START] failed user=%s reason=%s", user_id, reason)
-            await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Failed", str(reason)), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(data, f"{e('warning', data)} Battle Failed", str(reason)), ephemeral=True)
             return False
         return True
 
-    @app_commands.command(name="battle", description="Enter ranked queue.")
-    async def battle(self, interaction: discord.Interaction) -> None:
-        ok_route, reason, route_channel_id = check_battle_channel_allowed(interaction)
+    @commands.command(name="battle")
+    async def battle(self, ctx: commands.Context) -> None:
+        ok_route, reason, route_channel_id = check_battle_channel_allowed(ctx)
         if not ok_route:
             data = await self._load_battle_data()
-            await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Channel", f"{reason or 'not_allowed'}: Use <#{route_channel_id}>" if route_channel_id else str(reason or 'not_allowed')), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(data, f"{e('warning', data)} Battle Channel", f"{reason or 'not_allowed'}: Use <#{route_channel_id}>" if route_channel_id else str(reason or 'not_allowed')), ephemeral=True)
             return
-        if not await ensure_registered(interaction, self.bot.storage):
+        if not await ensure_registered(ctx, self.bot.storage):
             return
 
-        await interaction.response.defer(ephemeral=True, thinking=True)
-        uid = str(interaction.user.id)
+        await ctx.defer(ephemeral=True)
+        uid = str(ctx.author.id)
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             root = self._battle_root(data)
@@ -1531,25 +1527,25 @@ class BattleCog(commands.Cog):
         data = await self._load_battle_data()
         if not ok:
             msg = {
-                "already_battle": "You're already in an active battle. Use `/forfeit` to exit.",
+                "already_battle": "You're already in an active battle. Use `!forfeit` to exit.",
                 "already_queue": "You're already in the ranked queue. Wait for a match.",
                 "pending_friendly": "You have a pending friendly invite. Resolve it first.",
-                "no_team": "You need at least one fighter in your active squad. Use `/squad` to set one up.",
+                "no_team": "You need at least one fighter in your active squad. Use `!squad` to set one up.",
             }[status]
-            await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Queue Failed", msg), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(data, f"{e('warning', data)} Queue Failed", msg), ephemeral=True)
             return
 
-        matched = await self._try_match(interaction, uid)
+        matched = await self._try_match(ctx, uid)
         if matched:
             self._cancel_ranked_queue_task(uid)
-            await smart_reply(interaction, embed=make_embed(data, f"{e('ok', data)} Match Found!", "A ranked opponent was found — battle starting now."), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(data, f"{e('ok', data)} Match Found!", "A ranked opponent was found — battle starting now."), ephemeral=True)
             return
 
         self._cancel_ranked_queue_task(uid)
         self._track_background_task(
             self.queue_cpu_tasks,
             uid,
-            asyncio.create_task(self._queue_loop(interaction, uid)),
+            asyncio.create_task(self._queue_loop(ctx, uid)),
             "ranked_cpu_fallback",
         )
         view = RankedQueueView(self, uid)
@@ -1559,28 +1555,24 @@ class BattleCog(commands.Cog):
             f"{e('clock', data)} You've joined the ranked queue.\nIf no match is found within **{RANKED_QUEUE_TIMEOUT_SECONDS} seconds**, you'll face a CPU opponent.",
             fields=[(f"{e('timer', data)} Timeout", f"{RANKED_QUEUE_TIMEOUT_SECONDS} seconds", True), ("Actions", "CPU Battle or Forfeit the queue.", True)],
         )
-        if interaction.response.is_done():
-            msg = await interaction.followup.send(embed=embed, view=view, ephemeral=True, wait=True)
-        else:
-            await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
-            msg = await interaction.original_response()
+        msg = await ctx.send(embed=embed, view=view)
         if isinstance(msg, discord.Message):
             view.message = msg
 
-    @app_commands.command(name="battle_cancel", description="Cancel ranked queue.")
-    async def battle_cancel(self, interaction: discord.Interaction) -> None:
-        ok_route, reason, route_channel_id = check_battle_channel_allowed(interaction)
+    @commands.command(name="battle_cancel")
+    async def battle_cancel(self, ctx: commands.Context) -> None:
+        ok_route, reason, route_channel_id = check_battle_channel_allowed(ctx)
         if not ok_route:
             data = await self._load_battle_data()
-            await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Channel", f"{reason or 'not_allowed'}: Use <#{route_channel_id}>" if route_channel_id else str(reason or 'not_allowed')), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(data, f"{e('warning', data)} Battle Channel", f"{reason or 'not_allowed'}: Use <#{route_channel_id}>" if route_channel_id else str(reason or 'not_allowed')), ephemeral=True)
             return
-        uid = str(interaction.user.id)
+        uid = str(ctx.author.id)
         removed = (await self._remove_ranked_queue_state(uid))["removed"]
         data = await self._load_battle_data()
         if not removed:
-            await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)
             return
-        await smart_reply(interaction, embed=make_embed(data, f"{e('ok', data)} Queue Cancelled", "You've been removed from the ranked queue."), ephemeral=True)
+        await smart_reply(ctx, embed=make_embed(data, f"{e('ok', data)} Queue Cancelled", "You've been removed from the ranked queue."), ephemeral=True)
 
     def _remove_queue_entry(self, data: dict[str, Any], uid: str) -> bool:
         queue = self._battle_root(data).get("queue", [])
@@ -1590,16 +1582,16 @@ class BattleCog(commands.Cog):
         self._battle_root(data)["queue"] = [q for q in queue if not (isinstance(q, dict) and str(q.get("user_id", "")) == uid)]
         return len(self._battle_root(data)["queue"]) != before
 
-    @app_commands.command(name="friendly", description="Send friendly challenge.")
-    async def friendly(self, interaction: discord.Interaction, opponent: discord.User) -> None:
-        ok_route, reason, route_channel_id = check_battle_channel_allowed(interaction)
+    @commands.command(name="friendly")
+    async def friendly(self, ctx: commands.Context, opponent: discord.User) -> None:
+        ok_route, reason, route_channel_id = check_battle_channel_allowed(ctx)
         if not ok_route:
             data = await self._load_battle_data()
-            await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Channel", f"{reason or 'not_allowed'}: Use <#{route_channel_id}>" if route_channel_id else str(reason or 'not_allowed')), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(data, f"{e('warning', data)} Battle Channel", f"{reason or 'not_allowed'}: Use <#{route_channel_id}>" if route_channel_id else str(reason or 'not_allowed')), ephemeral=True)
             return
-        if not await ensure_registered(interaction, self.bot.storage):
+        if not await ensure_registered(ctx, self.bot.storage):
             return
-        cid = str(interaction.user.id)
+        cid = str(ctx.author.id)
         tid = str(opponent.id)
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
@@ -1629,18 +1621,18 @@ class BattleCog(commands.Cog):
         if not ok:
             msg = {
                 "self": "You can't challenge yourself to a friendly match.",
-                "target_unregistered": f"{opponent.mention} hasn't registered yet — they need to run `/start` first.",
+                "target_unregistered": f"{opponent.mention} hasn't registered yet — they need to run `!start` first.",
                 "in_battle": "One of you is already in an active battle.",
                 "no_team": "Both players need at least one card in their active squad.",
                 "in_queue": "One of you is currently in the ranked queue.",
             }[status]
-            await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Challenge Failed", msg), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(data, f"{e('warning', data)} Challenge Failed", msg), ephemeral=True)
             return
 
-        if interaction.channel:
+        if ctx.channel:
             view = FriendlyInviteView(self, cid, tid)
             try:
-                msg = await interaction.channel.send(
+                msg = await ctx.send(
                     embed=make_embed(
                         data,
                         f"{e('friendly', data)} Friendly Challenge!",
@@ -1663,7 +1655,7 @@ class BattleCog(commands.Cog):
                 self.bot.storage.with_lock(lambda d: self._battle_root(d).get("pending_friendly", {}).pop(tid, None))
                 await self.bot.battle_service.remove_pending_friendly(tid)
                 await smart_reply(
-                    interaction,
+                    ctx,
                     embed=make_embed(data, f"{e('warning', data)} Cannot Send", f"I don't have permission to send messages in this channel."),
                     ephemeral=True,
                 )
@@ -1675,18 +1667,18 @@ class BattleCog(commands.Cog):
         self._track_background_task(
             self.friendly_cpu_tasks,
             tid,
-            asyncio.create_task(self._friendly_timeout_to_cpu(interaction, cid, tid)),
+            asyncio.create_task(self._friendly_timeout_to_cpu(ctx, cid, tid)),
             "friendly_cpu_fallback",
         )
 
-        await smart_reply(interaction, embed=make_embed(data, f"{e('ok', data)} Challenge Sent", f"Your friendly challenge to {opponent.mention} has been sent.\nThey have **60 seconds** to accept."), ephemeral=True)
+        await smart_reply(ctx, embed=make_embed(data, f"{e('ok', data)} Challenge Sent", f"Your friendly challenge to {opponent.mention} has been sent.\nThey have **60 seconds** to accept."), ephemeral=True)
 
     def _set_pending_message(self, data: dict[str, Any], tid: str, message_id: str) -> None:
         pending = self._battle_root(data).get("pending_friendly", {}).get(tid)
         if isinstance(pending, dict):
             pending["message_id"] = message_id
 
-    async def _friendly_timeout_to_cpu(self, interaction: discord.Interaction, challenger_id: str, target_id: str) -> None:
+    async def _friendly_timeout_to_cpu(self, ctx: commands.Context, challenger_id: str, target_id: str) -> None:
         await asyncio.sleep(60)
         challenger = str(challenger_id)
         target = str(target_id)
@@ -1715,15 +1707,15 @@ class BattleCog(commands.Cog):
 
             data = await self._load_battle_data()
             cpu = self._make_cpu_participant(data, self._player_trophies(data, challenger))
-            ok, reason = await self.start_battle_or_fail(interaction, challenger, cpu["cpu_key"], "friendly", cpu_opponent=cpu)
+            ok, reason = await self.start_battle_or_fail(ctx, challenger, cpu["cpu_key"], "friendly", cpu_opponent=cpu)
             if not ok:
                 logger.warning("[FRIENDLY_TIMEOUT_CPU_START] failed challenger=%s target=%s reason=%s", challenger, target, reason)
                 return
 
             # Update the original challenge message to show expired (view.on_timeout should also handle this)
-            if msg_id and msg_id.isdigit() and interaction.channel:
+            if msg_id and msg_id.isdigit() and ctx.channel:
                 try:
-                    old_msg = await interaction.channel.fetch_message(int(msg_id))
+                    old_msg = await ctx.channel.fetch_message(int(msg_id))
                     data = await self._load_battle_data()
                     await old_msg.edit(
                         embed=make_embed(
@@ -1736,9 +1728,9 @@ class BattleCog(commands.Cog):
                 except (discord.NotFound, discord.Forbidden, discord.HTTPException):
                     pass
 
-            if interaction.channel is not None:
+            if ctx.channel is not None:
                 data = await self._load_battle_data()
-                await interaction.channel.send(
+                await ctx.send(
                     embed=make_embed(
                         data,
                         f"{e('friendly', data)} Friendly Timed Out",
@@ -1801,14 +1793,14 @@ class BattleCog(commands.Cog):
 
         await smart_reply(interaction, embed=make_embed(data, f"{e('ok', data)} Challenge Accepted!", "The friendly battle has started — good luck!"), ephemeral=True)
 
-    @app_commands.command(name="friendly_cancel", description="Cancel outgoing friendly challenge.")
-    async def friendly_cancel(self, interaction: discord.Interaction) -> None:
-        ok_route, reason, route_channel_id = check_battle_channel_allowed(interaction)
+    @commands.command(name="friendly_cancel")
+    async def friendly_cancel(self, ctx: commands.Context) -> None:
+        ok_route, reason, route_channel_id = check_battle_channel_allowed(ctx)
         if not ok_route:
             data = await self._load_battle_data()
-            await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Channel", f"{reason or 'not_allowed'}: Use <#{route_channel_id}>" if route_channel_id else str(reason or 'not_allowed')), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(data, f"{e('warning', data)} Battle Channel", f"{reason or 'not_allowed'}: Use <#{route_channel_id}>" if route_channel_id else str(reason or 'not_allowed')), ephemeral=True)
             return
-        uid = str(interaction.user.id)
+        uid = str(ctx.author.id)
 
         def mutate(data: dict[str, Any]) -> bool:
             pending = self._battle_root(data).get("pending_friendly", {})
@@ -1830,19 +1822,19 @@ class BattleCog(commands.Cog):
                 self.friendly_cpu_tasks.pop(tid, None)
         data = await self._load_battle_data()
         if not removed:
-            await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} No Active Challenge", "You don't have any outgoing friendly challenges to cancel."), ephemeral=True)
+            await smart_reply(ctx, embed=make_embed(data, f"{e('info', data)} No Active Challenge", "You don't have any outgoing friendly challenges to cancel."), ephemeral=True)
             return
-        await smart_reply(interaction, embed=make_embed(data, f"{e('ok', data)} Challenge Cancelled", "Your outgoing friendly challenge has been cancelled."), ephemeral=True)
+        await smart_reply(ctx, embed=make_embed(data, f"{e('ok', data)} Challenge Cancelled", "Your outgoing friendly challenge has been cancelled."), ephemeral=True)
 
-    @app_commands.command(name="o_battle_unstuck", description="Owner: clear stuck battle/pending state for a user.")
-    @app_commands.guilds(OWNER_GUILD)
-    async def o_battle_unstuck(self, interaction: discord.Interaction, target: discord.User | None = None) -> None:
+    @commands.command(name="o_battle_unstuck")
+    @commands.is_owner()
+    async def o_battle_unstuck(self, ctx: commands.Context, target: discord.User | None = None) -> None:
         data = await self._load_battle_data()
-        if not is_owner(interaction):
-            await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "You are not allowed to use this command."), ephemeral=True)
+        if not is_owner(ctx):
+            await smart_reply(ctx, embed=make_embed(data, f"{e('no', data)} Owner Only", "You are not allowed to use this command."), ephemeral=True)
             return
 
-        uid = str((target.id if target else interaction.user.id))
+        uid = str((target.id if target else ctx.author.id))
 
         def mutate(d: dict[str, Any]) -> tuple[int, int]:
             users = {uid}
@@ -1880,7 +1872,7 @@ class BattleCog(commands.Cog):
         logger.warning("[BATTLE_UNSTUCK] user=%s removed_active=%s removed_pending=%s", uid, removed_active, removed_pending)
         data = await self._load_battle_data()
         await smart_reply(
-            interaction,
+            ctx,
             embed=make_embed(
                 data,
                 f"{e('ok', data)} Battle State Cleared",
@@ -1914,24 +1906,18 @@ class BattleCog(commands.Cog):
         result = self.bot.storage.with_lock(mutate)
         data = self.bot.storage.load()
         if not result.get("ok"):
-            if interaction.response.is_done():
-                await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} No Active Battle", "You don't have an active battle to forfeit."), ephemeral=True)
-            else:
-                await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} No Active Battle", "You don't have an active battle to forfeit."), ephemeral=True)
+            await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} No Active Battle", "You don't have an active battle to forfeit."), ephemeral=True)
             return
 
         # Sync SQLite so user can battle again immediately
         await self.bot.battle_service.sync_active_by_user_from_data(data)
 
         await self._refresh_battle_message(str(result.get("battle_id", "")))
-        if interaction.response.is_done():
-            await smart_reply(interaction, embed=make_embed(data, f"{e('forfeit', data)} Battle Forfeited", "You've forfeited the battle. Better luck next time!"), ephemeral=True)
-        else:
-            await smart_reply(interaction, embed=make_embed(data, f"{e('forfeit', data)} Battle Forfeited", "You've forfeited the battle. Better luck next time!"), ephemeral=True)
+        await smart_reply(interaction, embed=make_embed(data, f"{e('forfeit', data)} Battle Forfeited", "You've forfeited the battle. Better luck next time!"), ephemeral=True)
 
-    @app_commands.command(name="forfeit", description="Forfeit your active battle.")
-    async def forfeit(self, interaction: discord.Interaction) -> None:
-        await self.forfeit_internal(interaction, str(interaction.user.id))
+    @commands.command(name="forfeit")
+    async def forfeit(self, ctx: commands.Context) -> None:
+        await self.forfeit_internal(ctx, str(ctx.author.id))
 
 
 async def setup(bot: commands.Bot) -> None:

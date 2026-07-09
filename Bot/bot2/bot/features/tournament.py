@@ -5,7 +5,6 @@ import uuid
 from typing import Any
 
 import discord
-from discord import app_commands
 from discord.ext import commands
 
 from bot.utils.checks import ensure_registered
@@ -13,9 +12,6 @@ from bot.utils.timeutil import now_ts
 from bot.utils.ui import make_embed
 from bot.utils.xp_logic import make_bar
 from bot.utils.interaction_visibility import smart_reply, error_reply
-from bot.config import OWNER_GUILD_ID
-
-OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 PRIZE_SPLIT = [0.40, 0.20, 0.12, 0.08, 0.05, 0.05, 0.025, 0.025, 0.025, 0.025]
 
 def _e(desc: str, color: int = 0x2B2D31) -> discord.Embed:
@@ -58,13 +54,13 @@ class TournamentCog(commands.Cog):
 
     # ── /tournament ───────────────────────────────────────────────
 
-    @app_commands.command(name="tournament", description="View active tournament leaderboard.")
-    async def tournament(self, interaction: discord.Interaction) -> None:
-        if not await ensure_registered(interaction, self.bot.storage):
+    @commands.command(name="tournament")
+    async def tournament(self, ctx: commands.Context) -> None:
+        if not await ensure_registered(ctx, self.bot.storage):
             return
         data = self.bot.storage.load()
         t    = _t_root(data)
-        uid  = str(interaction.user.id)
+        uid  = str(ctx.author.id)
 
         if not t.get("active"):
             await smart_reply(interaction, embed=_inf("╭─ ⚔️ No Active Tournament\n│ No tournament is running right now.\n╰────────────────"))
@@ -125,7 +121,7 @@ class TournamentCog(commands.Cog):
             battle_btn.callback = battle_cb
             view.add_item(battle_btn)
 
-        await smart_reply(interaction, embed=_inf(body), view=view)
+        await smart_reply(ctx, embed=_inf(body), view=view)
 
     # ── /tournament join ──────────────────────────────────────────
 
@@ -182,42 +178,42 @@ class TournamentCog(commands.Cog):
             f"│ 💰 Entry fee: -{int(t.get('entry_fee',0)):,} coins\n"
             f"│ 👥 You are player {result}/{int(t.get('max_players',16))}\n"
             f"│ ⏳ {_time_left(int(t.get('end_time',0)))} remaining\n"
-            f"│ Use /tournament battle to earn XP!\n"
+            f"│ Use !tournament_battle to earn XP!\n"
             "╰────────────────"
         ))
 
     # ── /tournament battle ────────────────────────────────────────
 
-    @app_commands.command(name="tournament_battle", description="Battle another tournament participant.")
-    async def tournament_battle(self, interaction: discord.Interaction) -> None:
-        if not await ensure_registered(interaction, self.bot.storage):
+    @commands.command(name="tournament_battle")
+    async def tournament_battle(self, ctx: commands.Context) -> None:
+        if not await ensure_registered(ctx, self.bot.storage):
             return
-        await self._start_tournament_battle(interaction)
+        await self._start_tournament_battle(ctx)
 
-    async def _start_tournament_battle(self, interaction: discord.Interaction) -> None:
-        uid  = str(interaction.user.id)
+    async def _start_tournament_battle(self, obj: Any) -> None:
+        uid  = str(getattr(obj, "author", None) or getattr(obj, "user", None))
         data = self.bot.storage.load()
         t    = _t_root(data)
 
         if not t.get("active"):
-            await error_reply(interaction, embed=_err("╭─ ❌ No active tournament.\n╰────────────────"))
+            await error_reply(obj, embed=_err("╭─ ❌ No active tournament.\n╰────────────────"))
             return
 
         parts = t.get("participants", {}) or {}
         if uid not in parts:
-            await error_reply(interaction, embed=_err("╭─ ❌ You are not in this tournament.\n│ Use /tournament_join first.\n╰────────────────"))
+            await error_reply(obj, embed=_err("╭─ ❌ You are not in this tournament.\n│ Use !tournament first.\n╰────────────────"))
             return
 
         # Check if already in battle
         from bot.utils.battle_state import create_battle_state
         battle_root = data.get("battle", {}).get("active_by_user", {})
         if str(battle_root.get(uid, "")):
-            await error_reply(interaction, embed=_err("╭─ ❌ You are already in a battle.\n╰────────────────"))
+            await error_reply(obj, embed=_err("╭─ ❌ You are already in a battle.\n╰────────────────"))
             return
 
         # Queue into tournament battle — uses same battle system
         # Mark as tournament battle type
-        await smart_reply(interaction, embed=_inf(
+        await smart_reply(obj, embed=_inf(
             f"╭─ ⚔️ Tournament Battle\n"
             f"│ Searching for opponent...\n"
             f"│ Only tournament participants\n"
@@ -253,7 +249,7 @@ class TournamentCog(commands.Cog):
                                 tq2.remove(p)
                     self.bot.storage.with_lock(start)
                     ok2, _ = await battle_cog.start_battle_or_fail(
-                        interaction, uid, opponent, "tournament"
+                        obj, uid, opponent, "tournament"
                     )
                 else:
                     # CPU fallback
@@ -263,31 +259,39 @@ class TournamentCog(commands.Cog):
                         if uid in tq3: tq3.remove(uid)
                     self.bot.storage.with_lock(remove_q)
                     await battle_cog.start_battle_or_fail(
-                        interaction, uid, cpu["cpu_key"], "tournament", cpu_opponent=cpu
+                        obj, uid, cpu["cpu_key"], "tournament", cpu_opponent=cpu
                     )
 
             asyncio.create_task(try_match())
 
     # ── Owner commands ────────────────────────────────────────────
 
-    @app_commands.command(name="o_tournament_create", description="Owner: create a tournament.")
-    @app_commands.guilds(OWNER_GUILD)
-    async def o_tournament_create(self, interaction: discord.Interaction,
+    @commands.command(name="o_tournament_create")
+    @commands.is_owner()
+    async def o_tournament_create(self, ctx: commands.Context,
                                    name: str,
-                                   duration_hours: app_commands.Range[int, 1, 168] = 24,
-                                   entry_fee: app_commands.Range[int, 0, 999_999_999] = 0,
-                                   max_players: app_commands.Range[int, 2, 256] = 16,
-                                   prize_pool: app_commands.Range[int, 0, 999_999_999] = 0,
+                                   duration_hours: int = 24,
+                                   entry_fee: int = 0,
+                                   max_players: int = 16,
+                                   prize_pool: int = 0,
                                    min_rank: str = "") -> None:
-        from bot.utils.checks import is_owner
         from bot.data.constants import RANK_ORDER
-        if not is_owner(interaction):
-            await error_reply(interaction, embed=_err("❌ Owner only."))
+        if duration_hours < 1 or duration_hours > 168:
+            await error_reply(ctx, embed=_err("❌ duration_hours must be between 1 and 168."))
+            return
+        if entry_fee < 0 or entry_fee > 999_999_999:
+            await error_reply(ctx, embed=_err("❌ entry_fee must be between 0 and 999,999,999."))
+            return
+        if max_players < 2 or max_players > 256:
+            await error_reply(ctx, embed=_err("❌ max_players must be between 2 and 256."))
+            return
+        if prize_pool < 0 or prize_pool > 999_999_999:
+            await error_reply(ctx, embed=_err("❌ prize_pool must be between 0 and 999,999,999."))
             return
 
         min_rank_clean = min_rank.strip().title()
         if min_rank_clean and min_rank_clean not in RANK_ORDER:
-            await error_reply(interaction, embed=_err(f"❌ Invalid rank. Choose from: {', '.join(RANK_ORDER)}"))
+            await error_reply(ctx, embed=_err(f"❌ Invalid rank. Choose from: {', '.join(RANK_ORDER)}"))
             return
 
         def mutate(data: dict) -> tuple[bool, str]:
@@ -308,11 +312,11 @@ class TournamentCog(commands.Cog):
 
         ok, msg = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"╭─ ❌ Failed\n│ {msg}\n╰────────────────"))
+            await error_reply(ctx, embed=_err(f"╭─ ❌ Failed\n│ {msg}\n╰────────────────"))
             return
 
         rank_line = f"│ 🏅 Min Rank: {min_rank_clean}\n" if min_rank_clean else ""
-        await smart_reply(interaction, embed=_ok(
+        await smart_reply(ctx, embed=_ok(
             f"╭─ ✅ Tournament Created!\n"
             f"│ ⚔️ {name}\n"
             f"│ ⏳ Duration: {duration_hours}h\n"
@@ -329,14 +333,9 @@ class TournamentCog(commands.Cog):
             await self._end_tournament()
         self._end_task = asyncio.create_task(auto_end())
 
-    @app_commands.command(name="o_tournament_cancel", description="Owner: cancel tournament and refund fees.")
-    @app_commands.guilds(OWNER_GUILD)
-    async def o_tournament_cancel(self, interaction: discord.Interaction) -> None:
-        from bot.utils.checks import is_owner
-        if not is_owner(interaction):
-            await error_reply(interaction, embed=_err("❌ Owner only."))
-            return
-
+    @commands.command(name="o_tournament_cancel")
+    @commands.is_owner()
+    async def o_tournament_cancel(self, ctx: commands.Context) -> None:
         def mutate(data: dict) -> tuple[bool, int, int]:
             t = _t_root(data)
             if not t.get("active"):
@@ -356,13 +355,13 @@ class TournamentCog(commands.Cog):
 
         ok, count, refunded = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err("╭─ ❌ No active tournament.\n╰────────────────"))
+            await error_reply(ctx, embed=_err("╭─ ❌ No active tournament.\n╰────────────────"))
             return
 
         if self._end_task and not self._end_task.done():
             self._end_task.cancel()
 
-        await smart_reply(interaction, embed=_ok(
+        await smart_reply(ctx, embed=_ok(
             f"╭─ 🚫 Tournament Cancelled\n"
             f"│ 💰 {count} players refunded\n"
             f"│ 💰 {refunded:,} coins returned\n"

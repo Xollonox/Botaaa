@@ -7,10 +7,8 @@ import random
 from typing import Any
 
 import discord
-from discord import app_commands
 from discord.ext import commands
 
-from bot.config import OWNER_GUILD_ID
 from bot.utils.cards_logic import build_card_instance
 from bot.utils.checks import ensure_registered, is_owner
 from bot.utils.timeutil import now_ts as _now_ts
@@ -21,7 +19,6 @@ from bot.utils.interaction_visibility import smart_reply, error_reply
 
 logger = logging.getLogger(__name__)
 
-OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
 
 def _get_player_pack_inventory(player: dict[str, Any]) -> list[dict[str, Any]]:
@@ -605,16 +602,15 @@ class PacksCog(commands.Cog):
     async def cog_unload(self) -> None:
         pass
 
-    @app_commands.command(name="o_pack", description="Owner: open pack management panel.")
-    @app_commands.guilds(OWNER_GUILD)
-    async def o_pack(self, interaction: discord.Interaction) -> None:
+    @commands.command(name="o_pack")
+    async def o_pack(self, ctx: commands.Context) -> None:
         data = self.bot.storage.load()
-        if not is_owner(interaction):
-            await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
+        if not is_owner(ctx):
+            await smart_reply(ctx, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
-        view = PackPanelView(self, str(interaction.user.id))
+        view = PackPanelView(self, str(ctx.author.id))
         view._rebuild(data)
-        await smart_reply(interaction, embed=view._embed(data), view=view, ephemeral=True)
+        await smart_reply(ctx, embed=view._embed(data), view=view, ephemeral=True)
 
     async def pack_buy(self, interaction: discord.Interaction, pack_name: str, quantity: int) -> None:
         if not await ensure_registered(interaction, self.bot.storage):

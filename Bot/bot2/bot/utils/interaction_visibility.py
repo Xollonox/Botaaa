@@ -4,26 +4,26 @@ import logging
 from typing import Any
 
 import discord
+from discord.ext import commands
 
 from bot.utils.ui import skin_embed, style_view
 
 logger = logging.getLogger(__name__)
 
 
-def _is_owner_command(interaction: Any) -> bool:
-    command = getattr(interaction, "command", None)
+def _is_owner_command(obj: Any) -> bool:
+    command = getattr(obj, "command", None)
     cmd_name = getattr(command, "name", "") if command is not None else ""
     return str(cmd_name).startswith("o_")
 
 
-def _load_data(interaction: Any) -> dict[str, Any] | None:
-    client = getattr(interaction, "client", None)
+def _load_data(obj: Any) -> dict[str, Any] | None:
+    # Works for both Interaction (obj.client) and Context (obj.bot)
+    client = getattr(obj, "client", None) or getattr(obj, "bot", None)
     storage = getattr(client, "storage", None)
     if storage is None:
         return None
     try:
-        # Read-only fast path: payload is only passed to skin_embed/style_view
-        # which must treat it as immutable.
         payload = storage.load_readonly()
         return payload if isinstance(payload, dict) else None
     except Exception:
@@ -31,49 +31,76 @@ def _load_data(interaction: Any) -> dict[str, Any] | None:
         return None
 
 
-def _style_payload(kwargs: dict[str, Any], interaction: Any) -> None:
-    data = _load_data(interaction)
+def _style_payload(kwargs: dict[str, Any], obj: Any) -> None:
+    data = _load_data(obj)
 
     embed = kwargs.get("embed")
     if embed is not None:
-        kwargs["embed"] = skin_embed(embed, interaction, data)
+        kwargs["embed"] = skin_embed(embed, obj, data)
 
     embeds = kwargs.get("embeds")
     if isinstance(embeds, list):
-        kwargs["embeds"] = [skin_embed(item, interaction, data) for item in embeds]
+        kwargs["embeds"] = [skin_embed(item, obj, data) for item in embeds]
 
     view = kwargs.get("view")
     if view is not None:
         kwargs["view"] = style_view(view, data)
 
 
-async def smart_reply(interaction: Any, *args: Any, **kwargs: Any) -> Any:
-    # Respect explicit visibility from the caller; otherwise keep the historical command-based default.
+async def smart_reply(ctx_or_interaction: Any, *args: Any, **kwargs: Any) -> Any:
+    _style_payload(kwargs, ctx_or_interaction)
+
+    # Prefix command (commands.Context)
+    if not hasattr(ctx_or_interaction, "response"):
+        ephemeral = kwargs.pop("ephemeral", False)
+        content = args[0] if args and isinstance(args[0], str) else kwargs.get("content")
+        if ephemeral:
+            msg = kwargs.pop("content", None) or args[0] if args else None
+            embed = kwargs.get("embed")
+            view = kwargs.get("view")
+            return await ctx_or_interaction.author.send(content=msg, embed=embed, view=view)
+        return await ctx_or_interaction.send(*args, **kwargs)
+
+    # Slash command (discord.Interaction) — legacy path
     if "ephemeral" not in kwargs:
-        kwargs["ephemeral"] = False  # owner commands visible to all by default
+        kwargs["ephemeral"] = False
 
-    _style_payload(kwargs, interaction)
-
-    if interaction.response.is_done():
-        return await interaction.followup.send(*args, **kwargs)
-    return await interaction.response.send_message(*args, **kwargs)
+    if ctx_or_interaction.response.is_done():
+        return await ctx_or_interaction.followup.send(*args, **kwargs)
+    return await ctx_or_interaction.response.send_message(*args, **kwargs)
 
 
-async def error_reply(interaction: Any, *args: Any, **kwargs: Any) -> None:
+async def error_reply(ctx_or_interaction: Any, *args: Any, **kwargs: Any) -> None:
     """Send an error/warning message that auto-deletes after 2 seconds."""
     import asyncio
-    kwargs.pop("ephemeral", None)
-    kwargs["ephemeral"] = False  # must be non-ephemeral for delete_after to work
 
-    _style_payload(kwargs, interaction)
+    _style_payload(kwargs, ctx_or_interaction)
+
+    # Prefix command path
+    if not hasattr(ctx_or_interaction, "response"):
+        kwargs.pop("ephemeral", None)
+        try:
+            msg = await ctx_or_interaction.send(*args, **kwargs)
+            await asyncio.sleep(2)
+            try:
+                await msg.delete()
+            except discord.HTTPException:
+                pass
+        except discord.HTTPException:
+            logger.exception("Discord HTTP error sending error_reply")
+        return
+
+    # Slash command path (legacy)
+    kwargs.pop("ephemeral", None)
+    kwargs["ephemeral"] = False
 
     try:
-        if interaction.response.is_done():
-            msg = await interaction.followup.send(*args, **kwargs, wait=True)
+        if ctx_or_interaction.response.is_done():
+            msg = await ctx_or_interaction.followup.send(*args, **kwargs, wait=True)
         else:
-            await interaction.response.send_message(*args, **kwargs)
+            await ctx_or_interaction.response.send_message(*args, **kwargs)
             try:
-                msg = await interaction.original_response()
+                msg = await ctx_or_interaction.original_response()
             except discord.HTTPException:
                 return
         if msg:

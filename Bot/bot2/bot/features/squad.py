@@ -6,7 +6,6 @@ import math
 from typing import Any
 
 import discord
-from discord import app_commands
 from discord.ext import commands
 
 from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card, normalize_mastery_list, rarity_rank
@@ -703,25 +702,23 @@ class SquadCog(commands.Cog):
 
     # ── command ────────────────────────────────────────────────────────────
 
-    @app_commands.command(name="squad", description="Open your squad management panel.")
-    async def squad(self, interaction: discord.Interaction) -> None:
-        if not await ensure_registered(interaction, self.bot.storage):
+    @commands.command(name="squad")
+    async def squad(self, ctx: commands.Context) -> None:
+        if not await ensure_registered(ctx, self.bot.storage):
             return
 
         data   = self.bot.storage.load()
-        player = get_player(data, str(interaction.user.id))
+        player = get_player(data, str(ctx.author.id))
         if player is None:
-            await interaction.response.send_message(
+            await ctx.send(
                 embed=make_embed(data, f"{e('warning', data)} Not Registered",
-                                 "Run `/start` to create your account first."),
-                ephemeral=True,
+                                 "Run `!start` to create your account first."),
             )
             return
 
-        panel = SquadPanel(self, interaction.user.id)
-        embed = _build_squad_embed(data, interaction.user, player, 0)
-        await interaction.response.send_message(embed=embed, view=panel)
-        panel.message = await interaction.original_response()
+        panel = SquadPanel(self, ctx.author.id)
+        embed = _build_squad_embed(data, ctx.author, player, 0)
+        panel.message = await ctx.send(embed=embed, view=panel)
 
 
 async def setup(bot: commands.Bot) -> None:

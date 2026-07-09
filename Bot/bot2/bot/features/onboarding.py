@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 import discord
-from discord import app_commands
 from discord.ext import commands
 
 from bot.utils.checks import effective_owner_ids
@@ -80,7 +79,7 @@ def build_start_embed(username: str) -> discord.Embed:
             "│ • Climb league ranks\n"
             "╰────────────────\n"
             "╭─ Begin\n"
-            "│ /help\n"
+            "│ !help\n"
             "│ 📖 /tutorial — Complete the tutorial for bonus rewards!\n"
             "│ /shop\n"
             "│ Buy packs from the /shop panel\n"
@@ -121,7 +120,7 @@ def build_about_embed() -> discord.Embed:
             "╰────────────────\n"
             "╭─ Quick Start\n"
             "│ /start\n"
-            "│ /help\n"
+            "│ !help\n"
             "│ /shop\n"
             "│ Buy packs from the /shop panel\n"
             "│ /squad\n"
@@ -383,7 +382,7 @@ class HelpPaginatorView(discord.ui.View):
                     (
                         f"{e('line', self.data)}\n"
                         f"{e('box', self.data)}  This menu belongs to another user.\n"
-                        f"{e('dot', self.data)}  Use `/help` to open your own panel."
+                        f"{e('dot', self.data)}  Use `!help` to open your own panel."
                     ),
                 ),
                 ephemeral=True,
@@ -450,10 +449,10 @@ class OnboardingCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @app_commands.command(name="start", description="Open your account panel.")
-    async def start(self, interaction: discord.Interaction) -> None:
-        user_id = str(interaction.user.id)
-        username = interaction.user.name
+    @commands.command(name="start")
+    async def start(self, ctx: commands.Context) -> None:
+        user_id = str(ctx.author.id)
+        username = ctx.author.name
 
         result = {"granted": False}
 
@@ -469,22 +468,19 @@ class OnboardingCog(commands.Cog):
 
         # Warm the bot-level terms cache so subsequent commands skip storage.load()
         if hasattr(self.bot, "mark_terms_accepted"):
-            self.bot.mark_terms_accepted(interaction.user.id)
+            self.bot.mark_terms_accepted(ctx.author.id)
 
-        embed = build_start_embed(interaction.user.name)
+        embed = build_start_embed(ctx.author.name)
         view = StartQuickLinksView(self.bot)
-        if interaction.response.is_done():
-            await interaction.followup.send(embed=embed, view=view)
-        else:
-            await interaction.response.send_message(embed=embed, view=view)
+        await ctx.send(embed=embed, view=view)
 
 
-    @app_commands.command(name="help", description="Browse all commands by category.")
-    async def help(self, interaction: discord.Interaction) -> None:
+    @commands.command(name="help")
+    async def help(self, ctx: commands.Context) -> None:
         data = self.bot.storage.load()
-        view = HelpPaginatorView(interaction.user.id, data, timeout=120)
-        await smart_reply(interaction, embed=view._build_embed(), view=view, ephemeral=True)
-        view.message = await interaction.original_response()
+        view = HelpPaginatorView(ctx.author.id, data, timeout=120)
+        msg = await smart_reply(ctx, embed=view._build_embed(), view=view, ephemeral=True)
+        view.message = msg
 
 
 async def setup(bot: commands.Bot) -> None:

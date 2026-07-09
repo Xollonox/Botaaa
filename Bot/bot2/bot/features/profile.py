@@ -6,7 +6,6 @@ import logging
 from typing import Any
 
 import discord
-from discord import app_commands
 from discord.ext import commands
 
 from bot.features.profile_render import (
@@ -115,22 +114,21 @@ class ProfileCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @app_commands.command(name="profile", description="View a premium profile card.")
-    async def profile(self, interaction: discord.Interaction, user: discord.User | None = None) -> None:
-        if not await ensure_registered(interaction, self.bot.storage):
+    @commands.command(name="profile")
+    async def profile(self, ctx: commands.Context, user: discord.User | None = None) -> None:
+        if not await ensure_registered(ctx, self.bot.storage):
             return
-        await interaction.response.defer()
         data      = self.bot.storage.load()
-        target    = user or interaction.user
+        target    = user or ctx.author
         target_id = str(target.id)
         players   = data.get("players", {})
         if not isinstance(players, dict) or target_id not in players:
-            await interaction.followup.send("That user is not registered.", ephemeral=True)
+            await ctx.send("That user is not registered.")
             return
         player    = players.get(target_id, {}) if isinstance(players, dict) else {}
         user_data = player.get("user", {}) if isinstance(player, dict) else {}
         rival     = user_data.get("rival", {}) if isinstance(user_data, dict) else {}
-        view = ProfileActionView(self, interaction.user.id, target) if target.id == interaction.user.id else None
+        view = ProfileActionView(self, ctx.author.id, target) if target.id == ctx.author.id else None
 
         def _rival_embed() -> discord.Embed | None:
             if not rival or not rival.get("rival_id"):
@@ -151,9 +149,9 @@ class ProfileCog(commands.Cog):
             if re:
                 embeds.append(re)
             if view:
-                await interaction.followup.send(embeds=embeds, files=[file], view=view)
+                await ctx.send(embeds=embeds, files=[file], view=view)
             else:
-                await interaction.followup.send(embeds=embeds, files=[file])
+                await ctx.send(embeds=embeds, files=[file])
         except Exception:
             logger.exception("[PROFILE] Failed to render profile card for user=%s", target_id)
             embed = build_profile_embed(data, target)
@@ -163,9 +161,9 @@ class ProfileCog(commands.Cog):
             if re:
                 embeds.append(re)
             if view:
-                await interaction.followup.send(embeds=embeds, view=view)
+                await ctx.send(embeds=embeds, view=view)
             else:
-                await interaction.followup.send(embeds=embeds)
+                await ctx.send(embeds=embeds)
 
     async def setbio(self, interaction: discord.Interaction, text: str) -> None:
         if not await ensure_registered(interaction, self.bot.storage):
