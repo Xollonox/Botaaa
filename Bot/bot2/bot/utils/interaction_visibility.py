@@ -50,15 +50,9 @@ def _style_payload(kwargs: dict[str, Any], obj: Any) -> None:
 async def smart_reply(ctx_or_interaction: Any, *args: Any, **kwargs: Any) -> Any:
     _style_payload(kwargs, ctx_or_interaction)
 
-    # Prefix command (commands.Context)
+    # Prefix command (commands.Context) — no ephemeral support, always send to channel
     if not hasattr(ctx_or_interaction, "response"):
-        ephemeral = kwargs.pop("ephemeral", False)
-        content = args[0] if args and isinstance(args[0], str) else kwargs.get("content")
-        if ephemeral:
-            msg = kwargs.pop("content", None) or args[0] if args else None
-            embed = kwargs.get("embed")
-            view = kwargs.get("view")
-            return await ctx_or_interaction.author.send(content=msg, embed=embed, view=view)
+        kwargs.pop("ephemeral", None)
         return await ctx_or_interaction.send(*args, **kwargs)
 
     # Slash command (discord.Interaction) — legacy path
