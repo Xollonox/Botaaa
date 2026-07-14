@@ -10,7 +10,7 @@ from discord.ext import commands
 
 from bot.utils.checks import ensure_registered
 from bot.utils.timeutil import now_ts
-from bot.utils.ui import make_embed
+from bot.utils.ui import e, make_embed
 from bot.utils.xp_logic import make_bar
 from bot.utils.interaction_visibility import smart_reply, error_reply
 from bot.config import OWNER_GUILD_ID
@@ -55,6 +55,26 @@ class TournamentCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self._end_task: asyncio.Task | None = None
+
+    async def cog_load(self) -> None:
+        data = self.bot.storage.load()
+        tournament = _t_root(data)
+        if tournament.get("active"):
+            self._schedule_end(max(0, int(tournament.get("end_time", 0)) - now_ts()))
+
+    def cog_unload(self) -> None:
+        if self._end_task and not self._end_task.done():
+            self._end_task.cancel()
+
+    def _schedule_end(self, delay_seconds: int) -> None:
+        if self._end_task and not self._end_task.done():
+            self._end_task.cancel()
+
+        async def auto_end() -> None:
+            await asyncio.sleep(max(0, int(delay_seconds)))
+            await self._end_tournament()
+
+        self._end_task = asyncio.create_task(auto_end())
 
     # ── /tournament ───────────────────────────────────────────────
 
@@ -323,11 +343,7 @@ class TournamentCog(commands.Cog):
             "╰────────────────"
         ), ephemeral=True)
 
-        # Schedule auto-end
-        async def auto_end() -> None:
-            await asyncio.sleep(duration_hours * 3600)
-            await self._end_tournament()
-        self._end_task = asyncio.create_task(auto_end())
+        self._schedule_end(duration_hours * 3600)
 
     @app_commands.command(name="o_tournament_cancel", description="Owner: cancel tournament and refund fees.")
     @app_commands.guilds(OWNER_GUILD)

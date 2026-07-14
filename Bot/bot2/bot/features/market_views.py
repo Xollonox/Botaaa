@@ -57,6 +57,14 @@ class BuyConfirmView(discord.ui.View):
         # Pre-fetch async data before entering the sync with_lock closure
         prefetched_listing = await self.cog.bot.market_service.get_listing(self.listing_id)
         mkt_settings = await _market_settings(self.cog)
+        claimed_player_listing = False
+        if isinstance(prefetched_listing, dict):
+            seller_id = str(prefetched_listing.get("seller_id", ""))
+            if seller_id and seller_id != "owner":
+                claimed_player_listing = await self.cog.bot.market_service.delete_listing(self.listing_id)
+                if not claimed_player_listing:
+                    await interaction.response.send_message("Listing no longer exists.", ephemeral=True)
+                    return
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str, bool]:
             m        = market_root(data)
@@ -167,11 +175,16 @@ class BuyConfirmView(discord.ui.View):
 
             return True, "ok", False
 
-        ok, reason, delete_player_listing = self.cog.bot.storage.with_lock(mutate)
-        if ok and delete_player_listing:
-            await self.cog.bot.market_service.delete_listing(self.listing_id)
+        try:
+            ok, reason, delete_player_listing = self.cog.bot.storage.with_lock(mutate)
+        except Exception:
+            if claimed_player_listing and isinstance(prefetched_listing, dict):
+                await self.cog.bot.market_service.upsert_listing(self.listing_id, prefetched_listing)
+            raise
 
         if not ok:
+            if claimed_player_listing and isinstance(prefetched_listing, dict):
+                await self.cog.bot.market_service.upsert_listing(self.listing_id, prefetched_listing)
             msgs = {
                 "not_found":           "Listing no longer exists.",
                 "already_sold":        "This card was already sold.",
@@ -186,6 +199,10 @@ class BuyConfirmView(discord.ui.View):
                 msg = f"Not enough coins. You have {int(have):,} but need {int(need):,}."
             await interaction.response.send_message(msg, ephemeral=True)
             return
+
+        if delete_player_listing and not claimed_player_listing:
+            # Legacy JSON-only listing: remove any late SQLite mirror too.
+            await self.cog.bot.market_service.delete_listing(self.listing_id)
 
         body = (
             f"╭─ 🛒 Purchase Complete!\n"

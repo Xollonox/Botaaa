@@ -7,6 +7,8 @@ import hashlib
 import logging
 import os
 import sys
+import time
+from collections import defaultdict, deque
 from typing import Any
 
 import discord
@@ -38,7 +40,7 @@ CLEAN_SHUTDOWN_MARKER = os.path.join(os.path.dirname(DATA_PATH), ".clean_shutdow
 
 # Marker file for one-shot global commands clear.
 # Prevents re-running the clear on every restart if HXCC_CLEAR_GLOBAL_COMMANDS_ONCE is left set.
-CLEARED_GLOBAL_COMMANDS_MARKER = os.path.join(DATA_PATH, ".cleared_global_commands")
+CLEARED_GLOBAL_COMMANDS_MARKER = os.path.join(os.path.dirname(DATA_PATH), ".cleared_global_commands")
 
 
 # ---------------------------------------------------------------------------
@@ -87,7 +89,7 @@ def _should_clear_global_commands() -> bool:
 def _write_global_commands_marker(env_value: str) -> None:
     """Write marker file with a token of the current env value."""
     try:
-        os.makedirs(DATA_PATH, exist_ok=True)
+        os.makedirs(os.path.dirname(CLEARED_GLOBAL_COMMANDS_MARKER), exist_ok=True)
         token = _get_env_token(env_value)
         with open(CLEARED_GLOBAL_COMMANDS_MARKER, "w", encoding="utf-8") as fh:
             fh.write(token)
@@ -182,25 +184,19 @@ class LookismBot(commands.Bot):
             pass
 
     async def _unlock_stale_trades(self) -> None:
-        """On startup, decide between clean-shutdown vs. crash recovery.
-
-        Clean shutdown (marker file present): trust on-disk state, do not
-        touch pending trades or trade_locked flags — just delete the marker
-        so the next boot can detect a crash.
-
-        Crash recovery (marker missing): only clear trade_locked flags on
-        inventory items so cards aren't stranded. Pending trades are left
-        intact; a crashed process is not a reason to destroy legitimate
-        in-flight offers.
-        """
-        clean_shutdown = os.path.exists(CLEAN_SHUTDOWN_MARKER)
-        if clean_shutdown:
+        """Clear non-persistent trade panels while preserving live board offers."""
+        if os.path.exists(CLEAN_SHUTDOWN_MARKER):
             try:
                 os.remove(CLEAN_SHUTDOWN_MARKER)
             except OSError as exc:
                 logger.warning("[BOOT] Could not remove clean-shutdown marker: %s", exc)
-            logger.info("[BOOT] Clean shutdown detected; preserving pending trades and locks.")
-            return
+
+        live_offers = await self.trade_service.get_open_offers(limit=10_000)
+        live_locks = {
+            (str(row.get("poster_id", "")), str(row.get("item_uid", "")))
+            for row in live_offers
+        }
+        pending_count = await self.trade_service.clear_pending()
 
         def mutate(data: dict[str, Any]) -> int:
             unlocked = 0
@@ -214,14 +210,17 @@ class LookismBot(commands.Bot):
                 if not isinstance(inv, list):
                     continue
                 for item in inv:
-                    if isinstance(item, dict) and item.get("trade_locked"):
+                    lock_key = (str(_pid), str(item.get("uid", ""))) if isinstance(item, dict) else ("", "")
+                    if isinstance(item, dict) and item.get("trade_locked") and lock_key not in live_locks:
                         item["trade_locked"] = False
                         unlocked += 1
+            data.setdefault("trades", {})["pending"] = {}
             return unlocked
 
         count = self.storage.with_lock(mutate)
         logger.warning(
-            "[BOOT] Crash recovery: cleared trade_locked on %d inventory item(s); pending trades preserved.",
+            "[BOOT] Trade recovery: cleared %d transient pending row(s) and unlocked %d card(s).",
+            pending_count,
             count,
         )
 
@@ -268,6 +267,34 @@ class LookismBot(commands.Bot):
             else:
                 await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
         except discord.NotFound:
+            pass
+        return False
+
+    async def _global_restriction_gate(self, interaction: discord.Interaction) -> bool:
+        """Enforce game-level bans and mutes for every slash command."""
+        from bot.utils.ui import e, make_embed
+
+        data = self.storage.load_readonly()
+        player = data.get("players", {}).get(str(interaction.user.id), {})
+        user = player.get("user", {}) if isinstance(player, dict) else {}
+        if not isinstance(user, dict):
+            return True
+        restriction = None
+        if bool(user.get("is_banned", False)):
+            restriction = ("Banned", str(user.get("ban_reason", "No reason provided.")))
+        elif bool(user.get("is_muted", False)):
+            restriction = ("Muted", str(user.get("mute_reason", "No reason provided.")))
+        if restriction is None:
+            return True
+        label, reason = restriction
+        embed = make_embed(
+            data,
+            f"{e('no', data)} You Are {label}",
+            f"You cannot use bot commands right now.\n**Reason:** {reason}",
+        )
+        try:
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        except discord.HTTPException:
             pass
         return False
 
@@ -364,14 +391,35 @@ class LookismBot(commands.Bot):
 
 
 class LookismCommandTree(app_commands.CommandTree["LookismBot"]):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._command_times: dict[int, deque[float]] = defaultdict(deque)
+
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if not isinstance(self.client, LookismBot):
             return True
+        if interaction.type is discord.InteractionType.autocomplete:
+            return True
+        if not await self.client._global_restriction_gate(interaction):
+            return False
         if not await self.client._global_terms_gate(interaction):
             return False
 
-        if interaction.type is discord.InteractionType.autocomplete:
-            return True
+        now = time.monotonic()
+        user_times = self._command_times[int(interaction.user.id)]
+        while user_times and now - user_times[0] >= 10.0:
+            user_times.popleft()
+        if len(user_times) >= 5:
+            retry_after = max(0.1, 10.0 - (now - user_times[0]))
+            try:
+                await interaction.response.send_message(
+                    f"⏳ Too many commands. Try again in **{retry_after:.1f}s**.",
+                    ephemeral=True,
+                )
+            except discord.HTTPException:
+                pass
+            return False
+        user_times.append(now)
 
         from bot.utils.server_rules import check_single_mode_allowed, is_admin
         from bot.utils.ui import e, make_embed

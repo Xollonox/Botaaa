@@ -463,6 +463,9 @@ class SQLiteTradeRepository:
                 )
                 """
             )
+            # A process may die after claiming an offer but before finalizing it.
+            # Claims are process-local, so make them available again on restart.
+            conn.execute("UPDATE trade_offer_board SET status = 'open' WHERE status = 'processing'")
             conn.commit()
 
     # ------------------------------------------------------------------
@@ -556,6 +559,12 @@ class SQLiteTradeRepository:
             conn.execute("DELETE FROM trade_pending WHERE user_id = ?", (str(b_id),))
             conn.commit()
 
+    def _sync_clear_pending(self) -> int:
+        with self._connect() as conn:
+            cur = conn.execute("DELETE FROM trade_pending")
+            conn.commit()
+            return max(0, int(cur.rowcount))
+
     def _sync_list_pending(self) -> dict[str, bool]:
         with self._connect() as conn:
             rows = conn.execute("SELECT user_id FROM trade_pending").fetchall()
@@ -624,7 +633,7 @@ class SQLiteTradeRepository:
             now = int(time.time())
             rows = conn.execute(
                 """
-                SELECT id, poster_id, poster_name, have_card, want_card, created_at, expires_at, status
+                SELECT id, poster_id, poster_name, have_card, want_card, item_uid, created_at, expires_at, status
                 FROM trade_offer_board
                 WHERE status = 'open' AND expires_at > ?
                 ORDER BY created_at DESC
@@ -637,26 +646,58 @@ class SQLiteTradeRepository:
     def _sync_cancel_offer(self, offer_id: str, poster_id: str) -> bool:
         with self._connect() as conn:
             cur = conn.execute(
-                "UPDATE trade_offer_board SET status = 'cancelled' WHERE id = ? AND poster_id = ?",
+                "UPDATE trade_offer_board SET status = 'cancelled' WHERE id = ? AND poster_id = ? AND status = 'open'",
                 (offer_id, poster_id),
             )
             conn.commit()
         return cur.rowcount > 0
 
-    def _sync_accept_offer(self, offer_id: str) -> dict[str, Any] | None:
+    def _sync_claim_offer(self, offer_id: str, now_ts: int) -> dict[str, Any] | None:
+        """Atomically reserve one live offer for a single acceptor."""
         with self._connect() as conn:
+            conn.execute("BEGIN IMMEDIATE")
             cursor = conn.execute(
-                "UPDATE trade_offer_board SET status = 'accepted' WHERE id = ? AND status = 'open'",
-                (offer_id,),
+                """
+                UPDATE trade_offer_board SET status = 'processing'
+                WHERE id = ? AND status = 'open' AND expires_at > ?
+                """,
+                (offer_id, int(now_ts)),
             )
-            conn.commit()
             if cursor.rowcount == 0:
-                return None  # already accepted, cancelled, or doesn't exist
+                conn.rollback()
+                return None
             row = conn.execute(
                 "SELECT * FROM trade_offer_board WHERE id = ?",
                 (offer_id,),
             ).fetchone()
+            conn.commit()
         return dict(row) if row else None
+
+    def _sync_finish_offer(self, offer_id: str, status: str) -> bool:
+        if status not in {"accepted", "open"}:
+            raise ValueError("Invalid terminal offer status")
+        with self._connect() as conn:
+            cur = conn.execute(
+                "UPDATE trade_offer_board SET status = ? WHERE id = ? AND status = 'processing'",
+                (status, offer_id),
+            )
+            conn.commit()
+            return cur.rowcount > 0
+
+    def _sync_expire_offers(self, now_ts: int) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            rows = conn.execute(
+                "SELECT * FROM trade_offer_board WHERE status = 'open' AND expires_at <= ?",
+                (int(now_ts),),
+            ).fetchall()
+            if rows:
+                conn.execute(
+                    "UPDATE trade_offer_board SET status = 'expired' WHERE status = 'open' AND expires_at <= ?",
+                    (int(now_ts),),
+                )
+            conn.commit()
+        return [dict(row) for row in rows]
 
     # ------------------------------------------------------------------
     # Async public API
@@ -694,6 +735,10 @@ class SQLiteTradeRepository:
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_remove_pending_pair, a_id, b_id)
 
+    async def clear_pending(self) -> int:
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self._sync_clear_pending)
+
     async def list_pending(self) -> dict[str, bool]:
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_list_pending)
@@ -718,9 +763,17 @@ class SQLiteTradeRepository:
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._sync_cancel_offer, offer_id, poster_id)
 
-    async def accept_offer(self, offer_id: str) -> dict[str, Any] | None:
+    async def claim_offer(self, offer_id: str, now_ts: int) -> dict[str, Any] | None:
         loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(None, self._sync_accept_offer, offer_id)
+        return await loop.run_in_executor(None, self._sync_claim_offer, offer_id, now_ts)
+
+    async def finish_offer(self, offer_id: str, status: str) -> bool:
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self._sync_finish_offer, offer_id, status)
+
+    async def expire_offers(self, now_ts: int) -> list[dict[str, Any]]:
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self._sync_expire_offers, now_ts)
 
 
 class SQLiteBattleRepository:

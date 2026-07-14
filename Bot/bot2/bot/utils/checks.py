@@ -60,6 +60,15 @@ async def ensure_registered(
             )
             await smart_reply(interaction, embed=embed, ephemeral=True)
             return False
+        if isinstance(user_row, dict) and bool(user_row.get("is_muted", False)):
+            mute_reason = str(user_row.get("mute_reason", "No reason provided."))
+            embed = make_embed(
+                data,
+                f"{e('no', data)} You Are Muted",
+                f"You cannot use bot commands right now.\n**Reason:** {mute_reason}",
+            )
+            await smart_reply(interaction, embed=embed, ephemeral=True)
+            return False
         return True
 
     embed = make_embed(

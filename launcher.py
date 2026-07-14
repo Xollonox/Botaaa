@@ -65,6 +65,12 @@ def start_bot(bot_name: str):
 def main():
     procs = {}
 
+    def request_shutdown(_signum, _frame):
+        raise KeyboardInterrupt
+
+    signal.signal(signal.SIGTERM, request_shutdown)
+    signal.signal(signal.SIGINT, request_shutdown)
+
     for name in _bot_names():
         proc = start_bot(name)
         if proc is not None:
@@ -99,6 +105,11 @@ def main():
         for proc in procs.values():
             if proc.poll() is None:
                 proc.terminate()
+        for proc in procs.values():
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                proc.kill()
 
 
 if __name__ == "__main__":

@@ -11,6 +11,7 @@ from bot.features.trade_views import (
     _unlock,
     _validate,
 )
+from bot.features.trades import _board_tradeable
 
 
 def _card(name: str, rarity: str, uid: str = "u") -> dict:
@@ -87,3 +88,9 @@ def test_trade_root_initializes_keys() -> None:
     assert t["pending"] == {}
     assert t["history"] == []
     assert data["trades"] is t
+
+
+def test_board_trade_rejects_every_lock_type() -> None:
+    assert _board_tradeable({"uid": "free"})
+    for flag in ("locked", "squad_locked", "market_locked", "trade_locked"):
+        assert not _board_tradeable({"uid": flag, flag: True})

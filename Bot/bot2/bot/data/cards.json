@@ -3218,7 +3218,7 @@
     "ultimate": [],
     "defensive_moves": []
   },
-  "Changyong ji": {
+  "Changyong Ji [HfH Arc]": {
     "name": "Changyong Ji [HfH Arc]",
     "title": "Upgraded Suwon Successor",
     "description": "Later-arc version of Changyong Ji with a much higher ceiling than the original Suwon successor.",
@@ -6773,7 +6773,7 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Heavy Hit",
+        "name": "Gang Rush",
         "type": "Special",
         "dialogue": "They overwhelm the enemy with force.",
         "crit_dialogue": "",
@@ -6787,7 +6787,7 @@
     ],
     "special": [
       "Group Attack",
-      "Heavy Hit"
+      "Gang Rush"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -7037,7 +7037,10 @@
       "Kick",
       "Body Blow"
     ],
-    "special": [],
+    "special": [
+      "Endure",
+      "Charge"
+    ],
     "ultimate": [],
     "defensive_moves": []
   },
@@ -7834,7 +7837,7 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Pain Mark",
+        "name": "Pain Engraving",
         "type": "Special",
         "dialogue": "Channing attacks with cruel pressure, like carving trauma into the fight.",
         "crit_dialogue": "",
@@ -7854,7 +7857,7 @@
       "Pain Mark"
     ],
     "special": [
-      "Pain Mark",
+      "Pain Engraving",
       "Ansan Pressure"
     ],
     "ultimate": [],

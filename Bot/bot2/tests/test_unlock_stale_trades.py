@@ -44,11 +44,18 @@ def _seed_storage(storage: Storage) -> None:
 
 
 def _run(storage: Storage) -> None:
-    stub = types.SimpleNamespace(storage=storage)
+    class TradeServiceStub:
+        async def get_open_offers(self, limit: int = 10_000) -> list[dict]:
+            return []
+
+        async def clear_pending(self) -> int:
+            return 1
+
+    stub = types.SimpleNamespace(storage=storage, trade_service=TradeServiceStub())
     asyncio.run(main.LookismBot._unlock_stale_trades(stub))
 
 
-def test_clean_shutdown_preserves_trades_and_locks(tmp_path, monkeypatch) -> None:
+def test_clean_shutdown_clears_transient_trades_and_locks(tmp_path, monkeypatch) -> None:
     marker = tmp_path / ".clean_shutdown"
     marker.write_text("ok")
     monkeypatch.setattr(main, "CLEAN_SHUTDOWN_MARKER", str(marker))
@@ -62,15 +69,13 @@ def test_clean_shutdown_preserves_trades_and_locks(tmp_path, monkeypatch) -> Non
     assert not marker.exists()
 
     data = storage.load()
-    # Pending trade untouched.
-    assert data["trades"]["pending"]["t1"]["status"] == "pending"
-    # trade_locked flags NOT flipped.
+    assert data["trades"]["pending"] == {}
     inv = data["players"]["1"]["user"]["inventory"]
-    assert inv[0]["trade_locked"] is True
+    assert inv[0]["trade_locked"] is False
     assert inv[1]["trade_locked"] is False
 
 
-def test_crash_recovery_unlocks_but_preserves_pending(tmp_path, monkeypatch) -> None:
+def test_crash_recovery_unlocks_and_clears_transient_pending(tmp_path, monkeypatch) -> None:
     marker = tmp_path / ".clean_shutdown"
     # marker file is absent → crash recovery path.
     assert not marker.exists()
@@ -82,8 +87,7 @@ def test_crash_recovery_unlocks_but_preserves_pending(tmp_path, monkeypatch) -> 
     _run(storage)
 
     data = storage.load()
-    # Pending trades preserved despite crash.
-    assert data["trades"]["pending"]["t1"]["status"] == "pending"
+    assert data["trades"]["pending"] == {}
     # trade_locked=True flipped to False; already-False left alone.
     inv = data["players"]["1"]["user"]["inventory"]
     assert inv[0]["trade_locked"] is False

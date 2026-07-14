@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from bot.data.sqlite_store import SQLiteTradeRepository
+from bot.utils.timeutil import now_ts
 
 
 class TradeService:
@@ -62,6 +63,11 @@ class TradeService:
             )
         )
 
+    async def clear_pending(self) -> int:
+        count = await self.repo.clear_pending()
+        self.storage.with_lock(lambda d: d.setdefault("trades", {}).__setitem__("pending", {}))
+        return count
+
     @staticmethod
     def _json_truncate_history(d: dict[str, Any], row: dict[str, Any]) -> None:
         h = d.setdefault("trades", {}).setdefault("history", [])
@@ -87,10 +93,42 @@ class TradeService:
         await self.repo.post_offer(offer_id, poster_id, poster_name, have_card, want_card, item_uid, created_at, expires_at)
 
     async def get_open_offers(self, limit: int = 10) -> list[dict[str, Any]]:
+        await self.expire_offers()
         return await self.repo.get_open_offers(limit)
 
     async def cancel_offer(self, offer_id: str, poster_id: str) -> bool:
         return await self.repo.cancel_offer(offer_id, poster_id)
 
-    async def accept_offer(self, offer_id: str) -> dict[str, Any] | None:
-        return await self.repo.accept_offer(offer_id)
+    async def claim_offer(self, offer_id: str) -> dict[str, Any] | None:
+        return await self.repo.claim_offer(offer_id, now_ts())
+
+    async def finish_offer(self, offer_id: str, *, accepted: bool) -> bool:
+        return await self.repo.finish_offer(offer_id, "accepted" if accepted else "open")
+
+    async def expire_offers(self) -> list[dict[str, Any]]:
+        expired = await self.repo.expire_offers(now_ts())
+        if not expired:
+            return []
+
+        expired_by_owner = {
+            (str(row.get("poster_id", "")), str(row.get("item_uid", "")))
+            for row in expired
+        }
+
+        def unlock(d: dict[str, Any]) -> None:
+            players = d.get("players", {})
+            if not isinstance(players, dict):
+                return
+            for owner_id, item_uid in expired_by_owner:
+                player = players.get(owner_id, {})
+                user = player.get("user", {}) if isinstance(player, dict) else {}
+                inventory = user.get("inventory", []) if isinstance(user, dict) else []
+                if not isinstance(inventory, list):
+                    continue
+                for item in inventory:
+                    if isinstance(item, dict) and str(item.get("uid", "")) == item_uid:
+                        item["trade_locked"] = False
+                        break
+
+        self.storage.with_lock(unlock)
+        return expired
