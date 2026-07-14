@@ -33,6 +33,7 @@ def _sync_catalog_cards(existing_cards: Any, catalog: dict[str, Any] | None = No
         return existing_cards
 
     synced = deepcopy(existing_cards)
+    synced.pop("Changyong ji", None)
     for card_name, card_def in catalog_cards.items():
         if isinstance(card_def, dict):
             synced[card_name] = deepcopy(card_def)
@@ -692,6 +693,8 @@ def ensure_structure(data: Any) -> dict[str, Any]:
                 if isinstance(inventory, list):
                     for item in inventory:
                         if isinstance(item, dict):
+                            if str(item.get("card_name", "")) == "Changyong ji":
+                                item["card_name"] = "Changyong Ji [HfH Arc]"
                             item.setdefault("squad_locked", False)
                             item.setdefault("market_locked", False)
             packs_profile = player.get("packs")

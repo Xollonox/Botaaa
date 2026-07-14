@@ -128,9 +128,7 @@ class ShopFilterSelect(discord.ui.Select):
             v.price_filter = val
             v.rarity_filter = "all"
         v.page = 0
-        v._rebuild_selects()
-        data = self._cog.bot.storage.load()
-        await interaction.response.edit_message(embed=v.embed(data), view=v)
+        await v._refresh_component(interaction)
 
 
 class ShopSortSelect(discord.ui.Select):
@@ -154,9 +152,7 @@ class ShopSortSelect(discord.ui.Select):
             return
         v.sort_key = self.values[0]
         v.page = 0
-        v._rebuild_selects()
-        data = self._cog.bot.storage.load()
-        await interaction.response.edit_message(embed=v.embed(data), view=v)
+        await v._refresh_component(interaction)
 
 
 class ShopBuyOpenButtons:
@@ -299,9 +295,7 @@ class ShopPackSelect(discord.ui.Select):
             await interaction.response.defer()
             return
         v.selected_pack = val
-        v._rebuild_selects()
-        data = self._cog.bot.storage.load()
-        await interaction.response.edit_message(embed=v.embed(data), view=v)
+        await v._refresh_component(interaction)
 
 
 class ShopPages(discord.ui.View):
@@ -347,7 +341,6 @@ class ShopPages(discord.ui.View):
         self.add_item(next_)
 
         # Row 3 — Pack selector
-        data     = self.cog.bot.storage.load()
         filtered = self._filtered()
         if filtered:
             self.add_item(ShopPackSelect(self, filtered))
@@ -374,14 +367,30 @@ class ShopPages(discord.ui.View):
     async def _guard(self, interaction: discord.Interaction) -> bool:
         return str(interaction.user.id) == self.user_id
 
+    async def _refresh_component(self, interaction: discord.Interaction) -> bool:
+        """Acknowledge a component promptly, then rebuild and edit its message."""
+        try:
+            if not interaction.response.is_done():
+                await interaction.response.defer()
+            self._rebuild_selects()
+            data = self.cog.bot.storage.load()
+            await interaction.edit_original_response(embed=self.embed(data), view=self)
+            return True
+        except discord.NotFound:
+            logger.warning(
+                "Shop component interaction expired before refresh | user=%s message=%s",
+                getattr(interaction.user, "id", "unknown"),
+                getattr(getattr(interaction, "message", None), "id", "unknown"),
+            )
+            self.stop()
+            return False
+
     async def _on_prev(self, interaction: discord.Interaction) -> None:
         if not await self._guard(interaction):
             await error_reply(interaction, "Not your panel.")
             return
         self.page = max(0, self.page - 1)
-        self._rebuild_selects()
-        data = self.cog.bot.storage.load()
-        await interaction.response.edit_message(embed=self.embed(data), view=self)
+        await self._refresh_component(interaction)
 
     async def _on_next(self, interaction: discord.Interaction) -> None:
         if not await self._guard(interaction):
@@ -389,9 +398,7 @@ class ShopPages(discord.ui.View):
             return
         filtered = self._filtered()
         self.page = min(self._max_page(filtered), self.page + 1)
-        self._rebuild_selects()
-        data = self.cog.bot.storage.load()
-        await interaction.response.edit_message(embed=self.embed(data), view=self)
+        await self._refresh_component(interaction)
 
     def _balance(self, data: dict[str, Any]) -> tuple[int, int]:
         """Return (coins, premium) for the current user."""

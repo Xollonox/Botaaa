@@ -73,7 +73,7 @@ def test_card_stats_have_exactly_six_connected_keys() -> None:
 def test_arc_versions_keep_expected_rarity_progression() -> None:
     cards = _load_seed_cards()
 
-    assert cards["Changyong ji"]["rarity"] == cards["Changyong Ji"]["rarity"] == "Common"
+    assert cards["Changyong Ji [HfH Arc]"]["rarity"] == cards["Changyong Ji"]["rarity"] == "Common"
     assert cards["Jay Hong Holiday Arc"]["rarity"] == cards["Jay Hong"]["rarity"] == "Rare"
     assert cards["Vin Jin Workers Arc"]["rarity"] == cards["Vin Jin"]["rarity"] == "Rare"
     assert cards["Magami Kenta 2"]["rarity"] == cards["Magami Kenta"]["rarity"] == "Rare"

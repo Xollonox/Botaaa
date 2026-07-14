@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import time
 import uuid
+from copy import deepcopy
 from typing import Any
 
 import discord
@@ -14,6 +15,7 @@ from discord.ext import commands
 from bot.features.trade_views import (
     TradePanel,
     _panel_embed,
+    _remove_card,
     _trade_root,
     _unlock,
     _history_embed_rows,
@@ -24,6 +26,13 @@ from bot.utils.squad_logic import get_player
 from bot.utils.ui import make_embed
 
 logger = logging.getLogger(__name__)
+
+
+def _board_tradeable(item: dict[str, Any]) -> bool:
+    return not any(
+        bool(item.get(flag))
+        for flag in ("locked", "squad_locked", "market_locked", "trade_locked")
+    )
 
 
 class TradesCog(commands.Cog):
@@ -181,7 +190,12 @@ class TradeGroup(app_commands.Group):
 
         have_item = None
         for item in inventory:
-            if isinstance(item, dict) and str(item.get("card_name", item.get("name", ""))).lower() == have_card.lower() and not item.get("trade_locked"):
+            if (
+                isinstance(item, dict)
+                and str(item.get("card_name", item.get("name", ""))).lower() == have_card.lower()
+                and _board_tradeable(item)
+                and str(item.get("uid", ""))
+            ):
                 have_item = item
                 break
 
@@ -198,18 +212,32 @@ class TradeGroup(app_commands.Group):
         now = int(time.time())
         expires_at = now + 172800
 
-        def lock_card(data: dict[str, Any]) -> None:
+        def lock_card(data: dict[str, Any]) -> bool:
             player = get_player(data, user_id)
             if isinstance(player, dict):
                 inventory = player.get("user", {}).get("inventory", [])
                 if isinstance(inventory, list):
                     for item in inventory:
-                        if isinstance(item, dict) and str(item.get("uid", "")) == item_uid:
+                        if isinstance(item, dict) and str(item.get("uid", "")) == item_uid and _board_tradeable(item):
                             item["trade_locked"] = True
-                            break
+                            return True
+            return False
 
-        self.cog.bot.storage.with_lock(lock_card)
-        await self.cog.bot.trade_service.post_offer(offer_id, user_id, str(interaction.user.display_name), have_card, want_card, item_uid, now, expires_at)
+        if not self.cog.bot.storage.with_lock(lock_card):
+            await smart_reply(interaction, embed=make_embed(None, "❌ Card Not Available", "That card is no longer available."), ephemeral=True)
+            return
+        try:
+            await self.cog.bot.trade_service.post_offer(offer_id, user_id, str(interaction.user.display_name), have_card, want_card, item_uid, now, expires_at)
+        except Exception:
+            logger.exception("Failed to persist trade-board offer %s; unlocking card", offer_id)
+            self.cog.bot.storage.with_lock(
+                lambda d: _unlock(
+                    (get_player(d, user_id) or {}).get("user", {}).get("inventory", []),
+                    item_uid,
+                )
+            )
+            await smart_reply(interaction, embed=make_embed(None, "❌ Offer Failed", "Trade storage failed; your card was unlocked."), ephemeral=True)
+            return
 
         embed = make_embed(
             None,
@@ -249,7 +277,7 @@ class TradeGroup(app_commands.Group):
             return
 
         acceptor_id = str(interaction.user.id)
-        offer = await self.cog.bot.trade_service.accept_offer(offer_id)
+        offer = await self.cog.bot.trade_service.claim_offer(offer_id)
         if not offer:
             await smart_reply(
                 interaction,
@@ -261,10 +289,17 @@ class TradeGroup(app_commands.Group):
         poster_id = offer.get("poster_id", "")
         have_card = offer.get("have_card", "")
         want_card = offer.get("want_card", "")
+        offered_uid = str(offer.get("item_uid", ""))
+
+        if acceptor_id == str(poster_id):
+            await self.cog.bot.trade_service.finish_offer(offer_id, accepted=False)
+            await smart_reply(interaction, embed=make_embed(None, "❌ Invalid Trade", "You cannot accept your own offer."), ephemeral=True)
+            return
 
         data = await self.cog._load_trade_data()
         acceptor = get_player(data, acceptor_id)
         if not isinstance(acceptor, dict):
+            await self.cog.bot.trade_service.finish_offer(offer_id, accepted=False)
             await smart_reply(interaction, embed=make_embed(None, "❌ Error", "Your player data not found."), ephemeral=True)
             return
 
@@ -274,17 +309,21 @@ class TradeGroup(app_commands.Group):
 
         want_item = None
         for item in acceptor_inventory:
-            if isinstance(item, dict) and str(item.get("card_name", item.get("name", ""))).lower() == want_card.lower() and not item.get("trade_locked"):
+            if isinstance(item, dict) and str(item.get("card_name", item.get("name", ""))).lower() == want_card.lower() and _board_tradeable(item):
                 want_item = item
                 break
 
         if not want_item:
+            await self.cog.bot.trade_service.finish_offer(offer_id, accepted=False)
             await smart_reply(
                 interaction,
                 embed=make_embed(None, "❌ Card Not Available", f"You don't have '{want_card}' to complete this trade."),
                 ephemeral=True,
             )
             return
+
+        wanted_uid = str(want_item.get("uid", ""))
+        receipt: dict[str, Any] = {}
 
         def execute_trade(data: dict[str, Any]) -> tuple[bool, str]:
             poster = get_player(data, poster_id)
@@ -301,13 +340,18 @@ class TradeGroup(app_commands.Group):
 
             have_idx = None
             for i, item in enumerate(poster_inv):
-                if isinstance(item, dict) and str(item.get("card_name", item.get("name", ""))).lower() == have_card.lower():
+                if (
+                    isinstance(item, dict)
+                    and str(item.get("uid", "")) == offered_uid
+                    and bool(item.get("trade_locked"))
+                    and not any(bool(item.get(flag)) for flag in ("locked", "squad_locked", "market_locked"))
+                ):
                     have_idx = i
                     break
 
             want_idx = None
             for i, item in enumerate(acceptor_inv):
-                if isinstance(item, dict) and str(item.get("card_name", item.get("name", ""))).lower() == want_card.lower():
+                if isinstance(item, dict) and str(item.get("uid", "")) == wanted_uid and _board_tradeable(item):
                     want_idx = i
                     break
 
@@ -317,6 +361,9 @@ class TradeGroup(app_commands.Group):
             have_item = poster_inv.pop(have_idx)
             want_item = acceptor_inv.pop(want_idx)
 
+            receipt["have_item"] = deepcopy(have_item)
+            receipt["want_item"] = deepcopy(want_item)
+
             have_item.pop("trade_locked", None)
             want_item.pop("trade_locked", None)
 
@@ -325,9 +372,54 @@ class TradeGroup(app_commands.Group):
 
             return True, "ok"
 
-        ok, msg = self.cog.bot.storage.with_lock(execute_trade)
+        try:
+            ok, msg = self.cog.bot.storage.with_lock(execute_trade)
+        except Exception:
+            logger.exception("Failed to execute claimed offer %s", offer_id)
+            try:
+                await self.cog.bot.trade_service.finish_offer(offer_id, accepted=False)
+            except Exception:
+                logger.exception("Failed to release offer %s after JSON error", offer_id)
+            await smart_reply(
+                interaction,
+                embed=make_embed(None, "❌ Trade Failed", "Trade storage failed; no cards were exchanged."),
+                ephemeral=True,
+            )
+            return
         if not ok:
+            await self.cog.bot.trade_service.finish_offer(offer_id, accepted=False)
             await smart_reply(interaction, embed=make_embed(None, "❌ Trade Failed", msg), ephemeral=True)
+            return
+
+        try:
+            finalized = await self.cog.bot.trade_service.finish_offer(offer_id, accepted=True)
+            if not finalized:
+                raise RuntimeError("offer claim was lost before finalization")
+        except Exception:
+            logger.exception("Failed to finalize accepted offer %s; rolling back card transfer", offer_id)
+
+            def rollback(data: dict[str, Any]) -> None:
+                poster = get_player(data, str(poster_id))
+                acceptor = get_player(data, acceptor_id)
+                if not isinstance(poster, dict) or not isinstance(acceptor, dict):
+                    return
+                poster_inv = poster.get("user", {}).get("inventory", [])
+                acceptor_inv = acceptor.get("user", {}).get("inventory", [])
+                if not isinstance(poster_inv, list) or not isinstance(acceptor_inv, list):
+                    return
+                _remove_card(acceptor_inv, offered_uid)
+                _remove_card(poster_inv, wanted_uid)
+                if isinstance(receipt.get("have_item"), dict):
+                    poster_inv.append(deepcopy(receipt["have_item"]))
+                if isinstance(receipt.get("want_item"), dict):
+                    acceptor_inv.append(deepcopy(receipt["want_item"]))
+
+            self.cog.bot.storage.with_lock(rollback)
+            try:
+                await self.cog.bot.trade_service.finish_offer(offer_id, accepted=False)
+            except Exception:
+                logger.exception("Failed to release offer %s after rollback", offer_id)
+            await smart_reply(interaction, embed=make_embed(None, "❌ Trade Failed", "Trade storage failed; no cards were exchanged."), ephemeral=True)
             return
 
         embed = make_embed(

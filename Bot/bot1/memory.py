@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import tempfile
+from copy import deepcopy
 from typing import Optional
 
 from config import MEMORY_FILE, SETTINGS_FILE, SPECIAL_USER_ID
@@ -84,8 +85,11 @@ def _save_json_file(path: str, data: dict) -> None:
 
 async def _save_json_file_async(path: str, data: dict) -> None:
     async with _memory_lock:
+        # Serialize an immutable snapshot: other message coroutines may mutate
+        # BOT_MEMORY while the blocking JSON write runs in the executor.
+        snapshot = deepcopy(data)
         loop = asyncio.get_running_loop()
-        await loop.run_in_executor(None, _save_json_file, path, data)
+        await loop.run_in_executor(None, _save_json_file, path, snapshot)
 
 
 BOT_MEMORY: dict = _load_json_file(MEMORY_FILE, {"users": {}, "channels": {}})

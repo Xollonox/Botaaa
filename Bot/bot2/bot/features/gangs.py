@@ -640,6 +640,7 @@ class GangsCog(commands.Cog):
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Failed\n│ {result}\n╰────────────────"))
             return
+        data = self.bot.storage.load()
         icon = e("unlock", data) if status.value == "open" else e("lock", data)
         await smart_reply(interaction, embed=_ok(
             f"╭─ {icon} Gang Status Updated\n"

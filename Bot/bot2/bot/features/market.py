@@ -199,13 +199,25 @@ class MarketCog(commands.Cog):
             return
 
         active_listings = await self.bot.market_service.get_active_listings()
+        claimed_payload = active_listings.get(listing_id)
+        if not isinstance(claimed_payload, dict) or not await self.bot.market_service.delete_listing(listing_id):
+            await smart_reply(interaction, embed=make_embed(None, "Market", "❌ Listing not found."), ephemeral=True)
+            return
 
         def mutate(data: dict[str, Any]) -> tuple[bool, bool]:
             m = market_root(data)
             listings = m.setdefault("listings", {})
-            listings.update(active_listings)
+            if not isinstance(listings, dict):
+                return False, False
+            listing = listings.get(listing_id)
+            if not isinstance(listing, dict):
+                # SQLite is authoritative during migration, but restore only
+                # the listing we atomically claimed -- never a stale snapshot
+                # of every listing.
+                listing = claimed_payload
+                listings[listing_id] = listing
             if listing_id in listings:
-                listing   = listings.pop(listing_id)
+                listing = listings.pop(listing_id)
                 seller_id = str(listing.get("seller_id", ""))
                 card_uid  = str(listing.get("card_uid", ""))
                 if seller_id and card_uid:
@@ -219,9 +231,13 @@ class MarketCog(commands.Cog):
                 return True, True
             return False, False
 
-        ok, should_delete_sqlite = self.bot.storage.with_lock(mutate)
-        if ok and should_delete_sqlite:
-            await self.bot.market_service.delete_listing(listing_id)
+        try:
+            ok, _should_delete_sqlite = self.bot.storage.with_lock(mutate)
+        except Exception:
+            await self.bot.market_service.upsert_listing(listing_id, claimed_payload)
+            raise
+        if not ok:
+            await self.bot.market_service.upsert_listing(listing_id, claimed_payload)
         msg = "✅ Listing removed." if ok else "❌ Listing not found."
         await smart_reply(interaction, embed=make_embed(None, "Market", msg), ephemeral=True)
 
@@ -417,24 +433,41 @@ class MarketGroup(app_commands.Group):
 
         # Pre-fetch active listings so the sync with_lock closure doesn't call async code
         active_listings = await self.cog.bot.market_service.get_active_listings()
+        claimed = next(
+            (
+                (lid, row)
+                for lid, row in active_listings.items()
+                if isinstance(row, dict)
+                and str(row.get("seller_id", "")) == user_id
+                and str(row.get("card_name", "")).lower() == card_name.lower()
+                and not row.get("sold")
+            ),
+            None,
+        )
+        if claimed is None:
+            await smart_reply(interaction, embed=make_embed(None, "❌ Not Found", f"No active listing found for **{card_name}**."), ephemeral=True)
+            return
+        claimed_lid, claimed_payload = claimed
+        if not await self.cog.bot.market_service.delete_listing(str(claimed_lid)):
+            await smart_reply(interaction, embed=make_embed(None, "❌ Not Found", f"No active listing found for **{card_name}**."), ephemeral=True)
+            return
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str, str]:
             m        = market_root(data)
             listings = m.setdefault("listings", {})
-            listings.update(active_listings)
             if not isinstance(listings, dict):
                 return False, "no_listings", ""
-            listing = next(
-                ((lid, l) for lid, l in listings.items()
-                 if isinstance(l, dict)
-                 and str(l.get("seller_id", "")) == user_id
-                 and str(l.get("card_name", "")).lower() == card_name.lower()
-                 and not l.get("sold")),
-                None,
-            )
-            if not listing:
+            l = listings.get(str(claimed_lid))
+            if not isinstance(l, dict):
+                l = claimed_payload
+                listings[str(claimed_lid)] = l
+            if (
+                str(l.get("seller_id", "")) != user_id
+                or str(l.get("card_name", "")).lower() != card_name.lower()
+                or l.get("sold")
+            ):
                 return False, "not_found", ""
-            lid, l = listing
+            lid = str(claimed_lid)
             listings.pop(lid, None)
             card_uid = str(l.get("card_uid", ""))
             player   = get_player(data, user_id)
@@ -446,10 +479,13 @@ class MarketGroup(app_commands.Group):
                         break
             return True, str(l.get("card_name", card_name)), str(lid)
 
-        ok, result, removed_lid = self.cog.bot.storage.with_lock(mutate)
-        if ok and removed_lid:
-            await self.cog.bot.market_service.delete_listing(removed_lid)
+        try:
+            ok, result, _removed_lid = self.cog.bot.storage.with_lock(mutate)
+        except Exception:
+            await self.cog.bot.market_service.upsert_listing(str(claimed_lid), claimed_payload)
+            raise
         if not ok:
+            await self.cog.bot.market_service.upsert_listing(str(claimed_lid), claimed_payload)
             await smart_reply(interaction, embed=make_embed(None, "❌ Not Found", f"No active listing found for **{card_name}**."), ephemeral=True)
             return
         await smart_reply(interaction, embed=make_embed(None, "✅ Removed", f"**{result}** removed from market."), ephemeral=True)

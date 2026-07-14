@@ -530,12 +530,20 @@ class ConfirmView(discord.ui.View):
 
         ok, reason = self.cog.bot.storage.with_lock(mutate)
         if ok:
-            await self.cog.bot.trade_service.append_history({
-                **s,
-                "status": "accepted",
-                "resolved_at": now_ts(),
-            })
-            await self.cog.bot.trade_service.remove_pending_pair(a_id, b_id, mirror_json=False)
+            try:
+                await self.cog.bot.trade_service.append_history({
+                    **s,
+                    "status": "accepted",
+                    "resolved_at": now_ts(),
+                })
+            except Exception:
+                # History is audit metadata; never leave users pending after the
+                # already-persisted card/coin exchange succeeds.
+                logger.exception("Failed to append completed trade history")
+            try:
+                await self.cog.bot.trade_service.remove_pending_pair(a_id, b_id, mirror_json=False)
+            except Exception:
+                logger.exception("Failed to clear SQLite pending rows after completed trade")
             self.cog.unregister_panel(self.panel)
         self.stop()
 

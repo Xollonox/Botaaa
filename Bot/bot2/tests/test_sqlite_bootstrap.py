@@ -18,6 +18,9 @@ class FakeStorage:
     def load(self) -> dict[str, Any]:
         return self.data
 
+    def with_lock(self, fn):
+        return fn(self.data)
+
 
 def test_market_bootstrap_does_not_overwrite_existing_sqlite_state(tmp_path) -> None:
     repo = SQLiteMarketRepository(str(tmp_path / "market.sqlite3"))
@@ -62,6 +65,48 @@ def test_trade_bootstrap_does_not_clear_existing_sqlite_state(tmp_path) -> None:
 
     assert asyncio.run(repo.is_pending("1"))
     assert asyncio.run(repo.json_bootstrap_completed())
+
+
+def test_trade_offer_claim_is_atomic_and_releasable(tmp_path) -> None:
+    repo = SQLiteTradeRepository(str(tmp_path / "trade-claims.sqlite3"))
+    asyncio.run(repo.post_offer("offer", "1", "Poster", "A", "B", "uid-a", 10, 200))
+
+    claimed = asyncio.run(repo.claim_offer("offer", 100))
+    assert claimed is not None
+    assert claimed["item_uid"] == "uid-a"
+    assert asyncio.run(repo.claim_offer("offer", 100)) is None
+
+    assert asyncio.run(repo.finish_offer("offer", "open"))
+    assert asyncio.run(repo.claim_offer("offer", 100)) is not None
+    assert asyncio.run(repo.finish_offer("offer", "accepted"))
+    assert asyncio.run(repo.claim_offer("offer", 100)) is None
+
+
+def test_expired_trade_offer_cannot_be_claimed_and_unlocks_exact_card(tmp_path, monkeypatch) -> None:
+    repo = SQLiteTradeRepository(str(tmp_path / "trade-expiry.sqlite3"))
+    data = {
+        "players": {
+            "1": {
+                "user": {
+                    "inventory": [
+                        {"uid": "uid-a", "trade_locked": True},
+                        {"uid": "uid-b", "trade_locked": True},
+                    ]
+                }
+            }
+        }
+    }
+    service = TradeService(repo, FakeStorage(data))
+    asyncio.run(repo.post_offer("expired", "1", "Poster", "A", "B", "uid-a", 10, 50))
+    monkeypatch.setattr("bot.services.trade_service.now_ts", lambda: 100)
+
+    assert asyncio.run(service.claim_offer("expired")) is None
+    expired = asyncio.run(service.expire_offers())
+    assert [row["id"] for row in expired] == ["expired"]
+    assert data["players"]["1"]["user"]["inventory"] == [
+        {"uid": "uid-a", "trade_locked": False},
+        {"uid": "uid-b", "trade_locked": True},
+    ]
 
 
 def test_battle_bootstrap_does_not_clear_existing_sqlite_state(tmp_path) -> None:
