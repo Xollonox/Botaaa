@@ -6,10 +6,11 @@ import subprocess
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BOT_ROOT = os.path.join(BASE_DIR, "Bot")
-DEFAULT_BOT_DIRS = ["bot1", "bot2"]
+DEFAULT_BOT_DIRS = ["bot1", "bot2", "bot3"]
 REQUIRED_ENV = {
     "bot1": ("DISCORD_TOKEN",),
     "bot2": ("BOT_TOKEN",),
+    "bot3": ("NEETVERSE_TOKEN",),
 }
 
 
@@ -77,7 +78,7 @@ def main():
             procs[name] = proc
 
     if not procs:
-        print("No bots started. Add main.py inside Bot/bot1 or Bot/bot2")
+        print("No bots started. Add main.py inside a configured Bot/ directory")
         return
 
     try:

@@ -23,3 +23,15 @@ def test_bot2_invalid_owner_env_does_not_block_startup() -> None:
     env = {"LOOKISM_OWNER_IDS": "abc", "BOT_TOKEN": "token"}
 
     assert launcher._missing_required_env("bot2", env) == []
+
+
+def test_bot3_requires_its_own_discord_token_only() -> None:
+    assert launcher._missing_required_env("bot3", {}) == ["NEETVERSE_TOKEN"]
+    assert launcher._missing_required_env(
+        "bot3", {"NEETVERSE_TOKEN": "token", "OPENROUTER_API_KEY": ""}
+    ) == []
+
+
+def test_default_launcher_includes_neetverse(monkeypatch) -> None:
+    monkeypatch.delenv("BOTAAA_BOTS", raising=False)
+    assert launcher._bot_names() == ["bot1", "bot2", "bot3"]
