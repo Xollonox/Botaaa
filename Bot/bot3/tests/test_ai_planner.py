@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import asyncio
 import json
 
 import pytest
 
-from neetverse.ai import AIQuotaExceeded, OpenRouterClient, _parse_json_object
+from neetverse.ai import AcademicAIService, AIQuotaExceeded, AIResult, OpenRouterClient, _parse_json_object
 from neetverse.database import Database
 from neetverse.planner import PlannerError, PlannerService
 from neetverse.profiles import ProfileService
@@ -44,6 +45,57 @@ def test_ai_quota_is_reserved_atomically(tmp_path) -> None:
 def test_json_plan_parser_handles_fenced_output() -> None:
     value = _parse_json_object('```json\n{"title":"Today","tasks":[]}\n```')
     assert value == {"title": "Today", "tasks": []}
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "Here is the plan:\n{\"title\":\"Today\",\"tasks\":[],}\nHope this helps!",
+        "{'title': 'Today', 'tasks': [{'title': 'NCERT',}],}",
+        "<think>drafting</think> {“title”: “Today”, “tasks”: []}",
+    ],
+)
+def test_json_plan_parser_recovers_common_free_model_formats(raw: str) -> None:
+    assert _parse_json_object(raw)["title"] == "Today"
+
+
+class RepairingClient:
+    def __init__(self) -> None:
+        self.task_types: list[str] = []
+
+    async def complete(self, **kwargs) -> AIResult:
+        self.task_types.append(kwargs["task_type"])
+        if kwargs["task_type"] == "daily_plan":
+            return AIResult("this is not json", "first/free", "first", 1, 1)
+        return AIResult(
+            '{"title":"Repaired","tasks":[{"title":"Read NCERT","subject":"Biology",'
+            '"chapter":"Genetics","activity":"Reading","estimated_minutes":60,"priority":1}]}',
+            "repair/free", "repair", 1, 1,
+        )
+
+
+def test_daily_plan_automatically_repairs_malformed_first_response(tmp_path) -> None:
+    database = Database(tmp_path / "data.sqlite3")
+    profiles = ProfileService(database)
+    profiles.ensure_draft("1", "Student", now=10)
+    profiles.update(
+        "1",
+        {
+            "target_year": 2027,
+            "current_status": "Class 12",
+            "timezone": "UTC",
+            "weekday_available_minutes": 120,
+            "weekend_available_minutes": 120,
+        },
+        now=11,
+    )
+    client = RepairingClient()
+    result, payload = asyncio.run(AcademicAIService(database, client).propose_daily_plan("1"))
+
+    assert client.task_types == ["daily_plan", "daily_plan_repair"]
+    assert result.model_used == "repair/free"
+    assert payload["title"] == "Repaired"
+    assert payload["tasks"][0]["estimated_minutes"] == 60
 
 
 def test_ai_proposal_requires_owner_and_approval_before_tasks_exist(tmp_path) -> None:
