@@ -154,7 +154,12 @@ class NeetVerseBot(commands.Bot):
 
     async def on_ready(self) -> None:
         logging.getLogger(__name__).info("NeetVerse ready as %s", self.user)
-        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.studying, name="NEET preparation"))
+        await self.change_presence(
+            activity=discord.Activity(
+                type=discord.ActivityType.watching,
+                name="NEET preparation",
+            )
+        )
 
     async def close(self) -> None:
         for cog_name, loop_name in (

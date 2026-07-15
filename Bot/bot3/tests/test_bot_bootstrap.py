@@ -4,6 +4,7 @@ import asyncio
 import re
 from unittest.mock import AsyncMock
 
+import discord
 import main
 from neetverse.guide import GUIDE_PAGES
 
@@ -39,3 +40,15 @@ def test_bot_loads_expected_discord_systems_without_network(tmp_path, monkeypatc
     }
     assert len(registered) == 55
     assert documented == registered
+
+
+def test_on_ready_uses_a_supported_discord_activity(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(main, "DATABASE_PATH", tmp_path / "bot.sqlite3")
+    bot = main.NeetVerseBot()
+    bot.change_presence = AsyncMock()
+
+    asyncio.run(bot.on_ready())
+
+    activity = bot.change_presence.await_args.kwargs["activity"]
+    assert activity.type is discord.ActivityType.watching
+    assert activity.name == "NEET preparation"
