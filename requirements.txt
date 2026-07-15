@@ -1,10 +1,11 @@
 # Shared Botaaa requirements; individual bots also document their own subsets.
-discord.py
+discord.py[voice]
 beautifulsoup4
 youtube-search-python
 pydantic==1.10.15
 httpx==0.27.2
 aiohttp==3.10.10
+edge-tts>=7.2.0
 Pillow>=10.0.0
 python-dotenv>=1.0.0
 tzdata>=2026.1

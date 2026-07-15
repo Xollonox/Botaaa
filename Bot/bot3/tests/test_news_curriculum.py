@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+from pathlib import Path
 
 import pytest
 
-from neetverse.curriculum import CurriculumError, CurriculumService
+from neetverse.curriculum import CurriculumError, CurriculumService, load_bundled_syllabus
 from neetverse.database import Database
 from neetverse.news import OfficialNewsService
 from neetverse.profiles import ProfileService
@@ -54,6 +55,34 @@ def test_curriculum_rejects_non_official_source(tmp_path) -> None:
             "source_url": "https://coaching.example/syllabus",
             "nodes": [{"key": "x", "node_type": "subject", "subject_code": "x", "name": "X"}],
         })
+
+
+def test_bundled_official_syllabus_is_complete_selectable_and_rolls_up(tmp_path) -> None:
+    database = Database(tmp_path / "test.sqlite3")
+    service = CurriculumService(database)
+    _profile(database, "u2027", 2027)
+    payload = load_bundled_syllabus(Path(__file__).parents[1] / "data" / "neet_ug_2026.json")
+
+    version_id = service.ensure_bundled_version(payload, now=200)
+    assert service.ensure_bundled_version(payload, now=201) == version_id
+    assert len(payload["nodes"]) == 783
+    with pytest.raises(CurriculumError, match="target year"):
+        service.summary("u2027")
+
+    selected = service.select_version("u2027", version_id[:8], now=300)
+    assert selected["target_year"] == 2026
+    physics = service.browse_nodes("u2027", subject="physics")
+    assert len(physics["nodes"]) == 20
+    measurement = physics["nodes"][0]
+    assert measurement["has_children"] is True
+
+    updated = service.update_progress(
+        "u2027", measurement["id"], "lecture_percent", 100, now=400
+    )
+    assert updated["affected_nodes"] == measurement["leaf_count"]
+    summary = service.summary("u2027")
+    physics_summary = next(row for row in summary["subjects"] if row["subject_code"] == "physics")
+    assert 0 < physics_summary["completion"] < 20
 
 
 class FakeResponse:

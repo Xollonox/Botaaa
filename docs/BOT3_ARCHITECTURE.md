@@ -19,9 +19,12 @@ score, score target, Pomodoro pattern, preferred language, books, or problems.
 New profiles store these fields as null/empty. Every update is scoped by Discord
 user ID and audited. A student can edit the values later.
 
-Official syllabus selection follows the same rule: an active version must match
-the student's supplied target year. NeetVerse does not substitute a different
-year when that version is unavailable.
+Official syllabus selection follows the same rule: a matching active version is
+selected automatically, but NeetVerse never silently substitutes another year.
+A student may explicitly select an older official reference version, and the UI
+must continue to label its actual exam year. The bundled NMC-finalized NEET (UG)
+2026 catalog is therefore usable by a 2027 aspirant without being misrepresented
+as an official 2027 publication.
 
 ## Runtime composition
 
@@ -34,10 +37,26 @@ The main layers are:
 
 1. Presentation — slash commands, mobile embeds, buttons, selects, and modals.
 2. Application services — profiles, study, planner, goals, curriculum, mastery,
-   practice, revision, mocks, coverage, reminders, lectures, news, AI, privacy.
+   practice, revision, mocks, coverage, streaks, student overview, reminders,
+   lectures, news, AI, privacy.
 3. Automation — persisted domain-event processing and reminder delivery.
 4. Persistence — versioned SQLite schema, transactions, audit records, outbox.
-5. Integrations — Discord, OpenRouter, YouTube Data API, and official authority pages.
+5. Integrations — Discord, OpenRouter, Edge TTS, YouTube Data API, and official authority pages.
+
+The presentation layer has one shared visual language: semantic title emoji,
+state colors, compact mobile fields, consistent branding, and progress bars
+calculated from canonical values. A bar cannot imply invented progress. Unknown
+totals remain explicitly unknown. YouTube search is presented as a paginated
+public lecture deck; each page keeps the raw watch URL in message content for
+Discord's native unfurl/player behavior and keeps saving/status changes scoped
+to the requesting student.
+
+The official syllabus browser uses `subject -> unit -> topic -> subtopic` as its
+stable hierarchy. Completion is never stored on parent nodes: it is calculated
+from leaf subtopics, each of which averages lecture, reading, notes, practice,
+and PYQ percentages. Updating a parent applies the selected track to all leaf
+descendants, making aggregate completion deterministic and avoiding double
+counting parent and child rows.
 
 ## Connected academic flow
 
@@ -76,6 +95,25 @@ boundary for future AI mutations such as schedule or profile changes.
 Core tracking, planning, revision, and analytics remain functional if AI is
 unconfigured, rate-limited, or unavailable.
 
+## Conversation and voice boundary
+
+NeetVerse can answer a direct mention or an `/ai tutor` request using the same
+bounded per-student academic context. Public tutor answers are explicit user
+actions; plan drafts, reviews, mock analyses, settings, and account data retain
+their private response paths.
+
+Voice is output-only in the first production version. A text question or a
+Speak in VC button produces an AI answer, a visible transcript, bounded Edge
+TTS audio, and serialized Discord playback. There is one queue per guild, a
+strict queue limit, an idle disconnect, temporary-file cleanup, and text
+fallback when TTS or voice playback fails. Only a member in the bot's current
+voice channel may stop or disconnect it. Per-user voice, rate, and pitch choices
+are stored separately and cascade with profile deletion.
+
+NeetVerse does not receive, record, or transcribe member audio. Any future
+speech-to-text system requires a separate reviewed design for consent,
+retention, Discord voice-receive reliability, and provider privacy.
+
 ## Persistence and consistency
 
 SQLite runs with foreign keys, WAL mode, normal synchronous mode, busy timeout,
@@ -87,8 +125,11 @@ are explicitly removed by the privacy service.
 Long live sessions above six hours are marked `review_required`, so suspicious
 time does not silently enter rankings or progress summaries. Page coverage uses
 the union of ranges and does not double-count overlap. Leaderboards include only
-students who explicitly opt in and only live-timed sessions; manual logs remain
-available for private personal analytics but cannot inflate public rankings.
+students who explicitly opt in and only live-timed sessions. Public streaks are
+derived on demand in the student's time zone from completed live sessions, so
+there is no mutable streak counter to drift from source data. Manual logs remain
+available for private personal analytics but cannot inflate public rankings or
+verified streaks.
 
 ## Background work and recovery
 
@@ -105,8 +146,12 @@ also permits offline command-tree tests without leaked tasks.
 
 ## Privacy and trust boundaries
 
-- Responses containing student data are ephemeral except the explicitly opt-in
-  ranking display.
+- Private settings, mistakes, plans under mutation, AI context, reminders,
+  exports, and deletion flows remain ephemeral.
+- A user can deliberately post their sanitized profile, streak, discipline,
+  syllabus, plan, and analytics panels. Viewing another student's public card
+  or streak requires their visibility opt-in. Sanitized cards omit time zone,
+  availability, coaching, language, books, blockers, and private notes.
 - Interactive views verify the initiating Discord user.
 - Official news filters both source page and destination host.
 - Syllabus imports require a configured owner and an NTA/NMC source URL.

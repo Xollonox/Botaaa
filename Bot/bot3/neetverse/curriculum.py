@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import time
 import uuid
+import json
+from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
@@ -100,8 +102,51 @@ class CurriculumService:
                     raise CurriculumError("Syllabus parent relationships contain a cycle")
         return version_id
 
+    def ensure_bundled_version(self, payload: dict[str, Any], *, now: int | None = None) -> str:
+        """Install reviewed bundled data once without replacing a later owner import."""
+
+        label = str(payload.get("label") or "").strip()
+        source_url = str(payload.get("source_url") or "").strip()
+        target_year = int(payload.get("target_year") or 0)
+        with self.database.connect() as conn:
+            existing = conn.execute(
+                """
+                SELECT id, status FROM curriculum_versions
+                WHERE exam='NEET-UG' AND target_year=? AND label=? AND source_url=?
+                ORDER BY created_at DESC LIMIT 1
+                """,
+                (target_year, label, source_url),
+            ).fetchone()
+            has_active = conn.execute(
+                """
+                SELECT 1 FROM curriculum_versions
+                WHERE exam='NEET-UG' AND target_year=? AND status='active' LIMIT 1
+                """,
+                (target_year,),
+            ).fetchone()
+        if existing:
+            if has_active is None and existing["status"] != "active":
+                with self.database.transaction(immediate=True) as conn:
+                    conn.execute(
+                        "UPDATE curriculum_versions SET status='active' WHERE id=?",
+                        (existing["id"],),
+                    )
+            return str(existing["id"])
+        return self.import_version(payload, activate=has_active is None, now=now)
+
     def active_for_user(self, user_id: str) -> dict[str, Any] | None:
         with self.database.connect() as conn:
+            selected = conn.execute(
+                """
+                SELECT cv.* FROM profile_curriculum_selections pcs
+                JOIN curriculum_versions cv ON cv.id=pcs.version_id
+                WHERE pcs.user_id=? AND cv.exam='NEET-UG' AND cv.status='active'
+                LIMIT 1
+                """,
+                (str(user_id),),
+            ).fetchone()
+            if selected:
+                return dict(selected)
             row = conn.execute(
                 """
                 SELECT cv.* FROM profiles p
@@ -112,6 +157,63 @@ class CurriculumService:
                 (str(user_id),),
             ).fetchone()
         return dict(row) if row else None
+
+    def list_versions(self) -> list[dict[str, Any]]:
+        with self.database.connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT cv.*, COUNT(cn.id) AS node_count
+                FROM curriculum_versions cv
+                LEFT JOIN curriculum_nodes cn ON cn.version_id=cv.id
+                WHERE cv.exam='NEET-UG' AND cv.status='active'
+                GROUP BY cv.id ORDER BY cv.target_year DESC, cv.created_at DESC
+                """
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def select_version(self, user_id: str, version_token: str, *, now: int | None = None) -> dict[str, Any]:
+        token = version_token.strip()
+        if not token:
+            raise CurriculumError("Choose a syllabus version ID")
+        timestamp = int(time.time() if now is None else now)
+        with self.database.transaction(immediate=True) as conn:
+            profile = conn.execute(
+                "SELECT 1 FROM profiles WHERE user_id=?", (str(user_id),)
+            ).fetchone()
+            if profile is None:
+                raise CurriculumError("Run /start first")
+            rows = conn.execute(
+                """
+                SELECT * FROM curriculum_versions
+                WHERE exam='NEET-UG' AND status='active' AND id LIKE ?
+                ORDER BY created_at DESC LIMIT 2
+                """,
+                (f"{token}%",),
+            ).fetchall()
+            if not rows:
+                raise CurriculumError("Active syllabus version not found")
+            if len(rows) > 1:
+                raise CurriculumError("Syllabus version ID is ambiguous; provide more characters")
+            version = rows[0]
+            conn.execute(
+                """
+                INSERT INTO profile_curriculum_selections(user_id, version_id, selected_at)
+                VALUES (?, ?, ?)
+                ON CONFLICT(user_id) DO UPDATE SET
+                    version_id=excluded.version_id, selected_at=excluded.selected_at
+                """,
+                (str(user_id), version["id"], timestamp),
+            )
+            self.database.emit_event(
+                conn,
+                event_type="CurriculumVersionSelected",
+                aggregate_type="curriculum_version",
+                aggregate_id=str(version["id"]),
+                user_id=str(user_id),
+                payload={"target_year": int(version["target_year"])},
+                occurred_at=timestamp,
+            )
+        return dict(version)
 
     def find_nodes(self, user_id: str, query: str, *, limit: int = 20) -> list[dict[str, Any]]:
         version = self.active_for_user(user_id)
@@ -132,6 +234,72 @@ class CurriculumService:
             ).fetchall()
         return [dict(row) for row in rows]
 
+    def browse_nodes(
+        self,
+        user_id: str,
+        *,
+        subject: str | None = None,
+        parent_token: str | None = None,
+    ) -> dict[str, Any]:
+        version = self.active_for_user(user_id)
+        if version is None:
+            raise CurriculumError("No syllabus is selected. Use /syllabus versions, then /syllabus use")
+        with self.database.connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT n.*, cp.lecture_percent, cp.reading_percent, cp.notes_percent,
+                       cp.practice_percent, cp.pyq_percent, cp.revision_count
+                FROM curriculum_nodes n
+                LEFT JOIN curriculum_progress cp ON cp.node_id=n.id AND cp.user_id=?
+                WHERE n.version_id=? ORDER BY n.sort_order, n.name
+                """,
+                (str(user_id), version["id"]),
+            ).fetchall()
+        nodes = [dict(row) for row in rows]
+        by_id = {row["id"]: row for row in nodes}
+        children: dict[str | None, list[dict[str, Any]]] = {}
+        for row in nodes:
+            children.setdefault(row["parent_id"], []).append(row)
+
+        parent: dict[str, Any] | None = None
+        if parent_token:
+            matches = [row for row in nodes if str(row["id"]).startswith(parent_token.strip())]
+            if not matches:
+                raise CurriculumError("No syllabus parent matches that ID")
+            if len(matches) > 1:
+                raise CurriculumError("Syllabus parent ID is ambiguous; provide more characters")
+            parent = matches[0]
+        elif subject:
+            code = subject.strip().lower()
+            parent = next(
+                (row for row in nodes if row["node_type"] == "subject" and row["subject_code"].lower() == code),
+                None,
+            )
+            if parent is None:
+                raise CurriculumError("That subject is not present in the selected syllabus")
+
+        def leaf_completions(node_id: str) -> list[float]:
+            direct = children.get(node_id, [])
+            if not direct:
+                row = by_id[node_id]
+                return [_node_completion(row)]
+            values: list[float] = []
+            for child in direct:
+                values.extend(leaf_completions(child["id"]))
+            return values
+
+        visible = children.get(parent["id"] if parent else None, [])
+        decorated: list[dict[str, Any]] = []
+        for row in visible:
+            values = leaf_completions(row["id"])
+            decorated.append({
+                **row,
+                "completion": sum(values) / len(values) if values else 0.0,
+                "leaf_count": len(values),
+                "has_children": bool(children.get(row["id"])),
+            })
+        return {"version": version, "parent": parent, "nodes": decorated}
+
     def update_progress(self, user_id: str, node_id: str, field: str, percent: float, *, now: int | None = None) -> dict[str, Any]:
         if field not in PROGRESS_FIELDS or not 0 <= float(percent) <= 100:
             raise CurriculumError("Choose a valid progress type and percentage from 0 to 100")
@@ -145,28 +313,53 @@ class CurriculumService:
             ).fetchone()
             if node is None:
                 raise CurriculumError("That syllabus node does not belong to your target-year syllabus")
-            conn.execute(
+            descendants = conn.execute(
+                """
+                WITH RECURSIVE tree(id) AS (
+                    SELECT id FROM curriculum_nodes WHERE id=?
+                    UNION ALL
+                    SELECT child.id FROM curriculum_nodes child JOIN tree ON child.parent_id=tree.id
+                )
+                SELECT tree.id FROM tree
+                WHERE NOT EXISTS (SELECT 1 FROM curriculum_nodes child WHERE child.parent_id=tree.id)
+                """,
+                (node_id,),
+            ).fetchall()
+            leaf_ids = [str(row["id"]) for row in descendants]
+            conn.executemany(
                 """
                 INSERT INTO curriculum_progress(user_id, node_id, updated_at)
                 VALUES (?, ?, ?)
                 ON CONFLICT(user_id, node_id) DO NOTHING
                 """,
-                (str(user_id), node_id, timestamp),
+                [(str(user_id), leaf_id, timestamp) for leaf_id in leaf_ids],
             )
-            conn.execute(
+            conn.executemany(
                 f"UPDATE curriculum_progress SET {field}=?, updated_at=? WHERE user_id=? AND node_id=?",
-                (float(percent), timestamp, str(user_id), node_id),
+                [(float(percent), timestamp, str(user_id), leaf_id) for leaf_id in leaf_ids],
             )
-            row = conn.execute(
-                "SELECT * FROM curriculum_progress WHERE user_id=? AND node_id=?", (str(user_id), node_id)
+            progress_rows = conn.execute(
+                f"""
+                SELECT AVG(lecture_percent) lecture_percent,
+                       AVG(reading_percent) reading_percent,
+                       AVG(notes_percent) notes_percent,
+                       AVG(practice_percent) practice_percent,
+                       AVG(pyq_percent) pyq_percent,
+                       CAST(AVG(revision_count) AS INTEGER) revision_count,
+                       MAX(updated_at) updated_at
+                FROM curriculum_progress
+                WHERE user_id=? AND node_id IN ({','.join('?' for _ in leaf_ids)})
+                """,
+                (str(user_id), *leaf_ids),
             ).fetchone()
             self.database.emit_event(
                 conn, event_type="SyllabusProgressUpdated", aggregate_type="curriculum_node",
                 aggregate_id=node_id, user_id=str(user_id),
-                payload={"field": field, "percent": float(percent)}, occurred_at=timestamp,
+                payload={"field": field, "percent": float(percent), "affected_nodes": len(leaf_ids)}, occurred_at=timestamp,
             )
-        result = dict(row)
+        result = dict(progress_rows)
         result["node_name"] = node["name"]
+        result["affected_nodes"] = len(leaf_ids)
         return result
 
     def summary(self, user_id: str) -> dict[str, Any]:
@@ -182,7 +375,8 @@ class CurriculumService:
                          COALESCE(cp.pyq_percent,0))/5.0) AS completion
                 FROM curriculum_nodes n
                 LEFT JOIN curriculum_progress cp ON cp.node_id=n.id AND cp.user_id=?
-                WHERE n.version_id=? AND n.node_type IN ('chapter','topic','subtopic')
+                WHERE n.version_id=?
+                  AND NOT EXISTS (SELECT 1 FROM curriculum_nodes child WHERE child.parent_id=n.id)
                 GROUP BY n.subject_code ORDER BY n.subject_code
                 """,
                 (str(user_id), version["id"]),
@@ -192,3 +386,55 @@ class CurriculumService:
 
 def _optional_int(value: Any) -> int | None:
     return int(value) if value not in (None, "") else None
+
+
+def _node_completion(row: dict[str, Any]) -> float:
+    return sum(float(row.get(field) or 0) for field in PROGRESS_FIELDS) / len(PROGRESS_FIELDS)
+
+
+def load_bundled_syllabus(path: str | Path) -> dict[str, Any]:
+    """Expand a compact reviewed subject/unit/topic/subtopic catalog for import."""
+
+    raw = json.loads(Path(path).read_text(encoding="utf-8"))
+    nodes: list[dict[str, Any]] = []
+    for subject_index, subject in enumerate(raw.pop("subjects")):
+        code = str(subject["code"]).strip().lower()
+        subject_key = f"s{subject_index}-{code}"
+        nodes.append({
+            "key": subject_key,
+            "node_type": "subject",
+            "subject_code": code,
+            "name": subject["name"],
+            "sort_order": subject_index,
+        })
+        for unit_index, unit in enumerate(subject["units"]):
+            unit_key = f"{subject_key}-u{unit_index}"
+            nodes.append({
+                "key": unit_key,
+                "parent_key": subject_key,
+                "node_type": "unit",
+                "subject_code": code,
+                "name": unit["name"],
+                "sort_order": unit_index,
+            })
+            for topic_index, topic in enumerate(unit["topics"]):
+                topic_key = f"{unit_key}-t{topic_index}"
+                nodes.append({
+                    "key": topic_key,
+                    "parent_key": unit_key,
+                    "node_type": "topic",
+                    "subject_code": code,
+                    "name": topic["name"],
+                    "sort_order": topic_index,
+                })
+                for subtopic_index, subtopic in enumerate(topic["subtopics"]):
+                    nodes.append({
+                        "key": f"{topic_key}-s{subtopic_index}",
+                        "parent_key": topic_key,
+                        "node_type": "subtopic",
+                        "subject_code": code,
+                        "name": subtopic,
+                        "sort_order": subtopic_index,
+                    })
+    raw["nodes"] = nodes
+    return raw

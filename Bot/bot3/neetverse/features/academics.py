@@ -9,7 +9,16 @@ from discord.ext import commands
 from neetverse.coverage import CoverageError
 from neetverse.practice import PracticeError
 from neetverse.revision import RevisionError
-from neetverse.ui import ERROR, SUCCESS, duration, embed, reply
+from neetverse.ui import (
+    ERROR,
+    SUCCESS,
+    duration,
+    embed,
+    progress_bar,
+    reply,
+    status_icon,
+    subject_icon,
+)
 
 
 class PracticeGroup(app_commands.Group):
@@ -40,13 +49,16 @@ class PracticeGroup(app_commands.Group):
             await reply(interaction, value=embed("Practice not saved", str(exc), color=ERROR))
             return
         text = (
-            f"Attempted: **{result['attempted']}**\nCorrect: **{result['correct']}**\n"
-            f"Incorrect: **{result['incorrect']}**\nSkipped: **{result['skipped']}**\n"
-            f"Accuracy: **{result['accuracy']}%**\n"
-            f"Current subject mastery estimate: **{result['subject_mastery']['score']}%** "
-            f"(confidence {result['subject_mastery']['confidence'] * 100:.0f}%)"
+            f"{subject_icon(subject)} **{subject.upper()} PRACTICE RUN**\n"
+            f"🎯 Accuracy {progress_bar(result['accuracy'], 100, width=12)}\n\n"
+            f"✅ **{result['correct']} correct**  •  ❌ **{result['incorrect']} incorrect**  •  "
+            f"⏭️ **{result['skipped']} skipped**\n"
+            f"📦 `{result['attempted']} total questions`\n\n"
+            f"🧠 **MASTERY ESTIMATE**\n"
+            f"{progress_bar(result['subject_mastery']['score'], 100, width=12)}\n"
+            f"Evidence confidence: **{result['subject_mastery']['confidence'] * 100:.0f}%**"
         )
-        await reply(interaction, value=embed("✅ Practice recorded", text, color=SUCCESS))
+        await reply(interaction, value=embed("Practice recorded", text, color=SUCCESS))
 
 
 class MistakeGroup(app_commands.Group):
@@ -103,7 +115,10 @@ class MistakeGroup(app_commands.Group):
             await reply(interaction, value=embed("Mistake book unavailable", str(exc), color=ERROR))
             return
         lines = [
-            f"`{row['id'][:8]}` **{row['subject']}**{f" • {row['chapter']}" if row.get('chapter') else ''}\n{row['category']} • {row['status']} • reviewed {row['repeat_count']} time(s)"
+            f"{status_icon(row['status'])} `{row['id'][:8]}` {subject_icon(row['subject'])} **{row['subject']}**"
+            + (f" → {row['chapter']}" if row.get("chapter") else "")
+            + "\n"
+            + f"└ `{row['category']}` • **{row['status'].upper()}** • 🔁 {row['repeat_count']} review(s)"
             for row in rows[:15]
         ]
         await reply(interaction, value=embed("📕 Mistake book", "\n\n".join(lines) or "No mistakes recorded."))
@@ -120,7 +135,10 @@ class RevisionGroup(app_commands.Group):
         if not rows:
             await reply(interaction, value=embed("Revision queue", "Nothing is due right now.", color=SUCCESS))
             return
-        lines = [f"`{row['id'][:8]}` • **{row['title']}** • interval {row['interval_days']}d" for row in rows[:15]]
+        lines = [
+            f"🔔 `{row['id'][:8]}` • **{row['title']}**\n└ Spacing interval: `{row['interval_days']} day(s)`"
+            for row in rows[:15]
+        ]
         await reply(interaction, value=embed("🔁 Revisions due", "\n".join(lines)))
 
     @app_commands.command(name="review", description="Record recall quality and schedule the next revision.")
@@ -178,7 +196,11 @@ class ResourceGroup(app_commands.Group):
         if not rows:
             await reply(interaction, value=embed("Resources", "No resources added yet."))
             return
-        lines = [f"`{row['id'][:8]}` • **{row['name']}** • {row['resource_type']}" for row in rows[:20]]
+        lines = [
+            f"📘 `{row['id'][:8]}` • **{row['name']}**\n"
+            f"└ `{row['resource_type'].upper()}` • {subject_icon(row.get('subject_code') or '')} {row.get('subject_code') or 'General'}"
+            for row in rows[:20]
+        ]
         await reply(interaction, value=embed("📚 Your resources", "\n".join(lines)))
 
     @app_commands.command(name="pages", description="Record an exact page range without double-counting overlaps.")
@@ -199,12 +221,15 @@ class ResourceGroup(app_commands.Group):
         except CoverageError as exc:
             await reply(interaction, value=embed("Pages not saved", str(exc), color=ERROR))
             return
-        percentage = "Unknown total" if result["coverage_percent"] is None else f"{result['coverage_percent']}%"
+        coverage = result["coverage_percent"]
+        percentage = "`Unknown total page count`" if coverage is None else progress_bar(coverage, 100, width=12)
         await reply(
             interaction,
             value=embed(
                 "Pages recorded",
-                f"**{found['name']}**\nUnique pages covered for {activity}: **{result['covered_pages']}**\nCoverage: **{percentage}**",
+                f"📘 **{found['name']}**\n"
+                f"📄 `{result['covered_pages']} unique pages` • **{activity}**\n"
+                f"{percentage}",
                 color=SUCCESS,
             ),
         )
@@ -218,8 +243,11 @@ class ResourceGroup(app_commands.Group):
             await reply(interaction, value=embed("Coverage unavailable", str(exc), color=ERROR))
             return
         lines = [
-            f"**{row['activity']}** — {row['covered_pages']} unique pages"
-            + (f" ({row['coverage_percent']}%)" if row["coverage_percent"] is not None else "")
+            f"📖 **{row['activity']}** • `{row['covered_pages']} unique pages`\n"
+            + (
+                f"└ {progress_bar(row['coverage_percent'], 100, width=9)}"
+                if row["coverage_percent"] is not None else "└ `Total page count unavailable`"
+            )
             for row in rows
         ]
         await reply(interaction, value=embed(f"📖 {found['name']}", "\n".join(lines) or "No pages recorded."))
@@ -243,19 +271,28 @@ class AcademicsCog(commands.Cog):
         except ValueError as exc:
             await reply(interaction, value=embed("Progress unavailable", str(exc), color=ERROR))
             return
-        mastery = "\n".join(
-            f"• {row['subject']}: **{row['score']:.1f}%** ({row['confidence'] * 100:.0f}% confidence)"
+        mastery = "\n\n".join(
+            f"{subject_icon(row['subject'])} **{row['subject']}**\n"
+            f"└ {progress_bar(row['score'], 100, width=9)} • `{row['confidence'] * 100:.0f}% confidence`"
             for row in data["mastery"]
         ) or "No mastery evidence yet."
-        accuracy = "No questions logged" if data["question_accuracy"] is None else f"{data['question_accuracy']}%"
+        accuracy = data["question_accuracy"]
         text = (
-            f"**Date:** {data['local_date']}\n"
-            f"**Focused:** {duration(data['focus_seconds'])} across {data['sessions']} completed session(s)\n"
-            f"**Questions:** {data['questions_attempted']} • accuracy {accuracy}\n"
-            f"**Revisions due:** {data['revisions_due']}\n\n"
-            f"**Current mastery estimates**\n{mastery}"
+            f"📅 `{data['local_date']}`  •  `LIVE ACADEMIC SNAPSHOT`\n\n"
+            f"⚡ **FOCUS:** `{duration(data['focus_seconds'])}` across `{data['sessions']} sessions`\n"
+            f"🎯 **QUESTIONS:** `{data['questions_attempted']}`\n"
+            + (
+                f"└ Accuracy {progress_bar(accuracy, 100, width=10)}\n"
+                if accuracy is not None else "└ `No accuracy evidence yet`\n"
+            )
+            + f"🔔 **REVISIONS DUE:** `{data['revisions_due']}`\n\n"
+            f"💎 **CURRENT MASTERY**\n{mastery}"
         )
-        await reply(interaction, value=embed("📊 Your progress", text))
+        await reply(
+            interaction,
+            value=embed("📊  Daily Progress Command Center", text),
+            ephemeral=False,
+        )
 
 
 async def setup(bot: commands.Bot) -> None:

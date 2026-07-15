@@ -7,7 +7,18 @@ from discord import app_commands
 from discord.ext import commands
 
 from neetverse.guide import GUIDE_PAGES
-from neetverse.ui import embed, reply
+from neetverse.ui import embed, progress_bar, reply
+
+
+def help_embed(index: int) -> discord.Embed:
+    title, description = GUIDE_PAGES[index]
+    header = (
+        f"{progress_bar(index + 1, len(GUIDE_PAGES), width=10)}  "
+        f"`SYSTEM {index + 1:02d}/{len(GUIDE_PAGES):02d}`\n\n"
+    )
+    value = embed(title, header + description)
+    value.set_footer(text="NEETVERSE  •  SELECT A SYSTEM BELOW  •  MOBILE COMMAND DECK")
+    return value
 
 
 class HelpSelect(discord.ui.Select):
@@ -19,8 +30,8 @@ class HelpSelect(discord.ui.Select):
         self.help_view = view
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        title, description = GUIDE_PAGES[int(self.values[0])]
-        await interaction.response.edit_message(embed=embed(title, description), view=self.help_view)
+        index = int(self.values[0])
+        await interaction.response.edit_message(embed=help_embed(index), view=self.help_view)
 
 
 class HelpView(discord.ui.View):
@@ -42,9 +53,8 @@ class HelpCog(commands.Cog):
 
     @app_commands.command(name="help", description="Explore NeetVerse systems and daily workflows.")
     async def help(self, interaction: discord.Interaction) -> None:
-        title, description = GUIDE_PAGES[0]
         await interaction.response.send_message(
-            embed=embed(title, description), view=HelpView(interaction.user.id), ephemeral=True
+            embed=help_embed(0), view=HelpView(interaction.user.id), ephemeral=True
         )
 
 

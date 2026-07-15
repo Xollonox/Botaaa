@@ -6,6 +6,7 @@ import logging
 import time
 from collections import defaultdict, deque
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 from typing import Any
 
 import discord
@@ -23,6 +24,11 @@ from config import (
     OPENROUTER_BASE_URL,
     OPENROUTER_MODEL,
     OPENROUTER_TIMEOUT_SECONDS,
+    TTS_DEFAULT_VOICE,
+    TTS_MAX_CHARACTERS,
+    TTS_TIMEOUT_SECONDS,
+    VOICE_IDLE_SECONDS,
+    VOICE_QUEUE_LIMIT,
     YOUTUBE_API_BASE_URL,
     YOUTUBE_API_KEY,
     require_runtime_config,
@@ -30,7 +36,7 @@ from config import (
 from neetverse.ai import AcademicAIService, OpenRouterClient
 from neetverse.analytics import AnalyticsService
 from neetverse.coverage import CoverageService
-from neetverse.curriculum import CurriculumService
+from neetverse.curriculum import CurriculumService, load_bundled_syllabus
 from neetverse.database import Database
 from neetverse.discipline import DisciplineService
 from neetverse.events import EventProcessor
@@ -39,6 +45,7 @@ from neetverse.mastery import MasteryService
 from neetverse.lectures import LectureService
 from neetverse.mocks import MockService
 from neetverse.news import OfficialNewsService
+from neetverse.overview import StudentOverviewService
 from neetverse.planner import PlannerService
 from neetverse.privacy import PrivacyService
 from neetverse.practice import PracticeService
@@ -46,6 +53,9 @@ from neetverse.profiles import ProfileService
 from neetverse.revision import RevisionService
 from neetverse.reminders import ReminderService
 from neetverse.study import StudyService
+from neetverse.streaks import StreakService
+from neetverse.speech import EdgeSpeechService, SpeechPreferenceService
+from neetverse.voice import VoiceSessionManager
 
 
 def configure_logging() -> None:
@@ -102,9 +112,21 @@ class NeetVerseBot(commands.Bot):
         self.revision_service = RevisionService(self.database, self.mastery_service, self.reminder_service)
         self.coverage_service = CoverageService(self.database, self.mastery_service)
         self.curriculum_service = CurriculumService(self.database)
+        bundled_syllabus = load_bundled_syllabus(
+            Path(__file__).resolve().parent / "data" / "neet_ug_2026.json"
+        )
+        self.curriculum_service.ensure_bundled_version(bundled_syllabus)
         self.analytics_service = AnalyticsService(self.database)
         self.mock_service = MockService(self.database, self.mastery_service)
         self.discipline_service = DisciplineService(self.database)
+        self.streak_service = StreakService(self.database)
+        self.overview_service = StudentOverviewService(
+            self.database,
+            self.curriculum_service,
+            self.discipline_service,
+            self.planner_service,
+            self.streak_service,
+        )
         self.goal_service = GoalService(self.database, self.reminder_service)
         self.event_processor = EventProcessor(self.database, self.reminder_service)
         self.lecture_service = LectureService(
@@ -121,12 +143,27 @@ class NeetVerseBot(commands.Bot):
             daily_user_limit=AI_DAILY_USER_LIMIT,
         )
         self.academic_ai = AcademicAIService(self.database, self.openrouter)
+        self.speech_preferences = SpeechPreferenceService(
+            self.database, default_voice=TTS_DEFAULT_VOICE
+        )
+        self.speech_service = EdgeSpeechService(
+            timeout_seconds=TTS_TIMEOUT_SECONDS,
+            max_characters=TTS_MAX_CHARACTERS,
+        )
+        self.voice_manager = VoiceSessionManager(
+            self,
+            self.speech_service,
+            self.speech_preferences,
+            queue_limit=VOICE_QUEUE_LIMIT,
+            idle_seconds=VOICE_IDLE_SECONDS,
+        )
 
     async def setup_hook(self) -> None:
         for extension in (
             "neetverse.features.profile",
             "neetverse.features.study",
             "neetverse.features.ai",
+            "neetverse.features.voice",
             "neetverse.features.academics",
             "neetverse.features.progression",
             "neetverse.features.reminders",
@@ -172,6 +209,8 @@ class NeetVerseBot(commands.Bot):
             if loop is not None:
                 loop.cancel()
         await self.openrouter.close()
+        await self.voice_manager.close()
+        await self.speech_service.close()
         await self.lecture_service.close()
         await self.news_service.close()
         await super().close()

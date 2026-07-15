@@ -10,10 +10,11 @@ from .database import Database
 
 EXPORT_TABLES = (
     "profiles", "profile_subject_progress", "profile_change_log", "study_sessions",
-    "plans", "tasks", "ai_usage", "ai_proposals", "curriculum_progress",
+    "plans", "tasks", "ai_usage", "ai_proposals", "profile_curriculum_selections", "curriculum_progress",
     "resources", "page_coverage", "practice_batches", "mistakes", "revision_items",
     "revision_attempts", "mastery_evidence", "mastery_snapshots", "mock_attempts",
     "reminder_jobs", "discipline_snapshots", "saved_lectures", "goals", "domain_events",
+    "voice_preferences",
 )
 
 

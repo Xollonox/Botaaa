@@ -7,36 +7,73 @@ from discord import app_commands
 from discord.ext import commands
 
 from neetverse.study import StudyError, StudyService
-from neetverse.ui import ERROR, SUCCESS, duration, embed, reply
+from neetverse.ui import (
+    ERROR,
+    SUCCESS,
+    duration,
+    embed,
+    progress_bar,
+    reply,
+    status_icon,
+    subject_icon,
+)
 
 
 def session_embed(session: dict) -> discord.Embed:
     status = str(session["status"]).replace("_", " ").title()
     phase = str(session["phase"]).replace("_", " ").title()
-    lines = [
-        f"**{session['subject']}** • {session['activity']}",
-        f"Status: **{status}**",
-        f"Focus: **{duration(session['focus_seconds'])}**",
-        f"Paused: {duration(session['paused_seconds'])}",
-        f"Breaks: {duration(session['break_seconds'])}",
-    ]
-    if session.get("chapter"):
-        lines.insert(1, f"Chapter: {session['chapter']}")
+    subject = str(session["subject"])
+    chapter = f" → **{session['chapter']}**" if session.get("chapter") else ""
+    headline = (
+        f"{status_icon(session['status'])} `STATUS: {status.upper()}`\n"
+        f"{subject_icon(subject)} **{subject}**{chapter}\n"
+        f"🎯 {session['activity']}"
+    )
+    progress = ""
     if session["mode"] == "pomodoro":
-        lines.extend(
-            [
-                f"Phase: **{phase}**",
-                f"Phase remaining: **{duration(session.get('phase_remaining_seconds', 0))}**",
-                f"Focus cycles completed: **{session['pomodoro_cycles_completed']}**",
-            ]
+        phase_minutes = {
+            "focus": session.get("pomodoro_focus_minutes"),
+            "short_break": session.get("pomodoro_short_break_minutes"),
+            "long_break": session.get("pomodoro_long_break_minutes"),
+        }.get(str(session["phase"]))
+        phase_total = int(phase_minutes or 0) * 60
+        remaining = int(session.get("phase_remaining_seconds") or 0)
+        elapsed = max(0, phase_total - remaining)
+        progress = (
+            f"**{phase.upper()} PHASE**\n{progress_bar(elapsed, phase_total, width=12)}\n"
+            f"⏳ **{duration(remaining)} remaining**\n"
+            f"🔄 Cycles {progress_bar(session['pomodoro_cycles_completed'], session.get('pomodoro_cycles_target') or 1, width=8)}"
         )
-    elif session.get("remaining_seconds") is not None:
-        lines.append(f"Target remaining: **{duration(session['remaining_seconds'])}**")
+    elif session.get("planned_seconds"):
+        progress = (
+            f"**SESSION TARGET**\n"
+            f"{progress_bar(session['focus_seconds'], session['planned_seconds'], width=12)}\n"
+            f"⏳ **{duration(session.get('remaining_seconds') or 0)} remaining**"
+        )
+    else:
+        progress = "**OPEN STOPWATCH**\n`LIVE • NO FIXED TARGET`"
     color = SUCCESS if session["status"] == "completed" else 0x6C5CE7
     if session["status"] == "review_required":
         color = 0xF1C40F
-        lines.append("⚠️ This unusually long session needs review before competitive credit.")
-    return embed("⏱️ Study Session", "\n".join(lines), color=color)
+        progress += "\n⚠️ This unusually long session needs review before competitive credit."
+    value = embed("⏱️  Focus Session HUD", headline, color=color)
+    value.add_field(name="⚡ LIVE PROGRESS", value=progress, inline=False)
+    value.add_field(
+        name="🧠 DEEP WORK",
+        value=f"`{duration(session['focus_seconds'])}`",
+        inline=True,
+    )
+    value.add_field(
+        name="⏸️ PAUSED",
+        value=f"`{duration(session['paused_seconds'])}`",
+        inline=True,
+    )
+    value.add_field(
+        name="☕ BREAKS",
+        value=f"`{duration(session['break_seconds'])}`",
+        inline=True,
+    )
+    return value
 
 
 class StudyControlView(discord.ui.View):

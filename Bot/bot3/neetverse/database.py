@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, Iterator
 
 
-LATEST_SCHEMA_VERSION = 7
+LATEST_SCHEMA_VERSION = 9
 
 
 class _ClosingConnection(sqlite3.Connection):
@@ -104,6 +104,18 @@ class Database:
                 conn.execute(
                     "INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                     (7, int(time.time())),
+                )
+            if current < 8:
+                self._apply_v8(conn)
+                conn.execute(
+                    "INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                    (8, int(time.time())),
+                )
+            if current < 9:
+                self._apply_v9(conn)
+                conn.execute(
+                    "INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                    (9, int(time.time())),
                 )
             if current > LATEST_SCHEMA_VERSION:
                 raise RuntimeError(f"Database schema {current} is newer than this bot supports")
@@ -588,6 +600,37 @@ class Database:
             ALTER TABLE official_news ADD COLUMN source_position INTEGER NOT NULL DEFAULT 9999;
             CREATE INDEX official_news_source_position
             ON official_news(last_seen_at DESC, source_position, source_key);
+            """
+        )
+
+    @staticmethod
+    def _apply_v8(conn: sqlite3.Connection) -> None:
+        conn.executescript(
+            """
+            CREATE TABLE voice_preferences (
+                user_id TEXT PRIMARY KEY REFERENCES profiles(user_id) ON DELETE CASCADE,
+                voice_name TEXT,
+                rate_percent INTEGER NOT NULL DEFAULT 0
+                    CHECK (rate_percent BETWEEN -50 AND 50),
+                pitch_hz INTEGER NOT NULL DEFAULT 0
+                    CHECK (pitch_hz BETWEEN -50 AND 50),
+                updated_at INTEGER NOT NULL
+            );
+            """
+        )
+
+    @staticmethod
+    def _apply_v9(conn: sqlite3.Connection) -> None:
+        conn.executescript(
+            """
+            CREATE TABLE profile_curriculum_selections (
+                user_id TEXT PRIMARY KEY REFERENCES profiles(user_id) ON DELETE CASCADE,
+                version_id TEXT NOT NULL REFERENCES curriculum_versions(id) ON DELETE CASCADE,
+                selected_at INTEGER NOT NULL
+            );
+
+            CREATE INDEX curriculum_nodes_by_parent
+            ON curriculum_nodes(version_id, parent_id, sort_order);
             """
         )
 

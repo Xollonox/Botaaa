@@ -34,7 +34,7 @@ class DeleteDataView(discord.ui.View):
         await interaction.response.edit_message(embed=embed("Data deleted", message, color=SUCCESS), view=self)
         self.stop()
 
-    @discord.ui.button(label="Keep my data", style=discord.ButtonStyle.secondary)
+    @discord.ui.button(label="Keep my data", emoji="🛡️", style=discord.ButtonStyle.secondary)
     async def cancel(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         for child in self.children:
             if hasattr(child, "disabled"):
@@ -57,7 +57,12 @@ class MyDataGroup(app_commands.Group):
             return
         raw = json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
         await interaction.response.send_message(
-            content="Your private NeetVerse export:",
+            embed=embed(
+                "🔐  Private Data Export",
+                "✅ Your complete NeetVerse archive is attached below.\n"
+                "🛡️ Only you can see this response.",
+                color=SUCCESS,
+            ),
             file=discord.File(io.BytesIO(raw), filename=f"neetverse-{interaction.user.id}.json"),
             ephemeral=True,
         )

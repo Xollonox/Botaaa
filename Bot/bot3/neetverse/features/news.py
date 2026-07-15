@@ -9,7 +9,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 from discord.utils import MISSING
 
-from neetverse.ui import embed
+from neetverse.ui import SUCCESS, WARNING, embed, status_icon
 
 
 class NewsGroup(app_commands.Group):
@@ -22,13 +22,21 @@ class NewsGroup(app_commands.Group):
         items = self.cog.bot.news_service.latest(limit=8)
         if not items:
             await interaction.response.send_message(
-                embed=embed("No official notices cached", "The news engine has not completed a successful source check yet."),
-                ephemeral=True,
+                embed=embed(
+                    "No official notices cached",
+                    "📡 The authority monitor is waiting for its first successful source check.",
+                    color=WARNING,
+                ),
             )
             return
-        lines = [f"**[{item['title']}]({item['url']})**\n{item['source_name']}" for item in items]
+        lines = [
+            f"📌 **[{item['title']}]({item['url']})**\n"
+            f"└ 🏛️ `{item['source_name']}`"
+            + (f" • <t:{item['published_at']}:R>" if item.get("published_at") else "")
+            for item in items
+        ]
         await interaction.response.send_message(
-            embed=embed("📢 Official NEET updates", "\n\n".join(lines)), ephemeral=True
+            embed=embed("📢  Official NEET Intelligence Feed", "\n\n".join(lines))
         )
 
     @app_commands.command(name="status", description="Show the health of official news sources.")
@@ -37,11 +45,19 @@ class NewsGroup(app_commands.Group):
         if not rows:
             description = "Sources have not been checked yet."
         else:
-            description = "\n".join(
-                f"**{row['source_key']}** — {row['status']} • {row['item_count']} items • <t:{row['checked_at']}:R>"
+            description = "\n\n".join(
+                f"{status_icon(row['status'])} **{row['source_key'].upper()}** • `{row['status'].upper()}`\n"
+                f"└ `{row['item_count']} notices` • checked <t:{row['checked_at']}:R>"
                 for row in rows
             )
-        await interaction.response.send_message(embed=embed("Official source status", description), ephemeral=True)
+        healthy = bool(rows) and all(row["status"] == "success" for row in rows)
+        await interaction.response.send_message(
+            embed=embed(
+                "📡  Official Source Monitor",
+                description,
+                color=SUCCESS if healthy else WARNING,
+            )
+        )
 
 
 class NewsCog(commands.Cog):

@@ -17,10 +17,14 @@ def test_bot_loads_expected_discord_systems_without_network(tmp_path, monkeypatc
 
     asyncio.run(bot.setup_hook())
 
+    versions = bot.curriculum_service.list_versions()
+    assert versions[0]["target_year"] == 2026
+    assert versions[0]["node_count"] == 783
+
     names = {command.name for command in bot.tree.get_commands()}
     assert {
-        "start", "profile", "study", "ai", "practice", "mistake", "revision",
-        "resource", "progress", "task", "plan", "goal", "mock", "ranking", "today", "discipline", "reminders", "lecture", "news", "syllabus", "mydata", "stats", "help",
+        "start", "profile", "study", "ai", "voice", "practice", "mistake", "revision",
+        "resource", "progress", "task", "plan", "goal", "mock", "ranking", "today", "streak", "discipline", "reminders", "lecture", "news", "syllabus", "mydata", "stats", "help",
     } <= names
 
     def endpoints(command, prefix=""):
@@ -38,7 +42,7 @@ def test_bot_loads_expected_discord_systems_without_network(tmp_path, monkeypatc
         for _, description in GUIDE_PAGES
         for match in re.findall(r"`/([^`]+)`", description)
     }
-    assert len(registered) == 55
+    assert len(registered) == 67
     assert documented == registered
 
 

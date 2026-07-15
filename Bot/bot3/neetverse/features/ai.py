@@ -2,29 +2,39 @@
 
 from __future__ import annotations
 
+import re
+
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from neetverse.ai import AIQuotaExceeded, AIUnavailable
+from neetverse.features.voice import SpeakResponseView
 from neetverse.planner import PlannerError
-from neetverse.ui import ERROR, SUCCESS, embed, reply
+from neetverse.ui import ERROR, SUCCESS, embed, progress_bar, reply, subject_icon
 
 
 def plan_embed(payload: dict, *, approved: bool = False) -> discord.Embed:
     lines: list[str] = []
-    total = 0
-    for index, task in enumerate(payload.get("tasks", []), 1):
+    tasks = payload.get("tasks", [])
+    total = sum(int(task.get("estimated_minutes", 0)) for task in tasks)
+    priority_icons = {1: "🔴", 2: "🟠", 3: "🟡", 4: "🔵", 5: "⚪"}
+    for index, task in enumerate(tasks, 1):
         minutes = int(task.get("estimated_minutes", 0))
-        total += minutes
         chapter = f" — {task['chapter']}" if task.get("chapter") else ""
         lines.append(
-            f"**{index}. {task.get('title', 'Study task')}**\n"
-            f"{task.get('subject', 'General')}{chapter} • {minutes} min • P{task.get('priority', 3)}"
+            f"{priority_icons.get(int(task.get('priority', 3)), '⚪')} `#{index:02d}` "
+            f"{subject_icon(task.get('subject', ''))} **{task.get('title', 'Study task')}**\n"
+            f"└ {task.get('subject', 'General')}{chapter} • `{minutes} min` • "
+            f"{progress_bar(minutes, total, width=6, show_percent=False)}"
         )
-    state = "Approved and saved" if approved else "Draft — review before approving"
-    description = f"**{state}**\nEstimated total: **{total // 60}h {total % 60}m**\n\n" + "\n\n".join(lines)
-    return embed(f"🗓️ {payload.get('title', 'Daily NEET Plan')}", description, color=SUCCESS if approved else 0x6C5CE7)
+    state = "✅ APPROVED & SAVED" if approved else "🟣 AI DRAFT • REVIEW REQUIRED"
+    description = (
+        f"`{state}`\n"
+        f"⏳ **TOTAL LOAD:** `{total // 60}h {total % 60}m` • `{len(tasks)} missions`\n\n"
+        + "\n\n".join(lines)
+    )
+    return embed(f"🗓️  {payload.get('title', 'Daily NEET Plan')}", description, color=SUCCESS if approved else 0x6C5CE7)
 
 
 class PlanProposalView(discord.ui.View):
@@ -80,8 +90,8 @@ class AIGroup(app_commands.Group):
         self.cog = cog
 
     @app_commands.command(name="tutor", description="Ask the AI tutor using your own academic context.")
-    async def tutor(self, interaction: discord.Interaction, question: str) -> None:
-        await interaction.response.defer(ephemeral=True, thinking=True)
+    async def tutor(self, interaction: discord.Interaction, question: str, private: bool = False) -> None:
+        await interaction.response.defer(ephemeral=private, thinking=True)
         try:
             result = await self.cog.bot.academic_ai.tutor(str(interaction.user.id), question)
         except (AIUnavailable, AIQuotaExceeded) as exc:
@@ -89,7 +99,13 @@ class AIGroup(app_commands.Group):
             return
         value = embed("🧠 NeetVerse Tutor", result.content)
         value.set_footer(text=f"NeetVerse • Free model: {result.model_used}")
-        await interaction.followup.send(embed=value, ephemeral=True)
+        await interaction.followup.send(
+            embed=value,
+            view=SpeakResponseView(
+                self.cog.bot, interaction.user.id, result.content, title=question
+            ),
+            ephemeral=private,
+        )
 
     @app_commands.command(name="daily_plan", description="Ask AI to draft a personalized daily study plan.")
     async def daily_plan(self, interaction: discord.Interaction, request: str = "") -> None:
@@ -148,6 +164,48 @@ class AICog(commands.Cog):
         self.bot = bot
         self.group = AIGroup(self)
         self.bot.tree.add_command(self.group)
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message) -> None:
+        if message.author.bot or self.bot.user is None:
+            return
+        direct_message = message.guild is None
+        mentioned = self.bot.user in message.mentions
+        if not direct_message and not mentioned:
+            return
+        question = re.sub(
+            rf"<@!?{self.bot.user.id}>", "", message.content or "", flags=re.IGNORECASE
+        ).strip()
+        if not question:
+            await message.reply(
+                "🧠 **NEETVERSE AI** • Mention me with a NEET question, or use `/ai tutor`.",
+                mention_author=False,
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
+            return
+        try:
+            async with message.channel.typing():
+                result = await self.bot.academic_ai.tutor(str(message.author.id), question)
+        except (AIUnavailable, AIQuotaExceeded) as exc:
+            await message.reply(
+                embed=embed("AI unavailable", str(exc), color=ERROR),
+                mention_author=False,
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
+            return
+        value = embed("🧠 NeetVerse Tutor", result.content)
+        value.set_footer(text=f"NeetVerse • Free model: {result.model_used}")
+        view = None
+        if message.guild is not None:
+            view = SpeakResponseView(
+                self.bot, message.author.id, result.content, title=question
+            )
+        await message.reply(
+            embed=value,
+            view=view,
+            mention_author=False,
+            allowed_mentions=discord.AllowedMentions.none(),
+        )
 
     async def cog_unload(self) -> None:
         self.bot.tree.remove_command(self.group.name, type=self.group.type)

@@ -19,6 +19,11 @@ OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openrouter/free").strip() or "
 OPENROUTER_TIMEOUT_SECONDS = max(10, int(os.getenv("OPENROUTER_TIMEOUT_SECONDS", "60")))
 AI_DAILY_GLOBAL_LIMIT = max(1, int(os.getenv("NEETVERSE_AI_DAILY_GLOBAL_LIMIT", "45")))
 AI_DAILY_USER_LIMIT = max(1, int(os.getenv("NEETVERSE_AI_DAILY_USER_LIMIT", "10")))
+TTS_DEFAULT_VOICE = os.getenv("NEETVERSE_TTS_DEFAULT_VOICE", "en-IN-NeerjaNeural").strip() or "en-IN-NeerjaNeural"
+TTS_TIMEOUT_SECONDS = max(10, int(os.getenv("NEETVERSE_TTS_TIMEOUT_SECONDS", "45")))
+TTS_MAX_CHARACTERS = max(200, min(int(os.getenv("NEETVERSE_TTS_MAX_CHARACTERS", "1800")), 4000))
+VOICE_QUEUE_LIMIT = max(1, min(int(os.getenv("NEETVERSE_VOICE_QUEUE_LIMIT", "5")), 20))
+VOICE_IDLE_SECONDS = max(30, int(os.getenv("NEETVERSE_VOICE_IDLE_SECONDS", "300")))
 LOG_LEVEL = os.getenv("NEETVERSE_LOG_LEVEL", "INFO").upper()
 GUILD_IDS = tuple(
     int(part.strip())

@@ -7,7 +7,7 @@ GUIDE_PAGES: tuple[tuple[str, str], ...] = (
     (
         "🚀 Getting started",
         "`/start` — create or continue onboarding\n"
-        "`/profile` — view and edit your academic profile\n"
+        "`/profile` — post your privacy-safe public student card\n"
         "`/help` — open the command-category navigator\n"
         "`/today` — view today's active daily plan\n"
         "`/progress` — view today's study, practice, revision, and mastery\n"
@@ -37,8 +37,9 @@ GUIDE_PAGES: tuple[tuple[str, str], ...] = (
         "`/goal progress` — manually set a goal's current value\n"
         "`/goal cancel` — cancel an active goal\n"
         "`/discipline` — explain your recent discipline score and level\n"
-        "`/ranking privacy` — opt in or out of public rankings\n"
-        "`/ranking weekly` — view opted-in live focus rankings",
+        "`/streak` — post your verified automatic focus streak\n"
+        "`/ranking privacy` — control public profile and ranking visibility\n"
+        "`/ranking weekly` — view opted-in live focus and streak rankings",
     ),
     (
         "📚 Practice, resources, and syllabus",
@@ -47,9 +48,12 @@ GUIDE_PAGES: tuple[tuple[str, str], ...] = (
         "`/resource list` — view active resources and IDs\n"
         "`/resource pages` — record exact page ranges without overlap inflation\n"
         "`/resource coverage` — view unique coverage by activity\n"
-        "`/syllabus summary` — view target-year syllabus completion\n"
-        "`/syllabus find` — find an official chapter/topic and its ID\n"
-        "`/syllabus progress` — update lecture/reading/notes/practice/PYQ progress\n"
+        "`/syllabus versions` — list reviewed official versions and sources\n"
+        "`/syllabus use` — select an official or reference syllabus version\n"
+        "`/syllabus browse` — drill through every unit, topic, and subtopic\n"
+        "`/syllabus summary` — post automatically calculated completion\n"
+        "`/syllabus find` — find an official unit/topic/subtopic and its ID\n"
+        "`/syllabus progress` — update a track; parent updates roll down to leaves\n"
         "`/syllabus import_version` — owner-only reviewed official syllabus import",
     ),
     (
@@ -64,7 +68,7 @@ GUIDE_PAGES: tuple[tuple[str, str], ...] = (
     ),
     (
         "🎥 Lectures and official news",
-        "`/lecture find` — search YouTube for a NEET lecture\n"
+        "`/lecture find` — open a playable, paginated YouTube lecture deck\n"
         "`/lecture saved` — view your private lecture queue\n"
         "`/lecture status` — mark a lecture planned/watching/completed/archived\n"
         "`/news latest` — view notices collected from official authorities\n"
@@ -78,12 +82,26 @@ GUIDE_PAGES: tuple[tuple[str, str], ...] = (
         "`/ai approve_plan` — approve a proposal after its panel expires\n"
         "`/ai weekly_review` — receive evidence-based preparation feedback\n"
         "`/ai mock_analysis` — analyse your latest recorded mock\n\n"
-        "Every AI request uses `openrouter/free`. AI plan changes require your explicit approval.",
+        "Every AI request uses `openrouter/free`. AI plan changes require your explicit approval. "
+        "You can also mention NeetVerse with a question in a server channel or DM.",
+    ),
+    (
+        "🎙️ AI voice companion",
+        "`/voice join` — connect NeetVerse to your current voice channel\n"
+        "`/voice ask` — ask AI, post its transcript, and queue the spoken answer\n"
+        "`/voice repeat` — repeat the latest explanation with your settings\n"
+        "`/voice stop` — stop speaking and clear the queue\n"
+        "`/voice leave` — clear the queue and disconnect\n"
+        "`/voice status` — view connection, current speaker, and queue bars\n"
+        "`/voice settings` — view or change your voice, rate, and pitch\n"
+        "`/voice voices` — search available Edge TTS voice names\n\n"
+        "Voice is text-triggered: NeetVerse speaks but does not listen to the VC.",
     ),
     (
         "🔒 Your data",
         "`/mydata export` — privately download your NeetVerse records as JSON\n"
         "`/mydata delete` — permanently delete your profile and records after confirmation\n\n"
-        "Student responses are private by default. Only live-timed focus can enter rankings, and only after opt-in.",
+        "Private settings, AI context, mistakes and exports stay private. Public cards hide schedules, time zones, coaching, books and blockers. "
+        "Only live-timed focus can enter rankings, and only after opt-in.",
     ),
 )

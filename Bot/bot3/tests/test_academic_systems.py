@@ -25,7 +25,7 @@ def test_schema_migrates_all_academic_systems(tmp_path) -> None:
         version = conn.execute("SELECT MAX(version) FROM schema_migrations").fetchone()[0]
         tables = {row["name"] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     assert version == LATEST_SCHEMA_VERSION
-    assert {"curriculum_nodes", "practice_batches", "mistakes", "revision_items", "mastery_snapshots", "mock_attempts", "reminder_jobs"} <= tables
+    assert {"curriculum_nodes", "profile_curriculum_selections", "practice_batches", "mistakes", "revision_items", "mastery_snapshots", "mock_attempts", "reminder_jobs"} <= tables
 
 
 def test_overlapping_page_ranges_are_not_double_counted(tmp_path) -> None:

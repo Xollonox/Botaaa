@@ -10,7 +10,7 @@ from discord.ext import commands
 
 from neetverse.guide import GUIDE_PAGES
 from neetverse.profiles import ProfileService, ProfileValidationError
-from neetverse.ui import ERROR, SUCCESS, embed, reply
+from neetverse.ui import ERROR, SUCCESS, duration, embed, progress_bar, reply, subject_icon
 
 
 def _hours_to_minutes(raw: str) -> int | None:
@@ -179,7 +179,12 @@ class ProfileSetupView(discord.ui.View):
         if self.page == 0:
             return profile_embed(self.service.get(self.user_id) or {})
         title, description = GUIDE_PAGES[self.page - 1]
-        return embed(title, description)
+        guide_index = self.page
+        header = (
+            f"{progress_bar(guide_index, len(GUIDE_PAGES), width=10)}  "
+            f"`COMMAND DECK {guide_index:02d}/{len(GUIDE_PAGES):02d}`\n\n"
+        )
+        return embed(title, header + description)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if str(interaction.user.id) != self.user_id:
@@ -222,9 +227,18 @@ class ProfileSetupView(discord.ui.View):
 
 def profile_embed(profile: dict) -> discord.Embed:
     progress = profile.get("subject_progress", {})
-    def percent(subject: str) -> str:
+    def subject_progress(subject: str) -> str:
         value = progress.get(subject, {}).get("progress_percent")
-        return "Not provided" if value is None else f"{value:g}%"
+        if value is None:
+            return "`Not provided`"
+        return progress_bar(float(value), 100, width=8)
+
+    profile_fields = (
+        "target_year", "current_status", "timezone", "weekday_available_minutes",
+        "weekend_available_minutes", "current_mock_score", "target_score",
+        "preferred_language", "pomodoro_focus_minutes",
+    )
+    supplied = sum(profile.get(field) is not None for field in profile_fields)
     weekday = profile.get("weekday_available_minutes")
     weekend = profile.get("weekend_available_minutes")
     resources = ", ".join(profile.get("resources", [])) or "Not provided"
@@ -238,22 +252,151 @@ def profile_embed(profile: dict) -> discord.Embed:
         if all(value is not None for value in pomodoro_values) else "Not configured"
     )
     body = (
-        f"**Status:** {profile.get('onboarding_status', 'draft').title()}\n"
-        f"**Target:** NEET {profile.get('target_year') or 'Not provided'}\n"
-        f"**Class/status:** {profile.get('current_status') or 'Not provided'}\n"
-        f"**Coaching:** {profile.get('coaching') or 'Not provided'}\n"
-        f"**Time zone:** {profile.get('timezone') or 'Not provided'}\n\n"
-        f"**Language:** {profile.get('preferred_language') or 'Not provided'}\n"
-        f"**Weekday availability:** {f'{weekday / 60:g}h' if weekday is not None else 'Not provided'}\n"
-        f"**Weekend availability:** {f'{weekend / 60:g}h' if weekend is not None else 'Not provided'}\n"
-        f"**Mock:** {profile.get('current_mock_score') if profile.get('current_mock_score') is not None else 'Not provided'} / 720\n"
-        f"**Target score:** {profile.get('target_score') if profile.get('target_score') is not None else 'Not provided'} / 720\n\n"
-        f"**Physics:** {percent('physics')}  •  **Chemistry:** {percent('chemistry')}  •  **Biology:** {percent('biology')}\n\n"
-        f"**Pomodoro:** {pomodoro}\n"
-        f"**Books/modules:** {resources[:500]}\n"
-        f"**Main problems:** {problems[:500]}"
+        f"{progress_bar(supplied, len(profile_fields), width=12)}  `PROFILE COMPLETENESS`\n"
+        f"🎯 **NEET {profile.get('target_year') or 'YEAR NOT SET'}**  •  "
+        f"{profile.get('current_status') or 'Status not provided'}\n"
+        f"📍 `{profile.get('timezone') or 'Time zone not set'}`  •  "
+        f"🗣️ `{profile.get('preferred_language') or 'Language not set'}`"
     )
-    return embed(f"🎓 {profile.get('display_name', 'Student')}", body)
+    value = embed(f"🎓  {profile.get('display_name', 'Student')} • Student HUD", body)
+    value.add_field(
+        name="🏫 ACADEMIC BASE",
+        value=(
+            f"**Status:** `{profile.get('onboarding_status', 'draft').upper()}`\n"
+            f"**Coaching:** {profile.get('coaching') or 'Not provided'}"
+        ),
+        inline=True,
+    )
+    value.add_field(
+        name="⏳ AVAILABILITY",
+        value=(
+            f"**Weekday:** {f'{weekday / 60:g}h' if weekday is not None else 'Not provided'}\n"
+            f"**Weekend:** {f'{weekend / 60:g}h' if weekend is not None else 'Not provided'}"
+        ),
+        inline=True,
+    )
+    current_mock = profile.get("current_mock_score")
+    target_score = profile.get("target_score")
+    score_value = (
+        f"{progress_bar(float(current_mock), 720, width=10)}\n"
+        f"**Current:** `{current_mock:g}/720`  •  **Target:** `{target_score if target_score is not None else '—'}/720`"
+        if current_mock is not None else "`No mock baseline provided`"
+    )
+    value.add_field(name="🏁 SCORE CHASE", value=score_value, inline=False)
+    value.add_field(
+        name="⚛️ PHYSICS",
+        value=subject_progress("physics"),
+        inline=True,
+    )
+    value.add_field(
+        name="🧪 CHEMISTRY",
+        value=subject_progress("chemistry"),
+        inline=True,
+    )
+    value.add_field(
+        name="🧬 BIOLOGY",
+        value=subject_progress("biology"),
+        inline=True,
+    )
+    value.add_field(
+        name="⏱️ FOCUS PROTOCOL",
+        value=f"**Pomodoro:** {pomodoro}\n**Books/modules:** {resources[:350]}",
+        inline=False,
+    )
+    value.add_field(
+        name="🧱 CURRENT BLOCKERS",
+        value=problems[:500],
+        inline=False,
+    )
+    return value
+
+
+def public_profile_embed(snapshot: dict, member: discord.abc.User | None = None) -> discord.Embed:
+    """Render only the deliberately public, competition-safe student card."""
+
+    profile = snapshot["profile"]
+    streak = snapshot["streak"]
+    discipline = snapshot["discipline"]
+    plan = snapshot["daily_plan"]
+    calendar = " ".join("🔥" if day["active"] else "▫️" for day in streak["calendar"])
+    calendar_labels = "  ".join(str(day.get("weekday", "?")) for day in streak["calendar"])
+    body = (
+        f"🎯 **NEET {profile['target_year'] or 'YEAR NOT SET'}**  •  "
+        f"{profile['current_status'] or 'Status not set'}\n"
+        f"🏅 **{discipline['tier']}**  •  `{discipline['level']}`  •  "
+        f"`{discipline['level_points']} XP`\n\n"
+        f"🔥 **DISCIPLINE POWER** {progress_bar(discipline['score'], 100, width=14)}"
+    )
+    value = embed(f"🎓  {profile['display_name']} • Public Student Card", body)
+    if member is not None:
+        value.set_thumbnail(url=member.display_avatar.url)
+    value.add_field(
+        name="🔥 VERIFIED STREAK",
+        value=(
+            f"**Current:** `{streak['current']} days`  •  **Best:** `{streak['longest']} days`\n"
+            f"{calendar}\n"
+            f"`{calendar_labels}`"
+        ),
+        inline=False,
+    )
+    value.add_field(
+        name="⏱️ FOCUS ENGINE",
+        value=(
+            f"**7-day live focus:** `{duration(streak['week_seconds'])}`\n"
+            f"**Active days:** `{streak['active_days_week']}/7`  •  "
+            f"**Today:** `{duration(streak['today_seconds'])}`"
+        ),
+        inline=True,
+    )
+    value.add_field(
+        name="🗓️ TODAY'S PLAN",
+        value=(
+            f"{progress_bar(plan['completed'], plan['total'], width=8)}\n"
+            f"`{plan['completed']}/{plan['total']} tasks`"
+            if plan["total"]
+            else "`No active daily plan`"
+        ),
+        inline=True,
+    )
+    current_mock = profile.get("current_mock_score")
+    target_score = profile.get("target_score")
+    if current_mock is not None or target_score is not None:
+        value.add_field(
+            name="🏁 SCORE CHASE • SELF-REPORTED",
+            value=(
+                f"{progress_bar(float(current_mock or 0), 720, width=12)}\n"
+                f"**Current:** `{current_mock if current_mock is not None else '—'}/720`  •  "
+                f"**Target:** `{target_score if target_score is not None else '—'}/720`"
+            ),
+            inline=False,
+        )
+    syllabus = snapshot.get("syllabus")
+    if syllabus:
+        subject_lines = [
+            f"{subject_icon(row['subject_code'])} **{row['subject_code'].title()}** "
+            f"{progress_bar(float(row['completion'] or 0), 100, width=7)}"
+            for row in syllabus["subjects"]
+        ]
+        overall = float(snapshot.get("syllabus_completion") or 0)
+        value.add_field(
+            name="📚 SYLLABUS COMPLETION",
+            value=(
+                f"**Overall** {progress_bar(overall, 100, width=12)}\n"
+                + "\n".join(subject_lines)
+            ),
+            inline=False,
+        )
+    totals = snapshot["totals"]
+    value.add_field(
+        name="⚔️ ACADEMIC RECORD",
+        value=(
+            f"`{totals['questions']}` questions  •  `{totals['revisions']}` revisions  •  "
+            f"`{totals['mocks']}` mocks"
+        ),
+        inline=False,
+    )
+    value.set_footer(text="NEETVERSE  •  VERIFIED LIVE ACTIVITY  •  PRIVATE DETAILS HIDDEN")
+    return value
 
 
 class ProfileCog(commands.Cog):
@@ -266,16 +409,28 @@ class ProfileCog(commands.Cog):
         view = ProfileSetupView(self.bot.profile_service, interaction.user.id)
         await interaction.response.send_message(embed=profile_embed(profile), view=view, ephemeral=True)
 
-    @app_commands.command(name="profile", description="View and edit your NeetVerse academic profile.")
-    async def profile(self, interaction: discord.Interaction) -> None:
-        profile = self.bot.profile_service.get(str(interaction.user.id))
+    @app_commands.command(name="profile", description="Post a privacy-safe public NeetVerse student card.")
+    @app_commands.describe(student="Optionally view an opted-in server member")
+    async def profile(self, interaction: discord.Interaction, student: discord.Member | None = None) -> None:
+        target = student or interaction.user
+        profile = self.bot.profile_service.get(str(target.id))
         if profile is None:
             await reply(interaction, value=embed("No profile", "Run `/start` to begin onboarding.", color=ERROR))
             return
+        if target.id != interaction.user.id and not profile["leaderboard_visible"]:
+            await reply(
+                interaction,
+                value=embed("Private profile", "That student has not enabled public profile and ranking visibility.", color=ERROR),
+            )
+            return
+        try:
+            snapshot = self.bot.overview_service.snapshot(str(target.id))
+        except ValueError as exc:
+            await reply(interaction, value=embed("Profile unavailable", str(exc), color=ERROR))
+            return
         await interaction.response.send_message(
-            embed=profile_embed(profile),
-            view=ProfileSetupView(self.bot.profile_service, interaction.user.id),
-            ephemeral=True,
+            embed=public_profile_embed(snapshot, target),
+            ephemeral=False,
         )
 
 

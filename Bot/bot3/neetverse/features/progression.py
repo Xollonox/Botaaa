@@ -8,7 +8,16 @@ from discord.ext import commands
 
 from neetverse.mocks import MockError
 from neetverse.planner import PlannerError
-from neetverse.ui import ERROR, SUCCESS, duration, embed, reply
+from neetverse.ui import (
+    ERROR,
+    SUCCESS,
+    duration,
+    embed,
+    progress_bar,
+    reply,
+    status_icon,
+    subject_icon,
+)
 
 
 class TaskGroup(app_commands.Group):
@@ -72,10 +81,12 @@ class PlanGroup(app_commands.Group):
     async def list_plans(self, interaction: discord.Interaction) -> None:
         plans = self.cog.bot.planner_service.list_plans(str(interaction.user.id))
         lines = [
-            f"`{plan['id'][:8]}` **{plan['title']}** — {plan['completed_count'] or 0}/{plan['task_count']} tasks • {plan['status']}"
+            f"{status_icon(plan['status'])} `{plan['id'][:8]}` **{plan['title']}**\n"
+            f"└ {progress_bar(plan['completed_count'] or 0, plan['task_count'], width=8)} • "
+            f"`{plan['completed_count'] or 0}/{plan['task_count']} TASKS` • `{plan['status'].upper()}`"
             for plan in plans
         ]
-        await reply(interaction, value=embed("Your study plans", "\n".join(lines) or "No plans yet."))
+        await reply(interaction, value=embed("🗂️  Your Study Plan Deck", "\n\n".join(lines) or "📭 No plans yet."))
 
 
 class MockGroup(app_commands.Group):
@@ -110,10 +121,18 @@ class MockGroup(app_commands.Group):
         except MockError as exc:
             await reply(interaction, value=embed("Mock not saved", str(exc), color=ERROR))
             return
-        text = f"Score: **{result['score']:g}/{result['max_score']:g}**\nPercentage: **{result['percentage']}%**"
+        text = (
+            f"🏁 **{result['name']}**\n"
+            f"{progress_bar(result['score'], result['max_score'], width=14)}\n"
+            f"🎯 **SCORE:** `{result['score']:g}/{result['max_score']:g}` • `{result['percentage']}%`"
+        )
         if result["sections"]:
             section = result["sections"][0]
-            text += f"\n{section['subject']}: **{section['score']:g}/{section['max_score']:g}**"
+            text += (
+                f"\n\n{subject_icon(section['subject'])} **{section['subject']} SECTION**\n"
+                f"{progress_bar(section['score'], section['max_score'], width=10)} • "
+                f"`{section['score']:g}/{section['max_score']:g}`"
+            )
         await reply(interaction, value=embed("📝 Mock recorded", text, color=SUCCESS))
 
     @app_commands.command(name="history", description="Review recent mock scores and score movement.")
@@ -122,8 +141,12 @@ class MockGroup(app_commands.Group):
         lines = []
         for row in rows:
             change = "first recorded" if row["score_change"] is None else f"{row['score_change']:+g} percentage points"
-            lines.append(f"**{row['name']}** — {row['score']:g}/{row['max_score']:g} ({row['percentage']:g}%) • {change}")
-        await reply(interaction, value=embed("📝 Mock history", "\n".join(lines) or "No mocks recorded."))
+            trend = "🟢" if (row["score_change"] or 0) > 0 else "🔴" if (row["score_change"] or 0) < 0 else "⚪"
+            lines.append(
+                f"{trend} **{row['name']}** • `{row['score']:g}/{row['max_score']:g}`\n"
+                f"└ {progress_bar(row['percentage'], 100, width=8)} • `{change}`"
+            )
+        await reply(interaction, value=embed("📝  Mock Performance History", "\n\n".join(lines) or "📭 No mocks recorded."))
 
 
 class RankingGroup(app_commands.Group):
@@ -131,7 +154,7 @@ class RankingGroup(app_commands.Group):
         super().__init__(name="ranking", description="Control and view opt-in study rankings.")
         self.cog = cog
 
-    @app_commands.command(name="privacy", description="Choose whether your study time appears on leaderboards.")
+    @app_commands.command(name="privacy", description="Control public profile and leaderboard visibility.")
     async def privacy(self, interaction: discord.Interaction, visible: bool) -> None:
         profile = self.cog.bot.profile_service.get(str(interaction.user.id))
         if profile is None:
@@ -139,7 +162,14 @@ class RankingGroup(app_commands.Group):
             return
         self.cog.bot.profile_service.update(str(interaction.user.id), {"leaderboard_visible": visible})
         state = "visible" if visible else "private"
-        await reply(interaction, value=embed("Ranking privacy updated", f"Your leaderboard statistics are now **{state}**.", color=SUCCESS))
+        await reply(
+            interaction,
+            value=embed(
+                "Public visibility updated",
+                f"Your privacy-safe student card and leaderboard statistics are now **{state}**.",
+                color=SUCCESS,
+            ),
+        )
 
     @app_commands.command(name="weekly", description="View opted-in students by verified weekly focus time.")
     async def weekly(self, interaction: discord.Interaction) -> None:
@@ -147,8 +177,20 @@ class RankingGroup(app_commands.Group):
         if not rows:
             await reply(interaction, value=embed("Weekly ranking", "No students have opted in yet."))
             return
-        lines = [f"**{index}. {row['display_name']}** — {duration(row['focus_seconds'])}" for index, row in enumerate(rows, 1)]
-        await interaction.response.send_message(embed=embed("🏆 Weekly verified focus", "\n".join(lines)))
+        peak = max(int(row["focus_seconds"]) for row in rows) or 1
+        medals = ("🥇", "🥈", "🥉")
+        lines = []
+        for index, row in enumerate(rows, 1):
+            try:
+                streak_days = self.cog.bot.streak_service.calculate(str(row["user_id"]))["current"]
+            except ValueError:
+                streak_days = 0
+            lines.append(
+                f"{medals[index - 1] if index <= 3 else f'`#{index:02d}`'} **{row['display_name']}**\n"
+                f"└ {progress_bar(row['focus_seconds'], peak, width=8, show_percent=False)} • "
+                f"`{duration(row['focus_seconds'])}` • 🔥 `{streak_days}d`"
+            )
+        await interaction.response.send_message(embed=embed("🏆  Weekly Focus League", "\n\n".join(lines)))
 
 
 class ProgressionCog(commands.Cog):
@@ -168,14 +210,57 @@ class ProgressionCog(commands.Cog):
         if plan is None:
             await reply(interaction, value=embed("Today", "No active daily plan. Create a draft with `/ai daily_plan`."))
             return
+        completed = sum(task["status"] == "completed" for task in plan["tasks"])
         lines = []
         for task in plan["tasks"]:
-            mark = "✅" if task["status"] == "completed" else "⬜"
+            mark = status_icon(task["status"])
             lines.append(
                 f"{mark} `{task['id'][:8]}` **{task['title']}**\n"
-                f"{task.get('subject') or 'General'} • {task.get('estimated_minutes') or '?'} min • {task['status']}"
+                f"└ {subject_icon(task.get('subject') or '')} {task.get('subject') or 'General'} • "
+                f"`{task.get('estimated_minutes') or '?'} min` • `{task['status'].upper()}`"
             )
-        await reply(interaction, value=embed(f"🗓️ {plan['title']}", "\n\n".join(lines) or "No tasks."))
+        header = (
+            f"🎯 **DAILY EXECUTION** {progress_bar(completed, len(plan['tasks']), width=12)}\n"
+            f"`{completed}/{len(plan['tasks'])} TASKS COMPLETE`\n\n"
+        )
+        await reply(
+            interaction,
+            value=embed(f"🗓️  {plan['title']}", header + ("\n\n".join(lines) or "No tasks.")),
+            ephemeral=False,
+        )
+
+    @app_commands.command(name="streak", description="Post an automatically calculated verified study streak.")
+    @app_commands.describe(student="Optionally view an opted-in server member")
+    async def streak(self, interaction: discord.Interaction, student: discord.Member | None = None) -> None:
+        target = student or interaction.user
+        profile = self.bot.profile_service.get(str(target.id))
+        if profile is None:
+            await reply(interaction, value=embed("No profile", "Run `/start` first.", color=ERROR))
+            return
+        if target.id != interaction.user.id and not profile["leaderboard_visible"]:
+            await reply(
+                interaction,
+                value=embed("Private streak", "That student has not enabled public visibility.", color=ERROR),
+            )
+            return
+        try:
+            result = self.bot.streak_service.calculate(str(target.id))
+        except ValueError as exc:
+            await reply(interaction, value=embed("Streak unavailable", str(exc), color=ERROR))
+            return
+        calendar = " ".join("🔥" if day["active"] else "▫️" for day in result["calendar"])
+        calendar_labels = "  ".join(str(day["weekday"]) for day in result["calendar"])
+        text = (
+            f"🔥 **CURRENT** `{result['current']} DAYS`  •  🏆 **BEST** `{result['longest']} DAYS`\n"
+            f"{calendar}\n`{calendar_labels}`\n\n"
+            f"⚡ **WEEKLY CONSISTENCY** {progress_bar(result['active_days_week'], 7, width=14)}\n"
+            f"⏱️ **Verified focus:** `{duration(result['week_seconds'])}`  •  "
+            f"**Today:** `{duration(result['today_seconds'])}`\n\n"
+            f"_{result['rule']} Offline manual logs never inflate this card._"
+        )
+        value = embed(f"🔥  {profile['display_name']} • Streak Reactor", text)
+        value.set_thumbnail(url=target.display_avatar.url)
+        await interaction.response.send_message(embed=value, ephemeral=False)
 
     @app_commands.command(name="discipline", description="View your transparent recent discipline and lifetime level.")
     async def discipline(self, interaction: discord.Interaction) -> None:
@@ -186,15 +271,15 @@ class ProgressionCog(commands.Cog):
             return
         factors = result["factors"]
         text = (
-            f"**Tier:** {result['tier']}\n**Score:** {result['score']}/100\n"
-            f"**Study level:** {result['level']} ({result['level_points']} points)\n\n"
-            f"Consistency: {factors['consistency']}%\n"
-            f"Plan completion: {factors['plan_completion']}%\n"
-            f"Revision control: {factors['revision_control']}%\n"
-            f"Subject balance: {factors['subject_balance']}%\n\n"
-            "Discipline measures recent behavior, not raw lifetime hours."
+            f"🏅 **{result['tier'].upper()} TIER**  •  `LEVEL {result['level']}`  •  `{result['level_points']} XP`\n"
+            f"🔥 **DISCIPLINE CORE** {progress_bar(result['score'], 100, width=14)}\n\n"
+            f"📅 **Consistency**\n└ {progress_bar(factors['consistency'], 100, width=10)}\n"
+            f"✅ **Plan completion**\n└ {progress_bar(factors['plan_completion'], 100, width=10)}\n"
+            f"🔁 **Revision control**\n└ {progress_bar(factors['revision_control'], 100, width=10)}\n"
+            f"⚖️ **Subject balance**\n└ {progress_bar(factors['subject_balance'], 100, width=10)}\n\n"
+            "_Discipline measures recent behavior—not raw lifetime hours._"
         )
-        await reply(interaction, value=embed("🔥 Discipline", text))
+        await reply(interaction, value=embed("🔥  Discipline Power Core", text), ephemeral=False)
 
 
 async def setup(bot: commands.Bot) -> None:

@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from datetime import date, timedelta
+
 import discord
 from discord import app_commands
 from discord.ext import commands
 
-from neetverse.ui import ERROR, duration, embed, reply
+from neetverse.ui import ERROR, duration, embed, progress_bar, reply, sparkline, subject_icon
 
 
 class StatsGroup(app_commands.Group):
@@ -28,21 +30,56 @@ class StatsGroup(app_commands.Group):
         except ValueError as exc:
             await reply(interaction, value=embed("Stats unavailable", str(exc), color=ERROR))
             return
-        accuracy = "No questions" if data["question_accuracy"] is None else f"{data['question_accuracy']}% accuracy"
-        mock = "No mocks" if data["average_mock_percent"] is None else f"{data['average_mock_percent']}% average"
+        accuracy = data["question_accuracy"]
+        mock = data["average_mock_percent"]
         subjects = "\n".join(
-            f"• {subject}: **{duration(seconds)}**" for subject, seconds in list(data["by_subject"].items())[:8]
+            f"{subject_icon(subject)} **{subject}** • `{duration(seconds)}`\n"
+            f"└ {progress_bar(seconds, data['focus_seconds'], width=7)}"
+            for subject, seconds in list(data["by_subject"].items())[:8]
         ) or "No completed focus sessions."
+        start = date.fromisoformat(data["starts_on"])
+        daily_values = [
+            int(data["by_day"].get((start + timedelta(days=offset)).isoformat(), 0))
+            for offset in range(data["days"])
+        ]
+        activity_graph = sparkline(daily_values)
         body = (
-            f"**{data['starts_on']} to {data['ends_on']}**\n"
-            f"Focus: **{duration(data['focus_seconds'])}** across {data['sessions']} sessions\n"
-            f"Active days: **{data['active_days']}/{data['days']}** • average {duration(data['average_focus_per_active_day'])}/active day\n"
-            f"Questions: **{data['questions_attempted']}** • {accuracy}\n"
-            f"Revisions completed: **{data['revisions_completed']}**\n"
-            f"Mocks: **{data['mocks_completed']}** • {mock}\n\n"
-            f"**Subject balance**\n{subjects}"
+            f"`{data['starts_on']}  →  {data['ends_on']}`\n"
+            f"📅 **ACTIVE DAYS** {progress_bar(data['active_days'], data['days'], width=12)}\n"
+            f"📈 **FOCUS TREND** `{activity_graph}`"
         )
-        await reply(interaction, value=embed(f"📈 {title}", body))
+        value = embed(f"📈  {title} • Performance HUD", body)
+        value.add_field(
+            name="⚡ FOCUS OUTPUT",
+            value=(
+                f"**{duration(data['focus_seconds'])}** • `{data['sessions']} sessions`\n"
+                f"Average `{duration(data['average_focus_per_active_day'])}` / active day"
+            ),
+            inline=False,
+        )
+        value.add_field(
+            name="🎯 QUESTION ACCURACY",
+            value=(
+                f"{progress_bar(accuracy, 100, width=9)}\n`{data['questions_attempted']} attempted`"
+                if accuracy is not None else "`No questions logged`"
+            ),
+            inline=True,
+        )
+        value.add_field(
+            name="📝 MOCK AVERAGE",
+            value=(
+                f"{progress_bar(mock, 100, width=9)}\n`{data['mocks_completed']} mocks`"
+                if mock is not None else "`No mocks logged`"
+            ),
+            inline=True,
+        )
+        value.add_field(
+            name="🔁 REVISION CONTROL",
+            value=f"`{data['revisions_completed']} completed`",
+            inline=True,
+        )
+        value.add_field(name="⚖️ SUBJECT BALANCE", value=subjects, inline=False)
+        await reply(interaction, value=value, ephemeral=False)
 
 
 class AnalyticsCog(commands.Cog):

@@ -70,12 +70,12 @@ def test_invalid_timezone_and_score_are_rejected(tmp_path) -> None:
         service.update("1", {"target_score": 900})
 
 
-def test_start_profile_view_has_profile_plus_eight_guide_pages(tmp_path) -> None:
+def test_start_profile_view_has_profile_plus_nine_guide_pages(tmp_path) -> None:
     service = ProfileService(Database(tmp_path / "data.sqlite3"))
     service.ensure_draft("1", "Student")
     view = ProfileSetupView(service, 1)
 
-    assert view.page_total == 9
-    assert view.page_indicator.label == "1/9"
+    assert view.page_total == 10
+    assert view.page_indicator.label == "1/10"
     assert view.previous.disabled is True
     assert view.next.disabled is False

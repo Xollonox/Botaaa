@@ -7,7 +7,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from neetverse.goals import GoalError
-from neetverse.ui import ERROR, SUCCESS, embed, reply
+from neetverse.ui import ERROR, SUCCESS, embed, progress_bar, reply, subject_icon
 
 
 class GoalGroup(app_commands.Group):
@@ -47,10 +47,12 @@ class GoalGroup(app_commands.Group):
     async def list_goals(self, interaction: discord.Interaction) -> None:
         goals = self.cog.bot.goal_service.list(str(interaction.user.id))
         lines = [
-            f"`{goal['id'][:8]}` **{goal['title']}** — {goal['current_value']:g}/{goal['target_value']:g} {goal['unit']} ({goal['progress_percent']:g}%)"
+            f"🎯 `{goal['id'][:8]}` {subject_icon(goal.get('subject') or '')} **{goal['title']}**\n"
+            f"└ {progress_bar(goal['current_value'], goal['target_value'], width=10)} • "
+            f"`{goal['current_value']:g}/{goal['target_value']:g} {goal['unit']}`"
             for goal in goals
         ]
-        await reply(interaction, value=embed("🎯 Your goals", "\n".join(lines) or "No active goals."))
+        await reply(interaction, value=embed("🎯  Goal Mission Board", "\n\n".join(lines) or "📭 No active goals."))
 
     @app_commands.command(name="progress", description="Set the current value of one of your goals.")
     async def progress(self, interaction: discord.Interaction, goal_id: str, current_value: app_commands.Range[float, 0.0, 10_000_000.0]) -> None:
@@ -61,7 +63,9 @@ class GoalGroup(app_commands.Group):
             return
         await reply(interaction, value=embed(
             "Goal completed" if goal["status"] == "completed" else "Goal updated",
-            f"**{goal['title']}** — {goal['current_value']:g}/{goal['target_value']:g} {goal['unit']} ({goal['progress_percent']:g}%)",
+            f"🎯 **{goal['title']}**\n"
+            f"{progress_bar(goal['current_value'], goal['target_value'], width=12)}\n"
+            f"`{goal['current_value']:g}/{goal['target_value']:g} {goal['unit']}`",
             color=SUCCESS,
         ))
 

@@ -37,10 +37,12 @@ class DisciplineService:
             profile = conn.execute("SELECT timezone FROM profiles WHERE user_id=?", (str(user_id),)).fetchone()
         if profile is None:
             raise ValueError("Profile not found")
+        if not profile["timezone"]:
+            raise ValueError("Set your time zone in /start before calculating discipline")
         try:
-            zone = ZoneInfo(profile["timezone"]) if profile["timezone"] else ZoneInfo("UTC")
-        except ZoneInfoNotFoundError:
-            zone = ZoneInfo("UTC")
+            zone = ZoneInfo(profile["timezone"])
+        except ZoneInfoNotFoundError as exc:
+            raise ValueError("Your profile time zone is invalid") from exc
         local_now = datetime.fromtimestamp(timestamp, zone)
         period_end = local_now.date()
         period_start = period_end - timedelta(days=6)
