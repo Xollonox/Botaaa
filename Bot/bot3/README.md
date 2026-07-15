@@ -80,8 +80,10 @@ All command panels use the shared presentation toolkit in `neetverse/ui.py`.
 Bars represent real ratios such as focus targets, accuracy, syllabus completion,
 mock scores, goals, queue capacity, or task completion; unknown values are shown
 as unknown instead of receiving decorative fake percentages. `/lecture find`
-posts one raw YouTube URL at a time so Discord can render its native player when
-the client permits, alongside the NeetVerse result card and navigation controls.
+posts one dedicated raw-URL message with embeds unsuppressed so Discord can
+generate its native YouTube provider preview/player when the client and video
+permit it. A separate NeetVerse message contains metadata and navigation, so a
+custom bot embed cannot displace the provider embed.
 
 ## Official syllabus import
 

@@ -47,9 +47,10 @@ The presentation layer has one shared visual language: semantic title emoji,
 state colors, compact mobile fields, consistent branding, and progress bars
 calculated from canonical values. A bar cannot imply invented progress. Unknown
 totals remain explicitly unknown. YouTube search is presented as a paginated
-public lecture deck; each page keeps the raw watch URL in message content for
-Discord's native unfurl/player behavior and keeps saving/status changes scoped
-to the requesting student.
+public lecture deck. The raw watch URL is isolated in an unsuppressed link-only
+message so Discord can create its provider unfurl/player, while a second message
+owns the NeetVerse metadata and controls. Pagination updates both messages and
+saving/status changes remain scoped to the requesting student.
 
 The official syllabus browser uses `subject -> unit -> topic -> subtopic` as its
 stable hierarchy. Completion is never stored on parent nodes: it is calculated

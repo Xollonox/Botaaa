@@ -40,7 +40,7 @@ def lecture_embed(
         f"⏱️ `{length}`  •  👁️ `{views} views`  •  📅 `{published}`\n\n"
         f"💎 **WHY THIS MATCHED**\n"
         f"> {item.get('selection_reason') or 'Relevant NEET lecture result'}\n\n"
-        "▶️ Use the player below, or press **Watch on YouTube**."
+        "▶️ Use Discord's YouTube preview above, or press **Watch on YouTube**."
     )
     value = embed(f"🎬  {item.get('title') or 'NEET Lecture'}", description)
     value.url = str(item.get("url") or "") or None
@@ -67,6 +67,7 @@ class LectureResultsView(discord.ui.View):
         self.subject = subject
         self.topic = topic
         self.index = 0
+        self.player_message: discord.WebhookMessage | None = None
         self.message: discord.Message | None = None
         self.saved_video_ids: set[str] = set()
         self.watch_button = discord.ui.Button(
@@ -120,11 +121,20 @@ class LectureResultsView(discord.ui.View):
 
     async def _show(self, interaction: discord.Interaction) -> None:
         self._sync_controls()
-        await interaction.response.edit_message(
-            content=f"▶️ **PLAYABLE YOUTUBE LECTURE**\n{self.current['url']}",
-            embed=self.current_embed(),
-            view=self,
-        )
+        await interaction.response.defer()
+        if self.player_message is None:
+            self.player_message = await interaction.followup.send(
+                content=str(self.current["url"]), suppress_embeds=False, wait=True
+            )
+        else:
+            try:
+                await self.player_message.edit(content=str(self.current["url"]))
+            except discord.DiscordException:
+                self.player_message = await interaction.followup.send(
+                    content=str(self.current["url"]), suppress_embeds=False, wait=True
+                )
+        if self.message is not None:
+            await self.message.edit(embed=self.current_embed(), view=self)
 
     @discord.ui.button(label="Previous", emoji="◀️", style=discord.ButtonStyle.primary, row=0)
     async def previous(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
@@ -156,7 +166,6 @@ class LectureResultsView(discord.ui.View):
         self.saved_video_ids.add(str(lecture["video_id"]))
         self._sync_controls()
         await interaction.response.edit_message(
-            content=f"▶️ **PLAYABLE YOUTUBE LECTURE**\n{self.current['url']}",
             embed=self.current_embed(),
             view=self,
         )
@@ -214,8 +223,12 @@ class LectureGroup(app_commands.Group):
         view = LectureResultsView(
             self.cog.bot, interaction.user.id, results, subject, topic
         )
+        view.player_message = await interaction.followup.send(
+            content=str(view.current["url"]),
+            suppress_embeds=False,
+            wait=True,
+        )
         view.message = await interaction.followup.send(
-            content=f"▶️ **PLAYABLE YOUTUBE LECTURE**\n{view.current['url']}",
             embed=view.current_embed(),
             view=view,
             wait=True,

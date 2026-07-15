@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 from neetverse.features.ai import plan_embed
 from neetverse.features.lectures import LectureResultsView, lecture_embed
@@ -72,6 +72,27 @@ def test_lecture_deck_navigation_updates_watch_url() -> None:
         assert view.page_indicator.label == "2/2"
         assert view.next.disabled is True
         assert view.watch_button.url == LECTURES[1]["url"]
+        view.stop()
+
+    asyncio.run(scenario())
+
+
+def test_lecture_deck_updates_separate_native_player_and_control_messages() -> None:
+    async def scenario() -> None:
+        view = LectureResultsView(MagicMock(), 7, LECTURES, "Physics", "Rotation")
+        view.index = 1
+        view.player_message = AsyncMock()
+        view.message = AsyncMock()
+        interaction = MagicMock()
+        interaction.response.defer = AsyncMock()
+
+        await view._show(interaction)
+
+        interaction.response.defer.assert_awaited_once()
+        view.player_message.edit.assert_awaited_once_with(content=LECTURES[1]["url"])
+        panel_call = view.message.edit.await_args.kwargs
+        assert panel_call["view"] is view
+        assert panel_call["embed"].url == LECTURES[1]["url"]
         view.stop()
 
     asyncio.run(scenario())
