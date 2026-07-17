@@ -158,7 +158,6 @@ discord.py               # Bot framework
 openai==1.37.1           # LLM API client
 Pillow>=10.0.0           # Image processing
 aiohttp==3.10.10         # Async HTTP
-httpx==0.27.2            # HTTP client
 pydantic==1.10.15        # Data validation
 python-dotenv>=1.0.0     # .env loading
 ```
