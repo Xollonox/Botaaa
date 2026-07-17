@@ -73,7 +73,9 @@ GUIDE_PAGES: tuple[tuple[str, str], ...] = (
         "`/lecture status` — mark a lecture planned/watching/completed/archived\n"
         "`/news latest` — view notices collected from official authorities\n"
         "`/news status` — inspect authority-source polling health\n\n"
-        "YouTube requires its API key. Official news does not use coaching-site articles.",
+        "`/search web` — low-volume official, study-source, or general web links\n\n"
+        "YouTube requires its API key. Official news does not use coaching-site articles. "
+        "Web search is rate-limited and does not verify arbitrary results.",
     ),
     (
         "🧠 OpenRouter academic AI",

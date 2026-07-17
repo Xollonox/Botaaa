@@ -24,6 +24,9 @@ from config import (
     OPENROUTER_BASE_URL,
     OPENROUTER_MODEL,
     OPENROUTER_TIMEOUT_SECONDS,
+    SEARCH_COOLDOWN_SECONDS,
+    SEARCH_GLOBAL_DAILY_LIMIT,
+    SEARCH_USER_DAILY_LIMIT,
     TTS_DEFAULT_VOICE,
     TTS_MAX_CHARACTERS,
     TTS_TIMEOUT_SECONDS,
@@ -56,6 +59,7 @@ from neetverse.study import StudyService
 from neetverse.streaks import StreakService
 from neetverse.speech import EdgeSpeechService, SpeechPreferenceService
 from neetverse.voice import VoiceSessionManager
+from neetverse.websearch import WebSearchService
 
 
 def configure_logging() -> None:
@@ -157,6 +161,11 @@ class NeetVerseBot(commands.Bot):
             queue_limit=VOICE_QUEUE_LIMIT,
             idle_seconds=VOICE_IDLE_SECONDS,
         )
+        self.web_search_service = WebSearchService(
+            user_cooldown_seconds=SEARCH_COOLDOWN_SECONDS,
+            user_daily_limit=SEARCH_USER_DAILY_LIMIT,
+            global_daily_limit=SEARCH_GLOBAL_DAILY_LIMIT,
+        )
 
     async def setup_hook(self) -> None:
         for extension in (
@@ -175,6 +184,7 @@ class NeetVerseBot(commands.Bot):
             "neetverse.features.privacy",
             "neetverse.features.analytics",
             "neetverse.features.help",
+            "neetverse.features.search",
         ):
             await self.load_extension(extension)
             logging.getLogger(__name__).info("Loaded %s", extension)

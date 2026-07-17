@@ -42,7 +42,7 @@ def test_bot_loads_expected_discord_systems_without_network(tmp_path, monkeypatc
         for _, description in GUIDE_PAGES
         for match in re.findall(r"`/([^`]+)`", description)
     }
-    assert len(registered) == 67
+    assert len(registered) == 68
     assert documented == registered
 
 

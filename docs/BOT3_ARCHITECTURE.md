@@ -142,6 +142,12 @@ verified streaks.
   configured NTA NEET and MCC authority pages.
 - YouTube searches are cached for six hours to conserve quota.
 
+Web search is deliberately a separate, low-volume integration. The `ddgs`
+client is optional and runs in a worker thread so synchronous upstream work
+does not block Discord. Requests are capped per user and globally, result URLs
+are restricted by scope, and the bot does not persist arbitrary web content.
+This system must never be used as a bulk question scraper.
+
 Background loops begin only after a properly initialized Discord client, which
 also permits offline command-tree tests without leaked tasks.
 

@@ -1592,6 +1592,10 @@ class BattleCog(commands.Cog):
 
     @app_commands.command(name="friendly", description="Send friendly challenge.")
     async def friendly(self, interaction: discord.Interaction, opponent: discord.User) -> None:
+        # A friendly challenge performs storage/SQLite and channel work before
+        # sending its confirmation.  Acknowledge immediately so the interaction
+        # token remains valid; smart_reply will then use the follow-up webhook.
+        await interaction.response.defer(ephemeral=True, thinking=True)
         ok_route, reason, route_channel_id = check_battle_channel_allowed(interaction)
         if not ok_route:
             data = await self._load_battle_data()

@@ -217,7 +217,7 @@ class TradePanel(discord.ui.View):
         for child in list(self.children):
             self.remove_item(child)
 
-        data = self.cog._load_trade_data()
+        data = self.cog.bot.storage.load()
         a_opts = self._card_opts(data, self.a_id)
         b_opts = self._card_opts(data, self.b_id)
 
@@ -349,7 +349,7 @@ class TradePanel(discord.ui.View):
         if uid == "none":
             await interaction.response.defer()
             return
-        data = self.cog._load_trade_data()
+        data = self.cog.bot.storage.load()
         player = get_player(data, self.a_id)
         inv = player.get("user", {}).get("inventory", []) if player else []
         card = next((i for i in inv if isinstance(i, dict) and str(i.get("uid","")) == uid), None)
@@ -367,7 +367,7 @@ class TradePanel(discord.ui.View):
         if uid == "none":
             await interaction.response.defer()
             return
-        data = self.cog._load_trade_data()
+        data = self.cog.bot.storage.load()
         player = get_player(data, self.b_id)
         inv = player.get("user", {}).get("inventory", []) if player else []
         card = next((i for i in inv if isinstance(i, dict) and str(i.get("uid","")) == uid), None)

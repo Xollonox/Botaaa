@@ -10,6 +10,15 @@ def test_ranked_queue_timeout_matches_cpu_fallback_window() -> None:
     assert RANKED_QUEUE_TIMEOUT_SECONDS == 60
 
 
+def test_friendly_acknowledges_before_slow_route_and_storage_work() -> None:
+    from bot.features.battle import BattleCog
+
+    source = inspect.getsource(BattleCog.friendly.callback)
+    assert source.index("await interaction.response.defer(ephemeral=True, thinking=True)") < source.index(
+        "check_battle_channel_allowed(interaction)"
+    )
+
+
 def test_help_uses_registered_group_command_names() -> None:
     commands = [cmd for category in help_index.HELP_CATEGORIES for cmd, _desc in category["items"]]
 

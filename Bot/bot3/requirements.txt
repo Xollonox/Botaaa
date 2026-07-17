@@ -4,3 +4,5 @@ edge-tts>=7.2.0
 python-dotenv>=1.0.0
 tzdata>=2026.1
 pytest>=8.0.0
+ddgs>=9.14.4,<10
+ddgs>=9.14.4,<10

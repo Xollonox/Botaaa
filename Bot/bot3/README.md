@@ -22,6 +22,7 @@ SQLite is the runtime authority; OpenRouter's free route supplies optional AI.
 - Privacy-safe public student cards with live focus, plan, syllabus, level, and academic totals
 - YouTube lecture discovery with quota-conscious caching and saved queues
 - Official-only NTA NEET and MCC notice ingestion
+- Low-volume open-source `ddgs` web search with official/study/general scopes
 - OpenRouter `openrouter/free` tutor, weekly review, and plan drafts
 - Mention-based AI conversation in server channels and DMs
 - Edge TTS voice companion with per-guild queues, transcripts, and user voice settings
@@ -50,6 +51,7 @@ them, and remain editable later.
 - `/mock log|history`, `/discipline`, `/streak`, `/ranking privacy|weekly`
 - `/lecture find|saved|status`
 - `/news latest|status`, `/reminders`
+- `/search web`
 - `/ai tutor|daily_plan|approve_plan|weekly_review|mock_analysis`
 - `/voice join|ask|repeat|stop|leave|status|settings|voices`
 
@@ -75,6 +77,13 @@ not capture or transcribe voice-channel audio. Each guild has one bounded queue,
 only members in the active voice channel can control it, and the bot disconnects
 after an idle timeout. `/voice settings` stores independent voice/rate/pitch
 preferences; the exact available provider voices can be searched in Discord.
+
+`/search web` uses the optional open-source `ddgs` client without a search API
+key. It is intentionally bounded to eight results, one request per user every
+20 seconds, ten requests per user per day, and 100 shared requests per day.
+Official and study scopes filter result domains after retrieval; general web is
+explicitly opt-in. This feature is for occasional resource discovery, not bulk
+question scraping.
 
 All command panels use the shared presentation toolkit in `neetverse/ui.py`.
 Bars represent real ratios such as focus targets, accuracy, syllabus completion,
