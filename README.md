@@ -17,15 +17,14 @@
 
 ## Overview
 
-This workspace hosts three Discord bots that run concurrently via `launcher.py`:
+This workspace hosts two Discord bots that run concurrently via `launcher.py`:
 
 | Bot | Directory | Purpose | Stack |
 |-----|-----------|---------|-------|
 | **Miss Kim** | `Bot/bot1/` | Conversational AI with image generation, vision, mood system | discord.py, OpenAI-compat LLMs (Cerebras, Groq, Ollama), Cloudflare AI |
 | **Lookism HXCC** | `Bot/bot2/` | Gacha game bot: cards, battles, market, trades, gangs, wars, tournaments | discord.py, SQLite + JSON, PIL, Supabase sync |
-| **NeetVerse** | `Bot/bot3/` | Discord-native NEET preparation OS: profiles, study tracking, Pomodoro, mastery, revision, planning and AI tutoring | discord.py, SQLite, OpenRouter |
 
-Each bot owns its commands, tests, and runtime data. Bot3 is intentionally isolated from Bot2's game state.
+Each bot owns its commands, tests, and runtime data.
 
 ---
 
@@ -44,11 +43,7 @@ python launcher.py
 |----------|:--------:|---------|
 | `DISCORD_TOKEN` | Yes | bot1 |
 | `BOT_TOKEN` | Yes | bot2 |
-| `NEETVERSE_TOKEN` | Yes | bot3 |
 | `LOOKISM_OWNER_IDS` | Yes | bot2 owner commands |
-| `OPENROUTER_API_KEY` | No | bot3 AI systems |
-| `YOUTUBE_API_KEY` | No | bot3 lecture finder |
-| `NEETVERSE_OWNER_IDS` | No | bot3 reviewed syllabus imports |
 | `CEREBRAS_API_KEY` | No | bot1 |
 | `GROQ_API_KEY` | No | bot1 |
 | `OLLAMA_API_KEY` | No | bot1 (up to 5 keys) |
@@ -90,11 +85,6 @@ Botaaa/
 │       │   └── utils/            # 25 utility modules
 │       └── tests/                # 17 test files, 127 tests
 │   │
-│   └── bot3/                     # NeetVerse — NEET preparation OS
-│       ├── main.py               # Service composition and Discord lifecycle
-│       ├── config.py             # Env-only runtime configuration
-│       ├── neetverse/            # Domain services and feature cogs
-│       └── tests/                # Bot3 service and integration tests
 │
 ├── assets/                       # Logo and branding
 └── docs/                         # Full documentation
@@ -147,7 +137,6 @@ Full-featured gacha card game bot with 80+ slash commands.
 # Run all tests
 cd Bot/bot1 && pytest -q
 cd Bot/bot2 && pytest -q
-cd Bot/bot3 && pytest -q
 
 # Focused suites
 cd Bot/bot2
@@ -156,9 +145,9 @@ pytest -q tests/test_storage.py tests/test_race_conditions.py
 pytest -q tests/test_trade_lifecycle.py
 ```
 
-197 tests across the workspace cover Discord command registration, Bot3 profiles
-and academic systems, SQLite migrations, AI routing, reminders, event automation,
-battle formulas, storage races, trade lifecycle, and more.
+Tests across the workspace cover Discord command registration, SQLite migrations,
+AI routing, reminders, event automation, battle formulas, storage races, trade
+lifecycle, and more.
 
 ---
 
@@ -182,7 +171,6 @@ python-dotenv>=1.0.0     # .env loading
 |------|-------------|
 | [`docs/BOT1_ARCHITECTURE.md`](docs/BOT1_ARCHITECTURE.md) | Bot1 architecture, AI provider chain, memory system, image pipeline |
 | [`docs/BOT2_ARCHITECTURE.md`](docs/BOT2_ARCHITECTURE.md) | Bot2 architecture, extension loading, event flow, storage layer |
-| [`docs/BOT3_ARCHITECTURE.md`](docs/BOT3_ARCHITECTURE.md) | NeetVerse boundaries, connected systems, AI authority, persistence and privacy |
 | [`docs/BATTLE_SYSTEM.md`](docs/BATTLE_SYSTEM.md) | Full battle damage pipeline, stamina, types, defense, ELO |
 | [`docs/DATA_FLOW.md`](docs/DATA_FLOW.md) | Data flow through JSON + SQLite dual storage |
 | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Production deployment guide |

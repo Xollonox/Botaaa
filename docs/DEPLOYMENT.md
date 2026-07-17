@@ -141,7 +141,6 @@ python launcher.py
 2. **Avoid dirty repo:** Set `git fetch origin main && git reset --hard origin/main` as deploy command
 3. **Watch for:** `Bot/bot2/logs/bot.log` being tracked in git (make it ignored)
 4. **Environment:** Set all tokens as panel environment variables
-5. **NeetVerse voice:** Ensure `ffmpeg` is installed and install the root requirements so PyNaCl and Edge TTS are available
 
 **Safe Deploy Flow:**
 ```bash

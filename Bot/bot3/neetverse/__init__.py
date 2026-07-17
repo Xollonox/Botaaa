@@ -1,1 +1,0 @@
-"""NeetVerse application package."""

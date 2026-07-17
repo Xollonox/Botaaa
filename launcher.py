@@ -6,11 +6,10 @@ import subprocess
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BOT_ROOT = os.path.join(BASE_DIR, "Bot")
-DEFAULT_BOT_DIRS = ["bot1", "bot2", "bot3"]
+DEFAULT_BOT_DIRS = ["bot1", "bot2"]
 REQUIRED_ENV = {
     "bot1": ("DISCORD_TOKEN",),
     "bot2": ("BOT_TOKEN",),
-    "bot3": ("NEETVERSE_TOKEN",),
 }
 
 
