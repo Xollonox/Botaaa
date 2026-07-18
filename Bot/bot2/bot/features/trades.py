@@ -150,7 +150,7 @@ class TradeGroup(app_commands.Group):
             panel.stop()
             if panel.message:
                 try:
-                    embed = make_embed(None, "LOOKISM HXCC • TRADE", f"**🚫 Trade Cancelled**\nCancelled by @{interaction.user.display_name}", color=0xE74C3C)
+                    embed = make_embed(None, "LOOKISM HXCC • TRADE", f"╭─ 🚫 Trade Cancelled\n│ Cancelled by @{interaction.user.display_name}\n╰────────────────", color=0xE74C3C)
                     await panel.message.edit(embed=embed, view=None)
                 except Exception:
                     logger.exception("Failed to edit cancelled trade panel message")

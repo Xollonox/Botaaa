@@ -35,9 +35,14 @@ def _ok(d: str) -> discord.Embed: return _e(d, 0x2ECC71)
 def _err(d: str) -> discord.Embed: return _e(d, 0xE74C3C)
 def _inf(d: str) -> discord.Embed: return _e(d, 0x9B59B6)
 
+B = "\u256d\u2500"
+M = "\u2502"
+E = "\u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500"
+
+
 def _box(title: str, lines: list[str]) -> str:
-    body = "\n".join(str(l) for l in lines)
-    return f"**{title}**\n{body}" if body else f"**{title}**"
+    body = "\n".join(f"{M}  {l}" for l in lines)
+    return f"{B} {title}\n{body}\n{E}"
 
 
 def _is_hv(gang: dict, uid: str) -> bool:

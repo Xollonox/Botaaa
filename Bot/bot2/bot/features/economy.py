@@ -57,9 +57,10 @@ class EconomyCog(commands.Cog):
             "LOOKISM HXCC • WALLET",
             (
                 f"**WALLET — {interaction.user.display_name}**\n\n"
-                "**Currency**\n"
-                f"Coins: {coins:,}\n"
-                f"Gems: {gems:,}\n"
+                "╭─ Currency\n"
+                f"│ Coins: {coins:,}\n"
+                f"│ Gems: {gems:,}\n"
+                "╰────────────────"
             ),
             color=BALANCE_COLOR,
             footer="Economy",

@@ -205,10 +205,11 @@ class BuyConfirmView(discord.ui.View):
             await self.cog.bot.market_service.delete_listing(self.listing_id)
 
         body = (
-            f"**🛒 Purchase Complete!**\n"
-            f"{self.card_name}\n"
-            f"💰 -{self.price:,} coins\n"
-            "Card added to your inventory\n"
+            f"╭─ 🛒 Purchase Complete!\n"
+            f"│ {self.card_name}\n"
+            f"│ 💰 -{self.price:,} coins\n"
+            "│ Card added to your inventory\n"
+            "╰────────────────"
         )
         embed = make_embed(None, "LOOKISM HXCC • MARKET", body, color=0x2ECC71)
         for child in self.children:
@@ -377,10 +378,11 @@ class MarketPanel(discord.ui.View):
         rarity    = str(listing.get("rarity", ""))
 
         body = (
-            f"**🛒 Confirm Purchase**\n"
-            f"{_ri(rarity)} {card_name}  [{rarity}]\n"
-            f"💰 {price:,} coins\n"
-            "Are you sure?\n"
+            f"╭─ 🛒 Confirm Purchase\n"
+            f"│ {_ri(rarity)} {card_name}  [{rarity}]\n"
+            f"│ 💰 {price:,} coins\n"
+            "│ Are you sure?\n"
+            "╰────────────────"
         )
         embed = make_embed(None, "LOOKISM HXCC • MARKET", body, color=0xE11D48)
         view = BuyConfirmView(self.cog, str(interaction.user.id), self.selected_id, price, card_name)

@@ -76,7 +76,7 @@ def _resolve_field(raw: Any, desc_raw: Any = None) -> tuple[str, str]:
 def _build_slot_block(data: dict[str, Any], slot_index: int, instance: dict[str, Any] | None) -> str:
     label = _slot_label(slot_index)
     if instance is None:
-        return f"**{label}**\n[Empty]"
+        return f"╭─ {label}\n│ [Empty]\n╰────────────────"
 
     card_name = str(instance.get("card_name", "Unknown"))
     rarity    = str(instance.get("rarity", "Common"))
@@ -89,12 +89,14 @@ def _build_slot_block(data: dict[str, Any], slot_index: int, instance: dict[str,
     power    = compute_power(scaled)
 
     return (
-        f"**{label} — {_rarity_icon(rarity)} {rarity} • {card_name}**\n"
-        f"Power: {power:,} · Stars: {_star_string(stars)}\n"
-        f"STR {int(scaled.get('strength', 0))} · SPD {int(scaled.get('speed', 0))} · "
-        f"END {int(scaled.get('endurance', 0))} · TEC {int(scaled.get('technique', 0))} · "
-        f"IQ {int(scaled.get('iq', 0))} · BIQ {int(scaled.get('battle_iq', 0))}\n"
-        f"{'Locked' if locked else 'Unlocked'}"
+        f"╭─ {label} — {_rarity_icon(rarity)} {rarity} • {card_name}\n"
+        f"│ ⚡ Power: {power:,}\n"
+        f"│ ⭐ Stars: {_star_string(stars)}\n"
+        f"│ 💪 STR: {int(scaled.get('strength', 0))}  ⚡ SPD: {int(scaled.get('speed', 0))}\n"
+        f"│ 🛡 END: {int(scaled.get('endurance', 0))}  🎯 TEC: {int(scaled.get('technique', 0))}\n"
+        f"│ 🧠 IQ: {int(scaled.get('iq', 0))}   🔮 BIQ: {int(scaled.get('battle_iq', 0))}\n"
+        f"│ {'🔒 Status: Locked' if locked else '🔓 Status: Unlocked'}\n"
+        "╰────────────────"
     )
 
 
@@ -110,8 +112,10 @@ def _build_squad_embed(
     filled = sum(1 for i in range(NUM_SLOTS) if _get_slot_uid(squad, i))
 
     overview = (
-        "**Squad Overview**\n"
-        f"Total Power: {total_power:,} · Slots Filled: {filled}/{NUM_SLOTS}"
+        "╭─ Squad Overview\n"
+        f"│ ⚡ Total Power: {total_power:,}\n"
+        f"│ 👥 Slots Filled: {filled}/{NUM_SLOTS}\n"
+        "╰────────────────"
     )
 
     blocks: list[str] = []
@@ -121,7 +125,7 @@ def _build_squad_embed(
         block = _build_slot_block(data, i, inst)
         # highlight the currently focused slot
         if i == current_slot:
-            block = f"👉 {block}"
+            block = f"**{block}**" if inst is None else block.replace("╭─", "╭─ 👉", 1)
         blocks.append(block)
 
     body = overview + "\n\n" + "\n\n".join(blocks)
@@ -159,16 +163,33 @@ def _build_fighter_embed(data: dict[str, Any], instance: dict[str, Any]) -> disc
 
     body = (
         f"{heading}\n\n"
-        f"{bio or '—'}\n\n"
-        "**Combat Stats**\n"
-        f"STR {int(scaled.get('strength', 0))} · SPD {int(scaled.get('speed', 0))} · "
-        f"END {int(scaled.get('endurance', 0))} · TEC {int(scaled.get('technique', 0))} · "
-        f"IQ {int(scaled.get('iq', 0))} · BIQ {int(scaled.get('battle_iq', 0))}\n\n"
-        "**Progression**\n"
-        f"Stars: {_star_string(stars)} · Power: {power:,} · {'Locked' if locked else 'Unlocked'}\n\n"
-        f"**Mastery**\n{mastery_str}\n\n"
-        f"**Unique Path**\n{unique_path}\n{unique_path_desc}\n\n"
-        f"**Unique Skill**\n{unique_skill}\n{unique_skill_desc}"
+        "╭─ Bio\n"
+        f"│ {bio or '—'}\n"
+        "╰────────────────\n\n"
+        "╭─ Combat Stats\n"
+        f"│ 💪 STR: {int(scaled.get('strength', 0))}\n"
+        f"│ ⚡ SPD: {int(scaled.get('speed', 0))}\n"
+        f"│ 🛡 END: {int(scaled.get('endurance', 0))}\n"
+        f"│ 🎯 TEC: {int(scaled.get('technique', 0))}\n"
+        f"│ 🧠 IQ: {int(scaled.get('iq', 0))}\n"
+        f"│ 🔮 BIQ: {int(scaled.get('battle_iq', 0))}\n"
+        "╰────────────────\n\n"
+        "╭─ Progression\n"
+        f"│ ⭐ Stars: {_star_string(stars)}\n"
+        f"│ ⚡ Power: {power:,}\n"
+        f"│ {'🔒 Status: Locked' if locked else '🔓 Status: Unlocked'}\n"
+        "╰────────────────\n\n"
+        "╭─ Mastery\n"
+        f"│ {mastery_str}\n"
+        "╰────────────────\n\n"
+        "╭─ Unique Path\n"
+        f"│ {unique_path}\n"
+        f"│ {unique_path_desc}\n"
+        "╰────────────────\n\n"
+        "╭─ Unique Skill\n"
+        f"│ {unique_skill}\n"
+        f"│ {unique_skill_desc}\n"
+        "╰────────────────"
     )
     embed = make_embed(None, "LOOKISM HXCC • FIGHTER", body, color=0xE11D48, image_url=image_url, footer="Squad • Fighter Detail")
     return embed

@@ -103,15 +103,15 @@ class AllianceInviteView(discord.ui.View):
 
         if not ok:
             await interaction.response.edit_message(
-                embed=_err(f"**❌ Invite Failed**\n{result}"), view=self)
+                embed=_err(f"╭─ ❌ Invite Failed\n│ {result}\n╰────────────────"), view=self)
             return
 
         if result == "declined":
             await interaction.response.edit_message(
-                embed=_inf(f"**❌ Invite Declined**\nDeclined to join **{self.alliance_name}**."), view=self)
+                embed=_inf(f"╭─ ❌ Invite Declined\n│ Declined to join **{self.alliance_name}**.\n╰────────────────"), view=self)
         else:
             await interaction.response.edit_message(
-                embed=_ok(f"**✅ Joined Alliance!**\nWelcome to **{self.alliance_name}**!"), view=self)
+                embed=_ok(f"╭─ ✅ Joined Alliance!\n│ Welcome to **{self.alliance_name}**!\n╰────────────────"), view=self)
 
     @discord.ui.button(label="✅ Accept", style=discord.ButtonStyle.success, row=0)
     async def accept_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
@@ -204,16 +204,17 @@ class AllianceCog(commands.Cog):
 
         ok, result = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"**❌ Alliance Create Failed**\n{result}"))
+            await error_reply(interaction, embed=_err(f"╭─ ❌ Alliance Create Failed\n│ {result}\n╰────────────────"))
             return
         data = self.bot.storage.load()
         gid, gang = get_user_gang(data, uid)
         await smart_reply(interaction, embed=_ok(
-            f"**🤝 Alliance Created!**\n"
-            f"Name: **{result}**\n"
-            f"📝 {description}\n"
-            f"👑 Founded by: {gang.get('name','?') if gang else '?'}\n"
-            f"📊 Gangs: 1/{MAX_GANGS}\n"
+            f"╭─ 🤝 Alliance Created!\n"
+            f"│ Name: **{result}**\n"
+            f"│ 📝 {description}\n"
+            f"│ 👑 Founded by: {gang.get('name','?') if gang else '?'}\n"
+            f"│ 📊 Gangs: 1/{MAX_GANGS}\n"
+            "╰────────────────"
         ))
 
     # ── /alliance info ────────────────────────────────────────────
@@ -236,7 +237,7 @@ class AllianceCog(commands.Cog):
                     alliance = data.get("alliances", {}).get(aid)
 
         if not aid or not isinstance(alliance, dict):
-            await error_reply(interaction, embed=_err("**❌ Not Found**\nAlliance not found."))
+            await error_reply(interaction, embed=_err("╭─ ❌ Not Found\n│ Alliance not found.\n╰────────────────"))
             return
 
         gangs     = data.get("gangs", {})
@@ -254,14 +255,15 @@ class AllianceCog(commands.Cog):
                 int((data.get("players", {}).get(str(m), {}).get("user") or {}).get("trophies", 0))
                 for m in members
             )
-            gang_lines.append(f"⚔️ {gang.get('name','?'):<20} {trophies:,} 🏆")
+            gang_lines.append(f"│ ⚔️ {gang.get('name','?'):<20} {trophies:,} 🏆")
 
         body = (
-            f"**🤝 {alliance.get('name','?')}**\n"
-            f"📝 {desc}\n"
-            f"📊 {len(gang_ids)}/{MAX_GANGS} Gangs  •  {total_t:,} 🏆\n"
-            "\n"
+            f"╭─ 🤝 {alliance.get('name','?')}\n"
+            f"│ 📝 {desc}\n"
+            f"│ 📊 {len(gang_ids)}/{MAX_GANGS} Gangs  •  {total_t:,} 🏆\n"
+            "│\n"
             + "\n".join(gang_lines)
+            + "\n╰────────────────"
         )
         await smart_reply(interaction, embed=_inf(body))
 
@@ -314,7 +316,7 @@ class AllianceCog(commands.Cog):
 
         ok, msg, iid, target_head_id, a_name = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"**❌ Invite Failed**\n{msg}"))
+            await error_reply(interaction, embed=_err(f"╭─ ❌ Invite Failed\n│ {msg}\n╰────────────────"))
             return
 
         data = self.bot.storage.load()
@@ -323,10 +325,11 @@ class AllianceCog(commands.Cog):
 
         view  = AllianceInviteView(self.bot, iid, int(target_head_id), a_name, my_gang_name)
         embed = _inf(
-            f"**📨 Alliance Invite**\n"
-            f"From: **{my_gang_name}** → **{gang_name}**\n"
-            f"Alliance: **{a_name}**\n"
-            f"⏳ Expires: 10 minutes\n"
+            f"╭─ 📨 Alliance Invite\n"
+            f"│ From: **{my_gang_name}** → **{gang_name}**\n"
+            f"│ Alliance: **{a_name}**\n"
+            f"│ ⏳ Expires: 10 minutes\n"
+            "╰────────────────"
         )
         try:
             user = await self.bot.fetch_user(int(target_head_id))
@@ -336,10 +339,11 @@ class AllianceCog(commands.Cog):
                 await interaction.channel.send(content=f"<@{target_head_id}>", embed=embed, view=view)
 
         await smart_reply(interaction, embed=_ok(
-            f"**📨 Alliance Invite Sent**\n"
-            f"To: **{gang_name}**\n"
-            f"Alliance: **{a_name}**\n"
-            f"⏳ Expires: 10 minutes\n"
+            f"╭─ 📨 Alliance Invite Sent\n"
+            f"│ To: **{gang_name}**\n"
+            f"│ Alliance: **{a_name}**\n"
+            f"│ ⏳ Expires: 10 minutes\n"
+            "╰────────────────"
         ))
 
     # ── /alliance leave ───────────────────────────────────────────
@@ -376,12 +380,13 @@ class AllianceCog(commands.Cog):
 
         ok, a_name, gang_name = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"**❌ Leave Failed**\n{a_name}"))
+            await error_reply(interaction, embed=_err(f"╭─ ❌ Leave Failed\n│ {a_name}\n╰────────────────"))
             return
         await smart_reply(interaction, embed=_inf(
-            f"**👋 Left Alliance**\n"
-            f"**{gang_name}** left **{a_name}**\n"
-            f"⚠️ Cannot join any alliance for 24h\n"
+            f"╭─ 👋 Left Alliance\n"
+            f"│ **{gang_name}** left **{a_name}**\n"
+            f"│ ⚠️ Cannot join any alliance for 24h\n"
+            "╰────────────────"
         ))
 
     # ── Autocomplete ──────────────────────────────────────────────

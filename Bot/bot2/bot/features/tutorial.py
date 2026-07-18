@@ -10,31 +10,31 @@ from discord.ext import commands
 TUTORIAL_STEPS = {
     1: {
         "title": "Step 1: Open Your First Pack",
-        "desc": "**Mission**\nOpen any pack from `/shop`\nYou have 3 newbie packs ready!\n\nUse `/shop` → select a pack → Open!",
+        "desc": "╭─ Mission\n│ Open any pack from `/shop`\n│ You have 3 newbie packs ready!\n╰────────────────\n\nUse `/shop` → select a pack → Open!",
         "reward": "🎉 +200 coins",
         "action": "open_pack",
     },
     2: {
         "title": "Step 2: Build Your Squad",
-        "desc": "**Mission**\nAdd a card to your squad\nUse `/squad assign`",
+        "desc": "╭─ Mission\n│ Add a card to your squad\n│ Use `/squad assign`\n╰────────────────",
         "reward": "🎉 +300 coins",
         "action": "assign_squad",
     },
     3: {
         "title": "Step 3: Your First Battle",
-        "desc": "**Mission**\nWin your first battle!\nUse `/battle` to fight a CPU opponent",
+        "desc": "╭─ Mission\n│ Win your first battle!\n│ Use `/battle` to fight a CPU opponent\n╰────────────────",
         "reward": "🎉 +500 coins + 1 Amateur Pack",
         "action": "win_battle",
     },
     4: {
         "title": "Step 4: Claim Your Daily Reward",
-        "desc": "**Mission**\nUse `/daily` to claim your reward\nCome back every day to build a streak!",
+        "desc": "╭─ Mission\n│ Use `/daily` to claim your reward\n│ Come back every day to build a streak!\n╰────────────────",
         "reward": "🎉 +200 coins",
         "action": "claim_daily",
     },
     5: {
         "title": "Step 5: Check Your Achievements",
-        "desc": "**Mission**\nUse `/achievements` to see your goals\nComplete them for bonus CP and rewards!",
+        "desc": "╭─ Mission\n│ Use `/achievements` to see your goals\n│ Complete them for bonus CP and rewards!\n╰────────────────",
         "reward": "🎉 +1000 coins + 🏆 Graduate Badge",
         "action": "view_achievements",
     },

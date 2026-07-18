@@ -233,12 +233,13 @@ def build_market_embed(
         stock_disp = "∞" if int(stock) == -1 else str(stock)
         arc_disp   = str(featured.get("arc", "—")).strip() or "—"
         blocks.append(
-            f"**⭐ Featured Card**\n"
-            f"{icon} {featured.get('card_name', '?')}{rarity_tag}\n"
-            f"💰 {price:,} coins\n"
-            f"📦 Stock: {stock_disp}\n"
-            f"🌍 Arc: {arc_disp}\n"
-            f"⏳ {tl}"
+            f"╭─ ⭐ Featured Card\n"
+            f"│ {icon} {featured.get('card_name', '?')}{rarity_tag}\n"
+            f"│ 💰 {price:,} coins\n"
+            f"│ 📦 Stock: {stock_disp}\n"
+            f"│ 🌍 Arc: {arc_disp}\n"
+            f"│ ⏳ {tl}\n"
+            "╰────────────────"
         )
         image_url = str(featured.get("image_url", "")).strip() or None
 
@@ -256,10 +257,11 @@ def build_market_embed(
         stock_disp = "∞" if int(stock) == -1 else str(stock)
         arc_disp   = str(special.get("arc", "—")).strip() or "—"
         blocks.append(
-            f"**🎁 Special Offer**\n"
-            f"✨ LIMITED  •  {icon} {special.get('card_name', '?')}{rarity_tag}\n"
-            f"💰 {price:,} coins  •  📦 {stock_disp}  •  🕐 {tl}\n"
-            f"🌍 Arc: {arc_disp}"
+            f"╭─ 🎁 Special Offer\n"
+            f"│ ✨ LIMITED  •  {icon} {special.get('card_name', '?')}{rarity_tag}\n"
+            f"│ 💰 {price:,} coins  •  📦 {stock_disp}  •  🕐 {tl}\n"
+            f"│ 🌍 Arc: {arc_disp}\n"
+            "╰────────────────"
         )
         if not image_url:
             image_url = str(special.get("image_url", "")).strip() or None
@@ -268,8 +270,9 @@ def build_market_embed(
     if isinstance(cotd, dict) and cotd.get("card_name"):
         buff_pct = int(cotd.get("buff_pct", 15))
         blocks.append(
-            f"**⚡ Card of the Day**\n"
-            f"**{cotd['card_name']}** · +{buff_pct}% damage in battles"
+            f"╭─ ⚡ Card of the Day\n"
+            f"│ **{cotd['card_name']}** · +{buff_pct}% damage in battles\n"
+            "╰────────────────"
         )
 
     total_pages = max(1, (len(sorted_listings) + PAGE_SIZE - 1) // PAGE_SIZE)
@@ -277,7 +280,7 @@ def build_market_embed(
     page_items = sorted_listings[page * PAGE_SIZE:(page + 1) * PAGE_SIZE]
 
     if not page_items:
-        blocks.append("**🔥 Latest Listings**\nNo listings yet.")
+        blocks.append("╭─ 🔥 Latest Listings\n│ No listings yet.\n╰────────────────")
     else:
         lines = []
         for i, listing in enumerate(page_items, start=page * PAGE_SIZE + 1):
@@ -287,8 +290,8 @@ def build_market_embed(
             price  = int(listing.get("price", 0))
             seller = str(listing.get("seller_name", "?"))
             marker = "▶ " if lid == selected_id else f"{i}. "
-            lines.append(f"{marker}{name}  {icon}  {price:,} coins  @{seller}")
-        blocks.append("**🔥 Latest Listings**\n" + "\n".join(lines))
+            lines.append(f"│ {marker}{name}  {icon}  {price:,} coins  @{seller}")
+        blocks.append("╭─ 🔥 Latest Listings\n" + "\n".join(lines) + "\n╰────────────────")
 
     if selected_id:
         listings_map = market_root(data).get("listings", {})
@@ -296,11 +299,12 @@ def build_market_embed(
         if isinstance(sel, dict):
             rarity = str(sel.get("rarity", ""))
             blocks.append(
-                f"**🃏 {sel.get('card_name', '?')}**\n"
-                f"{_ri(rarity)} Rarity: {rarity}\n"
-                f"💰 Price: {int(sel.get('price', 0)):,} coins\n"
-                f"👤 Seller: @{sel.get('seller_name', '?')}\n"
-                f"🌍 Arc: {sel.get('arc', '—')}"
+                f"╭─ 🃏 {sel.get('card_name', '?')}\n"
+                f"│ {_ri(rarity)} Rarity: {rarity}\n"
+                f"│ 💰 Price: {int(sel.get('price', 0)):,} coins\n"
+                f"│ 👤 Seller: @{sel.get('seller_name', '?')}\n"
+                f"│ 🌍 Arc: {sel.get('arc', '—')}\n"
+                "╰────────────────"
             )
             sel_img = str(sel.get("image_url", "")).strip()
             if sel_img:

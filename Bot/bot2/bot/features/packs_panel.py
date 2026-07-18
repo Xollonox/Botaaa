@@ -62,13 +62,14 @@ def _panel_embed(user_id: str, slot: int, pack_inv: list[dict[str, Any]], player
     keys  = list(counts.keys())
     total = len(pack_inv)
     overview = (
-        "**Pack Inventory**\n"
-        f"📦 Total Packs: {total}\n"
-        f"🎴 Types: {len(keys)}"
+        "╭─ Pack Inventory\n"
+        f"│ 📦 Total Packs: {total}\n"
+        f"│ 🎴 Types: {len(keys)}\n"
+        "╰────────────────"
     )
 
     if not keys:
-        desc = overview + "\n\n**No Packs**\nBuy packs from /shop!"
+        desc = overview + "\n\n╭─ No Packs\n│ Buy packs from /shop!\n╰────────────────"
         return make_embed(None, "LOOKISM HXCC • PACKS", desc, color=0xE11D48, footer="Pack Inventory")
 
     slot = max(0, min(slot, len(keys) - 1))
@@ -93,9 +94,9 @@ def _panel_embed(user_id: str, slot: int, pack_inv: list[dict[str, Any]], player
     blocks = [overview]
     for i, k in enumerate(keys):
         marker = "👉 " if i == slot else ""
-        pity_str = f"\n🎯 Pity: {pity_lines[k]}" if k in pity_lines else ""
+        pity_str = f"\n│ 🎯 Pity: {pity_lines[k]}" if k in pity_lines else ""
         blocks.append(
-            f"**{marker}{names[k]}**\nQuantity: ×{counts[k]}\nSecret contents inside...{pity_str}"
+            f"╭─ {marker}{names[k]}\n│ Quantity: ×{counts[k]}\n│ Secret contents inside...{pity_str}\n╰────────────────"
         )
 
     return make_embed(None, "LOOKISM HXCC • PACKS", "\n\n".join(blocks), color=0xE11D48, footer=f"Pack Inventory • Slot {slot + 1}/{len(keys)}")
@@ -110,9 +111,10 @@ def _card_reveal_embed(roll: dict[str, str], idx: int, total: int, pack_name: st
     color  = colors.get(rarity.lower(), 0x2B2D31)
 
     body = (
-        f"**🎴 {pack_name}  •  Card {idx}/{total}**\n"
-        f"{icon} {name}\n"
-        f"[{rarity}]"
+        f"╭─ 🎴 {pack_name}  •  Card {idx}/{total}\n"
+        f"│ {icon} {name}\n"
+        f"│ [{rarity}]\n"
+        "╰────────────────"
     )
     if rarity.lower() in HIGH_RARITY:
         sep   = "━" * 24
@@ -125,7 +127,7 @@ def _card_reveal_embed(roll: dict[str, str], idx: int, total: int, pack_name: st
 def _anim_embed(title: str, slots: str, caption: str, color: int = 0xE11D48) -> discord.Embed:
     return make_embed(
         None, "LOOKISM HXCC • PACKS",
-        f"**{title}**\n{slots}\n{caption}",
+        f"╭─ {title}\n│ {slots}\n│ {caption}\n╰────────────────",
         color=color, footer="Opening...",
     )
 
@@ -205,7 +207,7 @@ async def animate_pack_open(
         if anim_view.skipped:
             return
         sep   = "━" * 14
-        alert = f"{sep}\n⚠️  {str(rarest.get('rarity','')).upper()} DETECTED!\n{sep}"
+        alert = f"{sep}\n│ ⚠️  {str(rarest.get('rarity','')).upper()} DETECTED!\n│ {sep}"
         try:
             await msg.edit(embed=_anim_embed(title, slot_row, alert, 0xF39C12))
         except (discord.NotFound, discord.Forbidden):
@@ -318,9 +320,10 @@ class PostRevealView(discord.ui.View):
         self.rolls[self.idx]["_sold"] = True
         icon = _ri(rarity)
         body = (
-            f"**⚡ Quick Sold!**\n"
-            f"{icon} {roll.get('name', '')}  [{rarity}]\n"
-            f"💰 +{value:,} coins"
+            f"╭─ ⚡ Quick Sold!\n"
+            f"│ {icon} {roll.get('name', '')}  [{rarity}]\n"
+            f"│ 💰 +{value:,} coins\n"
+            "╰────────────────"
         )
         e = make_embed(None, "LOOKISM HXCC • PACKS", body, color=0x2B2D31, footer=f"Card {self.idx + 1} of {len(self.rolls)} • Sold")
         await interaction.response.edit_message(embed=e, view=self)
@@ -377,9 +380,10 @@ class PostRevealView(discord.ui.View):
 
         rarity = str(roll.get("rarity", ""))
         body = (
-            f"**🪖 Added to Squad!**\n"
-            f"{_ri(rarity)} {roll.get('name', '')}  [{rarity}]\n"
-            "Use /squad to manage your formation"
+            f"╭─ 🪖 Added to Squad!\n"
+            f"│ {_ri(rarity)} {roll.get('name', '')}  [{rarity}]\n"
+            "│ Use /squad to manage your formation\n"
+            "╰────────────────"
         )
         e = make_embed(None, "LOOKISM HXCC • PACKS", body, color=0x3498DB, footer=f"Card {self.idx + 1} of {len(self.rolls)} • Added")
         await interaction.response.edit_message(embed=e, view=self)
