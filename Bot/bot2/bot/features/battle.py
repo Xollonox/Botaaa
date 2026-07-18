@@ -293,7 +293,7 @@ class BattleCog(commands.Cog):
                     if isinstance(card_def, dict):
                         cm = normalize_card_moves(card_def)
                         attacks = []
-                        for k in ("normal", "special", "ultimate", "unique_skill", "unique_path"):
+                        for k in ("normal", "special", "unique_skill", "unique_skill", "unique_path"):
                             attacks.extend(cm.get(k, []))
                     else:
                         attacks = []
@@ -320,7 +320,7 @@ class BattleCog(commands.Cog):
                 legacy = pstate.get("uses", {}).get(uid)
                 if isinstance(legacy, dict):
                     legacy["special_left"] = 999
-                    legacy["ultimate_left"] = 999
+                    legacy["power_left"] = 999
                     legacy["unique_skill_left"] = 999
                     legacy["unique_path_left"] = 999
 
@@ -516,8 +516,8 @@ class BattleCog(commands.Cog):
             add_row(str(mv), "normal")
         for mv in moves.get("special", []):
             add_row(str(mv), "special")
-        for mv in moves.get("ultimate", []):
-            add_row(str(mv), "ultimate")
+        for mv in moves.get("unique_skill", []):
+            add_row(str(mv), "unique_skill")
         for mv in moves.get("unique_skill", []):
             add_row(str(mv), "unique_skill")
         for mv in moves.get("unique_path", []):
@@ -575,12 +575,12 @@ class BattleCog(commands.Cog):
         return out
 
     def _moves_summary(self, offensive: list[dict[str, Any]]) -> str:
-        counts = {"normal": 0, "special": 0, "ultimate": 0, "unique_skill": 0, "unique_path": 0}
+        counts = {"normal": 0, "special": 0, "unique_skill": 0, "unique_skill": 0, "unique_path": 0}
         for row in offensive:
             t = str(row.get("type", "normal"))
             if t in counts:
                 counts[t] += 1
-        return f"N:{counts['normal']} S:{counts['special']} U:{counts['ultimate']} US:{counts['unique_skill']} UP:{counts['unique_path']}"
+        return f"N:{counts['normal']} S:{counts['special']} U:{counts['unique_skill']} US:{counts['unique_skill']} UP:{counts['unique_path']}"
 
     def _uses_summary(self, offensive: list[dict[str, Any]]) -> str:
         lines = []
@@ -764,7 +764,7 @@ class BattleCog(commands.Cog):
                 if special_allowed_now:
                     for row in offensive_now:
                         typ = normalize_attack_type(str(row.get("type", "normal")))
-                        if typ in {"special", "ultimate", "unique_skill", "unique_path"}:
+                        if typ in {"special", "unique_skill", "unique_skill", "unique_path"}:
                             return typ, str(row.get("key", typ))
                 for row in defensive_now:
                     typ = normalize_attack_type(str(row.get("type", "block")))

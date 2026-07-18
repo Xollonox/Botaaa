@@ -238,7 +238,7 @@ DEFAULT_CONFIG = {
             "attacks":      "⚔",
             "attack_normal":    "🗡",
             "attack_special":   "💥",
-            "attack_ultimate":  "🌀",
+            "attack_unique_skill":  "🌀",
             "attack_unique_skill": "✨",
             "attack_unique_path":  "🛤",
             "def_block":    "🛡",
@@ -602,7 +602,7 @@ DEFAULT_DATA = {
         "level_50": {"id": "level_50", "name": "Veteran Player", "desc": "Reach player level 50.", "tier": "Gold", "icon_key": "level", "points": 1000},
         "spend_100k_coins": {"id": "spend_100k_coins", "name": "Big Spender", "desc": "Spend 100,000 total coins.", "tier": "Gold", "icon_key": "coins", "points": 400},
         "win_gang_war": {"id": "win_gang_war", "name": "Gang War Victor", "desc": "Win a gang war.", "tier": "Gold", "icon_key": "gang", "points": 600},
-        "land_10_ultimates": {"id": "land_10_ultimates", "name": "Ultimate Striker", "desc": "Land 10 ultimate moves in battle.", "tier": "Silver", "icon_key": "battle", "points": 250},
+        "land_10_power_moves": {"id": "land_10_power_moves", "name": "Power Striker", "desc": "Land 10 unique skill or path moves in battle.", "tier": "Silver", "icon_key": "battle", "points": 250},
         "perfect_block_10": {"id": "perfect_block_10", "name": "Perfect Defender", "desc": "Successfully block 10 attacks.", "tier": "Silver", "icon_key": "battle", "points": 200},
     },
     "tournament": {

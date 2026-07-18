@@ -571,7 +571,7 @@ class GangWarCog(commands.Cog):
             if not isinstance(qe, dict): continue
             g = data.get("gangs", {}).get(qe.get("gang_id", ""), {})
             qlines.append(f"[{qid}] {g.get('name','?')} \u2014 {qe.get('format')}v{qe.get('format')} \u2014 avg\U0001f3c6{qe.get('avg_trophies',0)}")
-        body = _box("Active Wars", wlines or ["None"]) + "\n\n" + _box("Queue", qlines or ["Empty"])
+        body = _box("Active Wars", wlines or ["None"]) + "\n" + _box("Queue", qlines or ["Empty"])
         await smart_reply(i, embed=_inf(body), ephemeral=True)
 
 

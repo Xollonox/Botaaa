@@ -130,7 +130,6 @@ EXTENSIONS = [
     "bot.features.announce_owner",
     "bot.features.attacks_owner",
     "bot.features.moderation_owner",
-    "bot.features.confirm",
     "bot.features.packs_panel",
     "bot.features.emoji_panel",
     "bot.features.gang_war",

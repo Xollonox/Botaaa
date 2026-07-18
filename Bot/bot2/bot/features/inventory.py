@@ -580,7 +580,7 @@ class CollectionGalleryView(discord.ui.View):
             f"│ 🃏 Unique Fighters: {len(unique_owned)}/{total}\n"
             "│ 📊 Completion\n"
             f"│ {_make_bar(completion)} {completion:.0f}%\n"
-            "╰────────────────\n\n"
+            "╰────────────────\n"
             "Select a fighter below to view."
         )
         embed = make_embed(None, "LOOKISM HXCC • COLLECTION", body, color=0xE11D48, footer=f"Card Collection • Page {self.page}/{self.total_pages}")
@@ -773,46 +773,44 @@ class InventoryCog(commands.Cog):
         unique_path, unique_path_desc = _resolve_field(
             card_def.get("unique_path"), card_def.get("unique_path_description")
         )
-        unique_skill, unique_skill_desc = _resolve_field(
-            card_def.get("unique_skill"), card_def.get("unique_skill_description")
-        )
-        unique_skill_2, unique_skill_2_desc = _resolve_field(card_def.get("unique_skill_2"))
-        unique_skill_3, unique_skill_3_desc = _resolve_field(card_def.get("unique_skill_3"))
-        mastery_list: list[str] = normalize_mastery_list(card_def.get("mastery", []) if isinstance(card_def, dict) else [])
+        # Support both singular fields and plural "unique_skills" list from cards.json
+        _skills_list = card_def.get("unique_skills", []) if isinstance(card_def, dict) else []
+        if isinstance(_skills_list, list) and _skills_list and not card_def.get("unique_skill"):
+            unique_skill, unique_skill_desc = _skills_list[0] if isinstance(_skills_list[0], (list, tuple)) else (_skills_list[0], ""), ""
+            unique_skill_2, unique_skill_2_desc = (_skills_list[1], "") if len(_skills_list) > 1 else ("", "")
+            unique_skill_3, unique_skill_3_desc = (_skills_list[2], "") if len(_skills_list) > 2 else ("", "")
+            if isinstance(unique_skill, str):
+                unique_skill_desc = ""
+            if isinstance(unique_skill_2, str):
+                unique_skill_2_desc = ""
+            if isinstance(unique_skill_3, str):
+                unique_skill_3_desc = ""
+        else:
+            unique_skill, unique_skill_desc = _resolve_field(
+                card_def.get("unique_skill"), card_def.get("unique_skill_description")
+            )
+            unique_skill_2, unique_skill_2_desc = _resolve_field(card_def.get("unique_skill_2"))
+            unique_skill_3, unique_skill_3_desc = _resolve_field(card_def.get("unique_skill_3"))
+        mastery_list: list[str] = normalize_mastery_list(card_def.get("mastery", card_def.get("masteries", [])) if isinstance(card_def, dict) else [])
         mastery_str = "  ".join(f"• {m}" for m in mastery_list) if mastery_list else "—"
 
-        # Compute skill unlock thresholds
-        skill_count = sum([
-            bool(card_def.get("unique_skill")),
-            bool(card_def.get("unique_skill_2")),
-            bool(card_def.get("unique_skill_3")),
-        ])
-        _skill_thresholds = {1: [3], 2: [3, 4], 3: [3, 4, 5]}.get(skill_count, [])
-
-        def _skill_block(skill_name: str, skill_desc: str, skill_raw: Any, unlock_star: int | None) -> str:
-            kind = ""
-            if isinstance(skill_raw, dict):
-                kind = " [Active]" if skill_raw.get("active", True) else " [Passive]"
-            if unlock_star is not None and stars < unlock_star:
-                return (
-                    f"╭─ Unique Skill{kind}\n"
-                    f"│ 🔒 Unlocks at ★{unlock_star}\n"
-                    "╰────────────────\n\n"
-                )
-            return (
-                f"╭─ Unique Skill{kind}\n"
-                f"│ {skill_name}\n"
-                f"│ {skill_desc}\n"
-                "╰────────────────\n\n"
-            )
-
+        # All unique skills unlock at ★3 — show them in one box like /card_info
+        all_skills = [s for s in [unique_skill, unique_skill_2, unique_skill_3] if s and s != "—"]
         skill_blocks = ""
-        if skill_count >= 1:
-            skill_blocks += _skill_block(unique_skill, unique_skill_desc, card_def.get("unique_skill"), _skill_thresholds[0] if _skill_thresholds else None)
-        if skill_count >= 2:
-            skill_blocks += _skill_block(unique_skill_2, unique_skill_2_desc, card_def.get("unique_skill_2"), _skill_thresholds[1] if len(_skill_thresholds) > 1 else None)
-        if skill_count >= 3:
-            skill_blocks += _skill_block(unique_skill_3, unique_skill_3_desc, card_def.get("unique_skill_3"), _skill_thresholds[2] if len(_skill_thresholds) > 2 else None)
+        if all_skills:
+            if stars < 3:
+                skill_blocks = (
+                    "╭─ Unique Skill\n"
+                    "│ 🔒 Unlocks at ★3\n"
+                    "╰────────────────\n"
+                )
+            else:
+                lines = "\n".join(f"│ • {s}" for s in all_skills)
+                skill_blocks = (
+                    f"╭─ Unique Skill\n"
+                    f"{lines}\n"
+                    "╰────────────────\n"
+                )
 
         path_raw = card_def.get("unique_path")
         path_kind = ""
@@ -822,14 +820,14 @@ class InventoryCog(commands.Cog):
             path_block = (
                 f"╭─ Unique Path{path_kind}\n"
                 "│ 🔒 Unlocks at ★5\n"
-                "╰────────────────\n\n"
+                "╰────────────────\n"
             )
         elif path_raw:
             path_block = (
                 f"╭─ Unique Path{path_kind}\n"
                 f"│ {unique_path}\n"
                 f"│ {unique_path_desc}\n"
-                "╰────────────────\n\n"
+                "╰────────────────\n"
             )
         else:
             path_block = ""
@@ -852,9 +850,9 @@ class InventoryCog(commands.Cog):
 
         body = (
             f"{heading}\n\n"
-            "╭─ Bio\n"
+            "╭─ Description\n"
             f"│ {bio or '—'}\n"
-            "╰────────────────\n\n"
+            "╰────────────────\n"
             "╭─ Combat Stats\n"
             f"│ 💪 STR: {stats['strength']}\n"
             f"│ ⚡ SPD: {stats['speed']}\n"
@@ -862,16 +860,14 @@ class InventoryCog(commands.Cog):
             f"│ 🎯 TEC: {stats['technique']}\n"
             f"│ 🧠 IQ: {stats['iq']}\n"
             f"│ 🔮 BIQ: {stats['battle_iq']}\n"
-            "╰────────────────\n\n"
+            "╰────────────────\n"
             "╭─ Progression\n"
             f"│ ⭐ Stars: {_star_string(stars)}\n"
             f"│ ⚡ Power: {power:,}\n"
             f"│ {'🔒 Status: Locked' if locked else '🔓 Status: Unlocked'}\n"
             f"│ {weapon_line}"
-            "╰────────────────\n\n"
-            "╭─ Mastery\n"
-            f"│ {mastery_str}\n"
-            "╰────────────────\n\n"
+            "╰────────────────\n"
+            + (f"╭─ Mastery\n│ {mastery_str}\n╰────────────────\n" if mastery_list else "")
             + skill_blocks + path_block
         ).rstrip()
         embed = make_embed(None, "LOOKISM HXCC • FIGHTER", body, color=0xE11D48, image_url=image_url, footer="Card Collection")

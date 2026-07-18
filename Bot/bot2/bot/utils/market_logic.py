@@ -311,7 +311,7 @@ def build_market_embed(
                 image_url = sel_img
 
     embed = make_embed(
-        None, "LOOKISM HXCC • MARKET", "\n\n".join(blocks),
+        None, "LOOKISM HXCC • MARKET", "\n".join(blocks),
         color=0x2B2D31,
         footer=f"Market  •  {SORT_LABELS.get(sort_key, sort_key)}  •  Page {page + 1}/{total_pages}",
         image_url=image_url,

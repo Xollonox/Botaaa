@@ -30,7 +30,7 @@ class TestNormalizeAttackType:
     def test_canonical_types(self) -> None:
         assert normalize_attack_type("normal") == "normal"
         assert normalize_attack_type("special") == "special"
-        assert normalize_attack_type("ultimate") == "ultimate"
+        assert normalize_attack_type("unique_skill") == "unique_skill"
         assert normalize_attack_type("unique_skill") == "unique_skill"
         assert normalize_attack_type("unique_path") == "unique_path"
 
@@ -44,7 +44,7 @@ class TestNormalizeAttackType:
     def test_case_and_whitespace(self) -> None:
         assert normalize_attack_type("  NORMAL  ") == "normal"
         assert normalize_attack_type("Special") == "special"
-        assert normalize_attack_type("ULTIMATE") == "ultimate"
+        assert normalize_attack_type("ULTIMATE") == "normal"  # Ultimate no longer exists
 
     def test_hyphen_to_underscore(self) -> None:
         assert normalize_attack_type("unique-skill") == "unique_skill"
@@ -95,10 +95,10 @@ class TestCalcDamage:
         )
         assert dmg >= 1
 
-    def test_ultimate_uses_battle_iq(self) -> None:
+    def test_power_move_uses_battle_iq(self) -> None:
         dmg = calc_damage(
             {"battle_iq": 90}, {"endurance": 30},
-            attack_type="ultimate", attack_power=10,
+            attack_type="unique_skill", attack_power=10,
         )
         assert dmg >= 1
 
@@ -160,9 +160,9 @@ class TestTechniqueBonusMultiplier:
         m = _get_technique_bonus_multiplier(96, "normal")
         assert m == 1.15
 
-    def test_ultimate_bonus(self) -> None:
-        m_low = _get_technique_bonus_multiplier(30, "ultimate")
-        m_high = _get_technique_bonus_multiplier(96, "ultimate")
+    def test_power_move_bonus(self) -> None:
+        m_low = _get_technique_bonus_multiplier(30, "unique_skill")
+        m_high = _get_technique_bonus_multiplier(96, "unique_skill")
         assert m_low == 1.10
         assert m_high == 1.30
 
@@ -188,16 +188,16 @@ class TestStrengthBonus:
         b = _strength_bonus(50, "normal", True)
         assert b == 10
 
-    def test_mastery_bonus_ultimate(self) -> None:
-        b = _strength_bonus(50, "ultimate", True)
+    def test_mastery_bonus_power_move(self) -> None:
+        b = _strength_bonus(50, "unique_skill", True)
         assert b == 30
 
     def test_over_100_normal(self) -> None:
         b = _strength_bonus(120, "normal", False)
         assert b == 20
 
-    def test_over_100_ultimate(self) -> None:
-        b = _strength_bonus(120, "ultimate", False)
+    def test_over_100_power_move(self) -> None:
+        b = _strength_bonus(120, "unique_skill", False)
         assert b == 50
 
     def test_defense_type_no_bonus(self) -> None:
@@ -338,13 +338,13 @@ class TestCalculateStatDamage:
         dmg_special, _ = calculate_stat_damage(atk, dfs, "special")
         assert dmg_special > dmg_normal
 
-    def test_ultimate_does_more_than_special(self) -> None:
+    def test_power_move_does_more_than_special(self) -> None:
         atk = {"strength": 100, "biq": 50, "technique": 50, "iq": 0, "speed": 50, "endurance": 50}
         dfs = {"biq": 10, "iq": 0, "endurance": 30, "speed": 30}
         random.seed(54321)
         dmg_special, _ = calculate_stat_damage(atk, dfs, "special")
         random.seed(54321)
-        dmg_ult, _ = calculate_stat_damage(atk, dfs, "ultimate")
+        dmg_ult, _ = calculate_stat_damage(atk, dfs, "unique_skill")
         assert dmg_ult > dmg_special
 
     def test_miss_returns_zero_damage(self) -> None:

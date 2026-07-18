@@ -33,7 +33,7 @@ def build_battle_stats_embed(battle_state: dict, winner_name: str) -> discord.Em
 
     damage_by_pid: dict[str, int] = {pid: 0 for pid in pid_list}
     move_counts: dict[str, dict[str, int]] = {
-        pid: {"normal": 0, "special": 0, "ultimate": 0, "unique_skill": 0, "unique_path": 0, "parry": 0, "dodge": 0, "block": 0, "revert": 0, "tank": 0}
+        pid: {"normal": 0, "special": 0, "unique_skill": 0, "unique_skill": 0, "unique_path": 0, "parry": 0, "dodge": 0, "block": 0, "revert": 0, "tank": 0}
         for pid in pid_list
     }
     total_moves_per_pid: dict[str, int] = {pid: 0 for pid in pid_list}
@@ -129,12 +129,12 @@ def build_battle_stats_embed(battle_state: dict, winner_name: str) -> discord.Em
 
     # ── All Moves Used ───────────────────────────────────────────────
     move_emoji_map = {
-        "normal": "🔷", "special": "🔶", "ultimate": "🔥",
+        "normal": "🔷", "special": "🔶", "unique_skill": "🔥",
         "unique_skill": "\u2728", "unique_path": "🌀",
         "parry": "🛡\uFE0F", "dodge": "\u26A1", "block": "🔑", "revert": "🔄", "tank": "🛡",
     }
     move_labels = {
-        "normal": "Normal", "special": "Special", "ultimate": "Ultimate",
+        "normal": "Normal", "special": "Special", "unique_skill": "Unique Skill",
         "unique_skill": "Skill", "unique_path": "Path",
         "parry": "Parry", "dodge": "Dodge", "block": "Block", "revert": "Revert", "tank": "Tank",
     }
@@ -334,8 +334,8 @@ def build_embed_view(
                 return "Normal Attack"
             if norm == "special":
                 return "Special Attack"
-            if norm == "ultimate":
-                return "Ultimate Attack"
+            if norm == "unique_skill":
+                return "Unique Skill"
             if norm == "unique_skill":
                 return "Unique Skill"
             if norm == "unique_path":
@@ -350,7 +350,7 @@ def build_embed_view(
                 return e("attack_normal", data)
             if norm == "special":
                 return e("attack_special", data)
-            if norm == "ultimate":
+            if norm == "unique_skill":
                 return e("attack_ultimate", data)
             if norm == "unique_skill":
                 return e("attack_unique_skill", data)
@@ -378,11 +378,11 @@ def build_embed_view(
                     entry_name = str(entry.get("name", "")).strip()
                     entry_type = normalize_attack_type(str(entry.get("type", norm)))
                     if entry_name:
-                        if entry_type in {"normal", "special", "ultimate", "unique_skill", "unique_path"}:
+                        if entry_type in {"normal", "special", "unique_skill", "unique_skill", "unique_path"}:
                             return entry_name
                         if entry_type in {"block", "dodge", "revert", "parry", "tank"}:
                             return entry_name
-            if norm in {"normal", "special", "ultimate", "unique_skill", "unique_path"}:
+            if norm in {"normal", "special", "unique_skill", "unique_skill", "unique_path"}:
                 return move_label(norm)
             if norm in {"block", "dodge", "revert", "parry", "tank"}:
                 return move_label(norm)
@@ -455,11 +455,11 @@ def build_embed_view(
 
         # ── Build three embeds ─────────────────────────────────
         desc_a = (
-            f"{side_panel(a_id, a, 'Side A')}\n\n"
+            f"{side_panel(a_id, a, 'Side A')}\n"
             f"{squad_block('Squad', a)}"
         )
         desc_b = (
-            f"{side_panel(b_id, b, 'Side B')}\n\n"
+            f"{side_panel(b_id, b, 'Side B')}\n"
             f"{squad_block('Squad', b)}"
         )
 
@@ -467,7 +467,7 @@ def build_embed_view(
         embed_a = make_embed(None, header, desc_a, color=0x2b2d31, image_url=a_img)
         embed_b = make_embed(None, "", desc_b, color=0x2b2d31, image_url=b_img)
         log_display = log_text[:1024] if log_text else "—"
-        turn_line = f"**Turn:** {turn_label}  •  **Round:** {round_no}\n\n"
+        turn_line = f"**Turn:** {turn_label}  •  **Round:** {round_no}\n"
         embed_c = make_embed(None, f"{e('list', data)} Battle Log", turn_line + log_display, color=0x2b2d31)
 
     except Exception:
@@ -489,7 +489,7 @@ def build_embed_view(
                 "Battle ended due to inactivity.",
                 "No trophies or rewards were granted.",
             ]
-            embed_a.description = "─" * 32 + "\n" + "\n".join(result_lines) + "\n" + "─" * 32 + "\n\n" + (embed_a.description or "")
+            embed_a.description = "\n".join(result_lines) + "\n" + (embed_a.description or "")
             ended_log = f"**Turn:** {turn_label}  •  **Round:** {round_no}  •  *Ended*\n\n" if turn_label else ""
             embed_c_log = make_embed(None, f"{e('list', data)} Battle Log — Ended", ended_log + (log_text[:1024] if log_text else "—"), color=0x2b2d31)
             return embed_a, embed_b, embed_c_log, None
@@ -499,7 +499,7 @@ def build_embed_view(
                 "🤝 Draw",
                 "Both sides were knocked out at the same time.",
             ]
-            embed_a.description = "─" * 32 + "\n" + "\n".join(result_lines) + "\n" + "─" * 32 + "\n\n" + (embed_a.description or "")
+            embed_a.description = "\n".join(result_lines) + "\n" + (embed_a.description or "")
             ended_log = f"**Turn:** {turn_label}  •  **Round:** {round_no}  •  *Ended*\n\n" if turn_label else ""
             embed_c_log = make_embed(None, "Battle Log — Ended", ended_log + (log_text[:1024] if log_text else "—"), color=0x2b2d31)
             return embed_a, embed_b, embed_c_log, None
@@ -528,7 +528,7 @@ def build_embed_view(
         if coin_reward:
             result_lines.append(f"💰 Reward: +{coin_reward} coins")
 
-        embed_a.description = "─" * 32 + "\n" + "\n".join(result_lines) + "\n" + "─" * 32 + "\n\n" + (embed_a.description or "")
+        embed_a.description = "\n".join(result_lines) + "\n" + (embed_a.description or "")
         ended_log = f"**Turn:** {turn_label}  •  **Round:** {round_no}  •  *Ended*\n\n" if turn_label else ""
         embed_c_log = make_embed(None, "Battle Log \u2014 Ended", ended_log + (log_text[:1024] if log_text else "\u2014"), color=0x2b2d31)
         return embed_a, embed_b, embed_c_log, None
@@ -536,11 +536,11 @@ def build_embed_view(
     offensive, defensive = cog._fighter_attack_rows(data, battle_id, turn_user)
     switch_opts = cog._switch_options(data, battle_id, turn_user)
 
-    atk_emoji = {"normal": e("attack_normal",data), "special": e("attack_special",data), "ultimate": e("attack_ultimate",data), "unique_skill": e("attack_unique_skill",data), "unique_path": e("attack_unique_path",data)}
+    atk_emoji = {"normal": e("attack_normal",data), "special": e("attack_special",data), "unique_skill": e("attack_ultimate",data), "unique_skill": e("attack_unique_skill",data), "unique_path": e("attack_unique_path",data)}
     attack_opts: list[discord.SelectOption] = []
     for r in offensive:
         nt = normalize_attack_type(str(r.get("type", "normal")))
-        if nt not in {"normal", "special", "ultimate", "unique_skill", "unique_path"}:
+        if nt not in {"normal", "special", "unique_skill", "unique_skill", "unique_path"}:
             continue
         power = r.get("power")
         left = int(r.get("left", -1))

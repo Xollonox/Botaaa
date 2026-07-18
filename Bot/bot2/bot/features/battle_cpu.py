@@ -19,7 +19,7 @@ def _cpu_pick_move(personality: str, available_moves: list, fighter_hp_pct: floa
     Args:
         personality: personality name string
         available_moves: list of move type strings that still have uses
-            (e.g. ["normal", "special", "ultimate", "block", "dodge"])
+            (e.g. ["normal", "special", "unique_skill", "block", "dodge"])
         fighter_hp_pct: current fighter's HP as 0.0-1.0
         enemy_hp_pct: enemy fighter's HP as 0.0-1.0
         fighter_stamina: current stamina of active CPU fighter
@@ -30,7 +30,7 @@ def _cpu_pick_move(personality: str, available_moves: list, fighter_hp_pct: floa
         return "normal"
 
     has_special = "special" in available_moves
-    has_ultimate = "ultimate" in available_moves
+    has_power_move = "unique_skill" in available_moves
     has_block = "block" in available_moves
     has_dodge = "dodge" in available_moves
 
@@ -38,8 +38,8 @@ def _cpu_pick_move(personality: str, available_moves: list, fighter_hp_pct: floa
 
     if p == "aggressive":
         # Always use the most powerful move available
-        if has_ultimate:
-            return "ultimate"
+        if has_power_move:
+            return "unique_skill"
         if has_special:
             return "special"
         return "normal"
@@ -63,8 +63,8 @@ def _cpu_pick_move(personality: str, available_moves: list, fighter_hp_pct: floa
 
     elif p == "finisher":
         # Save ultimate for when enemy is low
-        if has_ultimate and enemy_hp_pct < 0.3:
-            return "ultimate"
+        if has_power_move and enemy_hp_pct < 0.3:
+            return "unique_skill"
         if has_special and enemy_hp_pct < 0.5:
             return "special"
         if has_block and fighter_hp_pct < 0.4:
@@ -73,8 +73,8 @@ def _cpu_pick_move(personality: str, available_moves: list, fighter_hp_pct: floa
 
     else:  # "balanced" or unknown
         # Mix of offense and defense
-        if has_ultimate and fighter_hp_pct > 0.5 and random.random() < 0.3:
-            return "ultimate"
+        if has_power_move and fighter_hp_pct > 0.5 and random.random() < 0.3:
+            return "unique_skill"
         if has_special and random.random() < 0.4:
             return "special"
         if has_block and fighter_hp_pct < 0.5 and random.random() < 0.3:
@@ -133,7 +133,7 @@ def choose_cpu_move(cog: Any, data: dict[str, Any], battle_id: str, cpu_id: str,
             base_map = {
                 "normal": 28,
                 "special": 54,
-                "ultimate": 82,
+                "unique_skill": 82,
                 "unique_skill": 68,
                 "unique_path": 66,
                 "block": 42,
@@ -142,14 +142,14 @@ def choose_cpu_move(cog: Any, data: dict[str, Any], battle_id: str, cpu_id: str,
                 "parry": 46,
             }
             base = base_map.get(typ, 25)
-        if typ == "ultimate":
+        if typ == "unique_skill":
             base += 12
         elif typ in {"unique_skill", "unique_path"}:
             base += 8
         elif typ == "special":
             base += 4
         left = int(row.get("left", -1))
-        if left == 1 and typ in {"ultimate", "unique_skill", "unique_path", "block", "dodge", "revert", "parry"}:
+        if left == 1 and typ in {"unique_skill", "unique_skill", "unique_path", "block", "dodge", "revert", "parry"}:
             base += 3
         return base
 
@@ -165,9 +165,9 @@ def choose_cpu_move(cog: Any, data: dict[str, Any], battle_id: str, cpu_id: str,
 
     normals = best([r for r in offensive if normalize_attack_type(str(r.get("type", "normal"))) == "normal"])
     specials = best([r for r in offensive if normalize_attack_type(str(r.get("type", "normal"))) in {"special", "unique_skill", "unique_path"}])
-    ultimates = best([
+    power_moves = best([
         r for r in offensive
-        if normalize_attack_type(str(r.get("type", "normal"))) == "ultimate" and used_ult < ult_limit and not used_ult_by_char
+        if normalize_attack_type(str(r.get("type", "normal"))) == "unique_skill" and used_ult < ult_limit and not used_ult_by_char
     ])
     used_defs_map = battle.get("used_defenses_by_char_uid", {}) if isinstance(battle.get("used_defenses_by_char_uid", {}), dict) else {}
     raw_used_defs = used_defs_map.get(cpu_uid, set())
@@ -184,7 +184,7 @@ def choose_cpu_move(cog: Any, data: dict[str, Any], battle_id: str, cpu_id: str,
     ])
     best_normal_score = row_score(normals[0]) if normals else -1
     best_special_score = row_score(specials[0]) if specials else -1
-    best_ultimate_score = row_score(ultimates[0]) if ultimates else -1
+    best_power_score = row_score(power_moves[0]) if power_moves else -1
     enemy_pressure = max((row_score(r) for r in enemy_offensive), default=30)
     enemy_end = int((enemy_stats or {}).get("endurance", 0)) if isinstance(enemy_stats, dict) else 0
     cpu_hp_pct = hp_pct
@@ -217,12 +217,12 @@ def choose_cpu_move(cog: Any, data: dict[str, Any], battle_id: str, cpu_id: str,
         return defense_choice, defense_choice
 
     if special_allowed:
-        if ultimates and (enemy_pct <= 58 or best_ultimate_score >= best_normal_score + 24):
+        if power_moves and (enemy_pct <= 58 or best_power_score >= best_normal_score + 24):
             if personality in {"Aggressive", "Finisher"} or random.random() < 0.72:
-                return pick_best(ultimates, "normal")
+                return pick_best(power_moves, "normal")
         if specials and (enemy_pct <= 72 or best_special_score >= best_normal_score + 12):
-            if personality == "Finisher" and ultimates and enemy_pct <= 45 and random.random() < 0.85:
-                return pick_best(ultimates, "normal")
+            if personality == "Finisher" and power_moves and enemy_pct <= 45 and random.random() < 0.85:
+                return pick_best(power_moves, "normal")
             if personality in {"Aggressive", "Finisher", "Trickster"} or random.random() < 0.62:
                 return pick_best(specials, "normal")
 
@@ -291,8 +291,8 @@ def choose_cpu_move(cog: Any, data: dict[str, Any], battle_id: str, cpu_id: str,
         return defense_choice, defense_choice
     if personality == "Trickster" and specials and special_allowed and random.random() < 0.58:
         return pick_best(specials, "normal")
-    if personality in {"Aggressive", "Finisher"} and ultimates and special_allowed and random.random() < 0.48:
-        return pick_best(ultimates, "normal")
+    if personality in {"Aggressive", "Finisher"} and power_moves and special_allowed and random.random() < 0.48:
+        return pick_best(power_moves, "normal")
     if personality in {"Aggressive", "Finisher", "Balanced"} and specials and special_allowed and random.random() < 0.55:
         return pick_best(specials, "normal")
 
@@ -365,7 +365,7 @@ def choose_cpu_move(cog: Any, data: dict[str, Any], battle_id: str, cpu_id: str,
         normal_weight = 9
         if side_last_group == "normal_or_defensive":
             normal_weight -= 2
-        if any([specials, ultimates, defense_choice, switch_choice]):
+        if any([specials, power_moves, defense_choice, switch_choice]):
             normal_weight -= 2
         if personality == "Aggressive":
             normal_weight += 1
@@ -391,21 +391,21 @@ def choose_cpu_move(cog: Any, data: dict[str, Any], battle_id: str, cpu_id: str,
             special_weight -= 1
         add_choice(*pick_best(specials, "normal"), max(2, special_weight))
 
-    if special_allowed and ultimates:
-        ultimate_weight = 7
+    if special_allowed and power_moves:
+        power_weight = 7
         if enemy_pct <= 60:
-            ultimate_weight += 4
+            power_weight += 4
         if enemy_pct <= 35:
-            ultimate_weight += 4
-        if best_ultimate_score >= best_normal_score + 10:
-            ultimate_weight += 5
+            power_weight += 4
+        if best_power_score >= best_normal_score + 10:
+            power_weight += 5
         if personality == "Aggressive":
-            ultimate_weight += 4
+            power_weight += 4
         elif personality == "Finisher":
-            ultimate_weight += 6 if enemy_pct <= 65 else 2
+            power_weight += 6 if enemy_pct <= 65 else 2
         elif personality == "Balanced":
-            ultimate_weight += 1
-        add_choice(*pick_best(ultimates, "normal"), max(2, ultimate_weight))
+            power_weight += 1
+        add_choice(*pick_best(power_moves, "normal"), max(2, power_weight))
 
     if defense_choice:
         defense_weight = 6
@@ -448,8 +448,8 @@ def choose_cpu_move(cog: Any, data: dict[str, Any], battle_id: str, cpu_id: str,
 
     if normals:
         return pick_best(normals, "normal")
-    if special_allowed and ultimates:
-        return pick_best(ultimates, "normal")
+    if special_allowed and power_moves:
+        return pick_best(power_moves, "normal")
     if special_allowed and specials:
         return pick_best(specials, "normal")
     if defense_choice:
@@ -461,7 +461,7 @@ def choose_cpu_move(cog: Any, data: dict[str, Any], battle_id: str, cpu_id: str,
             typ = normalize_attack_type(str(row.get("type", "normal")))
             if typ == "switch":
                 continue
-            if not special_allowed and typ in {"special", "unique_skill", "unique_path", "ultimate"}:
+            if not special_allowed and typ in {"special", "unique_skill", "unique_path", "unique_skill"}:
                 continue
             return typ, str(row.get("key", "normal"))
     if defensive:

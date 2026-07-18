@@ -57,7 +57,7 @@ STAMINA_BASE: int = 100
 STAMINA_COST: dict[str, int] = {
     "normal":       10,
     "special":      20,
-    "ultimate":     35,
+    "unique_skill":     35,
     "unique_skill": 25,
     "unique_path":  25,
     "block":        15,

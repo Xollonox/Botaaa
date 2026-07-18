@@ -10,7 +10,7 @@ from discord.ext import commands
 TUTORIAL_STEPS = {
     1: {
         "title": "Step 1: Open Your First Pack",
-        "desc": "╭─ Mission\n│ Open any pack from `/shop`\n│ You have 3 newbie packs ready!\n╰────────────────\n\nUse `/shop` → select a pack → Open!",
+        "desc": "╭─ Mission\n│ Open any pack from `/shop`\n│ You have 3 newbie packs ready!\n╰────────────────\nUse `/shop` → select a pack → Open!",
         "reward": "🎉 +200 coins",
         "action": "open_pack",
     },

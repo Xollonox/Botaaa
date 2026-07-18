@@ -92,7 +92,7 @@ def _rank_from_trophies(trophies: int) -> str:
 def _get_technique_bonus_multiplier(technique: int, move_type: str) -> float:
     tec = int(technique)
     typ = normalize_attack_type(str(move_type or "normal"))
-    if typ == "ultimate":
+    if typ == "unique_skill":
         if tec < 50:
             return 1.10
         if tec <= 70:
@@ -125,7 +125,7 @@ def _get_technique_bonus_multiplier(technique: int, move_type: str) -> float:
 
 def _move_group(move_type: str) -> str:
     mt = normalize_attack_type(str(move_type or "normal"))
-    if mt in {"special", "ultimate", "unique_skill", "unique_path"}:
+    if mt in {"special", "unique_skill", "unique_skill", "unique_path"}:
         return "special_like"
     return "normal_or_defensive"
 
@@ -488,7 +488,7 @@ def _strength_bonus(strength: int, move_type: str, has_strength_mastery: bool) -
     if strength > 100:
         if mt == "normal":
             return 20
-        if mt == "ultimate":
+        if mt == "unique_skill":
             return 50
         if mt in {"special", "unique_skill", "unique_path"}:
             return 30
@@ -496,7 +496,7 @@ def _strength_bonus(strength: int, move_type: str, has_strength_mastery: bool) -
     if has_strength_mastery:
         if mt == "normal":
             return 10
-        if mt == "ultimate":
+        if mt == "unique_skill":
             return 30
         if mt in {"special", "unique_skill", "unique_path"}:
             return 15
@@ -532,7 +532,7 @@ def calculate_stat_damage(attacker: dict[str, Any], defender: dict[str, Any], mo
     elif mt == "special":
         # Special: noticeably stronger than normal
         lo, hi = int(round(x + 20)), int(round(x + 45))
-    elif mt == "ultimate":
+    elif mt == "unique_skill":
         # Ultimate: devastating, 3-4x strength scaling
         lo, hi = int(round(3 * x)), int(round(4 * x))
     elif mt in {"unique_skill", "unique_path"}:
@@ -735,7 +735,7 @@ def _enforce_attack_usage_rules(state: dict, me: dict, my_uid: str, actor: str, 
             return "unique_path_already_used"
         used_path[my_uid] = True
 
-    if move_norm == "ultimate":
+    if move_norm == "unique_skill":
         used_ult = state.setdefault("used_ultimate_count_by_side", {})
         if not isinstance(used_ult, dict):
             used_ult = {}
@@ -780,6 +780,20 @@ def _compute_attack_damage(data: dict, me: dict, opp: dict, my_uid: str, opp_uid
     atk = dict(atk) if isinstance(atk, dict) else {}
     atk["mastery"] = mastery_by_uid.get(my_uid, []) if isinstance(mastery_by_uid.get(my_uid, []), list) else []
 
+    # Conviction Mastery: ×2 STR/SPD/END when HP ≤25%, permanent once triggered
+    _conviction_triggered = me.get("conviction_triggered", {}) if isinstance(me.get("conviction_triggered"), dict) else {}
+    if any("conviction" in str(m).lower() for m in atk.get("mastery", [])):
+        cur_hp = (me.get("hp", {}) or {}).get(my_uid, 1)
+        max_hp = (me.get("hp_max", {}) or {}).get(my_uid, 1)
+        already_triggered = bool(_conviction_triggered.get(my_uid, False))
+        if already_triggered or (max_hp > 0 and cur_hp <= max_hp * 0.25):
+            if not already_triggered:
+                _conviction_triggered[my_uid] = True
+                me["conviction_triggered"] = _conviction_triggered
+            atk["strength"] = int(atk.get("strength", 0)) * 2
+            atk["speed"] = int(atk.get("speed", 0)) * 2
+            atk["endurance"] = int(atk.get("endurance", 0)) * 2
+
     if custom_power is not None:
         damage = max(0, int(custom_power))
     else:
@@ -803,6 +817,22 @@ def _apply_defense_and_finalize_damage(state: dict, me: dict, opp: dict, my_uid:
 
     atk_stats = (me.get("stats", {}) or {}).get(my_uid, {}) if isinstance(me.get("stats", {}), dict) else {}
     def_stats = (opp.get("stats", {}) or {}).get(opp_uid, {}) if isinstance(opp.get("stats", {}), dict) else {}
+
+    # Apply Conviction Mastery boost to defender if triggered
+    def_stats = dict(def_stats) if isinstance(def_stats, dict) else {}
+    _opp_conviction = opp.get("conviction_triggered", {}) if isinstance(opp.get("conviction_triggered"), dict) else {}
+    _opp_mastery = (opp.get("mastery_by_uid", {}) or {}).get(opp_uid, [])
+    if any("conviction" in str(m).lower() for m in (_opp_mastery if isinstance(_opp_mastery, list) else [])):
+        opp_cur_hp = (opp.get("hp", {}) or {}).get(opp_uid, 1)
+        opp_max_hp = (opp.get("hp_max", {}) or {}).get(opp_uid, 1)
+        opp_already = bool(_opp_conviction.get(opp_uid, False))
+        if opp_already or (opp_max_hp > 0 and opp_cur_hp <= opp_max_hp * 0.25):
+            if not opp_already:
+                _opp_conviction[opp_uid] = True
+                opp["conviction_triggered"] = _opp_conviction
+            def_stats["strength"] = int(def_stats.get("strength", 0)) * 2
+            def_stats["speed"] = int(def_stats.get("speed", 0)) * 2
+            def_stats["endurance"] = int(def_stats.get("endurance", 0)) * 2
 
     atk_str = int(atk_stats.get("strength", 0))
     def_end = int(def_stats.get("endurance", 0))
