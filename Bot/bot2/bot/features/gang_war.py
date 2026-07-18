@@ -41,7 +41,7 @@ E = "\u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2
 
 
 def _box(title: str, lines: list[str]) -> str:
-    body = "\n".join(f"{M} {l}" for l in lines)
+    body = "\n".join(f"{M}  {l}" for l in lines)
     return f"{B} {title}\n{body}\n{E}"
 
 
