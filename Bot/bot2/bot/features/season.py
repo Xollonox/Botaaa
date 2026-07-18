@@ -198,26 +198,26 @@ def _build_season_embed(data: dict[str, Any], uid: str) -> discord.Embed:
 
     medals = [e("winner",data), "🥈", "🥉"] + [f" {i}." for i in range(4, 11)]
     lb_lines = "\n".join(
-        f"│  {medals[i]}  {name:<18} {cp:,} CP"
+        f"│ {medals[i]}  {name:<18} {cp:,} CP"
         for i, (cp, name) in enumerate(ranking[:10])
-    ) or "│  No data yet."
+    ) or "│ No data yet."
 
     body = (
         f"{_hdr('🌟  ' + s.get('name', 'Season'))}\n\n"
         f"╭─ 📅 Season Info\n"
-        f"│  Start  {_fmt_date(int(s.get('start_time',0)))}\n"
-        f"│  End    {_fmt_date(end_time)}\n"
-        f"│  ⏳ {_time_left(end_time)} remaining\n"
-        f"│  🔄 Resets: Trophies + Rank\n"
-        f"╰────────────────────────────────\n\n"
+        f"│ Start  {_fmt_date(int(s.get('start_time',0)))}\n"
+        f"│ End    {_fmt_date(end_time)}\n"
+        f"│ ⏳ {_time_left(end_time)} remaining\n"
+        f"│ 🔄 Resets: Trophies + Rank\n"
+        f"╰────────────────\n\n"
         f"╭─ 📊 Your Progress\n"
-        f"│  🎯 Season CP:  {my_cp:,}\n"
-        f"│  ⭐ Level:      {lvl}\n"
-        f"│  🏆 Trophies:   {trophies:,}\n"
-        f"╰────────────────────────────────\n\n"
+        f"│ 🎯 Season CP:  {my_cp:,}\n"
+        f"│ ⭐ Level:      {lvl}\n"
+        f"│ 🏆 Trophies:   {trophies:,}\n"
+        f"╰────────────────\n\n"
         f"╭─ 🏆 Leaderboard\n"
         f"{lb_lines}\n"
-        f"╰────────────────────────────────"
+        f"╰────────────────"
     )
     return _inf(body)
 
@@ -300,23 +300,23 @@ class PassPanel(discord.ui.View):
             paid_s   = "✅ CLAIMED" if cp2 else ("CLAIM" if (unlocked and has_paid) else ("🔒 Buy Pass" if unlocked else f"🔒"))
             tier_lines.append(
                 f"│\n"
-                f"│  {'──────────── ' if unlocked else '🔒 '}Tier {tid}  ({cp_req:,} CP){'────────────' if unlocked else ''}\n"
-                f"│  🆓  {free_r:<25} {free_s}\n"
-                f"│  💎  {paid_r:<25} {paid_s}"
+                f"│ {'──────────── ' if unlocked else '🔒 '}Tier {tid}  ({cp_req:,} CP){'────────────' if unlocked else ''}\n"
+                f"│ 🆓  {free_r:<25} {free_s}\n"
+                f"│ 💎  {paid_r:<25} {paid_s}"
             )
 
         body = (
             _hdr('🎫  SEASON PASS — ' + s.get('name', 'Season').upper()) + '\n\n'
             f"╭─ 💎 Pass Status\n"
-            f"│  Paid Pass:  {'✅ Unlocked' if has_paid else f'❌ Not Unlocked  ({PASS_COST} gems)'}\n"
-            f"│  Tier:       {current_tier} / {len(tiers)}\n"
-            f"│  CP:         {my_cp:,}\n"
-            f"│  {bar}  {my_cp:,} CP\n"
-            + (f"│  Next tier:  {next_cp:,} CP away\n" if next_cp else "│  🎉 All tiers unlocked!\n")
-            + f"╰────────────────────────────────\n\n"
+            f"│ Paid Pass:  {'✅ Unlocked' if has_paid else f'❌ Not Unlocked  ({PASS_COST} gems)'}\n"
+            f"│ Tier:       {current_tier} / {len(tiers)}\n"
+            f"│ CP:         {my_cp:,}\n"
+            f"│ {bar}  {my_cp:,} CP\n"
+            + (f"│ Next tier:  {next_cp:,} CP away\n" if next_cp else "│ 🎉 All tiers unlocked!\n")
+            + f"╰────────────────\n\n"
             f"╭─ 🎁 Rewards  (Page {self.page+1}/{total_pages})\n"
             + "\n".join(tier_lines)
-            + "\n╰────────────────────────────────"
+            + "\n╰────────────────"
         )
         return _inf(body)
 
@@ -360,10 +360,10 @@ class PassPanel(discord.ui.View):
         self._rebuild()
         await interaction.response.edit_message(embed=_ok(
             f"╭─ 💎 Pass Unlocked!\n"
-            f"│  You spent {PASS_COST} gems\n"
-            f"│  Paid tier rewards are now available!\n"
-            f"│  You'll earn 250 gems back through tiers 🎉\n"
-            "╰────────────────────────────────"
+            f"│ You spent {PASS_COST} gems\n"
+            f"│ Paid tier rewards are now available!\n"
+            f"│ You'll earn 250 gems back through tiers 🎉\n"
+            "╰────────────────"
         ), view=self)
 
     async def _on_claim(self, interaction: discord.Interaction) -> None:
@@ -396,13 +396,13 @@ class PassPanel(discord.ui.View):
         if count == 0:
             await interaction.response.send_message("Nothing to claim right now.", ephemeral=True)
             return
-        reward_text = "\n".join(f"│  {r}" for r in rewards[:10])
+        reward_text = "\n".join(f"│ {r}" for r in rewards[:10])
         self._rebuild()
         await interaction.response.edit_message(
             embed=_ok(
                 f"╭─ ✅ Claimed {count} Rewards!\n"
                 f"{reward_text}\n"
-                "╰────────────────────────────────"
+                "╰────────────────"
             ),
             view=self,
         )
@@ -457,7 +457,7 @@ class MissionPanel(discord.ui.View):
                 progress = int(m_prog.get(mid, 0))
                 claimed  = mid in m_claimed
                 if is_paid and not has_paid and not claimed:
-                    lines.append(f"│  🔒  {title:<28} +{cp_r} CP  [Paid]")
+                    lines.append(f"│ 🔒  {title:<28} +{cp_r} CP  [Paid]")
                     continue
                 bar  = make_bar(progress, target, 8)
                 if claimed:
@@ -467,8 +467,8 @@ class MissionPanel(discord.ui.View):
                 else:
                     status = f"{progress}/{target}"
                 icon = e("ok",data) if claimed else (e("reward",data) if progress >= target else e("timer",data))
-                lines.append(f"│  {icon}  {title:<28} +{cp_r} CP    {status}")
-            return lines or ["│  No missions."]
+                lines.append(f"│ {icon}  {title:<28} +{cp_r} CP    {status}")
+            return lines or ["│ No missions."]
 
         period_icons = {"daily": "🌅 Daily", "weekly": "📅 Weekly", "monthly": "🗓️ Monthly", "season": "🌟 Season"}
         sections = []
@@ -478,7 +478,7 @@ class MissionPanel(discord.ui.View):
             reset_str = f"  (resets in {_time_until_reset(period)})" if period != "season" else ""
             header = f"╭─ {period_icons[period]}{reset_str}"
             lines  = _mission_lines(mlist, period)
-            sections.append(header + "\n" + "\n".join(lines) + "\n╰────────────────────────────────")
+            sections.append(header + "\n" + "\n".join(lines) + "\n╰────────────────")
 
         body = (
             f"{_hdr('📋  SEASON MISSIONS')}\n\n"
@@ -526,8 +526,8 @@ class MissionPanel(discord.ui.View):
         await interaction.response.edit_message(
             embed=_ok(
                 f"╭─ ✅ Claimed {cnt} Missions!\n"
-                f"│  🎯 +{tcp:,} Season CP earned\n"
-                "╰────────────────────────────────"
+                f"│ 🎯 +{tcp:,} Season CP earned\n"
+                "╰────────────────"
             ),
             view=self,
         )
@@ -572,7 +572,7 @@ class SeasonCog(commands.Cog):
         if not s.get("active"):
             await smart_reply(interaction, embed=_inf(
                 f"{_hdr('🌟  SEASON')}\n\n"
-                "╭─ No Active Season\n│  No season is running right now.\n│  Check back soon!\n╰────────────────────────────────"
+                "╭─ No Active Season\n│ No season is running right now.\n│ Check back soon!\n╰────────────────"
             ))
             return
         uid = str(interaction.user.id)
@@ -608,7 +608,7 @@ class SeasonCog(commands.Cog):
         data = self.bot.storage.load()
         s    = _season_root(data)
         if not s.get("active"):
-            await error_reply(interaction, embed=_err("╭─ ❌ No Active Season\n╰────────────────────────────────"))
+            await error_reply(interaction, embed=_err("╭─ ❌ No Active Season\n╰────────────────"))
             return
         panel = PassPanel(self, str(interaction.user.id))
         await smart_reply(interaction, embed=panel._build_embed(), view=panel)
@@ -624,7 +624,7 @@ class SeasonCog(commands.Cog):
         data = self.bot.storage.load()
         s    = _season_root(data)
         if not s.get("active"):
-            await error_reply(interaction, embed=_err("╭─ ❌ No Active Season\n╰────────────────────────────────"))
+            await error_reply(interaction, embed=_err("╭─ ❌ No Active Season\n╰────────────────"))
             return
         panel = MissionPanel(self, str(interaction.user.id))
         await smart_reply(interaction, embed=panel.build_embed(data), view=panel)
@@ -647,7 +647,7 @@ class SeasonCog(commands.Cog):
         self.bot.storage.with_lock(mutate)
         data = self.bot.storage.load(); s = _season_root(data)
         await smart_reply(interaction, embed=_ok(
-            f"╭─ ✅ Season Created!\n│  📅 {name}\n│  Start: {_fmt_date(int(s['start_time']))}\n│  End:   {_fmt_date(int(s['end_time']))}\n│  🔄 Reset: {reset.title()}\n│  ⏳ {duration_days} days\n╰────────────────────────────────"
+            f"╭─ ✅ Season Created!\n│ 📅 {name}\n│ Start: {_fmt_date(int(s['start_time']))}\n│ End:   {_fmt_date(int(s['end_time']))}\n│ 🔄 Reset: {reset.title()}\n│ ⏳ {duration_days} days\n╰────────────────"
         ), ephemeral=True)
 
     @app_commands.command(name="o_season_end", description="Owner: end the current season.")
@@ -671,7 +671,7 @@ class SeasonCog(commands.Cog):
             return True, count
         ok, count = self.bot.storage.with_lock(mutate)
         if not ok: await error_reply(interaction, embed=_err("❌ No active season.")); return
-        await smart_reply(interaction, embed=_ok(f"╭─ 🏁 Season Ended!\n│  🔄 {count} players reset\n│  💾 Archived\n╰────────────────────────────────"), ephemeral=True)
+        await smart_reply(interaction, embed=_ok(f"╭─ 🏁 Season Ended!\n│ 🔄 {count} players reset\n│ 💾 Archived\n╰────────────────"), ephemeral=True)
 
     @app_commands.command(name="o_season_pass_setup", description="Owner: configure a season pass tier.")
     @app_commands.guilds(OWNER_GUILD)
@@ -681,7 +681,7 @@ class SeasonCog(commands.Cog):
         def mutate(data: dict) -> None:
             _season_root(data).setdefault("pass_tiers", {})[str(tier)] = {"cp_required": cp_required, "free_reward": free_reward, "paid_reward": paid_reward}
         self.bot.storage.with_lock(mutate)
-        await smart_reply(interaction, embed=_ok(f"╭─ ✅ Pass Tier Set\n│  Tier {tier}  •  {cp_required:,} CP\n│  🆓 Free: {free_reward}\n│  💎 Paid: {paid_reward}\n╰────────────────────────────────"), ephemeral=True)
+        await smart_reply(interaction, embed=_ok(f"╭─ ✅ Pass Tier Set\n│ Tier {tier}  •  {cp_required:,} CP\n│ 🆓 Free: {free_reward}\n│ 💎 Paid: {paid_reward}\n╰────────────────"), ephemeral=True)
 
     @app_commands.command(name="o_season_add_cp", description="Owner: manually add season CP to a player.")
     @app_commands.guilds(OWNER_GUILD)
@@ -697,7 +697,7 @@ class SeasonCog(commands.Cog):
             return True, int(scp[sn])
         ok, total = self.bot.storage.with_lock(mutate)
         if not ok: await error_reply(interaction, embed=_err("❌ Player not found.")); return
-        await smart_reply(interaction, embed=_ok(f"╭─ ✅ CP Added\n│  {player.mention}  +{amount:,} CP\n│  Total CP: {total:,}\n╰────────────────────────────────"), ephemeral=True)
+        await smart_reply(interaction, embed=_ok(f"╭─ ✅ CP Added\n│ {player.mention}  +{amount:,} CP\n│ Total CP: {total:,}\n╰────────────────"), ephemeral=True)
 
     @app_commands.command(name="o_season_mission_create", description="Owner: create a season mission.")
     @app_commands.guilds(OWNER_GUILD)
@@ -729,7 +729,7 @@ class SeasonCog(commands.Cog):
         self.bot.storage.with_lock(mutate)
         icon = "🆓" if mission_type.value == "free" else "💎"
         await smart_reply(interaction, embed=_ok(
-            f"╭─ ✅ Mission Created\n│  {icon} [{period.name}] {title}\n│  Req: {requirement.name} × {target}\n│  Reward: +{reward_cp:,} CP\n╰────────────────────────────────"
+            f"╭─ ✅ Mission Created\n│ {icon} [{period.name}] {title}\n│ Req: {requirement.name} × {target}\n│ Reward: +{reward_cp:,} CP\n╰────────────────"
         ), ephemeral=True)
 
 

@@ -118,7 +118,7 @@ def _panel_embed(session: dict[str, Any], locked_a: bool, locked_b: bool) -> dis
         if card:
             rarity = str(card.get("rarity", ""))
             name   = str(card.get("card_name", "?"))
-            line   = f"{_ri(rarity)} {name}\n│   [{rarity}]"
+            line   = f"{_ri(rarity)} {name}\n│ [{rarity}]"
         elif coins and coins > 0:
             line = f"💰 {coins:,} coins"
         else:

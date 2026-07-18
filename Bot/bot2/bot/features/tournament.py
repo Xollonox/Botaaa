@@ -99,7 +99,7 @@ class TournamentCog(commands.Cog):
         for i, (uid2, name, xp) in enumerate(lb[:10]):
             if i >= len(PRIZE_SPLIT): break
             coins = int(pool * PRIZE_SPLIT[i])
-            prize_lines.append(f"│  {medals[i]}  {name:<18} {xp:,} XP   💰 {coins:,}")
+            prize_lines.append(f"│ {medals[i]}  {name:<18} {xp:,} XP   💰 {coins:,}")
 
         my_entry   = t.get("participants", {}).get(uid)
         my_xp      = int(my_entry.get("xp_earned", 0)) if isinstance(my_entry, dict) else 0
@@ -109,18 +109,18 @@ class TournamentCog(commands.Cog):
         body = (
             f"{SEP}\n  ⚔️  {t.get('name','Tournament').upper()}\n{SEP}\n\n"
             f"╭─ 📋 Tournament Info\n"
-            f"│  ⏳ Time Left:    {_time_left(int(t.get('end_time',0)))}\n"
-            f"│  💰 Entry Fee:   {int(t.get('entry_fee',0)):,} coins\n"
-            f"│  🏆 Prize Pool:  {pool:,} coins\n"
-            f"│  👥 Players:     {len(lb)} / {int(t.get('max_players',16))}\n"
-            f"╰────────────────────────────────\n\n"
+            f"│ ⏳ Time Left:    {_time_left(int(t.get('end_time',0)))}\n"
+            f"│ 💰 Entry Fee:   {int(t.get('entry_fee',0)):,} coins\n"
+            f"│ 🏆 Prize Pool:  {pool:,} coins\n"
+            f"│ 👥 Players:     {len(lb)} / {int(t.get('max_players',16))}\n"
+            f"╰────────────────\n\n"
             f"╭─ 🏆 Leaderboard\n"
-            + ("\n".join(prize_lines) if prize_lines else "│  No participants yet.")
-            + "\n╰────────────────────────────────"
+            + ("\n".join(prize_lines) if prize_lines else "│ No participants yet.")
+            + "\n╰────────────────"
             + (
                 f"\n\n╭─ 📊 Your Standing\n"
-                f"│  Rank #{my_rank}  •  {my_xp:,} XP earned\n"
-                "╰────────────────────────────────"
+                f"│ Rank #{my_rank}  •  {my_xp:,} XP earned\n"
+                "╰────────────────"
                 if in_tourney else ""
             )
         )
