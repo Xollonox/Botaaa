@@ -266,26 +266,27 @@ def build_embed_view(
             def s(k: str) -> int:
                 return int(stats.get(k, 0))
 
-            lines = [
-                f"**{label} — {display_name(pid, pstate)}**",
-                f"{card_name}  [{rarity}]",
-                f"HP:  {hp_bar(pct)}  {cur_hp}/{max_hp} ({pct}%)",
-            ]
             stamina_map = pstate.get("stamina", {}) if isinstance(pstate.get("stamina"), dict) else {}
             cur_sta = max(0, int(stamina_map.get(uid, 100)))
             sta_pct = int(round((cur_sta / 100) * 100))
             exhausted = cur_sta <= 0
             sta_label = " [EXHAUSTED]" if exhausted else ""
-            lines.append(f"STA: {hp_bar(sta_pct)}  {cur_sta}/100{sta_label}")
-            lines.append(f"STR {s('strength')} | SPD {s('speed')} | END {s('endurance')} | TEC {s('technique')} | IQ {s('iq')} | BIQ {s('biq')}")
-            return "\n".join(lines)
+
+            return (
+                f"╭─ {label} — {display_name(pid, pstate)}\n"
+                f"│ {card_name}  [{rarity}]\n"
+                f"│ HP:  {hp_bar(pct)}  {cur_hp}/{max_hp} ({pct}%)\n"
+                f"│ STA: {hp_bar(sta_pct)}  {cur_sta}/100{sta_label}\n"
+                f"│ STR {s('strength')} | SPD {s('speed')} | END {s('endurance')} | TEC {s('technique')} | IQ {s('iq')} | BIQ {s('biq')}\n"
+                "╰────────────────"
+            )
 
         def squad_block(label: str, pstate: dict[str, Any]) -> str:
             team = pstate.get("team_uids", []) if isinstance(pstate.get("team_uids"), list) else []
             hp = pstate.get("hp", {}) if isinstance(pstate.get("hp"), dict) else {}
             hp_max = pstate.get("hp_max", {}) if isinstance(pstate.get("hp_max"), dict) else {}
             cur_uid = cog._current_uid(pstate)
-            lines = [f"**{label}**"]
+            lines = []
             for i, uid in enumerate(team, 1):
                 card_name, _ = fighter_bundle(str(uid), pstate)
                 cur = int(hp.get(uid, 0))
@@ -295,8 +296,10 @@ def build_embed_view(
                 name_str = f"~~{card_name}~~" if is_fainted else card_name
                 status = "fainted" if is_fainted else ("active" if is_active else f"{cur}/{mx}")
                 marker = "▸" if is_active else "◦"
-                lines.append(f"{marker} {i}. {name_str} — {status}")
-            return "\n".join(lines) if len(lines) > 1 else f"**{label}**\n-"
+                lines.append(f"│ {marker} {i}. {name_str} — {status}")
+            if not lines:
+                lines.append("│ —")
+            return f"╭─ {label}\n" + "\n".join(lines) + "\n╰────────────────"
 
         # ── Log display ────────────────────────────────────────
         logs = battle.get("log", []) if isinstance(battle.get("log"), list) else []
@@ -467,8 +470,13 @@ def build_embed_view(
         embed_a = make_embed(None, header, desc_a, color=0x2b2d31, image_url=a_img)
         embed_b = make_embed(None, "", desc_b, color=0x2b2d31, image_url=b_img)
         log_display = log_text[:1024] if log_text else "—"
-        turn_line = f"**Turn:** {turn_label}  •  **Round:** {round_no}\n"
-        embed_c = make_embed(None, f"{e('list', data)} Battle Log", turn_line + log_display, color=0x2b2d31)
+        log_body = (
+            f"╭─ Battle Log\n"
+            f"│ Turn: {turn_label}  •  Round: {round_no}\n"
+            f"│ {log_display.replace(chr(10), chr(10) + '│ ')}\n"
+            "╰────────────────"
+        )
+        embed_c = make_embed(None, "", log_body, color=0x2b2d31)
 
     except Exception:
         logger.exception("[BATTLE_EMBED_ERROR] battle_id=%s", battle_id)
@@ -484,24 +492,28 @@ def build_embed_view(
     if bool(battle.get("ended", False)):
         end_reason = str(battle.get("reason", ""))
         if end_reason in {"timeout_abandoned", "abandoned", "no_contest"}:
-            result_lines = [
-                "No Contest",
-                "Battle ended due to inactivity.",
-                "No trophies or rewards were granted.",
-            ]
-            embed_a.description = "\n".join(result_lines) + "\n" + (embed_a.description or "")
-            ended_log = f"**Turn:** {turn_label}  •  **Round:** {round_no}  •  *Ended*\n\n" if turn_label else ""
-            embed_c_log = make_embed(None, f"{e('list', data)} Battle Log — Ended", ended_log + (log_text[:1024] if log_text else "—"), color=0x2b2d31)
+            result_block = (
+                "╭─ Battle Result\n"
+                "│ No Contest\n"
+                "│ Battle ended due to inactivity.\n"
+                "│ No trophies or rewards were granted.\n"
+                "╰────────────────"
+            )
+            embed_a.description = result_block + "\n" + (embed_a.description or "")
+            ended_log = f"╭─ Battle Log — Ended\n│ Turn: {turn_label}  •  Round: {round_no}\n│ {(log_text[:900] if log_text else '—').replace(chr(10), chr(10) + '│ ')}\n╰────────────────"
+            embed_c_log = make_embed(None, "", ended_log, color=0x2b2d31)
             return embed_a, embed_b, embed_c_log, None
 
         if end_reason == "draw":
-            result_lines = [
-                "🤝 Draw",
-                "Both sides were knocked out at the same time.",
-            ]
-            embed_a.description = "\n".join(result_lines) + "\n" + (embed_a.description or "")
-            ended_log = f"**Turn:** {turn_label}  •  **Round:** {round_no}  •  *Ended*\n\n" if turn_label else ""
-            embed_c_log = make_embed(None, "Battle Log — Ended", ended_log + (log_text[:1024] if log_text else "—"), color=0x2b2d31)
+            result_block = (
+                "╭─ Battle Result\n"
+                "│ 🤝 Draw\n"
+                "│ Both sides were knocked out at the same time.\n"
+                "╰────────────────"
+            )
+            embed_a.description = result_block + "\n" + (embed_a.description or "")
+            ended_log = f"╭─ Battle Log — Ended\n│ Turn: {turn_label}  •  Round: {round_no}\n│ {(log_text[:900] if log_text else '—').replace(chr(10), chr(10) + '│ ')}\n╰────────────────"
+            embed_c_log = make_embed(None, "", ended_log, color=0x2b2d31)
             return embed_a, embed_b, embed_c_log, None
 
         winner = str(battle.get("winner_id", ""))
@@ -515,22 +527,23 @@ def build_embed_view(
         coin_reward = battle.get("coin_reward")
 
         result_lines = [
-            f"🏆 Winner: {winner_name}",
-            f"💀 Loser:  {loser_name}",
+            f"│ 🏆 Winner: {winner_name}",
+            f"│ 💀 Loser: {loser_name}",
         ]
         if trophy_changes and isinstance(trophy_changes, dict):
             for pid, delta in trophy_changes.items():
                 sign = "+" if delta >= 0 else ""
-                result_lines.append(f"🏅 <@{pid}>: {sign}{delta} trophies")
+                result_lines.append(f"│ 🏅 <@{pid}>: {sign}{delta} trophies")
         elif cpu_trophy_change is not None:
             sign = "+" if cpu_trophy_change >= 0 else ""
-            result_lines.append(f"🏅 Trophy change: {sign}{cpu_trophy_change}")
+            result_lines.append(f"│ 🏅 Trophy change: {sign}{cpu_trophy_change}")
         if coin_reward:
-            result_lines.append(f"💰 Reward: +{coin_reward} coins")
+            result_lines.append(f"│ 💰 Reward: +{coin_reward} coins")
 
-        embed_a.description = "\n".join(result_lines) + "\n" + (embed_a.description or "")
-        ended_log = f"**Turn:** {turn_label}  •  **Round:** {round_no}  •  *Ended*\n\n" if turn_label else ""
-        embed_c_log = make_embed(None, "Battle Log \u2014 Ended", ended_log + (log_text[:1024] if log_text else "\u2014"), color=0x2b2d31)
+        result_block = "╭─ Battle Result\n" + "\n".join(result_lines) + "\n╰────────────────"
+        embed_a.description = result_block + "\n" + (embed_a.description or "")
+        ended_log = f"╭─ Battle Log — Ended\n│ Turn: {turn_label}  •  Round: {round_no}\n│ {(log_text[:900] if log_text else '—').replace(chr(10), chr(10) + '│ ')}\n╰────────────────"
+        embed_c_log = make_embed(None, "", ended_log, color=0x2b2d31)
         return embed_a, embed_b, embed_c_log, None
 
     offensive, defensive = cog._fighter_attack_rows(data, battle_id, turn_user)
