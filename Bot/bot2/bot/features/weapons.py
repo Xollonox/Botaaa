@@ -80,20 +80,19 @@ class WeaponDetailView(discord.ui.View):
             equip_line = str(card.get("card_name", "Unknown")) if card else "Unknown card"
 
         buff_lines = "\n".join(
-            f"│ +{v} {k.upper()}" for k, v in buffs.items() if v != 0
-        ) or "│ No stat buffs"
+            f"+{v} {k.upper()}" for k, v in buffs.items() if v != 0
+        ) or "No stat buffs"
 
         body = (
-            f"╭─ {_rarity_icon(rarity)} {weapon.get('weapon_name', '?')} [{rarity}]\n"
-            f"│ Stars: {_star_str(stars)}\n"
-            f"│ Equipped: {equip_line}\n"
-            "├─ Stat Buffs (at current stars)\n"
+            f"**{_rarity_icon(rarity)} {weapon.get('weapon_name', '?')} [{rarity}]**\n"
+            f"Stars: {_star_str(stars)}\n"
+            f"Equipped: {equip_line}\n"
+            "**Stat Buffs (at current stars)**\n"
             f"{buff_lines}\n"
-            f"├─ Effect [{kind}]\n"
-            f"│ {effect}\n"
-            f"├─ Compatible Cards\n"
-            f"│ {', '.join(compatible) if compatible else '—'}\n"
-            "╰────────────────"
+            f"**Effect [{kind}]**\n"
+            f"{effect}\n"
+            f"**Compatible Cards**\n"
+            f"{', '.join(compatible) if compatible else '—'}\n"
         )
         return make_embed(data, "LOOKISM HXCC • WEAPON", body, color=0xE67E22, image_url=image_url)
 

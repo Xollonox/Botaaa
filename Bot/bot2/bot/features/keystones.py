@@ -71,18 +71,16 @@ class KeystonesCog(commands.Cog):
 
         if result == "equipped":
             body = (
-                f"╭─ Keystone Equipped\n"
-                f"│ Card: {info['card']}\n"
-                f"│ Keystone: {info['keystone']}\n"
-                "╰────────────────"
+                f"**Keystone Equipped**\n"
+                f"Card: {info['card']}\n"
+                f"Keystone: {info['keystone']}\n"
             )
             await smart_reply(interaction, embed=make_embed(data, "LOOKISM HXCC • KEYSTONE", body, color=0x9B59B6))
         elif result == "unequipped":
             body = (
-                f"╭─ Keystone Unequipped\n"
-                f"│ Card: {info['card']}\n"
-                f"│ Keystone: {info['keystone']}\n"
-                "╰────────────────"
+                f"**Keystone Unequipped**\n"
+                f"Card: {info['card']}\n"
+                f"Keystone: {info['keystone']}\n"
             )
             await smart_reply(interaction, embed=make_embed(data, "LOOKISM HXCC • KEYSTONE", body, color=0x95A5A6))
         elif result == "wrong_rarity":
@@ -135,13 +133,12 @@ class KeystonesCog(commands.Cog):
         status = "✅ Equipped" if equipped else "❌ Unequipped"
 
         body = (
-            f"╭─ Keystone — {keystone.get('name', '—')}\n"
-            f"│ Card: {card_def.get('name', '—')}\n"
-            f"│ Type: {kind}\n"
-            f"│ Status: {status}\n"
-            "├─ Effect\n"
-            f"│ {keystone.get('effect', '—')}\n"
-            "╰────────────────"
+            f"**Keystone — {keystone.get('name', '—')}**\n"
+            f"Card: {card_def.get('name', '—')}\n"
+            f"Type: {kind}\n"
+            f"Status: {status}\n"
+            "**Effect**\n"
+            f"{keystone.get('effect', '—')}\n"
         )
         await smart_reply(interaction, embed=make_embed(data, "LOOKISM HXCC • KEYSTONE", body, color=0x9B59B6))
 

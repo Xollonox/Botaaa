@@ -157,9 +157,8 @@ class RewardCardActionView(discord.ui.View):
             footer="Rewards",
             body=(
                 "**CARD SOLD**\n\n"
-                "╭─ Sale\n"
-                f"│ Coins Earned: +{sold_for:,}\n"
-                "╰────────────────"
+                "**Sale**\n"
+                f"Coins Earned: +{sold_for:,}"
             ),
             color=HOURLY_COLOR,
         )
@@ -227,10 +226,9 @@ class RewardCardActionView(discord.ui.View):
             footer="Rewards",
             body=(
                 "**SQUAD UPDATED**\n\n"
-                "╭─ Status\n"
-                "│ Card added to squad\n"
-                "│ Use /squad to manage your formation\n"
-                "╰────────────────"
+                "**Status**\n"
+                "Card added to squad\n"
+                "Use /squad to manage your formation"
             ),
             color=DAILY_COLOR,
         )
@@ -273,9 +271,8 @@ class RewardsCog(commands.Cog):
                 footer="Rewards",
                 body=(
                     "**HOURLY REWARD**\n\n"
-                    "╭─ Cooldown\n"
-                    f"│ Remaining: {fmt_duration(remaining)}\n"
-                    "╰────────────────"
+                    "**Cooldown**\n"
+                    f"Remaining: {fmt_duration(remaining)}"
                 ),
                 color=HOURLY_COLOR,
             )
@@ -287,10 +284,9 @@ class RewardsCog(commands.Cog):
             footer="Rewards",
             body=(
                 "**HOURLY REWARD**\n\n"
-                "╭─ Reward\n"
-                "│ Coins Earned: +100\n"
-                f"│ New Balance: {new_balance:,}\n"
-                "╰────────────────\n\n"
+                "**Reward**\n"
+                "Coins Earned: +100\n"
+                f"New Balance: {new_balance:,}\n\n"
                 "Next Hourly: 1h"
             ),
             color=HOURLY_COLOR,
@@ -397,9 +393,8 @@ class RewardsCog(commands.Cog):
                 footer=footer,
                 body=(
                     f"**{heading}**\n\n"
-                    "╭─ Cooldown\n"
-                    f"│ Remaining: {fmt_duration(remaining)}\n"
-                    "╰────────────────"
+                    "**Cooldown**\n"
+                    f"Remaining: {fmt_duration(remaining)}"
                 ),
                 color=color,
             )
@@ -410,24 +405,23 @@ class RewardsCog(commands.Cog):
             # Build streak info for daily rewards
             streak_info = ""
             if reward_type == "daily" and streak > 0:
-                streak_info = f"\n│ 🔥 Login Streak: {streak} days"
+                streak_info = f"\n🔥 Login Streak: {streak} days"
                 if multiplier > 1.0:
                     bonus_pct = int((multiplier - 1.0) * 100)
-                    streak_info += f"\n│ ✨ Streak Bonus: +{bonus_pct}%"
+                    streak_info += f"\n✨ Streak Bonus: +{bonus_pct}%"
                 # Check for milestones
                 if streak in [3, 7, 14, 30]:
-                    streak_info += f"\n│ 🎉 Milestone Reached: {streak} days!"
+                    streak_info += f"\n🎉 Milestone Reached: {streak} days!"
 
             embed = _reward_embed(
                 panel=panel,
                 footer=footer,
                 body=(
                     f"**{heading.replace('CARD OBTAINED', 'COINS OBTAINED').replace('Card Obtained', 'Coins Obtained')}**\n\n"
-                    "╭─ Reward\n"
-                    f"│ Coins: +{granted_coins:,}\n"
-                    f"│ New Balance: {new_balance:,}"
-                    f"{streak_info}\n"
-                    "╰────────────────"
+                    "**Reward**\n"
+                    f"Coins: +{granted_coins:,}\n"
+                    f"New Balance: {new_balance:,}"
+                    f"{streak_info}"
                 ),
                 color=color,
             )
@@ -442,25 +436,24 @@ class RewardsCog(commands.Cog):
         # Build streak info for daily rewards
         streak_info = ""
         if reward_type == "daily" and streak > 0:
-            streak_info = f"\n│ 🔥 Login Streak: {streak} days"
+            streak_info = f"\n🔥 Login Streak: {streak} days"
             if multiplier > 1.0:
                 bonus_pct = int((multiplier - 1.0) * 100)
-                streak_info += f"\n│ ✨ Streak Bonus: +{bonus_pct}%"
+                streak_info += f"\n✨ Streak Bonus: +{bonus_pct}%"
             # Check for milestones
             if streak in [3, 7, 14, 30]:
-                streak_info += f"\n│ 🎉 Milestone Reached: {streak} days!"
+                streak_info += f"\n🎉 Milestone Reached: {streak} days!"
 
         embed = _reward_embed(
             panel=panel,
             footer=footer,
             body=(
                 f"**{heading}**\n\n"
-                "╭─ Card\n"
-                f"│ {card_name}\n"
-                f"│ Rarity: {pulled_rarity}\n"
-                "│ Stars: ☆☆☆☆☆"
-                f"{streak_info}\n"
-                "╰────────────────"
+                "**Card**\n"
+                f"{card_name}\n"
+                f"Rarity: {pulled_rarity}\n"
+                "Stars: ☆☆☆☆☆"
+                f"{streak_info}"
             ),
             color=color,
         )

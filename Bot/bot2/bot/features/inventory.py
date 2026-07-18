@@ -575,12 +575,9 @@ class CollectionGalleryView(discord.ui.View):
         completion = (len(unique_owned) / max(1, total) * 100.0) if total else 0.0
 
         body = (
-            "╭─ Progress\n"
-            f"│ 📦 Cards Owned: {owned}\n"
-            f"│ 🃏 Unique Fighters: {len(unique_owned)}/{total}\n"
-            "│ 📊 Completion\n"
-            f"│ {_make_bar(completion)} {completion:.0f}%\n"
-            "╰────────────────\n\n"
+            "**Progress**\n"
+            f"Cards Owned: {owned} · Unique Fighters: {len(unique_owned)}/{total}\n"
+            f"Completion: {_make_bar(completion)} {completion:.0f}%\n\n"
             "Select a fighter below to view."
         )
         embed = make_embed(None, "LOOKISM HXCC • COLLECTION", body, color=0xE11D48, footer=f"Card Collection • Page {self.page}/{self.total_pages}")
@@ -713,24 +710,20 @@ class InventoryCog(commands.Cog):
         card_name = str(item.get("card_name", item.get("name", "Card")))
 
         body = (
-            "**UPGRADE PREVIEW**\n\n"
+            "**Upgrade Preview**\n\n"
             f"{card_name}\n\n"
-            "╭─ Star Evolution\n"
-            f"│ {_star_string(stars)} → {_star_string(next_stars)}\n"
-            f"│ Multiplier: {cur_mult:.2f} → {nxt_mult:.2f}\n"
-            "╰────────────────\n"
-            "╭─ Stat Increase\n"
-            f"│ STR {cur_stats['strength']} → {nxt_stats['strength']}\n"
-            f"│ SPD {cur_stats['speed']} → {nxt_stats['speed']}\n"
-            f"│ END {cur_stats['endurance']} → {nxt_stats['endurance']}\n"
-            f"│ TEC {cur_stats['technique']} → {nxt_stats['technique']}\n"
-            f"│ IQ {cur_stats['iq']} → {nxt_stats['iq']}\n"
-            f"│ BIQ {cur_stats['battle_iq']} → {nxt_stats['battle_iq']}\n"
-            "╰────────────────\n"
-            "╭─ Requirements\n"
-            "│ 🃏 Duplicate Card: 1\n"
-            f"│ 💰 Coins: {cost:,}\n"
-            "╰────────────────"
+            "**Star Evolution**\n"
+            f"{_star_string(stars)} → {_star_string(next_stars)}\n"
+            f"Multiplier: {cur_mult:.2f} → {nxt_mult:.2f}\n\n"
+            "**Stat Increase**\n"
+            f"STR {cur_stats['strength']} → {nxt_stats['strength']} · "
+            f"SPD {cur_stats['speed']} → {nxt_stats['speed']} · "
+            f"END {cur_stats['endurance']} → {nxt_stats['endurance']}\n"
+            f"TEC {cur_stats['technique']} → {nxt_stats['technique']} · "
+            f"IQ {cur_stats['iq']} → {nxt_stats['iq']} · "
+            f"BIQ {cur_stats['battle_iq']} → {nxt_stats['battle_iq']}\n\n"
+            "**Requirements**\n"
+            f"Duplicate Card: 1 · Coins: {cost:,}"
         )
         embed = make_embed(None, "LOOKISM HXCC • UPGRADE", body, color=0xE11D48, footer="Star Upgrade")
         return embed
@@ -794,17 +787,8 @@ class InventoryCog(commands.Cog):
             if isinstance(skill_raw, dict):
                 kind = " [Active]" if skill_raw.get("active", True) else " [Passive]"
             if unlock_star is not None and stars < unlock_star:
-                return (
-                    f"╭─ Unique Skill{kind}\n"
-                    f"│ 🔒 Unlocks at ★{unlock_star}\n"
-                    "╰────────────────\n\n"
-                )
-            return (
-                f"╭─ Unique Skill{kind}\n"
-                f"│ {skill_name}\n"
-                f"│ {skill_desc}\n"
-                "╰────────────────\n\n"
-            )
+                return f"**Unique Skill{kind}**\nUnlocks at ★{unlock_star}\n\n"
+            return f"**Unique Skill{kind}**\n{skill_name}\n{skill_desc}\n\n"
 
         skill_blocks = ""
         if skill_count >= 1:
@@ -819,18 +803,9 @@ class InventoryCog(commands.Cog):
         if isinstance(path_raw, dict):
             path_kind = " [Active]" if path_raw.get("active", True) else " [Passive]"
         if path_raw and stars < 5:
-            path_block = (
-                f"╭─ Unique Path{path_kind}\n"
-                "│ 🔒 Unlocks at ★5\n"
-                "╰────────────────\n\n"
-            )
+            path_block = f"**Unique Path{path_kind}**\nUnlocks at ★5\n\n"
         elif path_raw:
-            path_block = (
-                f"╭─ Unique Path{path_kind}\n"
-                f"│ {unique_path}\n"
-                f"│ {unique_path_desc}\n"
-                "╰────────────────\n\n"
-            )
+            path_block = f"**Unique Path{path_kind}**\n{unique_path}\n{unique_path_desc}\n\n"
         else:
             path_block = ""
 
@@ -852,26 +827,15 @@ class InventoryCog(commands.Cog):
 
         body = (
             f"{heading}\n\n"
-            "╭─ Bio\n"
-            f"│ {bio or '—'}\n"
-            "╰────────────────\n\n"
-            "╭─ Combat Stats\n"
-            f"│ 💪 STR: {stats['strength']}\n"
-            f"│ ⚡ SPD: {stats['speed']}\n"
-            f"│ 🛡 END: {stats['endurance']}\n"
-            f"│ 🎯 TEC: {stats['technique']}\n"
-            f"│ 🧠 IQ: {stats['iq']}\n"
-            f"│ 🔮 BIQ: {stats['battle_iq']}\n"
-            "╰────────────────\n\n"
-            "╭─ Progression\n"
-            f"│ ⭐ Stars: {_star_string(stars)}\n"
-            f"│ ⚡ Power: {power:,}\n"
-            f"│ {'🔒 Status: Locked' if locked else '🔓 Status: Unlocked'}\n"
-            f"│ {weapon_line}"
-            "╰────────────────\n\n"
-            "╭─ Mastery\n"
-            f"│ {mastery_str}\n"
-            "╰────────────────\n\n"
+            f"{bio or '—'}\n\n"
+            "**Combat Stats**\n"
+            f"STR {stats['strength']} · SPD {stats['speed']} · END {stats['endurance']} · "
+            f"TEC {stats['technique']} · IQ {stats['iq']} · BIQ {stats['battle_iq']}\n\n"
+            "**Progression**\n"
+            f"Stars: {_star_string(stars)} · Power: {power:,} · {'Locked' if locked else 'Unlocked'}\n"
+            f"{weapon_line}"
+            "\n"
+            f"**Mastery**\n{mastery_str}\n\n"
             + skill_blocks + path_block
         ).rstrip()
         embed = make_embed(None, "LOOKISM HXCC • FIGHTER", body, color=0xE11D48, image_url=image_url, footer="Card Collection")

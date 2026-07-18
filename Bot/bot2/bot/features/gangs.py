@@ -93,15 +93,15 @@ class GangInviteView(discord.ui.View):
 
         if not ok:
             await interaction.response.edit_message(
-                embed=_err(f"╭─ ❌ Invite Failed\n│ {result}\n╰────────────────"), view=self)
+                embed=_err(f"**❌ Invite Failed**\n{result}"), view=self)
             return
 
         if result == "declined":
             await interaction.response.edit_message(
-                embed=_inf(f"╭─ ❌ Invite Declined\n│ You declined to join **{self.gang_name}**.\n╰────────────────"), view=self)
+                embed=_inf(f"**❌ Invite Declined**\nYou declined to join **{self.gang_name}**."), view=self)
         else:
             await interaction.response.edit_message(
-                embed=_ok(f"╭─ ✅ Joined Gang!\n│ Welcome to **{self.gang_name}**!\n│ 👤 Role: Member\n╰────────────────"), view=self)
+                embed=_ok(f"**✅ Joined Gang!**\nWelcome to **{self.gang_name}**!\n👤 Role: Member"), view=self)
 
     @discord.ui.button(label="✅ Accept", style=discord.ButtonStyle.success, row=0)
     async def accept_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
@@ -200,15 +200,14 @@ class GangsCog(commands.Cog):
 
         ok, result = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"╭─ ❌ Gang Create Failed\n│ {result}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"**❌ Gang Create Failed**\n{result}"))
             return
         await smart_reply(interaction, embed=_ok(
-            f"╭─ ⚔️ Gang Created!\n"
-            f"│ Name: {result}\n"
-            f"│ 💰 Cost: -{GANG_CREATION_COST:,} coins\n"
-            f"│ 👑 Role: Head\n"
-            f"│ 📊 Members: 1/{MAX_MEMBERS}\n"
-            "╰────────────────"
+            f"**⚔️ Gang Created!**\n"
+            f"Name: {result}\n"
+            f"💰 Cost: -{GANG_CREATION_COST:,} coins\n"
+            f"👑 Role: Head\n"
+            f"📊 Members: 1/{MAX_MEMBERS}\n"
         ))
 
     # ── /gang info ────────────────────────────────────────────────
@@ -224,7 +223,7 @@ class GangsCog(commands.Cog):
             gid, gang = get_user_gang(data, str(interaction.user.id))
 
         if not gid or not isinstance(gang, dict):
-            await error_reply(interaction, embed=_err("╭─ ❌ Not Found\n│ Gang not found.\n╰────────────────"))
+            await error_reply(interaction, embed=_err("**❌ Not Found**\nGang not found."))
             return
 
         members = gang.get("members", []) or []
@@ -244,19 +243,17 @@ class GangsCog(commands.Cog):
                 a_gangs  = len(alliance.get("gang_ids", []))
                 a_trophy = compute_alliance_trophies(data, alliance)
                 alliance_block = (
-                    f"\n\n╭─ 🤝 Alliance\n"
-                    f"│ {alliance.get('name','?')}\n"
-                    f"│ {a_gangs} gangs  •  {a_trophy:,} 🏆\n"
-                    "╰────────────────"
+                    f"\n\n**🤝 Alliance**\n"
+                    f"{alliance.get('name','?')}\n"
+                    f"{a_gangs} gangs  •  {a_trophy:,} 🏆\n"
                 )
 
         body = (
-            f"╭─ ⚔️ {gang.get('name','?')}\n"
-            f"│ 👑 Head: <@{head_id}>\n"
-            f"│ 📊 Members: {len(members)}/{MAX_MEMBERS}\n"
-            f"│ {status_icon} Status: {status}\n"
-            f"│ 📜 {desc}\n"
-            "╰────────────────"
+            f"**⚔️ {gang.get('name','?')}**\n"
+            f"👑 Head: <@{head_id}>\n"
+            f"📊 Members: {len(members)}/{MAX_MEMBERS}\n"
+            f"{status_icon} Status: {status}\n"
+            f"📜 {desc}\n"
             + alliance_block
         )
         await smart_reply(interaction, embed=_inf(body))
@@ -297,16 +294,15 @@ class GangsCog(commands.Cog):
 
         ok, msg, iid, gang_name = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"╭─ ❌ Invite Failed\n│ {msg}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"**❌ Invite Failed**\n{msg}"))
             return
 
         view = GangInviteView(self.bot, iid, user.id, gang_name)
         embed = _inf(
-            f"╭─ 📨 Gang Invite\n"
-            f"│ From: {interaction.user.mention} → {user.mention}\n"
-            f"│ Gang: **{gang_name}**\n"
-            f"│ ⏳ Expires: 10 minutes\n"
-            "╰────────────────"
+            f"**📨 Gang Invite**\n"
+            f"From: {interaction.user.mention} → {user.mention}\n"
+            f"Gang: **{gang_name}**\n"
+            f"⏳ Expires: 10 minutes\n"
         )
         # Always try DM first, fallback to channel
         try:
@@ -320,11 +316,10 @@ class GangsCog(commands.Cog):
                 )
 
         await smart_reply(interaction, embed=_ok(
-            f"╭─ 📨 Invite Sent\n"
-            f"│ To: {user.mention}\n"
-            f"│ Gang: **{gang_name}**\n"
-            f"│ ⏳ Expires: 10 minutes\n"
-            "╰────────────────"
+            f"**📨 Invite Sent**\n"
+            f"To: {user.mention}\n"
+            f"Gang: **{gang_name}**\n"
+            f"⏳ Expires: 10 minutes\n"
         ))
 
     # ── /gang join ────────────────────────────────────────────────
@@ -356,13 +351,12 @@ class GangsCog(commands.Cog):
 
         ok, result = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"╭─ ❌ Join Failed\n│ {result}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"**❌ Join Failed**\n{result}"))
             return
         await smart_reply(interaction, embed=_ok(
-            f"╭─ ✅ Joined Gang!\n"
-            f"│ Welcome to **{result}**!\n"
-            f"│ 👤 Role: Member\n"
-            "╰────────────────"
+            f"**✅ Joined Gang!**\n"
+            f"Welcome to **{result}**!\n"
+            f"👤 Role: Member\n"
         ))
 
     # ── /gang leave ───────────────────────────────────────────────
@@ -389,13 +383,12 @@ class GangsCog(commands.Cog):
 
         ok, role, gang_name = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"╭─ ❌ Leave Failed\n│ {role}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"**❌ Leave Failed**\n{role}"))
             return
         await smart_reply(interaction, embed=_inf(
-            f"╭─ 👋 Left Gang\n"
-            f"│ You left **{gang_name}**\n"
-            f"│ Your role was: {role}\n"
-            "╰────────────────"
+            f"**👋 Left Gang**\n"
+            f"You left **{gang_name}**\n"
+            f"Your role was: {role}\n"
         ))
 
     # ── /gang kick ────────────────────────────────────────────────
@@ -429,13 +422,12 @@ class GangsCog(commands.Cog):
 
         ok, result, gang_name = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"╭─ ❌ Kick Failed\n│ {result}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"**❌ Kick Failed**\n{result}"))
             return
         await smart_reply(interaction, embed=_ok(
-            f"╭─ 🚫 Member Kicked\n"
-            f"│ @{result} removed from **{gang_name}**\n"
-            f"│ By: {interaction.user.mention}\n"
-            "╰────────────────"
+            f"**🚫 Member Kicked**\n"
+            f"@{result} removed from **{gang_name}**\n"
+            f"By: {interaction.user.mention}\n"
         ))
 
     # ── /gang promote ─────────────────────────────────────────────
@@ -473,14 +465,13 @@ class GangsCog(commands.Cog):
 
         ok, name, role_label = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"╭─ ❌ Promote Failed\n│ {name}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"**❌ Promote Failed**\n{name}"))
             return
         icon = ROLE_ICONS.get(role.value, "•")
         await smart_reply(interaction, embed=_ok(
-            f"╭─ ⬆️ Member Promoted\n"
-            f"│ @{name} → {icon} {role_label}\n"
-            f"│ By: {interaction.user.mention}\n"
-            "╰────────────────"
+            f"**⬆️ Member Promoted**\n"
+            f"@{name} → {icon} {role_label}\n"
+            f"By: {interaction.user.mention}\n"
         ))
 
     # ── /gang demote ──────────────────────────────────────────────
@@ -511,13 +502,12 @@ class GangsCog(commands.Cog):
 
         ok, result = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"╭─ ❌ Demote Failed\n│ {result}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"**❌ Demote Failed**\n{result}"))
             return
         await smart_reply(interaction, embed=_ok(
-            f"╭─ ⬇️ Member Demoted\n"
-            f"│ @{result} → 👤 Member\n"
-            f"│ By: {interaction.user.mention}\n"
-            "╰────────────────"
+            f"**⬇️ Member Demoted**\n"
+            f"@{result} → 👤 Member\n"
+            f"By: {interaction.user.mention}\n"
         ))
 
     # ── /gang members ─────────────────────────────────────────────
@@ -532,7 +522,7 @@ class GangsCog(commands.Cog):
         else:
             gid, gang = get_user_gang(data, str(interaction.user.id))
         if not gid or not isinstance(gang, dict):
-            await error_reply(interaction, embed=_err("╭─ ❌ Not Found\n│ Gang not found.\n╰────────────────"))
+            await error_reply(interaction, embed=_err("**❌ Not Found**\nGang not found."))
             return
 
         members = [str(m) for m in (gang.get("members") or [])]
@@ -544,9 +534,8 @@ class GangsCog(commands.Cog):
         members_sorted = sorted(members, key=role_sort)
         lines = [format_member_line(data, gang, uid) for uid in members_sorted]
         body  = (
-            f"╭─ 👥 {gang.get('name','?')} — Members ({len(members)}/{MAX_MEMBERS})\n"
-            + "\n".join(f"│ {l}" for l in lines)
-            + "\n╰────────────────"
+            f"**👥 {gang.get('name','?')} — Members ({len(members)}/{MAX_MEMBERS})**\n"
+            + "\n".join(lines)
         )
         await smart_reply(interaction, embed=_inf(body))
 
@@ -578,13 +567,12 @@ class GangsCog(commands.Cog):
 
         ok, result = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"╭─ ❌ Transfer Failed\n│ {result}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"**❌ Transfer Failed**\n{result}"))
             return
         await smart_reply(interaction, embed=_ok(
-            f"╭─ 👑 Ownership Transferred\n"
-            f"│ New Head: @{result}\n"
-            f"│ Previous Head: {interaction.user.mention}\n"
-            "╰────────────────"
+            f"**👑 Ownership Transferred**\n"
+            f"New Head: @{result}\n"
+            f"Previous Head: {interaction.user.mention}\n"
         ))
 
     # ── /gang set_description ─────────────────────────────────────
@@ -606,13 +594,12 @@ class GangsCog(commands.Cog):
 
         ok, result = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"╭─ ❌ Failed\n│ {result}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"**❌ Failed**\n{result}"))
             return
         await smart_reply(interaction, embed=_ok(
-            f"╭─ 📝 Description Updated\n"
-            f"│ **{result}**\n"
-            f'│ "{text}"\n'
-            "╰────────────────"
+            f"**📝 Description Updated**\n"
+            f"**{result}**\n"
+            f'"{text}"\n'
         ))
 
     # ── /gang set_status ──────────────────────────────────────────
@@ -638,14 +625,13 @@ class GangsCog(commands.Cog):
 
         ok, result = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"╭─ ❌ Failed\n│ {result}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"**❌ Failed**\n{result}"))
             return
         data = self.bot.storage.load()
         icon = e("unlock", data) if status.value == "open" else e("lock", data)
         await smart_reply(interaction, embed=_ok(
-            f"╭─ {icon} Gang Status Updated\n"
-            f"│ **{result}** → {status.value.title()}\n"
-            "╰────────────────"
+            f"**{icon} Gang Status Updated**\n"
+            f"**{result}** → {status.value.title()}\n"
         ))
 
     # ── /gang stats ───────────────────────────────────────────────
@@ -657,7 +643,7 @@ class GangsCog(commands.Cog):
         data = self.bot.storage.load()
         gid, gang = get_user_gang(data, str(interaction.user.id))
         if not gid or not isinstance(gang, dict):
-            await error_reply(interaction, embed=_err("╭─ ❌ Not in Gang\n│ You are not in a gang.\n╰────────────────"))
+            await error_reply(interaction, embed=_err("**❌ Not in Gang**\nYou are not in a gang."))
             return
         wins    = int(gang.get("wins", 0))
         losses  = int(gang.get("losses", 0))
@@ -673,13 +659,12 @@ class GangsCog(commands.Cog):
         created = int(gang.get("created_at", 0))
         days    = max(0, (now_ts() - created) // 86400)
         await smart_reply(interaction, embed=_inf(
-            f"╭─ 📊 Gang Stats — {gang.get('name','?')}\n"
-            f"│ 🏆 Total Trophies: {total_trophies:,}\n"
-            f"│ ⚔️ Wars Won: {wins}\n"
-            f"│ 💀 Wars Lost: {losses}\n"
-            f"│ 📈 Win Rate: {wr}\n"
-            f"│ 📅 Active Since: {days}d\n"
-            "╰────────────────"
+            f"**📊 Gang Stats — {gang.get('name','?')}**\n"
+            f"🏆 Total Trophies: {total_trophies:,}\n"
+            f"⚔️ Wars Won: {wins}\n"
+            f"💀 Wars Lost: {losses}\n"
+            f"📈 Win Rate: {wr}\n"
+            f"📅 Active Since: {days}d\n"
         ))
 
     # ── Autocomplete ──────────────────────────────────────────────

@@ -121,13 +121,12 @@ class MarketCog(commands.Cog):
         self.bot.storage.with_lock(mutate)
         stock_text = "∞ Unlimited" if stock == -1 else str(stock)
         body = (
-            f"╭─ ⭐ Featured Card Set\n"
-            f"│ {card_name}\n"
-            f"│ 💰 {price:,} coins\n"
-            f"│ 📦 Stock: {stock_text}\n"
-            f"│ 🌍 Arc: {arc}\n"
-            f"│ ⏳ {expires_hours}h\n"
-            "╰────────────────"
+            f"**⭐ Featured Card Set**\n"
+            f"{card_name}\n"
+            f"💰 {price:,} coins\n"
+            f"📦 Stock: {stock_text}\n"
+            f"🌍 Arc: {arc}\n"
+            f"⏳ {expires_hours}h\n"
         )
         embed = make_embed(None, "LOOKISM HXCC • MARKET", body, color=0xF39C12)
         await smart_reply(interaction, embed=embed, ephemeral=True)
@@ -176,13 +175,12 @@ class MarketCog(commands.Cog):
         self.bot.storage.with_lock(mutate)
         stock_text = "∞ Unlimited" if stock == -1 else str(stock)
         body = (
-            f"╭─ 🎁 Special Offer Set\n"
-            f"│ {card_name}\n"
-            f"│ 💰 {price:,} coins\n"
-            f"│ 📦 Stock: {stock_text}\n"
-            f"│ 🌍 Arc: {arc}\n"
-            f"│ ⏳ {expires_hours}h\n"
-            "╰────────────────"
+            f"**🎁 Special Offer Set**\n"
+            f"{card_name}\n"
+            f"💰 {price:,} coins\n"
+            f"📦 Stock: {stock_text}\n"
+            f"🌍 Arc: {arc}\n"
+            f"⏳ {expires_hours}h\n"
         )
         embed = make_embed(None, "LOOKISM HXCC • MARKET", body, color=0xE11D48)
         await smart_reply(interaction, embed=embed, ephemeral=True)
@@ -380,12 +378,11 @@ class MarketGroup(app_commands.Group):
             return
 
         body = (
-            f"╭─ ✅ Listed!\n"
-            f"│ {card_name}  [{result}]\n"
-            f"│ 💰 {price:,} coins\n"
-            f"│ 🌍 Arc: {arc}\n"
-            "│ Use /market browse to view\n"
-            "╰────────────────"
+            f"**✅ Listed!**\n"
+            f"{card_name}  [{result}]\n"
+            f"💰 {price:,} coins\n"
+            f"🌍 Arc: {arc}\n"
+            "Use /market browse to view\n"
         )
         embed = make_embed(None, "LOOKISM HXCC • MARKET", body, color=0x2ECC71)
         await smart_reply(interaction, embed=embed, ephemeral=True)

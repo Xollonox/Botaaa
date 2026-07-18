@@ -87,7 +87,7 @@ class TournamentCog(commands.Cog):
         uid  = str(interaction.user.id)
 
         if not t.get("active"):
-            await smart_reply(interaction, embed=_inf("╭─ ⚔️ No Active Tournament\n│ No tournament is running right now.\n╰────────────────"))
+            await smart_reply(interaction, embed=_inf("**⚔️ No Active Tournament**\nNo tournament is running right now."))
             return
 
         lb     = _get_leaderboard(t)
@@ -99,7 +99,7 @@ class TournamentCog(commands.Cog):
         for i, (uid2, name, xp) in enumerate(lb[:10]):
             if i >= len(PRIZE_SPLIT): break
             coins = int(pool * PRIZE_SPLIT[i])
-            prize_lines.append(f"│  {medals[i]}  {name:<18} {xp:,} XP   💰 {coins:,}")
+            prize_lines.append(f"  {medals[i]}  {name:<18} {xp:,} XP   💰 {coins:,}")
 
         my_entry   = t.get("participants", {}).get(uid)
         my_xp      = int(my_entry.get("xp_earned", 0)) if isinstance(my_entry, dict) else 0
@@ -108,19 +108,16 @@ class TournamentCog(commands.Cog):
 
         body = (
             f"{SEP}\n  ⚔️  {t.get('name','Tournament').upper()}\n{SEP}\n\n"
-            f"╭─ 📋 Tournament Info\n"
-            f"│  ⏳ Time Left:    {_time_left(int(t.get('end_time',0)))}\n"
-            f"│  💰 Entry Fee:   {int(t.get('entry_fee',0)):,} coins\n"
-            f"│  🏆 Prize Pool:  {pool:,} coins\n"
-            f"│  👥 Players:     {len(lb)} / {int(t.get('max_players',16))}\n"
-            f"╰────────────────────────────────\n\n"
-            f"╭─ 🏆 Leaderboard\n"
-            + ("\n".join(prize_lines) if prize_lines else "│  No participants yet.")
-            + "\n╰────────────────────────────────"
+            f"**📋 Tournament Info**\n"
+            f"  ⏳ Time Left:    {_time_left(int(t.get('end_time',0)))}\n"
+            f"  💰 Entry Fee:   {int(t.get('entry_fee',0)):,} coins\n"
+            f"  🏆 Prize Pool:  {pool:,} coins\n"
+            f"  👥 Players:     {len(lb)} / {int(t.get('max_players',16))}\n\n"
+            f"**🏆 Leaderboard**\n"
+            + ("\n".join(prize_lines) if prize_lines else "  No participants yet.")
             + (
-                f"\n\n╭─ 📊 Your Standing\n"
-                f"│  Rank #{my_rank}  •  {my_xp:,} XP earned\n"
-                "╰────────────────────────────────"
+                f"\n\n**📊 Your Standing**\n"
+                f"  Rank #{my_rank}  •  {my_xp:,} XP earned"
                 if in_tourney else ""
             )
         )
@@ -191,19 +188,18 @@ class TournamentCog(commands.Cog):
 
         ok, result = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"╭─ ❌ Join Failed\n│ {result}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"**❌ Join Failed**\n{result}"))
             return
 
         data = self.bot.storage.load()
         t    = _t_root(data)
         await smart_reply(interaction, embed=_ok(
-            f"╭─ ⚔️ Joined Tournament!\n"
-            f"│ {t.get('name','Tournament')}\n"
-            f"│ 💰 Entry fee: -{int(t.get('entry_fee',0)):,} coins\n"
-            f"│ 👥 You are player {result}/{int(t.get('max_players',16))}\n"
-            f"│ ⏳ {_time_left(int(t.get('end_time',0)))} remaining\n"
-            f"│ Use /tournament battle to earn XP!\n"
-            "╰────────────────"
+            f"**⚔️ Joined Tournament!**\n"
+            f"{t.get('name','Tournament')}\n"
+            f"💰 Entry fee: -{int(t.get('entry_fee',0)):,} coins\n"
+            f"👥 You are player {result}/{int(t.get('max_players',16))}\n"
+            f"⏳ {_time_left(int(t.get('end_time',0)))} remaining\n"
+            f"Use /tournament battle to earn XP!"
         ))
 
     # ── /tournament battle ────────────────────────────────────────
@@ -220,29 +216,28 @@ class TournamentCog(commands.Cog):
         t    = _t_root(data)
 
         if not t.get("active"):
-            await error_reply(interaction, embed=_err("╭─ ❌ No active tournament.\n╰────────────────"))
+            await error_reply(interaction, embed=_err("**❌ No active tournament.**"))
             return
 
         parts = t.get("participants", {}) or {}
         if uid not in parts:
-            await error_reply(interaction, embed=_err("╭─ ❌ You are not in this tournament.\n│ Use /tournament_join first.\n╰────────────────"))
+            await error_reply(interaction, embed=_err("**❌ You are not in this tournament.**\nUse /tournament_join first."))
             return
 
         # Check if already in battle
         from bot.utils.battle_state import create_battle_state
         battle_root = data.get("battle", {}).get("active_by_user", {})
         if str(battle_root.get(uid, "")):
-            await error_reply(interaction, embed=_err("╭─ ❌ You are already in a battle.\n╰────────────────"))
+            await error_reply(interaction, embed=_err("**❌ You are already in a battle.**"))
             return
 
         # Queue into tournament battle — uses same battle system
         # Mark as tournament battle type
         await smart_reply(interaction, embed=_inf(
-            f"╭─ ⚔️ Tournament Battle\n"
-            f"│ Searching for opponent...\n"
-            f"│ Only tournament participants\n"
-            f"│ Win XP counts toward leaderboard!\n"
-            "╰────────────────"
+            f"**⚔️ Tournament Battle**\n"
+            f"Searching for opponent...\n"
+            f"Only tournament participants\n"
+            f"Win XP counts toward leaderboard!"
         ))
 
         # Trigger the battle cog's queue with tournament flag
@@ -328,19 +323,18 @@ class TournamentCog(commands.Cog):
 
         ok, msg = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err(f"╭─ ❌ Failed\n│ {msg}\n╰────────────────"))
+            await error_reply(interaction, embed=_err(f"**❌ Failed**\n{msg}"))
             return
 
-        rank_line = f"│ 🏅 Min Rank: {min_rank_clean}\n" if min_rank_clean else ""
+        rank_line = f"🏅 Min Rank: {min_rank_clean}\n" if min_rank_clean else ""
         await smart_reply(interaction, embed=_ok(
-            f"╭─ ✅ Tournament Created!\n"
-            f"│ ⚔️ {name}\n"
-            f"│ ⏳ Duration: {duration_hours}h\n"
-            f"│ 💰 Entry: {entry_fee:,} coins\n"
-            f"│ 👥 Max: {max_players} players\n"
-            f"│ 🏆 Prize Pool: {prize_pool:,} coins\n"
+            f"**✅ Tournament Created!**\n"
+            f"⚔️ {name}\n"
+            f"⏳ Duration: {duration_hours}h\n"
+            f"💰 Entry: {entry_fee:,} coins\n"
+            f"👥 Max: {max_players} players\n"
+            f"🏆 Prize Pool: {prize_pool:,} coins\n"
             f"{rank_line}"
-            "╰────────────────"
         ), ephemeral=True)
 
         self._schedule_end(duration_hours * 3600)
@@ -372,17 +366,16 @@ class TournamentCog(commands.Cog):
 
         ok, count, refunded = self.bot.storage.with_lock(mutate)
         if not ok:
-            await error_reply(interaction, embed=_err("╭─ ❌ No active tournament.\n╰────────────────"))
+            await error_reply(interaction, embed=_err("**❌ No active tournament.**"))
             return
 
         if self._end_task and not self._end_task.done():
             self._end_task.cancel()
 
         await smart_reply(interaction, embed=_ok(
-            f"╭─ 🚫 Tournament Cancelled\n"
-            f"│ 💰 {count} players refunded\n"
-            f"│ 💰 {refunded:,} coins returned\n"
-            "╰────────────────"
+            f"**🚫 Tournament Cancelled**\n"
+            f"💰 {count} players refunded\n"
+            f"💰 {refunded:,} coins returned"
         ), ephemeral=True)
 
     async def _end_tournament(self) -> None:
@@ -413,16 +406,15 @@ class TournamentCog(commands.Cog):
 
         data = self.bot.storage.load()
         medals = [e("winner",data), "🥈", "🥉"] + [f"{i}." for i in range(4, 11)]
-        lines  = [f"│ {medals[i]} {pname:<18} {xp:,} XP  +{prize:,} 💰"
+        lines  = [f"{medals[i]} {pname:<18} {xp:,} XP  +{prize:,} 💰"
                   for i, (pname, xp, prize) in enumerate(results)]
 
         body = (
-            f"╭─ 🏁 Tournament Over!\n"
-            f"│ {name}\n"
-            f"│ 🏆 Pool: {pool:,} coins distributed\n"
-            "│\n"
+            f"**🏁 Tournament Over!**\n"
+            f"{name}\n"
+            f"🏆 Pool: {pool:,} coins distributed\n"
+            "\n"
             + "\n".join(lines)
-            + "\n╰────────────────"
         )
 
         # Announce in all battle channels (best effort)

@@ -113,9 +113,9 @@ def divider(data: dict[str, Any] | None = None, width: int = 18) -> str:
     return str(line) * max(3, width)
 
 def box(title: str, lines: list[str]) -> str:
-    """Format a ╭─ ... ╰──────────────── block matching the squad panel style."""
-    body = "\n".join(f"│ {l}" for l in lines)
-    return f"╭─ {title}\n{body}\n╰────────────────"
+    """Format a titled section as plain markdown: a bold header followed by lines."""
+    body = "\n".join(str(l) for l in lines)
+    return f"**{title}**\n{body}" if body else f"**{title}**"
 
 
 
@@ -179,11 +179,7 @@ def _prepare_description(data: dict[str, Any] | None, description: str) -> str:
 
 def _decorate_field_name(data: dict[str, Any] | None, name: Any) -> str:
     clean = _trim(name, 256)
-    if not clean:
-        return f"{e('box', data)} Panel"
-    if clean[0] in {"•", "▪", "▣", "◆", "◇"}:
-        return clean
-    return f"{e('box', data)} {clean}"
+    return clean or "Info"
 
 
 def _decorate_field_value(value: Any) -> str:

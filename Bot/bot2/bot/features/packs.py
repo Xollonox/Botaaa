@@ -694,11 +694,10 @@ class PacksCog(commands.Cog):
         pack = payload["pack"]
         pack_name = str(pack.get("name", "Pack"))
         body = (
-            f"╭─ 🎴 Packs Purchased!\n"
-            f"│ {pack_name}  ×{payload['quantity']}\n"
-            f"│ 💰 Cost: {int(payload['total_cost']):,} coins\n"
-            f"│ Use /packs to open them!\n"
-            "╰────────────────"
+            f"**🎴 Packs Purchased!**\n"
+            f"{pack_name}  ×{payload['quantity']}\n"
+            f"💰 Cost: {int(payload['total_cost']):,} coins\n"
+            f"Use /packs to open them!"
         )
         await smart_reply(interaction, embed=make_embed(data, f"{e('pack', data)} Pack Purchased", body))
 
