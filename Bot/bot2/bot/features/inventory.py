@@ -773,19 +773,32 @@ class InventoryCog(commands.Cog):
         unique_path, unique_path_desc = _resolve_field(
             card_def.get("unique_path"), card_def.get("unique_path_description")
         )
-        unique_skill, unique_skill_desc = _resolve_field(
-            card_def.get("unique_skill"), card_def.get("unique_skill_description")
-        )
-        unique_skill_2, unique_skill_2_desc = _resolve_field(card_def.get("unique_skill_2"))
-        unique_skill_3, unique_skill_3_desc = _resolve_field(card_def.get("unique_skill_3"))
-        mastery_list: list[str] = normalize_mastery_list(card_def.get("mastery", []) if isinstance(card_def, dict) else [])
+        # Support both singular fields and plural "unique_skills" list from cards.json
+        _skills_list = card_def.get("unique_skills", []) if isinstance(card_def, dict) else []
+        if isinstance(_skills_list, list) and _skills_list and not card_def.get("unique_skill"):
+            unique_skill, unique_skill_desc = _skills_list[0] if isinstance(_skills_list[0], (list, tuple)) else (_skills_list[0], ""), ""
+            unique_skill_2, unique_skill_2_desc = (_skills_list[1], "") if len(_skills_list) > 1 else ("", "")
+            unique_skill_3, unique_skill_3_desc = (_skills_list[2], "") if len(_skills_list) > 2 else ("", "")
+            if isinstance(unique_skill, str):
+                unique_skill_desc = ""
+            if isinstance(unique_skill_2, str):
+                unique_skill_2_desc = ""
+            if isinstance(unique_skill_3, str):
+                unique_skill_3_desc = ""
+        else:
+            unique_skill, unique_skill_desc = _resolve_field(
+                card_def.get("unique_skill"), card_def.get("unique_skill_description")
+            )
+            unique_skill_2, unique_skill_2_desc = _resolve_field(card_def.get("unique_skill_2"))
+            unique_skill_3, unique_skill_3_desc = _resolve_field(card_def.get("unique_skill_3"))
+        mastery_list: list[str] = normalize_mastery_list(card_def.get("mastery", card_def.get("masteries", [])) if isinstance(card_def, dict) else [])
         mastery_str = "  ".join(f"• {m}" for m in mastery_list) if mastery_list else "—"
 
         # Compute skill unlock thresholds
         skill_count = sum([
-            bool(card_def.get("unique_skill")),
-            bool(card_def.get("unique_skill_2")),
-            bool(card_def.get("unique_skill_3")),
+            bool(unique_skill and unique_skill != "—"),
+            bool(unique_skill_2 and unique_skill_2 != "—"),
+            bool(unique_skill_3 and unique_skill_3 != "—"),
         ])
         _skill_thresholds = {1: [3], 2: [3, 4], 3: [3, 4, 5]}.get(skill_count, [])
 
