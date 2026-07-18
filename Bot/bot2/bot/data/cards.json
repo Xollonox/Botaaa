@@ -9764,7 +9764,9 @@
     "ultimate": [
       "Silhouette Strike"
     ],
-    "defensive_moves": []
+    "defensive_moves": [],
+    "unique_path": "Silhouette Strike",
+    "unique_path_description": "Kitae ends the fight with a brutal, unreadable finishing strike."
   },
   "Diego Kang Idol of PTJ Company": {
     "name": "Diego Kang",
@@ -9846,6 +9848,8 @@
     "ultimate": [
       "Final Sequence"
     ],
-    "defensive_moves": []
+    "defensive_moves": [],
+    "unique_path": "Final Sequence",
+    "unique_path_description": "Diego ends the fight with a perfect invisible-strike sequence."
   }
 }
