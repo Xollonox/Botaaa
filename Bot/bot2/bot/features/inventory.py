@@ -869,9 +869,7 @@ class InventoryCog(commands.Cog):
             f"│ {'🔒 Status: Locked' if locked else '🔓 Status: Unlocked'}\n"
             f"│ {weapon_line}"
             "╰────────────────\n\n"
-            "╭─ Mastery\n"
-            f"│ {mastery_str}\n"
-            "╰────────────────\n\n"
+            + (f"╭─ Mastery\n│ {mastery_str}\n╰────────────────\n\n" if mastery_list else "")
             + skill_blocks + path_block
         ).rstrip()
         embed = make_embed(None, "LOOKISM HXCC • FIGHTER", body, color=0xE11D48, image_url=image_url, footer="Card Collection")

@@ -4876,7 +4876,6 @@
     "title": "Boy of Promise",
     "description": "",
     "rarity": "Epic",
-    "mastery": "Speed",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1508412491556720760/CB415CB0-7BAD-4913-8E19-56ADF10871BB.jpeg?ex=6a2bdb9a&is=6a2a8a1a&hm=cfc15a34a8423e89e006ab5d777f87c06520980f42fd33ade700bbdc5ea5b50a&",
     "stats": {
       "strength": 35,
@@ -4963,9 +4962,6 @@
       "Rapid Series",
       "Charging Advance"
     ],
-    "unique_skill": [
-      "IA"
-    ],
     "ultimate": [],
     "defensive_moves": []
   },
@@ -4974,7 +4970,6 @@
     "title": "Iron Boxer",
     "description": "",
     "rarity": "Epic",
-    "mastery": "Endurance",
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1508549646837088286/9FF554CA-5AB9-4C3C-BD7C-DDE02950999F.jpeg?ex=6a2bb297&is=6a2a6117&hm=e7b9c0f1409c6ca12b36a55cd76d083e05f5d65eb9e8b15ea3d34df6b6e26be0&",
     "stats": {
       "strength": 36,
@@ -5584,10 +5579,6 @@
     "title": "Imperfect Iron Fortess",
     "description": "",
     "rarity": "Epic",
-    "mastery": [
-      "Speed",
-      "Endurance"
-    ],
     "image_url": "https://cdn.discordapp.com/attachments/1482377747970916364/1513501180490289273/Picsart_26-06-08_16-39-05-951.png?ex=6a2be9d0&is=6a2a9850&hm=96755dcb0cf9fa88913a8486ec02245720b8190a8c5929a166a5aaab2606461a&",
     "stats": {
       "strength": 38,
