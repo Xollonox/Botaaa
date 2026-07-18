@@ -852,7 +852,7 @@ class InventoryCog(commands.Cog):
 
         body = (
             f"{heading}\n\n"
-            "╭─ Bio\n"
+            "╭─ Description\n"
             f"│ {bio or '—'}\n"
             "╰────────────────\n\n"
             "╭─ Combat Stats\n"

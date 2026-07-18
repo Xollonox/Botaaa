@@ -58,8 +58,8 @@ class EconomyCog(commands.Cog):
             (
                 f"**WALLET — {interaction.user.display_name}**\n\n"
                 "╭─ Currency\n"
-                f"│ Coins: {coins:,}\n"
-                f"│ Gems: {gems:,}\n"
+                f"│ 🪙 {coins:,}\n"
+                f"│ 💎 {gems:,}\n"
                 "╰────────────────"
             ),
             color=BALANCE_COLOR,
