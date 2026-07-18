@@ -80,7 +80,7 @@ Extensions load in this order in `main.py`:
 | tournament/league | `tournament`, `leaderboards` |
 | progression | `achievements`, `season` |
 | social | `gangs`, `alliance`, `gang_war` |
-| settings/admin | `server_settings`, `announce_owner`, `cards_admin`, `attacks_owner`, `confirm`, `emoji_panel` |
+| settings/admin | `server_settings`, `announce_owner`, `cards_admin`, `attacks_owner`, `emoji_panel` |
 
 ---
 
@@ -93,7 +93,6 @@ Extensions load in this order in `main.py`:
 | `/start` | Account creation / onboarding panel |
 | `/help` | Command browser with Battle Guide button |
 | `/tutorial` | Tutorial progress |
-| `/confirm` | Confirm pending action by ID |
 | `/profile` | Premium profile card with rival info |
 | `/collection` | Browse owned cards with filters/sorts/lock/upgrade |
 | `/upgrade` | Directly upgrade a fighter's star level via autocomplete (skips `/collection` browsing) |
@@ -421,13 +420,12 @@ When bot2 breaks:
 | `battle_views.py` | Battle button/select views |
 | `card_tools.py` | Card info, search, list |
 | `cards_admin.py` | Owner card catalog CRUD |
-| `confirm.py` | Generic confirm/cancel UI |
 | `economy.py` | Balance, reward claims |
 | `emoji_panel.py` | Server emoji config |
 | `gang_war.py` | Gang war queue/attack/status |
 | `gangs.py` | Gang CRUD, invites, roles |
 | `help_index.py` | Help command |
-| `inventory.py` | Collection browser, lock, upgrade |
+| `inventory.py` | Collection browser, lock, upgrade, `/upgrade` autocomplete |
 | `keystones.py` | Keystone equip/unequip |
 | `leaderboards.py` | Trophy/XP/CP leaderboards |
 | `market.py` | Market browse, add, buy, sell |

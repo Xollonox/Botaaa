@@ -55,8 +55,6 @@
     "used_unique_skills_by_char_uid": {uid: [attack_key]},
     "used_unique_path_by_char_uid": {uid: bool},
     "guard_broken_by_char_uid": {uid: bool},
-    "used_ultimate_count_by_side": {pid: int},
-    "used_ultimate_by_char_uid": {uid: bool},
     "last_move_group_by_side": {pid: "normal_or_defensive"|"special_like"},
 }
 
@@ -98,29 +96,28 @@ roll = random(lo, hi)
 # By move type:
 # Normal:         lo=x-5,  hi=x+5
 # Special:        lo=x+20, hi=x+45
-# Ultimate:       lo=3x,   hi=4x
-# Unique Skill:   lo=x+40, hi=x+80
-# Unique Path:    lo=x+40, hi=x+80
+# Unique Skill:   lo=3x,   hi=4x
+# Path:           lo=3x,   hi=4x
 ```
 
 ### Step 3: Strength Bonus
 ```python
 if strength > 100:
-    Normal: +20, Special/Unique: +30, Ultimate: +50
+    Normal: +20, Special: +30, Unique Skill/Path: +50
 elif Strength mastery:
-    Normal: +10, Special/Unique: +15, Ultimate: +30
+    Normal: +10, Special: +15, Unique Skill/Path: +30
 else: +0
 ```
 
 ### Step 4: Technique Multiplier
 
-| TEC | Normal | Special/Unique | Ultimate |
-|-----|--------|----------------|----------|
-| <50 | 1.04 | 1.06 | 1.10 |
-| 50-70 | 1.06 | 1.10 | 1.13 |
-| 71-90 | 1.08 | 1.12 | 1.15 |
-| 91-95 | 1.10 | 1.13 | 1.18 |
-| 96+ | 1.15 | 1.18 | 1.30 |
+| TEC | Normal | Special/Unique Skill/Path |
+|-----|--------|---------------------------|
+| <50 | 1.04 | 1.06 |
+| 50-70 | 1.06 | 1.10 |
+| 71-90 | 1.08 | 1.12 |
+| 91-95 | 1.10 | 1.13 |
+| 96+ | 1.15 | 1.18 |
 
 ### Step 5: Attacker IQ Scaling
 ```python
@@ -229,15 +226,14 @@ def _build_hp(stats, mastery):
 |--------|------|
 | Normal Attack | 10 |
 | Special | 20 |
-| Ultimate | 35 |
 | Unique Skill | 25 |
-| Unique Path | 25 |
+| Path | 25 |
 | Block/Dodge/Parry/Revert/Tank | 15 |
 
 ### Exhaustion
 - When stamina ≤ 0, fighter is **exhausted**
 - Exhausted = locked to **normal attacks only**
-- Cannot use specials, ultimates, skills, path attacks, or defenses
+- Cannot use specials, unique skills, path attacks, or defenses
 
 ---
 
@@ -286,15 +282,44 @@ delta = round(K * (1 - expected_win_probability | 0 - expected_win_probability))
 
 ---
 
-## 8. 🎯 Ultimate Usage Limit
+## 8. 🎯 Move Types & Rarity Slots
 
-```python
-def _ultimate_limit_for_team(team_size):
-    if team_size >= 4: return 3
-    if team_size == 3: return 2
-    return 1
-```
-Each fighter can only use **one ultimate** per battle (tracked by `used_ultimate_by_char_uid`).
+### Move Types
+| Move type    | Description                                              |
+|--------------|----------------------------------------------------------|
+| Normal       | Standard attack, low cost.                               |
+| Special      | Mid-power move with moderate stamina cost.               |
+| Unique Skill | High-power move for Legendary/Mythical+ cards (3x–4x scaling). |
+| Path         | High-power move exclusive to Infernal/Abyssal cards (3x–4x scaling). |
+
+### Move Slots by Rarity
+| Rarity              | Normal | Special | Unique Skill | Path |
+|---------------------|--------|---------|--------------|------|
+| Common              | 3      | 1       | —            | —    |
+| Rare                | 4      | 2       | —            | —    |
+| Epic                | 5      | 3       | 1 (if applicable) | —    |
+| Legendary / Mythical| 5      | 4       | ✓            | —    |
+| Infernal / Abyssal  | 5      | 4       | ✓            | ✓    |
+
+### Unique Skill Usage
+- Tracked per fighter in `used_unique_skills_by_char_uid`
+- Each unique skill can be used once per battle per fighter
+
+### Path Usage
+- Tracked per fighter in `used_unique_path_by_char_uid`
+- Can be used once per battle per fighter
+- Only available to Infernal/Abyssal rarity cards
+
+---
+
+## 8b. 🔥 Conviction Mastery
+
+When a fighter with **Conviction Mastery** drops to ≤25% HP, their STR, SPD, and END are permanently doubled for the rest of the battle. This triggers once and does not reset.
+
+- **Activation condition:** `current_hp <= hp_max * 0.25`
+- **Stats doubled:** `strength`, `speed`, `endurance`
+- **One-time trigger** per fighter per battle (tracked by flag)
+- Does **not** reset on swap-out or heal
 
 ---
 
@@ -322,7 +347,7 @@ def _cpu_pick_move(personality, available_moves, fighter_hp%, enemy_hp%, stamina
     if personality == "Aggressive":   → highest power move available
     if personality == "Defensive":     → block/dodge when damaged
     if personality == "Trickster":     → unpredictable, dodge when healthy
-    if personality == "Finisher":      → save ultimate for low enemy HP
+    if personality == "Finisher":      → save unique skill for low enemy HP
     if "Balanced":                     → mixed offense/defense
 ```
 
@@ -443,16 +468,16 @@ The `cards.json` source file was missing `iq` and `battle_iq` fields in the `sta
 - Canonical types, case, whitespace, hyphens, unknown fallback, switch/forfeit
 
 **Damage Calc:** 6 tests
-- Basic normal, zero defense, zero power, high defense, special uses TEC, ultimate uses BIQ, stat scaling
+- Basic normal, zero defense, zero power, high defense, special uses TEC, unique skill uses scaling, stat scaling
 
 **Defense Reduction:** 6 tests
 - Block (40%), Parry (20%), Revert (60%), Dodge (50% RNG), zero handling, no defense
 
 **Technique Bonus:** 6 tests
-- Low/normal/ultimate/special, boundary checks at 50 and 90
+- Low/normal/unique skill/special, boundary checks at 50 and 90
 
 **Strength Bonus:** 6 tests
-- Low STR no bonus, mastery normal/ultimate, over-100 normal/ultimate, defense type
+- Low STR no bonus, mastery normal/unique skill, over-100 normal/unique skill, defense type
 
 **HP:** 4 tests
 - Basic, endurance mastery, other mastery, minimum
@@ -460,8 +485,8 @@ The `cards.json` source file was missing `iq` and `battle_iq` fields in the `sta
 **Rank from Trophies:** 9 parametrized tests
 - All 9 rank thresholds
 
-**Ultimate Limit:** 5 tests
-- 1, 2, 3, 4, 5+ team sizes
+**Move Slot Limits:** 5 tests
+- Rarity-based move slot verification
 
 **ELO Delta:** 5 tests
 - Equal win/loss, low rank, high rank, underdog bonus
@@ -470,7 +495,7 @@ The `cards.json` source file was missing `iq` and `battle_iq` fields in the `sta
 - Equal draw, equal win, higher wins, lower wins, draw with diff
 
 **Stat Damage:** 9 tests
-- Returns damage+detail, high BIQ avoids miss, low BIQ can miss, special>normal, ultimate>special, miss=zero, IQ boost, mastery boost
+- Returns damage+detail, high BIQ avoids miss, low BIQ can miss, special>normal, unique skill>special, miss=zero, IQ boost, mastery boost
 
 ### test_typing_matchup.py (17 tests)
 - Normalization (case, caps at 2, unknown dropped, CSV/slash input)

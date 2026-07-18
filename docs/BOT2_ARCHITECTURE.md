@@ -30,6 +30,7 @@
 |------|-------|------------|
 | `battle.py` | 2922 | **HIGHEST** — queue, turn system, CPU AI, rewards |
 | `battle_views.py` | 310 | UI components (selects, buttons, views) |
+| `battle_embeds.py` | — | Battle stat/status embeds using ╭─│╰ box style |
 | `battle_helpers.py` | 230 | CPU AI personalities, move normalization |
 | `packs_panel.py` | 590 | Pack animation, open/reveal, post-reveal actions |
 | `market_views.py` | 280 | Market browser, buy confirmation |
@@ -41,7 +42,7 @@
 | `season.py` | 600 | Season pass + missions |
 | `gang_war.py` | 520 | Full war system |
 | `gangs.py` | 420 | Gang management |
-| `inventory.py` | 600 | Card collection browser |
+| `inventory.py` | 600 | Card collection browser, `/upgrade` direct star upgrade via autocomplete |
 | `squad.py` | 400 | Squad management panel |
 | `announce_owner.py` | 250 | Background loops (COTD, bounty) |
 | `onboarding.py` | 300 | /start, /help, terms, paginator |
@@ -138,12 +139,11 @@ LookismBot.__init__()
 25. server_settings — (none)
 26. announce_owner  — server_settings
 27. attacks_owner   — cards_admin
-28. confirm         — (none)
-29. packs_panel     — packs
-30. emoji_panel     — (none)
-31. gang_war        — gangs, battle
-32. keystones       — cards_admin
-33. weapons         — inventory, cards_admin
+28. packs_panel     — packs
+29. emoji_panel     — (none)
+30. gang_war        — gangs, battle
+31. keystones       — cards_admin
+32. weapons         — inventory, cards_admin
 ```
 
 ---
@@ -257,7 +257,7 @@ battle_state = {
             "stamina_max": 100,
             "stats": {"uid1": {"strength": 50, ...}, ...},
             "fighter_names": {"uid1": "James Lee", ...},
-            "mastery_by_uid": {"uid1": ["speed"], ...},
+            "mastery_by_uid": {"uid1": ["speed"], ...},  # Includes Conviction mastery
             "assigned_attacks_by_uid": {"uid1": {...}},
             "passives_by_uid": {"uid1": [...]},
             "is_cpu": False,
@@ -274,7 +274,7 @@ battle_state = {
     "used_defenses_by_char_uid": {},
     "used_unique_skills_by_char_uid": {},
     "guard_broken_by_char_uid": {},
-    "used_ultimate_count_by_side": {},
+    "used_path_count_by_side": {},
     "created_at": timestamp,
     "turn_started_at": timestamp,
     "coin_reward": 0,
@@ -310,7 +310,7 @@ apply_move(data, battle_id, actor_id, move_type, value)
 │
 ├── 5. Attack
 │       - Check stamina > 0 (exhausted = normal only)
-│       - Check usage rules (ultimate limit, unique skill once, etc.)
+│       - Check usage rules (path limit, unique skill once, etc.)
 │       - Deduct stamina (10/20/35/25 based on move)
 │       - compute_attack_damage()
 │       - apply_defense()
@@ -326,8 +326,14 @@ apply_move(data, battle_id, actor_id, move_type, value)
 | **Aggressive** | Always use highest-power move available |
 | **Defensive** | Block when HP < 70%, dodge when HP < 50% |
 | **Trickster** | Dodge when healthy, unpredictable attacks |
-| **Finisher** | Save ultimate for when enemy HP < 30% |
+| **Finisher** | Save path move for when enemy HP < 30% |
 | **Balanced** | Mix of offense and defense |
+
+### Move Types
+Valid move types are: **Normal**, **Special**, **Unique Skill**, **Path**.
+
+### Battle UI Rendering
+All battle UI (including `build_battle_stats_embed`) now uses description-based ╭─│╰ box styling instead of Discord embed fields. This provides consistent formatting across all battle displays.
 
 ---
 
@@ -460,7 +466,7 @@ Queue → Match Found → Prep Phase (5 min)
 | On Fire | Silver | 300 | Win 5 in a row |
 | Card Collector | Diamond | 2000 | Own all 26 cards |
 | Ruby Tier | Diamond | 1500 | Reach Ruby rank |
-| Ultimate Striker | Silver | 250 | Land 10 ultimates |
+| Path Striker | Silver | 250 | Land 10 path moves |
 | Perfect Defender | Silver | 200 | Block 10 attacks |
 | Big Spender | Gold | 400 | Spend 100k coins |
 
