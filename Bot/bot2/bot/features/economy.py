@@ -12,7 +12,7 @@ from bot.config import OWNER_GUILD_ID
 from bot.utils.checks import ensure_registered, is_owner, is_registered
 from bot.utils.economy_logic import add_balance, add_premium, cooldown_remaining, fmt_duration
 from bot.utils.timeutil import now_ts
-from bot.utils.ui import e, make_embed
+from bot.utils.ui import e, make_embed, dot_panel, fancy
 from bot.utils.interaction_visibility import smart_reply, error_reply
 OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
@@ -55,13 +55,10 @@ class EconomyCog(commands.Cog):
         embed = make_embed(
             None,
             "LOOKISM HXCC • WALLET",
-            (
-                f"**WALLET — {interaction.user.display_name}**\n\n"
-                "╭─ Currency\n"
-                f"│ Coins: {coins:,}\n"
-                f"│ Gems: {gems:,}\n"
-                "╰────────────────"
-            ),
+            dot_panel("WALLET", [
+                f"Coins › {coins:,}",
+                f"Gems › {gems:,}",
+            ]),
             color=BALANCE_COLOR,
             footer="Economy",
         )

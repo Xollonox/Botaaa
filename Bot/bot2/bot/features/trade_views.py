@@ -11,7 +11,7 @@ from bot.data.constants import rarity_icon as _ri
 from bot.utils.interaction_visibility import error_reply
 from bot.utils.squad_logic import get_player
 from bot.utils.timeutil import now_ts
-from bot.utils.ui import make_embed
+from bot.utils.ui import dot_panel, fancy, make_embed
 
 if TYPE_CHECKING:
     from bot.features.trades import TradesCog
@@ -118,7 +118,7 @@ def _panel_embed(session: dict[str, Any], locked_a: bool, locked_b: bool) -> dis
         if card:
             rarity = str(card.get("rarity", ""))
             name   = str(card.get("card_name", "?"))
-            line   = f"{_ri(rarity)} {name}\n│   [{rarity}]"
+            line   = f"{_ri(rarity)} {name}\n│ [{rarity}]"
         elif coins and coins > 0:
             line = f"💰 {coins:,} coins"
         else:
@@ -137,16 +137,14 @@ def _panel_embed(session: dict[str, Any], locked_a: bool, locked_b: bool) -> dis
     else:
         status = "⏳ Both sides choose what to offer..."
 
-    body = (
-        f"╭─ 🔄 Trade Negotiation\n"
-        f"│ @{a_name}  ←→  @{b_name}\n"
-        f"│\n"
-        f"│ @{a_name} offers:        @{b_name} offers:\n"
-        f"│ {a_text:<28} {b_text}\n"
-        f"│\n"
-        f"│ {status}\n"
-        "╰────────────────"
-    )
+    body = dot_panel("TRADE NEGOTIATION", [
+        f"🔄 @{a_name}  ←→  @{b_name}",
+        "",
+        f"@{a_name} offers:        @{b_name} offers:",
+        f"{a_text:<28} {b_text}",
+        "",
+        status,
+    ])
     color = 0x2ECC71 if (locked_a and locked_b) else 0x3498DB
     return make_embed(None, "LOOKISM HXCC • TRADE", body, color=color, footer="10 minute session • Rules enforced")
 
@@ -331,7 +329,7 @@ class TradePanel(discord.ui.View):
         self.cog.unregister_panel(self)
         if self.message:
             try:
-                e = make_embed(None, "LOOKISM HXCC • TRADE", "╭─ ⏰ Trade Expired\n│ Session timed out.\n╰────────────────", color=0x636E72)
+                e = make_embed(None, "LOOKISM HXCC • TRADE", dot_panel("TRADE EXPIRED", ["⏰ Session timed out."]), color=0x636E72)
                 await self.message.edit(embed=e, view=None)
             except Exception:
                 logger.exception("Failed to edit expired trade panel message")
@@ -438,7 +436,7 @@ class TradePanel(discord.ui.View):
         await self.cog.bot.trade_service.remove_pending_pair(self.a_id, self.b_id, mirror_json=False)
         self.cog.unregister_panel(self)
         self.stop()
-        e = make_embed(None, "LOOKISM HXCC • TRADE", f"╭─ 🚫 Trade Cancelled\n│ Cancelled by @{interaction.user.name}\n╰────────────────", color=0xE74C3C)
+        e = make_embed(None, "LOOKISM HXCC • TRADE", dot_panel("TRADE CANCELLED", [f"🚫 Cancelled by @{interaction.user.name}"]), color=0xE74C3C)
         await interaction.response.edit_message(embed=e, view=None)
 
 
@@ -565,12 +563,10 @@ class ConfirmView(discord.ui.View):
 
         a_gave = f"{_ri(s['a_card']['rarity'])} {s['a_card']['card_name']}" if s.get("a_card") else f"💰 {int(s.get('a_coins',0)):,} coins"
         b_gave = f"{_ri(s['b_card']['rarity'])} {s['b_card']['card_name']}" if s.get("b_card") else f"💰 {int(s.get('b_coins',0)):,} coins"
-        body = (
-            f"╭─ ✅ Trade Complete!\n"
-            f"│ @{s['a_name']} gave:  {a_gave}\n"
-            f"│ @{s['b_name']} gave:  {b_gave}\n"
-            "╰────────────────"
-        )
+        body = dot_panel("TRADE COMPLETE", [
+            f"✅ @{s['a_name']} gave:  {a_gave}",
+            f"@{s['b_name']} gave:  {b_gave}",
+        ])
         embed = make_embed(None, "LOOKISM HXCC • TRADE", body, color=0x2ECC71)
         await interaction.response.edit_message(embed=embed, view=None)
 
@@ -599,14 +595,14 @@ class ConfirmView(discord.ui.View):
         await self.cog.bot.trade_service.remove_pending_pair(self.panel.a_id, self.panel.b_id, mirror_json=False)
         self.cog.unregister_panel(self.panel)
         self.stop()
-        e = make_embed(None, "LOOKISM HXCC • TRADE", f"╭─ 🚫 Trade Cancelled\n│ Cancelled by @{interaction.user.name}\n╰────────────────", color=0xE74C3C)
+        e = make_embed(None, "LOOKISM HXCC • TRADE", dot_panel("TRADE CANCELLED", [f"🚫 Cancelled by @{interaction.user.name}"]), color=0xE74C3C)
         await interaction.response.edit_message(embed=e, view=None)
 
 
 def _history_embed_rows(user_id: str, username: str, rows: list[dict[str, Any]]) -> discord.Embed:
     mine = list(rows[:20])
     if not mine:
-        body = "╭─ 📜 Trade History\n│ No trades yet.\n╰────────────────"
+        body = dot_panel("TRADE HISTORY", ["No trades yet."])
         return make_embed(None, "LOOKISM HXCC • TRADE", body, color=0x2B2D31)
 
     STATUS_ICONS = {"accepted": "✅", "declined": "❌", "cancelled": "🚫", "expired": "⏰"}
@@ -617,7 +613,7 @@ def _history_embed_rows(user_id: str, username: str, rows: list[dict[str, Any]])
         ts    = int(h.get("resolved_at", h.get("created_at", 0)))
         a_gave = f"{h['a_card']['card_name']}" if h.get("a_card") else f"💰{int(h.get('a_coins',0)):,}"
         b_gave = f"{h['b_card']['card_name']}" if h.get("b_card") else f"💰{int(h.get('b_coins',0)):,}"
-        lines.append(f"│ {i}. {icon} {a_gave} ↔ {b_gave}  •  @{other}  •  {_ago(ts)}")
+        lines.append(f"{i}. {icon} {a_gave} ↔ {b_gave}  •  @{other}  •  {_ago(ts)}")
 
-    body = f"╭─ 📜 Trade History — @{username}\n" + "\n".join(lines) + "\n╰────────────────"
+    body = dot_panel(f"TRADE HISTORY — @{username}", lines)
     return make_embed(None, "LOOKISM HXCC • TRADE", body, color=0x2B2D31, footer="Last 10 trades")

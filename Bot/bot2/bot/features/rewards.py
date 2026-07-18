@@ -15,7 +15,7 @@ from bot.utils.checks import ensure_registered
 from bot.utils.economy_logic import cooldown_remaining, fmt_duration
 from bot.utils.interaction_visibility import error_reply
 from bot.utils.timeutil import now_ts
-from bot.utils.ui import make_embed
+from bot.utils.ui import dot_panel, fancy, make_embed
 from bot.features.tutorial import advance_tutorial
 
 REWARD_COOLDOWNS = {
@@ -157,9 +157,7 @@ class RewardCardActionView(discord.ui.View):
             footer="Rewards",
             body=(
                 "**CARD SOLD**\n\n"
-                "╭─ Sale\n"
-                f"│ Coins Earned: +{sold_for:,}\n"
-                "╰────────────────"
+                + dot_panel("SALE", [f"💰 Coins Earned: +{sold_for:,}"])
             ),
             color=HOURLY_COLOR,
         )
@@ -227,10 +225,7 @@ class RewardCardActionView(discord.ui.View):
             footer="Rewards",
             body=(
                 "**SQUAD UPDATED**\n\n"
-                "╭─ Status\n"
-                "│ Card added to squad\n"
-                "│ Use /squad to manage your formation\n"
-                "╰────────────────"
+                + dot_panel("STATUS", ["✅ Card added to squad", "Use /squad to manage your formation"])
             ),
             color=DAILY_COLOR,
         )
@@ -273,9 +268,7 @@ class RewardsCog(commands.Cog):
                 footer="Rewards",
                 body=(
                     "**HOURLY REWARD**\n\n"
-                    "╭─ Cooldown\n"
-                    f"│ Remaining: {fmt_duration(remaining)}\n"
-                    "╰────────────────"
+                    + dot_panel("COOLDOWN", [f"⏳ Remaining: {fmt_duration(remaining)}"])
                 ),
                 color=HOURLY_COLOR,
             )
@@ -287,11 +280,11 @@ class RewardsCog(commands.Cog):
             footer="Rewards",
             body=(
                 "**HOURLY REWARD**\n\n"
-                "╭─ Reward\n"
-                "│ Coins Earned: +100\n"
-                f"│ New Balance: {new_balance:,}\n"
-                "╰────────────────\n\n"
-                "Next Hourly: 1h"
+                + dot_panel("REWARD", [
+                    "💰 Coins Earned: +100",
+                    f"💰 New Balance: {new_balance:,}",
+                ])
+                + "\n\nNext Hourly: 1h"
             ),
             color=HOURLY_COLOR,
         )
@@ -397,9 +390,7 @@ class RewardsCog(commands.Cog):
                 footer=footer,
                 body=(
                     f"**{heading}**\n\n"
-                    "╭─ Cooldown\n"
-                    f"│ Remaining: {fmt_duration(remaining)}\n"
-                    "╰────────────────"
+                    + dot_panel("COOLDOWN", [f"⏳ Remaining: {fmt_duration(remaining)}"])
                 ),
                 color=color,
             )
@@ -408,26 +399,27 @@ class RewardsCog(commands.Cog):
 
         if coins_path:
             # Build streak info for daily rewards
-            streak_info = ""
+            streak_lines: list[str] = []
             if reward_type == "daily" and streak > 0:
-                streak_info = f"\n│ 🔥 Login Streak: {streak} days"
+                streak_lines.append(f"🔥 Login Streak: {streak} days")
                 if multiplier > 1.0:
                     bonus_pct = int((multiplier - 1.0) * 100)
-                    streak_info += f"\n│ ✨ Streak Bonus: +{bonus_pct}%"
+                    streak_lines.append(f"✨ Streak Bonus: +{bonus_pct}%")
                 # Check for milestones
                 if streak in [3, 7, 14, 30]:
-                    streak_info += f"\n│ 🎉 Milestone Reached: {streak} days!"
+                    streak_lines.append(f"🎉 Milestone Reached: {streak} days!")
+
+            reward_lines = [
+                f"💰 Coins: +{granted_coins:,}",
+                f"💰 New Balance: {new_balance:,}",
+            ] + streak_lines
 
             embed = _reward_embed(
                 panel=panel,
                 footer=footer,
                 body=(
                     f"**{heading.replace('CARD OBTAINED', 'COINS OBTAINED').replace('Card Obtained', 'Coins Obtained')}**\n\n"
-                    "╭─ Reward\n"
-                    f"│ Coins: +{granted_coins:,}\n"
-                    f"│ New Balance: {new_balance:,}"
-                    f"{streak_info}\n"
-                    "╰────────────────"
+                    + dot_panel("REWARD", reward_lines)
                 ),
                 color=color,
             )
@@ -440,27 +432,28 @@ class RewardsCog(commands.Cog):
             image_url = "https://placehold.co/512x512/png?text=LOOKISM+CARD"
 
         # Build streak info for daily rewards
-        streak_info = ""
+        streak_lines: list[str] = []
         if reward_type == "daily" and streak > 0:
-            streak_info = f"\n│ 🔥 Login Streak: {streak} days"
+            streak_lines.append(f"🔥 Login Streak: {streak} days")
             if multiplier > 1.0:
                 bonus_pct = int((multiplier - 1.0) * 100)
-                streak_info += f"\n│ ✨ Streak Bonus: +{bonus_pct}%"
+                streak_lines.append(f"✨ Streak Bonus: +{bonus_pct}%")
             # Check for milestones
             if streak in [3, 7, 14, 30]:
-                streak_info += f"\n│ 🎉 Milestone Reached: {streak} days!"
+                streak_lines.append(f"🎉 Milestone Reached: {streak} days!")
+
+        card_lines = [
+            f"🎁 {card_name}",
+            f"Rarity: {pulled_rarity}",
+            "Stars: ☆☆☆☆☆",
+        ] + streak_lines
 
         embed = _reward_embed(
             panel=panel,
             footer=footer,
             body=(
                 f"**{heading}**\n\n"
-                "╭─ Card\n"
-                f"│ {card_name}\n"
-                f"│ Rarity: {pulled_rarity}\n"
-                "│ Stars: ☆☆☆☆☆"
-                f"{streak_info}\n"
-                "╰────────────────"
+                + dot_panel("CARD", card_lines)
             ),
             color=color,
         )
