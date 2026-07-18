@@ -430,7 +430,7 @@ class ShopPages(discord.ui.View):
 
         if not filtered:
             header = box("Filters", [f"Showing: {filter_label}", f"Sort: {sort_label}", "No packs match this filter."])
-            return make_embed(data, f"{e('shop', data)} Shop", wallet_block + "\n\n" + header)
+            return make_embed(data, f"{e('shop', data)} Shop", wallet_block + "\n" + header)
 
         start = self.page * self.page_size
         rows = filtered[start : start + self.page_size]
@@ -445,7 +445,7 @@ class ShopPages(discord.ui.View):
             pack_lines = [f"💰 Price: {price:,} coins"]
             blocks.append(box(f"{e('pack', data)} {marker}{pack.get('name', 'Pack')}", pack_lines))
 
-        return make_embed(data, f"{e('shop', data)} Shop", "\n\n".join(blocks))
+        return make_embed(data, f"{e('shop', data)} Shop", "\n".join(blocks))
 
 
 

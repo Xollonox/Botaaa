@@ -32,7 +32,7 @@ BATTLE_ERROR_TEXT = {
     "attack_missing": "That move is not available for your current fighter.",
     "no_uses_left": "That move has no uses left for this battle.",
     "defense_already_used": "That defense type is already consumed for this fighter. Pick a different defense or attack.",
-    "must_use_normal_or_defensive_first": "You cannot chain Special, Ultimate, Skill, or Path moves back-to-back. Use a normal or defense first.",
+    "must_use_normal_or_defensive_first": "You cannot chain Special, Unique Skill, or Path moves back-to-back. Use a normal or defense first.",
     "unique_skill_already_used": "That unique skill was already used by this fighter in this battle.",
     "unique_path_already_used": "That path move was already used by this fighter in this battle.",
     "ultimate_limit_reached": "Your team has reached its ultimate quota for this match.",
@@ -195,7 +195,7 @@ def normalize_card_moves(card: dict[str, Any]) -> dict[str, list[str]]:
     out = {
         "normal": [],
         "special": [],
-        "ultimate": [],
+        "unique_skill": [],
         "unique_skill": [],
         "unique_path": [],
         "defensive": [],
@@ -203,7 +203,7 @@ def normalize_card_moves(card: dict[str, Any]) -> dict[str, list[str]]:
 
     out["normal"] = norm_lines(moves.get("normal", []))
     out["special"] = norm_lines(moves.get("special", []))
-    out["ultimate"] = norm_lines(moves.get("ultimate", []))
+    out["unique_skill"] = norm_lines(moves.get("unique_skill", []))
     out["unique_skill"] = norm_lines(moves.get("unique_skill", []))
     out["unique_path"] = norm_lines(moves.get("unique_path", []))
     out["defensive"] = norm_lines(moves.get("defensive", []))
@@ -212,8 +212,8 @@ def normalize_card_moves(card: dict[str, Any]) -> dict[str, list[str]]:
         out["normal"] = norm_lines(c.get("normal_moves", [])) or norm_lines(c.get("attacks", [])) or norm_lines(c.get("moves_normal", [])) or norm_lines(c.get("moves_normal_text", ""))
     if not out["special"]:
         out["special"] = norm_lines(c.get("special_moves", [])) or norm_lines(c.get("special", []))
-    if not out["ultimate"]:
-        out["ultimate"] = norm_lines(c.get("ultimate_moves", [])) or norm_lines(c.get("ultimate", []))
+    if not out["unique_skill"]:
+        out["unique_skill"] = norm_lines(c.get("ultimate_moves", [])) or norm_lines(c.get("unique_skill", []))
     if not out["unique_skill"]:
         out["unique_skill"] = norm_lines(c.get("unique_skill_moves", [])) or norm_lines(c.get("unique_skill", []))
     if not out["unique_path"]:
@@ -224,7 +224,7 @@ def normalize_card_moves(card: dict[str, Any]) -> dict[str, list[str]]:
     if not out["defensive"]:
         out["defensive"] = ["Block", "Dodge", "Revert", "Parry", "Tank"]
 
-    if not any(out[k] for k in ("normal", "special", "ultimate", "unique_skill", "unique_path")):
+    if not any(out[k] for k in ("normal", "special", "unique_skill", "unique_skill", "unique_path")):
         out["normal"] = ["Basic Strike"]
 
     return out

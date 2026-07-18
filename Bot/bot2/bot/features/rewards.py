@@ -290,7 +290,7 @@ class RewardsCog(commands.Cog):
                 "╭─ Reward\n"
                 "│ Coins Earned: +100\n"
                 f"│ New Balance: {new_balance:,}\n"
-                "╰────────────────\n\n"
+                "╰────────────────\n"
                 "Next Hourly: 1h"
             ),
             color=HOURLY_COLOR,

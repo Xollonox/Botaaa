@@ -40,14 +40,13 @@ OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
 
 RARITY_CHOICES = ["Common", "Rare", "Epic", "Legendary", "Mythical", "Infernal", "Abyssal"]
-MASTERY_CHOICES = ["Strength", "Speed", "Endurance", "Technique", "IQ", "BIQ", "None"]
-MOVE_TYPE_CHOICES = ["Normal", "Special", "Unique Skill", "Ultimate", "Path Attack"]
+MASTERY_CHOICES = ["Strength", "Speed", "Endurance", "Technique", "IQ", "BIQ", "Conviction", "None"]
+MOVE_TYPE_CHOICES = ["Normal", "Special", "Unique Skill", "Path"]
 MOVE_LIMITS = {
     "Normal": 5,
     "Special": 4,
     "Unique Skill": 3,
-    "Ultimate": 1,
-    "Path Attack": 1,
+    "Path": 2,
 }
 
 
@@ -157,7 +156,7 @@ def _to_storage_card(payload: dict[str, Any]) -> dict[str, Any]:
     # compatibility attack mirrors
     card["attacks"] = [str(m.get("name", "")) for m in card.get("normal_moves", []) if isinstance(m, dict)]
     card["special"] = [str(m.get("name", "")) for m in card.get("special_moves", []) if isinstance(m, dict)]
-    card["ultimate"] = [str(card["ultimate_move"].get("name", ""))] if isinstance(card.get("ultimate_move"), dict) else []
+    card["unique_skill"] = [str(card["ultimate_move"].get("name", ""))] if isinstance(card.get("ultimate_move"), dict) else []
     card["path_attack_name"] = str(card.get("path_attack", {}).get("name", "")) if isinstance(card.get("path_attack"), dict) else ""
     return card
 
@@ -169,7 +168,7 @@ def _move_bucket(payload: dict[str, Any], move_type: str) -> tuple[list[dict[str
         return payload["special_moves"], "special_moves"
     if move_type == "Unique Skill":
         return payload["unique_skill_moves"], "unique_skill_moves"
-    if move_type == "Ultimate":
+    if move_type == "Unique Skill":
         return None, "ultimate_move"
     return None, "path_attack"
 
@@ -396,7 +395,7 @@ class CardSelect(discord.ui.Select):
 
 class AddMoveModal(discord.ui.Modal, title="Add Move"):
     move_name = discord.ui.TextInput(label="Move Name", max_length=80)
-    move_type = discord.ui.TextInput(label="Move Type", placeholder="Normal/Special/Unique Skill/Ultimate/Path Attack", max_length=32)
+    move_type = discord.ui.TextInput(label="Move Type", placeholder="Normal/Special/Unique Skill/Path", max_length=32)
     move_dialogue = discord.ui.TextInput(label="Move Dialogue", style=discord.TextStyle.paragraph, max_length=500)
     move_animation = discord.ui.TextInput(label="Move Animation", required=False, max_length=120)
 
@@ -438,7 +437,7 @@ class AddMoveModal(discord.ui.Modal, title="Add Move"):
 
 
 class EditMoveModal(discord.ui.Modal, title="Edit Move"):
-    move_type = discord.ui.TextInput(label="Move Type", placeholder="Normal/Special/Unique Skill/Ultimate/Path Attack", max_length=32)
+    move_type = discord.ui.TextInput(label="Move Type", placeholder="Normal/Special/Unique Skill/Path", max_length=32)
     old_move_name = discord.ui.TextInput(label="Current Move Name", max_length=80)
     new_move_name = discord.ui.TextInput(label="New Move Name", max_length=80)
     move_dialogue = discord.ui.TextInput(label="Move Dialogue", style=discord.TextStyle.paragraph, max_length=500)
@@ -487,7 +486,7 @@ class EditMoveModal(discord.ui.Modal, title="Edit Move"):
 
 
 class DeleteMoveModal(discord.ui.Modal, title="Delete Move"):
-    move_type = discord.ui.TextInput(label="Move Type", placeholder="Normal/Special/Unique Skill/Ultimate/Path Attack", max_length=32)
+    move_type = discord.ui.TextInput(label="Move Type", placeholder="Normal/Special/Unique Skill/Path", max_length=32)
     move_name = discord.ui.TextInput(label="Move Name", max_length=80)
 
     def __init__(self, panel: "CardEditorPanel") -> None:

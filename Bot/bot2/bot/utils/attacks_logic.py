@@ -6,7 +6,7 @@ from typing import Any
 
 from bot.utils.cards_logic import find_catalog_card
 
-ATTACK_TYPES = ["normal", "special", "ultimate", "unique_skill", "unique_path"]
+ATTACK_TYPES = ["normal", "special", "unique_skill", "unique_skill", "unique_path"]
 
 # Battle normalization still accepts legacy revert; the owner catalog UI does not
 # offer it for new assignment setup.
@@ -16,7 +16,7 @@ CATALOG_ATTACK_TYPES = ATTACK_TYPES + OWNER_DEFENSE_TYPES
 ASSIGNMENT_LIMITS: dict[str, int] = {
     "normal": 5,
     "special": 4,
-    "ultimate": 1,
+    "unique_skill": 1,
     "unique_skill": 2,
     "unique_path": 1,
 }
@@ -25,7 +25,7 @@ DEFENSE_ASSIGNMENT_LIMIT = 4
 DEFAULT_USES: dict[str, int] = {
     "normal": -1,
     "special": 5,
-    "ultimate": 1,
+    "unique_skill": 1,
     "unique_skill": 1,
     "unique_path": 1,
     "parry": 1,

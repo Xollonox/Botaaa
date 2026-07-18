@@ -8,7 +8,7 @@ from typing import Any
 
 RARITIES: list[str] = ["Common", "Rare", "Epic", "Legendary", "Mythical", "Infernal", "Abyssal"]
 
-MASTERY_VALUES: list[str] = ["Strength", "Speed", "Endurance", "Technique", "IQ", "BIQ"]
+MASTERY_VALUES: list[str] = ["Strength", "Speed", "Endurance", "Technique", "IQ", "BIQ", "Conviction"]
 
 # Flat stat bonus added per star, keyed by rarity tier.
 _FLAT_BONUS: dict[str, int] = {
