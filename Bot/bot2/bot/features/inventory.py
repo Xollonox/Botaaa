@@ -296,6 +296,20 @@ class CollectionDetailView(discord.ui.View):
         has_skill = bool(str(card_def.get("unique_skill", "")).strip())
         return "fighter" if (has_path or has_skill) else "viewer"
 
+    def _sync_upgrade_button(self, data: dict[str, Any], user_id: str) -> None:
+        """Disable the Upgrade button up front when the current card is maxed
+        or has no spare duplicate, instead of letting the user click through
+        to an error after the fact."""
+        item = self.cog._find_item(data, user_id, self.card_uid)
+        maxed = item is not None and _clamp_stars(item.get("stars", 0)) >= 5
+        no_dup = item is not None and not maxed and _find_available_duplicate_index(
+            data.get("players", {}).get(user_id, {}).get("user", {}).get("inventory", []), item
+        ) < 0
+        for child in self.children:
+            if isinstance(child, discord.ui.Button) and child.label == "Upgrade":
+                child.disabled = maxed or no_dup
+                child.label = "Maxed ⭐" if maxed else "Upgrade"
+
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.invoker_id:
             await smart_reply(interaction, "This collection panel belongs to another player.", ephemeral=True)
@@ -327,6 +341,7 @@ class CollectionDetailView(discord.ui.View):
 
         mode = self._mode(data, str(interaction.user.id))
         embed = self.cog._build_card_view_embed(data, str(interaction.user.id), self.card_uid, mode)
+        self._sync_upgrade_button(data, str(interaction.user.id))
         await interaction.response.edit_message(embed=embed, view=self)
 
     @discord.ui.button(label="Next", style=discord.ButtonStyle.primary, row=0)
@@ -344,6 +359,7 @@ class CollectionDetailView(discord.ui.View):
 
         mode = self._mode(data, str(interaction.user.id))
         embed = self.cog._build_card_view_embed(data, str(interaction.user.id), self.card_uid, mode)
+        self._sync_upgrade_button(data, str(interaction.user.id))
         await interaction.response.edit_message(embed=embed, view=self)
 
     @discord.ui.button(label="Lock / Unlock", style=discord.ButtonStyle.secondary, row=1)
@@ -355,6 +371,7 @@ class CollectionDetailView(discord.ui.View):
             return
         mode = self._mode(data, str(interaction.user.id))
         embed = self.cog._build_card_view_embed(data, str(interaction.user.id), self.card_uid, mode)
+        self._sync_upgrade_button(data, str(interaction.user.id))
         await interaction.response.edit_message(embed=embed, view=self)
 
     @discord.ui.button(label="Favorite", style=discord.ButtonStyle.primary, row=1)
@@ -366,6 +383,7 @@ class CollectionDetailView(discord.ui.View):
             return
         mode = self._mode(data, str(interaction.user.id))
         embed = self.cog._build_card_view_embed(data, str(interaction.user.id), self.card_uid, mode)
+        self._sync_upgrade_button(data, str(interaction.user.id))
         await interaction.response.edit_message(embed=embed, view=self)
 
     @discord.ui.button(label="Upgrade", style=discord.ButtonStyle.success, row=1)
@@ -374,6 +392,14 @@ class CollectionDetailView(discord.ui.View):
         item = self.cog._find_item(data, str(interaction.user.id), self.card_uid)
         if item is None:
             await smart_reply(interaction, "Card not found.", ephemeral=True)
+            return
+
+        if _clamp_stars(item.get("stars", 0)) >= 5:
+            await smart_reply(
+                interaction,
+                embed=make_embed(data, "⭐ Already at Max Stars", "This card is already at **5★** and cannot be upgraded further."),
+                ephemeral=True,
+            )
             return
 
         inv = data.get("players", {}).get(str(interaction.user.id), {}).get("user", {}).get("inventory", [])
@@ -492,6 +518,7 @@ class CardSelectMenu(discord.ui.Select):
         mode = "fighter" if (has_path or has_skill) else "viewer"
         embed = self.gallery_view.cog._build_card_view_embed(data, str(interaction.user.id), uid, mode)
         detail_view = CollectionDetailView(self.gallery_view.cog, interaction.user.id, uid, self.gallery_view.filter_value, self.gallery_view.sort_value, self.gallery_view.page)
+        detail_view._sync_upgrade_button(data, str(interaction.user.id))
         _sanitize_view(detail_view)
         await interaction.response.edit_message(embed=embed, view=detail_view)
         detail_view.message = interaction.message
