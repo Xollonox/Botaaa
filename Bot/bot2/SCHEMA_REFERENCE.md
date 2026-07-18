@@ -84,10 +84,17 @@ Keyed by unique storage name (e.g. `"Gun Park Shiro Oni"`). Each value:
     "image_url": str,               # Discord CDN image URL
     "emoji": str,                   # Display emoji (default "🃏")
 
-    # Mastery
+    # Mastery (Legendary+ use plural "masteries" list)
     "mastery": {"type": str|None, "description": str},
+    "masteries": list[{"type": str, "description": str}],
     # Possible mastery types: "Strength", "Speed", "Endurance",
-    #   "Technique", "IQ", "BIQ"
+    #   "Technique", "IQ", "BIQ", "Conviction"
+    # Conviction Mastery: Passive — when HP ≤25%, STR/SPD/END are doubled
+    #   permanently for the rest of battle.
+    # Common/Rare: no mastery fields
+    # Epic: mastery if character possesses it in Lookism canon
+    # Legendary/Mythical: mastery + unique_skills (no path)
+    # Infernal/Abyssal: mastery + unique_skills + unique_path
 
     # Combat
     "typing": list[str],            # 0-2 entries from TYPES
@@ -103,8 +110,14 @@ Keyed by unique storage name (e.g. `"Gun Park Shiro Oni"`). Each value:
     # Keystone
     "keystone_name": str|None,      # Linked keystone (Mythical+ only)
 
-    # Skills (unlock at star 3/4/5 depending on count)
-    "unique_skill": {               # Unlocks at star 3
+    # Skills (Legendary+ use plural "unique_skills" list)
+    # Unlock at star 3/4/5 depending on count
+    "unique_skills": list[{         # Legendary+ cards
+        "name": str,
+        "description": str,
+        "active": bool,
+    }],
+    "unique_skill": {               # Legacy single-skill field (unlocks at star 3)
         "name": str,
         "description": str,
         "active": bool,
@@ -412,8 +425,8 @@ RANK_ORDER = ["Copper", "Iron", "Bronze", "Silver", "Gold",
 |---|---|
 | Normal Attack | 10 |
 | Special | 20 |
-| Ultimate | 35 |
-| Unique Skill / Path | 25 |
+| Unique Skill | 25 |
+| Path | 25 |
 | Block / Dodge / Parry / Revert / Tank | 15 |
 
 Base stamina per fighter: **100**. Exhausted (≤0) → locked to normal attacks only. Switching resets to 100.
@@ -535,7 +548,21 @@ Max level: **100**. XP is permanent (never resets across seasons).
 | 3 skills | skill_1 | skill_2 | skill_3 |
 
 `unique_path` always unlocks at **star 5** regardless of skill count.
-Ultimates per team: 1 for 1-2 members, 2 for 3 members, 3 for 4+ members.
+Unique Skills per team: 1 for 1-2 members, 2 for 3 members, 3 for 4+ members.
+
+### Move Types
+
+Valid move types: **Normal**, **Special**, **Unique Skill**, **Path**
+
+### Move Slot Limits by Rarity
+
+| Rarity | Normal | Special | Unique Skill | Path |
+|---|---|---|---|---|
+| Common | 3 | 1 | — | — |
+| Rare | 4 | 2 | — | — |
+| Epic | 5 | 3 | 1 (if applicable) | — |
+| Legendary / Mythical | 5 | 4 | up to 3 | — |
+| Infernal / Abyssal | 5 | 4 | up to 3 | up to 2 |
 
 ---
 

@@ -23,7 +23,7 @@ Plus card-level fields used by the pipeline:
 - `stars` — 0–5, scales stats via `compute_scaled_stats`
 - `mastery` — one of `Strength / Speed / Endurance / Technique / IQ / BIQ / None`
 - `typing` — list of 1–2 of `Tank / Fighter / Brawler / Speedster / Assassin / Mastermind`
-- `moves` — Normal / Special / Unique Skill / Ultimate / Path Attack pools
+- `moves` — Normal / Special / Unique Skill / Path pools
 
 ---
 
@@ -78,8 +78,8 @@ Let `x = strength / 2`. Roll a uniform integer in `[lo, hi]`:
 |--------------------|---------------|-----------------|
 | Normal             | `x − 5`       | `x + 5`         |
 | Special            | `x + 20`      | `x + 45`        |
-| Ultimate           | `3x`          | `4x`            |
-| Unique Skill / Path| `x + 40`      | `x + 80`        |
+| Unique Skill       | `3x`          | `4x`            |
+| Path               | `3x`          | `4x`            |
 
 Result floored at 1.
 
@@ -90,20 +90,20 @@ Only fires if strength > 100 OR card has `Strength` mastery (`_strength_bonus`, 
 | Move type          | No mastery (str>100) | With Strength mastery |
 |--------------------|----------------------|------------------------|
 | Normal             | +5                   | +10                    |
-| Special / Unique   | +10                  | +15                    |
-| Ultimate           | +20                  | +30                    |
+| Special            | +10                  | +15                    |
+| Unique Skill / Path| +20                  | +30                    |
 
 ### Step 4 — Technique multiplier (bands)
 
 `_get_technique_bonus_multiplier(technique, move_type)`:
 
-| technique | Normal | Special / Unique | Ultimate |
-|-----------|--------|------------------|----------|
-| <50       | 1.04   | 1.06             | 1.10     |
-| 50–70     | 1.06   | 1.10             | 1.13     |
-| 71–90     | 1.08   | 1.12             | 1.15     |
-| 91–95     | 1.10   | 1.13             | 1.18     |
-| 96+       | 1.15   | 1.18             | 1.30     |
+| technique | Normal | Special / Unique Skill / Path |
+|-----------|--------|-------------------------------|
+| <50       | 1.04   | 1.06                          |
+| 50–70     | 1.06   | 1.10                          |
+| 71–90     | 1.08   | 1.12                          |
+| 91–95     | 1.10   | 1.13                          |
+| 96+       | 1.15   | 1.18                          |
 
 ### Step 5 — Attacker IQ scaling
 
@@ -273,7 +273,41 @@ If `typing` is missing or empty, both typing steps return ×1.00 — backward co
 
 ---
 
-## 6. Where to balance what
+## 6. Move types
+
+The four move types are:
+
+| Move type    | Description                                              |
+|--------------|----------------------------------------------------------|
+| Normal       | Standard attack, low cost.                               |
+| Special      | Mid-power move with moderate stamina cost.               |
+| Unique Skill | High-power move for Legendary/Mythical+ cards (3x–4x).  |
+| Path         | High-power move exclusive to Infernal/Abyssal cards (3x–4x). |
+
+### Move slots by rarity
+
+| Rarity              | Normal | Special | Unique Skill | Path |
+|---------------------|--------|---------|--------------|------|
+| Common              | 3      | 1       | —            | —    |
+| Rare                | 4      | 2       | —            | —    |
+| Epic                | 5      | 3       | 1 (if applicable) | —    |
+| Legendary / Mythical| 5      | 4       | ✓            | —    |
+| Infernal / Abyssal  | 5      | 4       | ✓            | ✓    |
+
+---
+
+## 7. Conviction Mastery
+
+When a fighter with **Conviction Mastery** drops to ≤25% HP, their STR, SPD, and END are permanently doubled for the rest of the battle. This triggers once and does not reset.
+
+- Activation condition: `current_hp <= hp_max * 0.25`
+- Stats doubled: `strength`, `speed`, `endurance`
+- One-time trigger per fighter per battle (tracked by flag)
+- Does **not** reset on swap-out or heal
+
+---
+
+## 8. Where to balance what
 
 | You want to change…           | Edit this                                                                  |
 |-------------------------------|-----------------------------------------------------------------------------|
@@ -288,7 +322,7 @@ If `typing` is missing or empty, both typing steps return ×1.00 — backward co
 
 ---
 
-## 7. Tests
+## 9. Tests
 
 - `tests/test_battle_engine.py` — base damage pipeline (73 tests, frozen behaviour).
 - `tests/test_typing_matchup.py` — 17 tests covering every spec case for typings.
