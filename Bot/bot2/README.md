@@ -96,6 +96,7 @@ Extensions load in this order in `main.py`:
 | `/confirm` | Confirm pending action by ID |
 | `/profile` | Premium profile card with rival info |
 | `/collection` | Browse owned cards with filters/sorts/lock/upgrade |
+| `/upgrade` | Directly upgrade a fighter's star level via autocomplete (skips `/collection` browsing) |
 | `/card_info` | Inspect catalog card definition |
 | `/card_lock` | Lock/unlock a card instance |
 | `/card_search` | Search catalog cards by name/rarity/typing |
