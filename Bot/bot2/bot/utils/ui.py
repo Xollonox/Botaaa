@@ -112,49 +112,10 @@ def divider(data: dict[str, Any] | None = None, width: int = 18) -> str:
         line = "━"
     return str(line) * max(3, width)
 
-
-# ── Double-Struck Unicode font for premium titles ─────────────────
-_DS_UPPER = "𝔸𝔹ℂ𝔻𝔼𝔽𝔾ℍ𝕀𝕁𝕂𝕃𝕄ℕ𝕆ℙℚℝ𝕊𝕋𝕌𝕍𝕎𝕏𝕐ℤ"
-_DS_LOWER = "𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫"
-_DS_DIGITS = "𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡"
-
-
-def fancy(text: str) -> str:
-    """Convert text to Double-Struck (𝕆𝕦𝕥𝕝𝕚𝕟𝕖𝕕) Unicode for premium titles."""
-    out: list[str] = []
-    for ch in text:
-        if "A" <= ch <= "Z":
-            out.append(_DS_UPPER[ord(ch) - ord("A")])
-        elif "a" <= ch <= "z":
-            out.append(_DS_LOWER[ord(ch) - ord("a")])
-        elif "0" <= ch <= "9":
-            out.append(_DS_DIGITS[ord(ch) - ord("0")])
-        else:
-            out.append(ch)
-    return "".join(out)
-
-
-# ── Panel format helpers ──────────────────────────────────────────
-
 def box(title: str, lines: list[str]) -> str:
     """Format a ╭─ ... ╰──────────────── block matching the squad panel style."""
     body = "\n".join(f"│ {l}" for l in lines)
-    return f"╭─ {fancy(title)}\n{body}\n╰────────────────"
-
-
-def dot_panel(title: str, lines: list[str]) -> str:
-    """Soft dot-separator panel for info/economy/rewards."""
-    sep = "· · · · · · · · · · · ·"
-    body = "\n".join(f"  {l}" for l in lines)
-    return f"{sep}\n  {fancy(title)}\n{sep}\n{body}\n{sep}"
-
-
-def hype_panel(title: str, lines: list[str]) -> str:
-    """Gradient block panel for battle/tournament/action moments."""
-    header = f"░▒▓ {fancy(title)} ▓▒░"
-    body = "\n".join(f"▸ {l}" for l in lines)
-    footer = "░▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒░"
-    return f"{header}\n{body}\n{footer}"
+    return f"╭─ {title}\n{body}\n╰────────────────"
 
 
 

@@ -1935,6 +1935,7 @@ class BattleCog(commands.Cog):
 
     @app_commands.command(name="forfeit", description="Forfeit your active battle.")
     async def forfeit(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer(ephemeral=True)
         await self.forfeit_internal(interaction, str(interaction.user.id))
 
 
