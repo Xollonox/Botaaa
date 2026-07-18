@@ -34,7 +34,7 @@ def _resolve_unique_skills(card: dict[str, Any]) -> tuple[str, str]:
     if isinstance(skill_names, list):
         names = [str(name).strip() for name in skill_names if str(name).strip()]
         if names:
-            return ", ".join(names), "—"
+            return "\n│ ".join(f"• {n}" for n in names), ""
     return _resolve_field(card.get("unique_skill"), card.get("unique_skill_description"))
 
 
@@ -91,9 +91,9 @@ def _build_catalog_card_embed(data: dict[str, Any], card: dict[str, Any]) -> dis
 
     body = (
         f"{heading}\n\n"
-        "╭─ Bio\n"
+        "╭─ Description\n"
         f"│ {bio}\n"
-        "╰────────────────\n\n"
+        "╰────────────────\n"
         "╭─ Combat Stats\n"
         f"│ 💪 STR: {int(scaled.get('strength', 0))}\n"
         f"│ ⚡ SPD: {int(scaled.get('speed', 0))}\n"
@@ -101,24 +101,38 @@ def _build_catalog_card_embed(data: dict[str, Any], card: dict[str, Any]) -> dis
         f"│ 🎯 TEC: {int(scaled.get('technique', 0))}\n"
         f"│ 🧠 IQ: {int(scaled.get('iq', 0))}\n"
         f"│ 🔮 BIQ: {int(scaled.get('battle_iq', 0))}\n"
-        "╰────────────────\n\n"
+        "╰────────────────\n"
         "╭─ Progression\n"
         f"│ ⭐ Stars: ☆☆☆☆☆\n"
         f"│ ⚡ Power: {power:,}\n"
         "│ 🔓 Status: Base Stats\n"
-        "╰────────────────\n\n"
-        "╭─ Mastery\n"
-        f"│ {mastery_str}\n"
-        "╰────────────────\n\n"
-        "╭─ Unique Path\n"
-        f"│ {unique_path}\n"
-        f"│ {unique_path_desc}\n"
-        "╰────────────────\n\n"
-        "╭─ Unique Skill\n"
-        f"│ {unique_skill}\n"
-        f"│ {unique_skill_desc}\n"
         "╰────────────────"
     )
+
+    # Only show Mastery if the card has it
+    if mastery_list:
+        body += (
+            "\n╭─ Mastery\n"
+            f"│ {mastery_str}\n"
+            "╰────────────────"
+        )
+
+    # Only show Unique Skill if the card has it
+    if unique_skill and unique_skill != "—":
+        skill_block = f"\n╭─ Unique Skill\n│ {unique_skill}\n"
+        if unique_skill_desc and unique_skill_desc != "—":
+            skill_block += f"│ {unique_skill_desc}\n"
+        skill_block += "╰────────────────"
+        body += skill_block
+
+    # Only show Unique Path if the card has it
+    if unique_path and unique_path != "—":
+        body += (
+            "\n╭─ Unique Path\n"
+            f"│ {unique_path}\n"
+            f"│ {unique_path_desc}\n"
+            "╰────────────────"
+        )
 
     return make_embed(None, "LOOKISM HXCC • FIGHTER", body, color=0xE11D48, footer="Card Catalog", image_url=image_url)
 

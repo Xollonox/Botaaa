@@ -45,7 +45,7 @@ def calc_damage(
 ) -> int:
     """Compatibility damage estimate for tests; runtime uses battle_state."""
     move_type = normalize_attack_type(attack_type)
-    if move_type == "ultimate":
+    if move_type == "unique_skill":
         attack_stat = int(attacker_stats.get("battle_iq", attacker_stats.get("strength", 0)) or 0)
     elif move_type in {"special", "unique_skill", "unique_path"}:
         attack_stat = int(attacker_stats.get("technique", attacker_stats.get("strength", 0)) or 0)

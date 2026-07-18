@@ -36,37 +36,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Elbow",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Aggressive Slam",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -74,14 +46,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Hook",
-      "Elbow",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
-      "Heavy Strike",
-      "Charging Advance",
-      "Aggressive Slam"
+      "Heavy Strike"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -123,37 +91,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Low Sweep",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Backhand",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Rapid Series",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Quick Barrage",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Accelerated Rush",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -161,14 +101,10 @@
     "attacks": [
       "Jab",
       "Side Kick",
-      "Palm Strike",
-      "Low Sweep",
-      "Backhand"
+      "Palm Strike"
     ],
     "special": [
-      "Rapid Series",
-      "Quick Barrage",
-      "Accelerated Rush"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -210,37 +146,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Knee Strike",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Shoulder Ram",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Overhead Strike",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Rising Blow",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Forward Charge",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -248,14 +156,10 @@
     "attacks": [
       "Punch",
       "Cross",
-      "Uppercut",
-      "Knee Strike",
-      "Shoulder Ram"
+      "Uppercut"
     ],
     "special": [
-      "Overhead Strike",
-      "Rising Blow",
-      "Forward Charge"
+      "Overhead Strike"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -297,37 +201,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Stomp",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Back Elbow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Pushing Rush",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Ground Slam",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Attack",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -335,14 +211,10 @@
     "attacks": [
       "Kick",
       "Hook",
-      "Palm",
-      "Stomp",
-      "Back Elbow"
+      "Palm"
     ],
     "special": [
-      "Pushing Rush",
-      "Ground Slam",
-      "Charging Attack"
+      "Pushing Rush"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -384,37 +256,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Palm Thrust",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Step In",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Speed Burst",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Rapid Advance",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Quick Combo",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -422,14 +266,10 @@
     "attacks": [
       "Jab",
       "Slash Punch",
-      "Front Kick",
-      "Palm Thrust",
-      "Step In"
+      "Front Kick"
     ],
     "special": [
-      "Speed Burst",
-      "Rapid Advance",
-      "Quick Combo"
+      "Speed Burst"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -471,37 +311,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Palm",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Sweep",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Calculated Strike",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Measured Charge",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Controlled Rush",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -509,14 +321,10 @@
     "attacks": [
       "Jab",
       "Hook",
-      "Knee",
-      "Palm",
-      "Sweep"
+      "Knee"
     ],
     "special": [
-      "Calculated Strike",
-      "Measured Charge",
-      "Controlled Rush"
+      "Calculated Strike"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -558,37 +366,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Elbow",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Heel Kick",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Crash",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Rising Strike",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -596,14 +376,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Cross",
-      "Elbow",
-      "Heel Kick"
+      "Cross"
     ],
     "special": [
-      "Heavy Crash",
-      "Rising Strike",
-      "Charging Advance"
+      "Heavy Crash"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -645,37 +421,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Shot",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Low Kick",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Ground Shake",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Heavy Stomp",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Heavy Charge",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -683,14 +431,10 @@
     "attacks": [
       "Punch",
       "Stomp",
-      "Headbutt",
-      "Body Shot",
-      "Low Kick"
+      "Headbutt"
     ],
     "special": [
-      "Ground Shake",
-      "Heavy Stomp",
-      "Heavy Charge"
+      "Ground Shake"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -732,37 +476,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Elbow",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Nervous Rush",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Rapid Barrage",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Quick Strike",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -770,14 +486,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Elbow",
-      "Body Blow"
+      "Jab"
     ],
     "special": [
-      "Nervous Rush",
-      "Rapid Barrage",
-      "Quick Strike"
+      "Nervous Rush"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -819,37 +531,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Jab",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Shot",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Guard Break",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Iron Step",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Yakuza Rush",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -857,14 +541,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Hook",
-      "Jab",
-      "Body Shot"
+      "Hook"
     ],
     "special": [
-      "Guard Break",
-      "Iron Step",
-      "Yakuza Rush"
+      "Guard Break"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -906,37 +586,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Palm Strike",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Royal Step",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Mercy Break",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Crown Rush",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -944,14 +596,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Palm Strike",
-      "Body Blow"
+      "Jab"
     ],
     "special": [
-      "Royal Step",
-      "Mercy Break",
-      "Crown Rush"
+      "Royal Step"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -993,37 +641,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Hook",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Shot",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Flame Step",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Heart Break",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Burning Rush",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -1031,14 +651,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Hook",
-      "Body Shot"
+      "Jab"
     ],
     "special": [
-      "Flame Step",
-      "Heart Break",
-      "Burning Rush"
+      "Flame Step"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -1080,37 +696,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Elbow",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Strike",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Simple Charge",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Forward Push",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Aggressive Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -1118,14 +706,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Elbow",
-      "Strike"
+      "Jab"
     ],
     "special": [
-      "Simple Charge",
-      "Forward Push",
-      "Aggressive Advance"
+      "Simple Charge"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -1167,37 +751,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Hook",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Speed Rush",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Heavy Push",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Final Drive",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -1205,14 +761,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Hook",
-      "Body Blow"
+      "Jab"
     ],
     "special": [
-      "Speed Rush",
-      "Heavy Push",
-      "Final Drive"
+      "Speed Rush"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -1254,37 +806,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Cross",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Speed Burst",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Quick Turn",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Forward Acceleration",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -1292,14 +816,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Cross",
-      "Body Blow"
+      "Jab"
     ],
     "special": [
-      "Speed Burst",
-      "Quick Turn",
-      "Forward Acceleration"
+      "Speed Burst"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -1348,13 +868,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -1367,26 +880,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -1428,37 +932,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Hook",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Shot",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Street Charge",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Shadow Strike",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Aggressive Rush",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -1466,14 +942,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Hook",
-      "Body Shot"
+      "Jab"
     ],
     "special": [
-      "Street Charge",
-      "Shadow Strike",
-      "Aggressive Rush"
+      "Street Charge"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -1515,37 +987,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Cross",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Hook",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Elegant Charge",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Refined Strike",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Graceful Rush",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -1553,14 +997,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Cross",
-      "Hook"
+      "Jab"
     ],
     "special": [
-      "Elegant Charge",
-      "Refined Strike",
-      "Graceful Rush"
+      "Elegant Charge"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -1602,37 +1042,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Hook",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Elbow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Rapid Barrage",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Heavy Impact",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Aggressive Series",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -1640,14 +1052,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Hook",
-      "Elbow"
+      "Jab"
     ],
     "special": [
-      "Rapid Barrage",
-      "Heavy Impact",
-      "Aggressive Series"
+      "Rapid Barrage"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -1689,37 +1097,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Cross",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Direct Charge",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Solid Strike",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Forward Push",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -1727,14 +1107,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Cross",
-      "Body Blow"
+      "Jab"
     ],
     "special": [
-      "Direct Charge",
-      "Solid Strike",
-      "Forward Push"
+      "Direct Charge"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -1776,37 +1152,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Shove",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Slam",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Aggressive Rush",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Heavy Charge",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Crowd Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -1814,14 +1162,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Shove",
-      "Body Slam"
+      "Jab"
     ],
     "special": [
-      "Aggressive Rush",
-      "Heavy Charge",
-      "Crowd Advance"
+      "Aggressive Rush"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -1863,37 +1207,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Slam",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Stone Crash",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Heavy Strike",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Descending Blow",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -1901,14 +1217,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Headbutt",
-      "Body Blow",
-      "Slam"
+      "Headbutt"
     ],
     "special": [
-      "Stone Crash",
-      "Heavy Strike",
-      "Descending Blow"
+      "Stone Crash"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -1950,37 +1262,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Hook",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Shot",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Crew Charge",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Heavy Impact",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Leadership Strike",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -1988,14 +1272,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Hook",
-      "Body Shot"
+      "Jab"
     ],
     "special": [
-      "Crew Charge",
-      "Heavy Impact",
-      "Leadership Strike"
+      "Crew Charge"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -2037,37 +1317,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Cross",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Dual Advance",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Mirror Strike",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Twin Charge",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -2075,14 +1327,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Cross",
-      "Body Blow"
+      "Jab"
     ],
     "special": [
-      "Dual Advance",
-      "Mirror Strike",
-      "Twin Charge"
+      "Dual Advance"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -2124,37 +1372,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Hook",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Twin Charge",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Connected Strike",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Coordinated Rush",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -2162,14 +1382,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Hook",
-      "Body Blow"
+      "Jab"
     ],
     "special": [
-      "Twin Charge",
-      "Connected Strike",
-      "Coordinated Rush"
+      "Twin Charge"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -2211,37 +1427,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Hook",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Rapid Combo",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -2249,14 +1437,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Hook",
-      "Body Blow"
+      "Jab"
     ],
     "special": [
-      "Heavy Strike",
-      "Rapid Combo",
-      "Charging Advance"
+      "Heavy Strike"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -2298,37 +1482,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Hook",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Rapid Combo",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -2336,14 +1492,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Hook",
-      "Body Blow"
+      "Jab"
     ],
     "special": [
-      "Heavy Strike",
-      "Rapid Combo",
-      "Charging Advance"
+      "Heavy Strike"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -2385,37 +1537,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Hook",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Rapid Combo",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -2423,14 +1547,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Hook",
-      "Body Blow"
+      "Jab"
     ],
     "special": [
-      "Heavy Strike",
-      "Rapid Combo",
-      "Charging Advance"
+      "Heavy Strike"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -2472,37 +1592,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Hook",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Rapid Combo",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -2510,14 +1602,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Hook",
-      "Body Blow"
+      "Jab"
     ],
     "special": [
-      "Heavy Strike",
-      "Rapid Combo",
-      "Charging Advance"
+      "Heavy Strike"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -2566,13 +1654,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -2585,26 +1666,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Cross",
-      "Body Blow"
+      "Cross"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -2653,13 +1725,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -2672,26 +1737,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -2740,13 +1796,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -2759,26 +1808,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -2827,13 +1867,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -2846,26 +1879,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Cross",
-      "Body Blow"
+      "Cross"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -2914,13 +1938,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -2933,26 +1950,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -3001,13 +2009,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -3020,26 +2021,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -3088,13 +2080,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -3107,26 +2092,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -3168,37 +2144,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Hook",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Rapid Series",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -3206,14 +2154,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Hook",
-      "Body Blow"
+      "Jab"
     ],
     "special": [
-      "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Heavy Strike"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -3255,37 +2199,9 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Hook",
-        "type": "Normal",
-        "dialogue": "Solid punch.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Rapid Series",
-        "type": "Special",
-        "dialogue": "Increased force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
         "crit_dialogue": "",
         "miss_dialogue": ""
       }
@@ -3293,14 +2209,10 @@
     "attacks": [
       "Punch",
       "Kick",
-      "Jab",
-      "Hook",
-      "Body Blow"
+      "Jab"
     ],
     "special": [
-      "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Heavy Strike"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -3349,13 +2261,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -3368,26 +2273,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -3436,13 +2332,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -3455,26 +2344,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -3523,13 +2403,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -3542,26 +2415,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -3610,13 +2474,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -3629,26 +2486,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -3697,13 +2545,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -3716,26 +2557,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -3784,13 +2616,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -3803,26 +2628,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -3871,13 +2687,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -3890,26 +2699,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Cross",
-      "Body Blow"
+      "Cross"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -3958,13 +2758,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -3977,26 +2770,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -4045,13 +2829,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -4064,26 +2841,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -4132,13 +2900,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -4151,26 +2912,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -4219,13 +2971,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -4238,26 +2983,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -4306,13 +3042,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -4325,26 +3054,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -4393,13 +3113,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -4412,26 +3125,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -4480,13 +3184,6 @@
         "miss_dialogue": ""
       },
       {
-        "name": "Body Blow",
-        "type": "Normal",
-        "dialogue": "Fast kick.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
-      },
-      {
         "name": "Heavy Strike",
         "type": "Special",
         "dialogue": "More power.",
@@ -4499,26 +3196,17 @@
         "dialogue": "Increased force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charging Advance",
-        "type": "Special",
-        "dialogue": "Strong technique.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
       "Punch",
       "Kick",
       "Jab",
-      "Hook",
-      "Body Blow"
+      "Hook"
     ],
     "special": [
       "Heavy Strike",
-      "Rapid Series",
-      "Charging Advance"
+      "Rapid Series"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -4869,7 +3557,10 @@
       "Charging Advance"
     ],
     "ultimate": [],
-    "defensive_moves": []
+    "defensive_moves": [],
+    "masteries": [
+      "Strength Mastery"
+    ]
   },
   "Sinu Han": {
     "name": "Sinu Han",
@@ -4963,7 +3654,10 @@
       "Charging Advance"
     ],
     "ultimate": [],
-    "defensive_moves": []
+    "defensive_moves": [],
+    "masteries": [
+      "Speed Mastery"
+    ]
   },
   "Zack Lee": {
     "name": "Zack Lee",
@@ -5050,7 +3744,10 @@
       "Charging Advance"
     ],
     "ultimate": [],
-    "defensive_moves": []
+    "defensive_moves": [],
+    "masteries": [
+      "Endurance Mastery"
+    ]
   },
   "Kuroda Ryuhae": {
     "name": "Kuroda Ryuhae",
@@ -5572,7 +4269,10 @@
       "Charging Advance"
     ],
     "ultimate": [],
-    "defensive_moves": []
+    "defensive_moves": [],
+    "masteries": [
+      "Endurance Mastery"
+    ]
   },
   "Zack Lee 2": {
     "name": "Zack Lee",
@@ -5659,7 +4359,11 @@
       "Charging Advance"
     ],
     "ultimate": [],
-    "defensive_moves": []
+    "defensive_moves": [],
+    "masteries": [
+      "Speed Mastery",
+      "Endurance Mastery"
+    ]
   },
   "Hudson 2": {
     "name": "Hudson",
@@ -6268,7 +4972,10 @@
       "Charging Advance"
     ],
     "ultimate": [],
-    "defensive_moves": []
+    "defensive_moves": [],
+    "masteries": [
+      "Strength Mastery"
+    ]
   },
   "Jake Kim": {
     "name": "Jake Kim",
@@ -6355,7 +5062,10 @@
       "Charging Advance"
     ],
     "ultimate": [],
-    "defensive_moves": []
+    "defensive_moves": [],
+    "masteries": [
+      "Conviction Mastery"
+    ]
   },
   "Minsik Choi": {
     "name": "Minsik Choi",
@@ -6573,13 +5283,6 @@
         "dialogue": "He rushes forward with determination.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Stand Firm",
-        "type": "Special",
-        "dialogue": "He refuses to go down easily.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
@@ -6588,8 +5291,7 @@
       "Body Blow"
     ],
     "special": [
-      "Forward Rush",
-      "Stand Firm"
+      "Forward Rush"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -6636,13 +5338,6 @@
         "dialogue": "He uses a cheap trick to survive.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Escape",
-        "type": "Special",
-        "dialogue": "He tries to get out of danger.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
@@ -6651,8 +5346,7 @@
       "Shove"
     ],
     "special": [
-      "Trick",
-      "Escape"
+      "Trick"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -6699,13 +5393,6 @@
         "dialogue": "They rush the enemy together.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Brawl",
-        "type": "Special",
-        "dialogue": "They attack with street-fighting pressure.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
@@ -6714,8 +5401,7 @@
       "Group Hit"
     ],
     "special": [
-      "Group Rush",
-      "Brawl"
+      "Group Rush"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -6762,13 +5448,6 @@
         "dialogue": "They attack with numbers.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Gang Rush",
-        "type": "Special",
-        "dialogue": "They overwhelm the enemy with force.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
@@ -6777,8 +5456,7 @@
       "Heavy Hit"
     ],
     "special": [
-      "Group Attack",
-      "Gang Rush"
+      "Group Attack"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -6825,13 +5503,6 @@
         "dialogue": "He attacks with the pressure of a gang leader.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Heavy Strike",
-        "type": "Special",
-        "dialogue": "He lands a strong leader's blow.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
@@ -6840,8 +5511,7 @@
       "Heavy Blow"
     ],
     "special": [
-      "Rush",
-      "Heavy Strike"
+      "Rush"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -6888,13 +5558,6 @@
         "dialogue": "He charges forward aggressively.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Brawl",
-        "type": "Special",
-        "dialogue": "He fights with wild street pressure.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
@@ -6903,8 +5566,7 @@
       "Headbutt"
     ],
     "special": [
-      "School Rush",
-      "Brawl"
+      "School Rush"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -6951,13 +5613,6 @@
         "dialogue": "He lands a strong direct blow.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Dirty Move",
-        "type": "Special",
-        "dialogue": "He uses cheap fighting tactics.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
@@ -6966,8 +5621,7 @@
       "Dirty Hit"
     ],
     "special": [
-      "Heavy Strike",
-      "Dirty Move"
+      "Heavy Strike"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -7014,13 +5668,6 @@
         "dialogue": "He keeps standing despite the damage.",
         "crit_dialogue": "",
         "miss_dialogue": ""
-      },
-      {
-        "name": "Charge",
-        "type": "Special",
-        "dialogue": "He rushes forward without fear.",
-        "crit_dialogue": "",
-        "miss_dialogue": ""
       }
     ],
     "attacks": [
@@ -7029,8 +5676,7 @@
       "Body Blow"
     ],
     "special": [
-      "Endure",
-      "Charge"
+      "Endure"
     ],
     "ultimate": [],
     "defensive_moves": []
@@ -7966,6 +6612,13 @@
         "dialogue": "Shiba Inu fights through a memory flash and strikes back.",
         "crit_dialogue": "",
         "miss_dialogue": ""
+      },
+      {
+        "name": "IA",
+        "type": "Unique Skill",
+        "dialogue": "Invincible attack.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
       }
     ],
     "attacks": [
@@ -7978,7 +6631,13 @@
       "Memory Strike"
     ],
     "ultimate": [],
-    "defensive_moves": []
+    "defensive_moves": [],
+    "masteries": [
+      "Speed Mastery"
+    ],
+    "unique_skills": [
+      "IA"
+    ]
   },
   "Samuel Seo Workers 2A": {
     "name": "Samuel Seo",
@@ -8041,7 +6700,10 @@
       "Counter"
     ],
     "ultimate": [],
-    "defensive_moves": []
+    "defensive_moves": [],
+    "masteries": [
+      "Endurance Mastery"
+    ]
   },
   "Ryuhei Kuroda Workers 2A": {
     "name": "Ryuhei Kuroda",
@@ -8230,7 +6892,10 @@
       "Counter"
     ],
     "ultimate": [],
-    "defensive_moves": []
+    "defensive_moves": [],
+    "masteries": [
+      "Conviction Mastery"
+    ]
   },
   "Yamazaki Gun Cheonliang Arc": {
     "name": "Yamazaki Gun",
@@ -8244,7 +6909,8 @@
     "unique_skills": [
       "Yamazaki Karate",
       "Power Threshold",
-      "Oni Pressure"
+      "Oni Pressure",
+      "Yamazaki Impact"
     ],
     "stats": {
       "strength": 72,
@@ -8277,6 +6943,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Body Strike II",
+        "type": "Normal",
+        "dialogue": "Gun crushes the body with controlled force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Body Strike III",
+        "type": "Normal",
+        "dialogue": "Gun crushes the body with controlled force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Power Threshold",
         "type": "Special",
         "dialogue": "Gun releases overwhelming strength through a precise strike.",
@@ -8291,8 +6971,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Yamazaki Counter II",
+        "type": "Special",
+        "dialogue": "Gun reads the attack and counters with brutal timing.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Yamazaki Counter III",
+        "type": "Special",
+        "dialogue": "Gun reads the attack and counters with brutal timing.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Yamazaki Impact",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Gun closes the distance and lands a decisive Yamazaki finishing blow.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -8301,15 +6995,17 @@
     "attacks": [
       "Yamazaki Straight",
       "Iron Low Kick",
-      "Body Strike"
+      "Body Strike",
+      "Body Strike II",
+      "Body Strike III"
     ],
     "special": [
       "Power Threshold",
-      "Yamazaki Counter"
+      "Yamazaki Counter",
+      "Yamazaki Counter II",
+      "Yamazaki Counter III"
     ],
-    "ultimate": [
-      "Yamazaki Impact"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "James Lee 2T Cheonliang Arc": {
@@ -8325,7 +7021,8 @@
     "unique_skills": [
       "Speed Threshold",
       "Technique Threshold",
-      "Blindspot Pressure"
+      "Blindspot Pressure",
+      "Threshold Finish"
     ],
     "stats": {
       "strength": 56,
@@ -8358,6 +7055,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Angle Feint II",
+        "type": "Normal",
+        "dialogue": "James creates an opening with a subtle angle change.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Angle Feint III",
+        "type": "Normal",
+        "dialogue": "James creates an opening with a subtle angle change.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Speed Threshold",
         "type": "Special",
         "dialogue": "James attacks from the opponent's blind spot with overwhelming speed.",
@@ -8372,8 +7083,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Technique Threshold II",
+        "type": "Special",
+        "dialogue": "James dismantles the guard with refined technique.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Technique Threshold III",
+        "type": "Special",
+        "dialogue": "James dismantles the guard with refined technique.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Threshold Finish",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "James combines speed and technique into a clean finishing sequence.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -8382,15 +7107,17 @@
     "attacks": [
       "Silent Step",
       "Precision Kick",
-      "Angle Feint"
+      "Angle Feint",
+      "Angle Feint II",
+      "Angle Feint III"
     ],
     "special": [
       "Speed Threshold",
-      "Technique Threshold"
+      "Technique Threshold",
+      "Technique Threshold II",
+      "Technique Threshold III"
     ],
-    "ultimate": [
-      "Threshold Finish"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Jichang Kwak Holiday Arc": {
@@ -8406,7 +7133,8 @@
     "unique_skills": [
       "Hand-Blade Style",
       "King's Analysis",
-      "Dual Threshold"
+      "Dual Threshold",
+      "King's Hand-Blade"
     ],
     "stats": {
       "strength": 73,
@@ -8439,6 +7167,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Tactical Feint II",
+        "type": "Normal",
+        "dialogue": "Jichang tests the opponent's reaction with a calculated feint.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Tactical Feint III",
+        "type": "Normal",
+        "dialogue": "Jichang tests the opponent's reaction with a calculated feint.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Seoul Strike",
         "type": "Special",
         "dialogue": "Jichang strikes with the force of a former Seoul King.",
@@ -8453,8 +7195,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Threshold Counter II",
+        "type": "Special",
+        "dialogue": "Jichang uses strength and speed to counter cleanly.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Threshold Counter III",
+        "type": "Special",
+        "dialogue": "Jichang uses strength and speed to counter cleanly.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "King's Hand-Blade",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Jichang delivers a decisive hand-blade strike with complete control.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -8463,15 +7219,17 @@
     "attacks": [
       "Hand-Blade Strike",
       "King's Step",
-      "Tactical Feint"
+      "Tactical Feint",
+      "Tactical Feint II",
+      "Tactical Feint III"
     ],
     "special": [
       "Seoul Strike",
-      "Threshold Counter"
+      "Threshold Counter",
+      "Threshold Counter II",
+      "Threshold Counter III"
     ],
-    "ultimate": [
-      "King's Hand-Blade"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "UI OG Daniel Holiday Arc": {
@@ -8484,7 +7242,8 @@
     "unique_skills": [
       "Ultra Instinct",
       "Copy Response",
-      "Automatic Combat"
+      "Automatic Combat",
+      "UI Sequence"
     ],
     "stats": {
       "strength": 66,
@@ -8517,6 +7276,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Instinctive Kick II",
+        "type": "Normal",
+        "dialogue": "Daniel throws a clean kick without conscious delay.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Instinctive Kick III",
+        "type": "Normal",
+        "dialogue": "Daniel throws a clean kick without conscious delay.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Copy Response",
         "type": "Special",
         "dialogue": "Daniel instantly responds with a copied technique.",
@@ -8531,8 +7304,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "UI Counter II",
+        "type": "Special",
+        "dialogue": "Daniel counters the attack through automatic combat reaction.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "UI Counter III",
+        "type": "Special",
+        "dialogue": "Daniel counters the attack through automatic combat reaction.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "UI Sequence",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Daniel chains copied movements into a precise finishing sequence.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -8541,15 +7328,17 @@
     "attacks": [
       "Automatic Strike",
       "Copied Step",
-      "Instinctive Kick"
+      "Instinctive Kick",
+      "Instinctive Kick II",
+      "Instinctive Kick III"
     ],
     "special": [
       "Copy Response",
-      "UI Counter"
+      "UI Counter",
+      "UI Counter II",
+      "UI Counter III"
     ],
-    "ultimate": [
-      "UI Sequence"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Charles Choi Holiday Arc": {
@@ -8567,7 +7356,8 @@
     "unique_skills": [
       "Four Masteries",
       "One-Handed Control",
-      "Elite Combat Reading"
+      "Elite Combat Reading",
+      "Chairman Strike"
     ],
     "stats": {
       "strength": 68,
@@ -8600,6 +7390,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Pressure Jab II",
+        "type": "Normal",
+        "dialogue": "Charles probes the defense with a sharp jab.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Pressure Jab III",
+        "type": "Normal",
+        "dialogue": "Charles probes the defense with a sharp jab.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Mastery Counter",
         "type": "Special",
         "dialogue": "Charles counters using complete mastery control.",
@@ -8614,8 +7418,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Elite Intercept II",
+        "type": "Special",
+        "dialogue": "Charles reads the attack and intercepts before it fully forms.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Elite Intercept III",
+        "type": "Special",
+        "dialogue": "Charles reads the attack and intercepts before it fully forms.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Chairman Strike",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Charles ends the exchange with cold and precise execution.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -8624,15 +7442,17 @@
     "attacks": [
       "One-Handed Strike",
       "Controlled Step",
-      "Pressure Jab"
+      "Pressure Jab",
+      "Pressure Jab II",
+      "Pressure Jab III"
     ],
     "special": [
       "Mastery Counter",
-      "Elite Intercept"
+      "Elite Intercept",
+      "Elite Intercept II",
+      "Elite Intercept III"
     ],
-    "ultimate": [
-      "Chairman Strike"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Goo Kim Cheonliang Arc": {
@@ -8645,7 +7465,8 @@
     "unique_skills": [
       "Weapon Handling",
       "Improvised Blade",
-      "Unpredictable Rhythm"
+      "Unpredictable Rhythm",
+      "Blade Finish"
     ],
     "stats": {
       "strength": 68,
@@ -8678,6 +7499,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Pivot Slash II",
+        "type": "Normal",
+        "dialogue": "Goo changes angle and cuts through the guard.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Pivot Slash III",
+        "type": "Normal",
+        "dialogue": "Goo changes angle and cuts through the guard.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Weapon Shift",
         "type": "Special",
         "dialogue": "Goo adapts his weapon path mid-combat.",
@@ -8692,8 +7527,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Edge Counter II",
+        "type": "Special",
+        "dialogue": "Goo attacks from an awkward angle with perfect timing.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Edge Counter III",
+        "type": "Special",
+        "dialogue": "Goo attacks from an awkward angle with perfect timing.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Blade Finish",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Goo finishes with a clean weapon sequence that leaves no safe angle.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -8702,15 +7551,17 @@
     "attacks": [
       "Improvised Cut",
       "Quick Draw",
-      "Pivot Slash"
+      "Pivot Slash",
+      "Pivot Slash II",
+      "Pivot Slash III"
     ],
     "special": [
       "Weapon Shift",
-      "Edge Counter"
+      "Edge Counter",
+      "Edge Counter II",
+      "Edge Counter III"
     ],
-    "ultimate": [
-      "Blade Finish"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Seongji Yuk 2T": {
@@ -8726,7 +7577,8 @@
     "unique_skills": [
       "Cheonliang Grip",
       "Power Threshold",
-      "Endurance Threshold"
+      "Endurance Threshold",
+      "King's Throw"
     ],
     "stats": {
       "strength": 75,
@@ -8759,6 +7611,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Iron Clinch II",
+        "type": "Normal",
+        "dialogue": "Seongji locks the opponent down with heavy pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Iron Clinch III",
+        "type": "Normal",
+        "dialogue": "Seongji locks the opponent down with heavy pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Power Threshold",
         "type": "Special",
         "dialogue": "Seongji releases overwhelming strength through a direct attack.",
@@ -8773,8 +7639,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Endurance Threshold II",
+        "type": "Special",
+        "dialogue": "Seongji absorbs pressure and drives forward.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Endurance Threshold III",
+        "type": "Special",
+        "dialogue": "Seongji absorbs pressure and drives forward.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "King's Throw",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Seongji ends the exchange with a crushing Cheonliang throw.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -8783,15 +7663,17 @@
     "attacks": [
       "Cheonliang Grip",
       "Heavy Throw",
-      "Iron Clinch"
+      "Iron Clinch",
+      "Iron Clinch II",
+      "Iron Clinch III"
     ],
     "special": [
       "Power Threshold",
-      "Endurance Threshold"
+      "Endurance Threshold",
+      "Endurance Threshold II",
+      "Endurance Threshold III"
     ],
-    "ultimate": [
-      "King's Throw"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "The Thing Workers 1A": {
@@ -8807,7 +7689,8 @@
     "unique_skills": [
       "Brute Force",
       "Iron Body",
-      "Relentless Pressure"
+      "Relentless Pressure",
+      "Heavy Impact"
     ],
     "stats": {
       "strength": 84,
@@ -8840,6 +7723,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Ground Pound II",
+        "type": "Normal",
+        "dialogue": "The Thing slams down with brute force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Ground Pound III",
+        "type": "Normal",
+        "dialogue": "The Thing slams down with brute force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Iron Body Charge",
         "type": "Special",
         "dialogue": "The Thing tanks the pressure and drives forward.",
@@ -8854,8 +7751,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Heavy Hold II",
+        "type": "Special",
+        "dialogue": "The Thing traps the opponent in a brutal hold.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Hold III",
+        "type": "Special",
+        "dialogue": "The Thing traps the opponent in a brutal hold.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Heavy Impact",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "The Thing delivers a raw finishing blow with monstrous force.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -8864,15 +7775,17 @@
     "attacks": [
       "Heavy Grab",
       "Shoulder Crash",
-      "Ground Pound"
+      "Ground Pound",
+      "Ground Pound II",
+      "Ground Pound III"
     ],
     "special": [
       "Iron Body Charge",
-      "Heavy Hold"
+      "Heavy Hold",
+      "Heavy Hold II",
+      "Heavy Hold III"
     ],
-    "ultimate": [
-      "Heavy Impact"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Johan Seong Workers 1A": {
@@ -8885,7 +7798,8 @@
     "unique_skills": [
       "Copy",
       "Accelerated Imitation",
-      "Blindspot Adaptation"
+      "Blindspot Adaptation",
+      "Imitation Burst"
     ],
     "stats": {
       "strength": 58,
@@ -8918,6 +7832,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Imitation Kick II",
+        "type": "Normal",
+        "dialogue": "Johan mirrors a refined kick from memory.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Imitation Kick III",
+        "type": "Normal",
+        "dialogue": "Johan mirrors a refined kick from memory.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Accelerated Copy",
         "type": "Special",
         "dialogue": "Johan copies the opponent's rhythm and attacks immediately.",
@@ -8932,8 +7860,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Blindspot Adaptation II",
+        "type": "Special",
+        "dialogue": "Johan adjusts his timing despite unstable vision.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Blindspot Adaptation III",
+        "type": "Special",
+        "dialogue": "Johan adjusts his timing despite unstable vision.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Imitation Burst",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Johan compresses copied techniques into a fast finishing burst.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -8942,15 +7884,17 @@
     "attacks": [
       "Copied Jab",
       "Quick Step",
-      "Imitation Kick"
+      "Imitation Kick",
+      "Imitation Kick II",
+      "Imitation Kick III"
     ],
     "special": [
       "Accelerated Copy",
-      "Blindspot Adaptation"
+      "Blindspot Adaptation",
+      "Blindspot Adaptation II",
+      "Blindspot Adaptation III"
     ],
-    "ultimate": [
-      "Imitation Burst"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Seokdu Wang": {
@@ -8965,7 +7909,8 @@
     "unique_skills": [
       "Suwon Headbutt",
       "King's Pressure",
-      "Heavy Frame"
+      "Heavy Frame",
+      "Suwon Crash"
     ],
     "stats": {
       "strength": 79,
@@ -8998,6 +7943,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Body Drive II",
+        "type": "Normal",
+        "dialogue": "Seokdu pushes forward with his full frame.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Body Drive III",
+        "type": "Normal",
+        "dialogue": "Seokdu pushes forward with his full frame.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "King's Pressure",
         "type": "Special",
         "dialogue": "Seokdu overwhelms the opponent with Suwon's pressure.",
@@ -9012,8 +7971,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Heavy Counter II",
+        "type": "Special",
+        "dialogue": "Seokdu absorbs the hit and counters with raw force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Counter III",
+        "type": "Special",
+        "dialogue": "Seokdu absorbs the hit and counters with raw force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Suwon Crash",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Seokdu lands a full-force headbutt that shakes the opponent.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -9022,15 +7995,17 @@
     "attacks": [
       "Suwon Headbutt",
       "Heavy Swing",
-      "Body Drive"
+      "Body Drive",
+      "Body Drive II",
+      "Body Drive III"
     ],
     "special": [
       "King's Pressure",
-      "Heavy Counter"
+      "Heavy Counter",
+      "Heavy Counter II",
+      "Heavy Counter III"
     ],
-    "ultimate": [
-      "Suwon Crash"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Taesoo Ma": {
@@ -9045,7 +8020,8 @@
     "unique_skills": [
       "Ansan Fist",
       "Power Threshold",
-      "Single-Fist Resolve"
+      "Single-Fist Resolve",
+      "King's Fist"
     ],
     "stats": {
       "strength": 87,
@@ -9078,6 +8054,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Right-Hand Feint II",
+        "type": "Normal",
+        "dialogue": "Taesoo threatens with his dominant fist.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Right-Hand Feint III",
+        "type": "Normal",
+        "dialogue": "Taesoo threatens with his dominant fist.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Power Threshold",
         "type": "Special",
         "dialogue": "Taesoo releases the full force of his strength mastery.",
@@ -9092,8 +8082,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "King's Right Hand II",
+        "type": "Special",
+        "dialogue": "Taesoo commits to a devastating right-hand strike.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "King's Right Hand III",
+        "type": "Special",
+        "dialogue": "Taesoo commits to a devastating right-hand strike.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "King's Fist",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Taesoo lands a crushing blow from the fist that defines Ansan.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -9102,15 +8106,17 @@
     "attacks": [
       "Ansan Fist",
       "Guard Break",
-      "Right-Hand Feint"
+      "Right-Hand Feint",
+      "Right-Hand Feint II",
+      "Right-Hand Feint III"
     ],
     "special": [
       "Power Threshold",
-      "King's Right Hand"
+      "King's Right Hand",
+      "King's Right Hand II",
+      "King's Right Hand III"
     ],
-    "ultimate": [
-      "King's Fist"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Jinyoung Park Medicine Genius": {
@@ -9128,7 +8134,8 @@
     "unique_skills": [
       "Medical Precision",
       "Four Masteries",
-      "Copy Analysis"
+      "Copy Analysis",
+      "Precision Sequence"
     ],
     "stats": {
       "strength": 69,
@@ -9161,6 +8168,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Copy Step II",
+        "type": "Normal",
+        "dialogue": "Jinyoung mirrors the opponent's movement and shifts position.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Copy Step III",
+        "type": "Normal",
+        "dialogue": "Jinyoung mirrors the opponent's movement and shifts position.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Medical Precision",
         "type": "Special",
         "dialogue": "Jinyoung attacks a weak point with surgical accuracy.",
@@ -9175,8 +8196,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Mastery Flow II",
+        "type": "Special",
+        "dialogue": "Jinyoung links all four masteries into a controlled sequence.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Mastery Flow III",
+        "type": "Special",
+        "dialogue": "Jinyoung links all four masteries into a controlled sequence.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Precision Sequence",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Jinyoung reads the body and finishes with a precise technical chain.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -9185,15 +8220,17 @@
     "attacks": [
       "Precision Jab",
       "Nerve Check",
-      "Copy Step"
+      "Copy Step",
+      "Copy Step II",
+      "Copy Step III"
     ],
     "special": [
       "Medical Precision",
-      "Mastery Flow"
+      "Mastery Flow",
+      "Mastery Flow II",
+      "Mastery Flow III"
     ],
-    "ultimate": [
-      "Precision Sequence"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Goo Kim 1st Moonlight Technique": {
@@ -9206,7 +8243,8 @@
     "unique_skills": [
       "Moonlight Technique",
       "Blade Control",
-      "Weapon Genius"
+      "Weapon Genius",
+      "Moonlight Arc"
     ],
     "stats": {
       "strength": 67,
@@ -9239,6 +8277,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Guard Split II",
+        "type": "Normal",
+        "dialogue": "Goo slices through the opponent's guard angle.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Guard Split III",
+        "type": "Normal",
+        "dialogue": "Goo slices through the opponent's guard angle.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Moonlight Technique",
         "type": "Special",
         "dialogue": "Goo releases a precise Moonlight sword sequence.",
@@ -9253,8 +8305,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Weapon Control II",
+        "type": "Special",
+        "dialogue": "Goo turns the weapon angle into an unavoidable threat.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Weapon Control III",
+        "type": "Special",
+        "dialogue": "Goo turns the weapon angle into an unavoidable threat.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Moonlight Arc",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Goo completes the first Moonlight Technique with a decisive blade arc.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -9263,15 +8329,17 @@
     "attacks": [
       "Moonlight Cut",
       "Blade Step",
-      "Guard Split"
+      "Guard Split",
+      "Guard Split II",
+      "Guard Split III"
     ],
     "special": [
       "Moonlight Technique",
-      "Weapon Control"
+      "Weapon Control",
+      "Weapon Control II",
+      "Weapon Control III"
     ],
-    "ultimate": [
-      "Moonlight Arc"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Gun Park Shiro Oni": {
@@ -9287,7 +8355,8 @@
     "unique_skills": [
       "Shiro Oni",
       "Yamazaki Combat",
-      "Iron Pressure"
+      "Iron Pressure",
+      "Yamazaki Break"
     ],
     "stats": {
       "strength": 95,
@@ -9320,6 +8389,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Bone Crush II",
+        "type": "Normal",
+        "dialogue": "Gun breaks through the opponent's defense with raw force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Bone Crush III",
+        "type": "Normal",
+        "dialogue": "Gun breaks through the opponent's defense with raw force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Iron Pressure",
         "type": "Special",
         "dialogue": "Gun overwhelms the field with demonic pressure.",
@@ -9334,8 +8417,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Endurance Threshold II",
+        "type": "Special",
+        "dialogue": "Gun absorbs damage and answers with heavier force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Endurance Threshold III",
+        "type": "Special",
+        "dialogue": "Gun absorbs damage and answers with heavier force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Yamazaki Break",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Gun finishes with the full weight of Shiro Oni power.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -9344,15 +8441,17 @@
     "attacks": [
       "Yamazaki Straight",
       "Iron Roundhouse",
-      "Bone Crush"
+      "Bone Crush",
+      "Bone Crush II",
+      "Bone Crush III"
     ],
     "special": [
       "Iron Pressure",
-      "Endurance Threshold"
+      "Endurance Threshold",
+      "Endurance Threshold II",
+      "Endurance Threshold III"
     ],
-    "ultimate": [
-      "Yamazaki Break"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Tom Lee Beggar King": {
@@ -9370,7 +8469,8 @@
     "unique_skills": [
       "Fighting Genius",
       "Wild Intercept",
-      "Four Masteries"
+      "Four Masteries",
+      "Full-Body Assault"
     ],
     "stats": {
       "strength": 88,
@@ -9403,6 +8503,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Dirty Feint II",
+        "type": "Normal",
+        "dialogue": "Tom tricks the opponent with an ugly but effective feint.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Dirty Feint III",
+        "type": "Normal",
+        "dialogue": "Tom tricks the opponent with an ugly but effective feint.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Combat Read",
         "type": "Special",
         "dialogue": "Tom reads the exchange and attacks from an unexpected angle.",
@@ -9417,8 +8531,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Wild Intercept II",
+        "type": "Special",
+        "dialogue": "Tom interrupts the opponent before they can complete their action.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Wild Intercept III",
+        "type": "Special",
+        "dialogue": "Tom interrupts the opponent before they can complete their action.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Full-Body Assault",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Tom ends the fight with a ruthless full-body assault.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -9427,15 +8555,17 @@
     "attacks": [
       "Wild Grab",
       "Heavy Stomp",
-      "Dirty Feint"
+      "Dirty Feint",
+      "Dirty Feint II",
+      "Dirty Feint III"
     ],
     "special": [
       "Combat Read",
-      "Wild Intercept"
+      "Wild Intercept",
+      "Wild Intercept II",
+      "Wild Intercept III"
     ],
-    "ultimate": [
-      "Full-Body Assault"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "James Lee 3T Cheonliang Arc": {
@@ -9452,7 +8582,8 @@
     "unique_skills": [
       "Three Thresholds",
       "Invisible Strike",
-      "Perfect Footwork"
+      "Perfect Footwork",
+      "Cheonliang Flash"
     ],
     "stats": {
       "strength": 70,
@@ -9485,6 +8616,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Angle Break II",
+        "type": "Normal",
+        "dialogue": "James breaks the opponent's position with a sharp angle.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Angle Break III",
+        "type": "Normal",
+        "dialogue": "James breaks the opponent's position with a sharp angle.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Invisible Strike",
         "type": "Special",
         "dialogue": "James attacks faster than the opponent can properly track.",
@@ -9499,8 +8644,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Threshold Flow II",
+        "type": "Special",
+        "dialogue": "James links speed, endurance, and technique into a complete sequence.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Threshold Flow III",
+        "type": "Special",
+        "dialogue": "James links speed, endurance, and technique into a complete sequence.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Cheonliang Flash",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "James finishes with a high-speed sequence of invisible strikes.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -9509,15 +8668,17 @@
     "attacks": [
       "Perfect Step",
       "Blindspot Kick",
-      "Angle Break"
+      "Angle Break",
+      "Angle Break II",
+      "Angle Break III"
     ],
     "special": [
       "Invisible Strike",
-      "Threshold Flow"
+      "Threshold Flow",
+      "Threshold Flow II",
+      "Threshold Flow III"
     ],
-    "ultimate": [
-      "Cheonliang Flash"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Seongji Yuk 3T": {
@@ -9534,7 +8695,8 @@
     "unique_skills": [
       "Three Thresholds",
       "Mujin Ssireum",
-      "Cheonliang King's Grip"
+      "Cheonliang King's Grip",
+      "Mountain Throw"
     ],
     "stats": {
       "strength": 89,
@@ -9567,6 +8729,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Heavy Step II",
+        "type": "Normal",
+        "dialogue": "Seongji advances with unstoppable pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Step III",
+        "type": "Normal",
+        "dialogue": "Seongji advances with unstoppable pressure.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Threshold Drive",
         "type": "Special",
         "dialogue": "Seongji combines strength, speed, and endurance into one charge.",
@@ -9581,8 +8757,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Cheonliang Lock II",
+        "type": "Special",
+        "dialogue": "Seongji traps the opponent and shuts down their movement.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Cheonliang Lock III",
+        "type": "Special",
+        "dialogue": "Seongji traps the opponent and shuts down their movement.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Mountain Throw",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Seongji finishes with a devastating Cheonliang throw.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -9591,15 +8781,17 @@
     "attacks": [
       "King's Grip",
       "Mujin Throw",
-      "Heavy Step"
+      "Heavy Step",
+      "Heavy Step II",
+      "Heavy Step III"
     ],
     "special": [
       "Threshold Drive",
-      "Cheonliang Lock"
+      "Cheonliang Lock",
+      "Cheonliang Lock II",
+      "Cheonliang Lock III"
     ],
-    "ultimate": [
-      "Mountain Throw"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Manager Kim White Tiger No.2": {
@@ -9617,7 +8809,8 @@
     "unique_skills": [
       "CQC Mastery",
       "Military Precision",
-      "Four Masteries"
+      "Four Masteries",
+      "CQC Sequence"
     ],
     "stats": {
       "strength": 76,
@@ -9650,6 +8843,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Tactical Step II",
+        "type": "Normal",
+        "dialogue": "Manager Kim shifts into a better angle without wasted motion.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Tactical Step III",
+        "type": "Normal",
+        "dialogue": "Manager Kim shifts into a better angle without wasted motion.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Military Precision",
         "type": "Special",
         "dialogue": "Manager Kim targets a weak point with trained accuracy.",
@@ -9664,8 +8871,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "CQC Suppression II",
+        "type": "Special",
+        "dialogue": "Manager Kim shuts down the opponent with close-quarters control.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "CQC Suppression III",
+        "type": "Special",
+        "dialogue": "Manager Kim shuts down the opponent with close-quarters control.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "CQC Sequence",
-        "type": "Ultimate",
+        "type": "Unique Skill",
         "dialogue": "Manager Kim executes a complete CQC finishing sequence.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -9674,15 +8895,17 @@
     "attacks": [
       "CQC Jab",
       "Joint Lock",
-      "Tactical Step"
+      "Tactical Step",
+      "Tactical Step II",
+      "Tactical Step III"
     ],
     "special": [
       "Military Precision",
-      "CQC Suppression"
+      "CQC Suppression",
+      "CQC Suppression II",
+      "CQC Suppression III"
     ],
-    "ultimate": [
-      "CQC Sequence"
-    ],
+    "ultimate": [],
     "defensive_moves": []
   },
   "Kitae Kim Silhouette": {
@@ -9731,6 +8954,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Heavy Blow II",
+        "type": "Normal",
+        "dialogue": "Kitae lands a brutal force-driven hit.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Heavy Blow III",
+        "type": "Normal",
+        "dialogue": "Kitae lands a brutal force-driven hit.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Frame Control",
         "type": "Special",
         "dialogue": "Kitae uses his physical presence to dominate the exchange.",
@@ -9745,8 +8982,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Endurance Breaker II",
+        "type": "Special",
+        "dialogue": "Kitae tanks the impact and answers with crushing force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Endurance Breaker III",
+        "type": "Special",
+        "dialogue": "Kitae tanks the impact and answers with crushing force.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Silhouette Strike",
-        "type": "Ultimate",
+        "type": "Path",
         "dialogue": "Kitae ends the fight with a brutal, unreadable finishing strike.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -9755,15 +9006,17 @@
     "attacks": [
       "Heavy Strike",
       "Heavy Step-In",
-      "Heavy Blow"
+      "Heavy Blow",
+      "Heavy Blow II",
+      "Heavy Blow III"
     ],
     "special": [
       "Frame Control",
-      "Endurance Breaker"
+      "Endurance Breaker",
+      "Endurance Breaker II",
+      "Endurance Breaker III"
     ],
-    "ultimate": [
-      "Silhouette Strike"
-    ],
+    "ultimate": [],
     "defensive_moves": [],
     "unique_path": "Silhouette Strike",
     "unique_path_description": "Kitae ends the fight with a brutal, unreadable finishing strike."
@@ -9815,6 +9068,20 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Hands-Free Feint II",
+        "type": "Normal",
+        "dialogue": "Diego creates an opening with effortless movement.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Hands-Free Feint III",
+        "type": "Normal",
+        "dialogue": "Diego creates an opening with effortless movement.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Invisible Strike",
         "type": "Special",
         "dialogue": "Diego attacks from a blind spot at overwhelming speed.",
@@ -9829,8 +9096,22 @@
         "miss_dialogue": ""
       },
       {
+        "name": "Perfect Footwork II",
+        "type": "Special",
+        "dialogue": "Diego controls the entire exchange through flawless positioning.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
+        "name": "Perfect Footwork III",
+        "type": "Special",
+        "dialogue": "Diego controls the entire exchange through flawless positioning.",
+        "crit_dialogue": "",
+        "miss_dialogue": ""
+      },
+      {
         "name": "Final Sequence",
-        "type": "Ultimate",
+        "type": "Path",
         "dialogue": "Diego ends the fight with a perfect invisible-strike sequence.",
         "crit_dialogue": "",
         "miss_dialogue": ""
@@ -9839,15 +9120,17 @@
     "attacks": [
       "Invisible Step",
       "Vital Kick",
-      "Hands-Free Feint"
+      "Hands-Free Feint",
+      "Hands-Free Feint II",
+      "Hands-Free Feint III"
     ],
     "special": [
       "Invisible Strike",
-      "Perfect Footwork"
+      "Perfect Footwork",
+      "Perfect Footwork II",
+      "Perfect Footwork III"
     ],
-    "ultimate": [
-      "Final Sequence"
-    ],
+    "ultimate": [],
     "defensive_moves": [],
     "unique_path": "Final Sequence",
     "unique_path_description": "Diego ends the fight with a perfect invisible-strike sequence."

@@ -118,7 +118,7 @@ class LeaderboardPanel(discord.ui.View):
         from bot.utils.ui import box
         threshold_lines = [f"{e(n.lower(), data) or '•'} {n}: {band}" for n, band in league_order]
         count_lines = [f"{e(n.lower(), data) or '•'} {n}: {counts.get(n, 0)}" for n, _ in league_order]
-        body = box("Trophy Thresholds", threshold_lines) + "\n\n" + box("League Distribution", count_lines) + "\n\n" + box("Summary", [f"👥 Total Players: {total_players}"])
+        body = box("Trophy Thresholds", threshold_lines) + "\n" + box("League Distribution", count_lines) + "\n" + box("Summary", [f"👥 Total Players: {total_players}"])
         embed = make_embed(data, f"{e('league', data)} League Overview", body)
         await interaction.response.send_message(embed=embed, ephemeral=True)
 

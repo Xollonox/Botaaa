@@ -277,7 +277,7 @@ def _pipeline_embed() -> discord.Embed:
         "1. Miss check          : if attacker.biq < defender.biq, roll for miss\n"
         "2. Base roll           : strength/2 ± range by move type\n"
         "                         normal ±5 | special +20..+45\n"
-        "                         ultimate 3x..4x | unique +40..+80\n"
+        "                         unique_skill 3x..4x | path +40..+80\n"
         "3. Strength bonus      : +10/+15/+30 if Strength mastery (by move)\n"
         "4. Technique multiplier: 1.04..1.30 (higher moves = bigger boost)\n"
         "5. Attacker IQ scaling : × (1 + iq/500)\n"
