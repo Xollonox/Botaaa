@@ -80,6 +80,30 @@ def _upgrade_cost(item: dict[str, Any]) -> int:
     return int(round(base * (1.6 ** stars)))
 
 
+def _find_available_duplicate_index(inv: list[Any], item: dict[str, Any]) -> int:
+    """Return the index of a spare, unlocked duplicate of *item* in *inv*, or -1.
+
+    A duplicate is unavailable if it's the same instance, or if it's locked,
+    market-listed, squad-locked, mid-trade, or has a weapon equipped.
+    """
+    return next(
+        (
+            i for i, row in enumerate(inv)
+            if isinstance(row, dict)
+            and str(row.get("card_name", "")) == str(item.get("card_name", ""))
+            and str(row.get("uid", "")) != str(item.get("uid", ""))
+            and not bool(
+                row.get("squad_locked", False)
+                or row.get("market_locked", False)
+                or row.get("locked", False)
+                or row.get("trade_locked", False)
+                or row.get("weapon_uid")
+            )
+        ),
+        -1,
+    )
+
+
 def _effective_stats(data: dict[str, Any], item: dict[str, Any], stars_override: int | None = None) -> dict[str, int]:
     card_def = _get_card_def(data, item)
     stars = _clamp_stars(item.get("stars", 0) if stars_override is None else stars_override)
@@ -355,9 +379,8 @@ class CollectionDetailView(discord.ui.View):
         inv = data.get("players", {}).get(str(interaction.user.id), {}).get("user", {}).get("inventory", [])
         if not isinstance(inv, list):
             inv = []
-        same = [x for x in inv if isinstance(x, dict) and str(x.get("card_name", "")) == str(item.get("card_name", "")) and str(x.get("uid", "")) != str(item.get("uid", ""))]
-        if len(same) < 1:
-            await smart_reply(interaction, "⚠ You need another copy of this fighter to upgrade.", ephemeral=True)
+        if _find_available_duplicate_index(inv, item) < 0:
+            await smart_reply(interaction, "⚠ You need a free (unlocked, untraded, unequipped) duplicate of this fighter to upgrade.", ephemeral=True)
             return
 
         preview = self.cog._build_upgrade_preview_embed(data, item)
@@ -870,7 +893,7 @@ class InventoryCog(commands.Cog):
             if coins < cost:
                 return "not_enough", stars, coins
 
-            dup_idx = next((i for i, row in enumerate(user.get("inventory", [])) if isinstance(row, dict) and str(row.get("card_name", "")) == str(item.get("card_name", "")) and str(row.get("uid", "")) != str(item.get("uid", "")) and not bool(row.get("squad_locked", False) or row.get("market_locked", False) or row.get("locked", False) or row.get("trade_locked", False) or row.get("weapon_uid"))), -1)
+            dup_idx = _find_available_duplicate_index(user.get("inventory", []), item)
             if dup_idx < 0:
                 return "need_duplicate", stars, coins
 
@@ -882,6 +905,90 @@ class InventoryCog(commands.Cog):
             return "ok", stars + 1, int(user.get("balance", user.get("coins", 0)))
 
         return self.bot.storage.with_lock(mutate)
+
+    def _upgradeable_entries(self, data: dict[str, Any], user_id: str) -> list[dict[str, Any]]:
+        """Return owned card instances that can be upgraded right now.
+
+        A card is upgradeable if it's below 5 stars AND has a free,
+        unlocked duplicate available to consume.
+        """
+        inv = data.get("players", {}).get(user_id, {}).get("user", {}).get("inventory", [])
+        if not isinstance(inv, list):
+            return []
+        result = []
+        for item in inv:
+            if not isinstance(item, dict):
+                continue
+            if _clamp_stars(item.get("stars", 0)) >= 5:
+                continue
+            if _find_available_duplicate_index(inv, item) < 0:
+                continue
+            result.append(item)
+        result.sort(key=lambda x: (-_compute_item_power(data, x), str(x.get("card_name", "")).lower()))
+        return result
+
+    @app_commands.command(name="upgrade", description="Upgrade a fighter's star level using a duplicate card.")
+    @app_commands.describe(card="The fighter to upgrade (only cards you can upgrade right now are shown).")
+    async def upgrade_command(self, interaction: discord.Interaction, card: str) -> None:
+        if not await ensure_registered(interaction, self.bot.storage):
+            return
+
+        user_id = str(interaction.user.id)
+        data = self.bot.storage.load()
+        item = self._find_item(data, user_id, card)
+
+        if item is None:
+            await error_reply(interaction, "⚠ Card not found in your collection. Use the autocomplete list to pick one.")
+            return
+
+        if _clamp_stars(item.get("stars", 0)) >= 5:
+            await smart_reply(
+                interaction,
+                embed=make_embed(data, "⭐ Already at Max Stars", "This card is already at **5★** and cannot be upgraded further."),
+                ephemeral=True,
+            )
+            return
+
+        inv = data.get("players", {}).get(user_id, {}).get("user", {}).get("inventory", [])
+        if not isinstance(inv, list):
+            inv = []
+        if _find_available_duplicate_index(inv, item) < 0:
+            await error_reply(interaction, "⚠ You need a free (unlocked, untraded, unequipped) duplicate of this fighter to upgrade.")
+            return
+
+        preview = self._build_upgrade_preview_embed(data, item)
+        view = UpgradeConfirmView(self, interaction.user.id, str(item.get("uid", "")), None)
+        _sanitize_view(view)
+        await smart_reply(interaction, embed=preview, view=view)
+        view.message = await interaction.original_response()
+
+    @upgrade_command.autocomplete("card")
+    async def upgrade_command_autocomplete(
+        self,
+        interaction: discord.Interaction,
+        current: str,
+    ) -> list[app_commands.Choice[str]]:
+        user_id = str(interaction.user.id)
+        data = self.bot.storage.load_readonly()
+        entries = self._upgradeable_entries(data, user_id)
+
+        token = str(current or "").casefold()
+        choices: list[app_commands.Choice[str]] = []
+        for item in entries:
+            name = str(item.get("card_name", item.get("name", "Unknown"))).strip()
+            uid = str(item.get("uid", "")).strip()
+            if not uid:
+                continue
+            if token and token not in name.casefold():
+                continue
+            rarity = str(item.get("rarity", "Common"))
+            stars = _clamp_stars(item.get("stars", 0))
+            cost = _upgrade_cost(item)
+            label = f"{name} [{rarity}] {stars}★→{stars + 1}★ • {cost:,}c"[:100]
+            choices.append(app_commands.Choice(name=label, value=uid))
+            if len(choices) >= 25:
+                break
+        return choices
 
     @app_commands.command(name="collection", description="Browse your card collection.")
     async def collection(self, interaction: discord.Interaction) -> None:
