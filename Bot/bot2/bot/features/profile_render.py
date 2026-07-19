@@ -211,18 +211,11 @@ def _rank_rows(data: dict[str,Any]) -> list[tuple[str,int]]:
 
 def _league_rank_emoji(data: dict[str,Any], league_name: str) -> str:
     normalized = str(league_name or "").strip().lower()
-    fallback_map = {
-        "copper":"🥉","iron":"🪙","bronze":"🥉","silver":"🥈",
-        "gold":"🥇","diamond":"💎","platinum":"🔷","sapphire":"💠",
-        "ruby":"🔴","unranked":"🏅",
-    }
-    fallback = fallback_map.get(normalized, "🏅")
     if normalized:
         value = str(e(normalized, data)).strip()
         if value and value != "•":
             return value
-    val2 = str(e("league", data)).strip()
-    return val2 if val2 and val2 != "•" else fallback
+    return str(e("league", data)).strip() or "•"
 
 def _resolve_card_by_uid(inventory: list[dict[str,Any]], uid: str) -> dict[str,Any] | None:
     return next((i for i in inventory if isinstance(i,dict) and str(i.get("uid",""))==uid), None)
@@ -363,10 +356,10 @@ def _draw_stat_box(
     canvas: Image.Image,
     draw: ImageDraw.ImageDraw,
     x: int, y: int, w: int, h: int,
-    value: str, label: str, emoji: str,
-    emoji_font, val_font, lbl_font,
+    value: str, label: str, icon_img: Image.Image | None,
+    val_font, lbl_font,
 ) -> None:
-    """Discord-style stat box with emoji, value, and label stacked cleanly."""
+    """Discord-style stat box with a configured custom-emoji icon, value, and label."""
     panel = Image.new("RGBA", (w, h), (0,0,0,0))
     pd    = ImageDraw.Draw(panel)
     pd.rounded_rectangle((0, 0, w, h), radius=22, fill=_DISCORD_BOX_BG)
@@ -374,8 +367,11 @@ def _draw_stat_box(
 
     cx = x + w // 2
 
-    # emoji — top, comfortably padded
-    draw.text((cx, y + 34), emoji, font=emoji_font, fill=_TEXT_WHITE, anchor="ma")
+    # icon — top, comfortably padded. Only drawn when a matching configured
+    # custom emoji resolved; concepts with no matching emoji show no icon.
+    if icon_img is not None:
+        icon = icon_img.resize((64, 64), Image.Resampling.LANCZOS)
+        canvas.alpha_composite(icon, (cx - 32, y + 24))
 
     # value — large, centered in the visual middle
     draw.text((cx, y + h // 2 - 8), value, font=val_font, fill=_TEXT_WHITE, anchor="mm")
@@ -484,7 +480,6 @@ async def render_profile_card(data: dict[str,Any], target: discord.abc.User) -> 
     font_body   = _font(72)
     font_body_b = _font(72, bold=True)
     font_small  = _font(56)
-    font_stat_e = _emoji_font(74)
     font_stat_v = _font(104, bold=True)
     font_stat_k = _font(44)
     font_card   = _font(68)
@@ -494,7 +489,10 @@ async def render_profile_card(data: dict[str,Any], target: discord.abc.User) -> 
         featured_img = await _fetch_image(session, featured_image_url)
         avatar_img   = await _fetch_image(session, str(avatar_url)) if avatar_url else None
         league_img   = await _fetch_image(session, _emoji_cdn_url(league_token) or "")
-        trophy_img   = await _fetch_image(session, _emoji_cdn_url("<:Trophy:1469971235453665345>") or "")
+        trophy_img   = await _fetch_image(session, _emoji_cdn_url(str(e("trophy", data))) or "")
+        rank_img     = await _fetch_image(session, _emoji_cdn_url(str(e("rank", data))) or "")
+        battle_img   = await _fetch_image(session, _emoji_cdn_url(str(e("battle", data))) or "")
+        catalog_img  = await _fetch_image(session, _emoji_cdn_url(str(e("catalog", data))) or "")
 
     # ── Layer 1: full-bleed featured card art as background ───────────────────
     if featured_img is not None:
@@ -636,7 +634,7 @@ async def render_profile_card(data: dict[str,Any], target: discord.abc.User) -> 
     draw.line((PNL_X1+40, BADGE_DIVIDER_Y, PNL_X2-40, BADGE_DIVIDER_Y), fill=(255,255,255,20), width=1)
 
     BADGE_TITLE_Y = BADGE_DIVIDER_Y + 24
-    draw.text((IX, BADGE_TITLE_Y), "🏅 Badges", font=font_body_b, fill=_TEXT_WHITE)
+    draw.text((IX, BADGE_TITLE_Y), "Badges", font=font_body_b, fill=_TEXT_WHITE)
 
     badge_lines = _badge_lines_from_text(badges_text)
     BADGE_LINES_Y = BADGE_TITLE_Y + 84
@@ -679,23 +677,23 @@ async def render_profile_card(data: dict[str,Any], target: discord.abc.User) -> 
     SB_H     = (SB_H_TOT - SB_GAP*(ROWS-1)) // ROWS
 
     stat_boxes = [
-        (f"{trophies:,}",                           "TROPHIES",    "🏆"),
-        (f"#{global_rank if global_rank else '—'}", "GLOBAL RANK", "🌐"),
-        (f"{win_rate:.1f}%",                        "WIN RATE",    "📈"),
-        (f"{battles_played:,}",                     "BATTLES",     "⚔️"),
-        (f"{win_streak}",                           "STREAK",      "🔥"),
-        (f"{cards_unlocked}",                       "CARDS",       "🃏"),
+        (f"{trophies:,}",                           "TROPHIES",    trophy_img),
+        (f"#{global_rank if global_rank else '—'}", "GLOBAL RANK", rank_img),
+        (f"{win_rate:.1f}%",                        "WIN RATE",    None),
+        (f"{battles_played:,}",                     "BATTLES",     battle_img),
+        (f"{win_streak}",                           "STREAK",      None),
+        (f"{cards_unlocked}",                       "CARDS",       catalog_img),
     ]
 
-    for i, (val, lbl, emoji) in enumerate(stat_boxes):
+    for i, (val, lbl, icon_img) in enumerate(stat_boxes):
         col = i % COLS
         row = i // COLS
         bx  = SB_X1 + col*(SB_W+SB_GAP)
         by  = SB_Y1 + row*(SB_H+SB_GAP)
         _draw_stat_box(
             canvas, draw, bx, by, SB_W, SB_H,
-            val, lbl, emoji,
-            font_stat_e, font_stat_v, font_stat_k,
+            val, lbl, icon_img,
+            font_stat_v, font_stat_k,
         )
         draw = ImageDraw.Draw(canvas)
 
@@ -708,6 +706,12 @@ async def render_profile_card(data: dict[str,Any], target: discord.abc.User) -> 
         outline=(0, 200, 255, 70), width=4
     )
     canvas.alpha_composite(border_img)
+
+    # ── Black & white pass — keep only the avatar photo in color ──────────────
+    bw_canvas = canvas.convert("L").convert("RGBA")
+    if avatar_img is not None:
+        bw_canvas.alpha_composite(av, (AV_X, AV_Y))
+    canvas = bw_canvas
 
     # ── Encode ────────────────────────────────────────────────────────────────
     out = io.BytesIO()

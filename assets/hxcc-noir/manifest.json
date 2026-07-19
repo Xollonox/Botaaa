@@ -1,0 +1,404 @@
+{
+  "theme": "HXCC Noir / Chrome",
+  "palette": {
+    "background": "#080808",
+    "panel": "#151515",
+    "primary": "#F2F2F2",
+    "secondary": "#A7A7A7",
+    "outline": "#000000"
+  },
+  "icons": {
+    "warning": {
+      "file": "icons/warning.png",
+      "size": "320x320",
+      "lucide_source": "triangle-alert",
+      "purpose": "Warnings and invalid actions"
+    },
+    "no": {
+      "file": "icons/no.png",
+      "size": "320x320",
+      "lucide_source": "circle-x",
+      "purpose": "Errors and denied actions"
+    },
+    "info": {
+      "file": "icons/info.png",
+      "size": "320x320",
+      "lucide_source": "info",
+      "purpose": "Information"
+    },
+    "help": {
+      "file": "icons/help.png",
+      "size": "320x320",
+      "lucide_source": "circle-help",
+      "purpose": "Help and onboarding"
+    },
+    "settings": {
+      "file": "icons/settings.png",
+      "size": "320x320",
+      "lucide_source": "settings",
+      "purpose": "Server and owner settings"
+    },
+    "unlock": {
+      "file": "icons/unlock.png",
+      "size": "320x320",
+      "lucide_source": "unlock",
+      "purpose": "Unlocked state"
+    },
+    "delete": {
+      "file": "icons/delete.png",
+      "size": "320x320",
+      "lucide_source": "trash-2",
+      "purpose": "Delete actions"
+    },
+    "prev": {
+      "file": "icons/prev.png",
+      "size": "320x320",
+      "lucide_source": "chevron-left",
+      "purpose": "Previous navigation"
+    },
+    "timer": {
+      "file": "icons/timer.png",
+      "size": "320x320",
+      "lucide_source": "timer",
+      "purpose": "Timers, clocks, and time"
+    },
+    "shop": {
+      "file": "icons/shop.png",
+      "size": "320x320",
+      "lucide_source": "shopping-cart",
+      "purpose": "Shop screen"
+    },
+    "market": {
+      "file": "icons/market.png",
+      "size": "320x320",
+      "lucide_source": "chart-candlestick",
+      "purpose": "Marketplace"
+    },
+    "store": {
+      "file": "icons/store.png",
+      "size": "320x320",
+      "lucide_source": "warehouse",
+      "purpose": "Store management"
+    },
+    "pack": {
+      "file": "icons/pack.png",
+      "size": "320x320",
+      "lucide_source": "package",
+      "purpose": "Card packs"
+    },
+    "open": {
+      "file": "icons/open.png",
+      "size": "320x320",
+      "lucide_source": "gift",
+      "purpose": "Open or claim reward"
+    },
+    "roll": {
+      "file": "icons/roll.png",
+      "size": "320x320",
+      "lucide_source": "dice-5",
+      "purpose": "Pack and card roll"
+    },
+    "list": {
+      "file": "icons/list.png",
+      "size": "320x320",
+      "lucide_source": "list",
+      "purpose": "Lists and history"
+    },
+    "page": {
+      "file": "icons/page.png",
+      "size": "320x320",
+      "lucide_source": "file-text",
+      "purpose": "Pages and documents"
+    },
+    "code": {
+      "file": "icons/code.png",
+      "size": "320x320",
+      "lucide_source": "ticket-check",
+      "purpose": "Codes and listings"
+    },
+    "uses": {
+      "file": "icons/uses.png",
+      "size": "320x320",
+      "lucide_source": "hash",
+      "purpose": "Usage count"
+    },
+    "limit": {
+      "file": "icons/limit.png",
+      "size": "320x320",
+      "lucide_source": "octagon-x",
+      "purpose": "Limit reached"
+    },
+    "fee": {
+      "file": "icons/fee.png",
+      "size": "320x320",
+      "lucide_source": "badge-percent",
+      "purpose": "Market fee"
+    },
+    "quick_sell": {
+      "file": "icons/quick_sell.png",
+      "size": "320x320",
+      "lucide_source": "badge-dollar-sign",
+      "purpose": "Quick sell"
+    },
+    "trade": {
+      "file": "icons/trade.png",
+      "size": "320x320",
+      "lucide_source": "arrow-left-right",
+      "purpose": "Trade and round"
+    },
+    "forfeit": {
+      "file": "icons/forfeit.png",
+      "size": "320x320",
+      "lucide_source": "flag",
+      "purpose": "Battle forfeit"
+    },
+    "switch": {
+      "file": "icons/switch.png",
+      "size": "320x320",
+      "lucide_source": "repeat-2",
+      "purpose": "Switch fighter"
+    },
+    "ranked": {
+      "file": "icons/ranked.png",
+      "size": "320x320",
+      "lucide_source": "swords",
+      "purpose": "Ranked battle"
+    },
+    "common": {
+      "file": "icons/common.png",
+      "size": "320x320",
+      "lucide_source": "circle",
+      "purpose": "Common rarity"
+    },
+    "mastery": {
+      "file": "icons/mastery.png",
+      "size": "320x320",
+      "lucide_source": "dna",
+      "purpose": "Mastery"
+    },
+    "active": {
+      "file": "icons/active.png",
+      "size": "320x320",
+      "lucide_source": "activity",
+      "purpose": "Active squad slot"
+    },
+    "backup": {
+      "file": "icons/backup.png",
+      "size": "320x320",
+      "lucide_source": "shield",
+      "purpose": "Backup squad slot"
+    },
+    "tier": {
+      "file": "icons/tier.png",
+      "size": "320x320",
+      "lucide_source": "layers-3",
+      "purpose": "Tier marker"
+    },
+    "achievement": {
+      "file": "icons/achievement.png",
+      "size": "320x320",
+      "lucide_source": "award",
+      "purpose": "Achievements"
+    },
+    "leaderboard": {
+      "file": "icons/leaderboard.png",
+      "size": "320x320",
+      "lucide_source": "chart-no-axes-column-increasing",
+      "purpose": "Leaderboards"
+    },
+    "profile": {
+      "file": "icons/profile.png",
+      "size": "320x320",
+      "lucide_source": "user-round",
+      "purpose": "Profile"
+    },
+    "bio": {
+      "file": "icons/bio.png",
+      "size": "320x320",
+      "lucide_source": "notebook-pen",
+      "purpose": "Biography"
+    },
+    "panel": {
+      "file": "icons/panel.png",
+      "size": "320x320",
+      "lucide_source": "panels-top-left",
+      "purpose": "Owner and squad panels"
+    },
+    "members": {
+      "file": "icons/members.png",
+      "size": "320x320",
+      "lucide_source": "users",
+      "purpose": "Members"
+    },
+    "invite": {
+      "file": "icons/invite.png",
+      "size": "320x320",
+      "lucide_source": "mail-plus",
+      "purpose": "Invites"
+    },
+    "leave": {
+      "file": "icons/leave.png",
+      "size": "320x320",
+      "lucide_source": "log-out",
+      "purpose": "Leave action"
+    },
+    "announce": {
+      "file": "icons/announce.png",
+      "size": "320x320",
+      "lucide_source": "megaphone",
+      "purpose": "Announcements"
+    },
+    "channel": {
+      "file": "icons/channel.png",
+      "size": "320x320",
+      "lucide_source": "radio",
+      "purpose": "Channel settings"
+    },
+    "start": {
+      "file": "icons/start.png",
+      "size": "320x320",
+      "lucide_source": "play",
+      "purpose": "Start and onboarding"
+    },
+    "status": {
+      "file": "icons/status.png",
+      "size": "320x320",
+      "lucide_source": "pin",
+      "purpose": "Status"
+    },
+    "link": {
+      "file": "icons/link.png",
+      "size": "320x320",
+      "lucide_source": "link",
+      "purpose": "Links"
+    },
+    "send": {
+      "file": "icons/send.png",
+      "size": "320x320",
+      "lucide_source": "send",
+      "purpose": "Send and publish"
+    },
+    "assign": {
+      "file": "icons/assign.png",
+      "size": "320x320",
+      "lucide_source": "user-round-plus",
+      "purpose": "Assign fighter/card"
+    },
+    "add": {
+      "file": "icons/add.png",
+      "size": "320x320",
+      "lucide_source": "plus",
+      "purpose": "Add and grant"
+    },
+    "remove": {
+      "file": "icons/remove.png",
+      "size": "320x320",
+      "lucide_source": "minus",
+      "purpose": "Remove"
+    },
+    "reset": {
+      "file": "icons/reset.png",
+      "size": "320x320",
+      "lucide_source": "rotate-ccw",
+      "purpose": "Reset"
+    },
+    "edit": {
+      "file": "icons/edit.png",
+      "size": "320x320",
+      "lucide_source": "pencil",
+      "purpose": "Edit"
+    },
+    "view": {
+      "file": "icons/view.png",
+      "size": "320x320",
+      "lucide_source": "eye",
+      "purpose": "View details"
+    },
+    "buy": {
+      "file": "icons/buy.png",
+      "size": "320x320",
+      "lucide_source": "shopping-bag",
+      "purpose": "Buy"
+    },
+    "stock": {
+      "file": "icons/stock.png",
+      "size": "320x320",
+      "lucide_source": "boxes",
+      "purpose": "Store stock"
+    },
+    "seller": {
+      "file": "icons/seller.png",
+      "size": "320x320",
+      "lucide_source": "user-round",
+      "purpose": "Seller"
+    },
+    "social": {
+      "file": "icons/social.png",
+      "size": "320x320",
+      "lucide_source": "globe-2",
+      "purpose": "Social links"
+    },
+    "cp": {
+      "file": "icons/cp.png",
+      "size": "320x320",
+      "lucide_source": "crosshair",
+      "purpose": "Combat power"
+    },
+    "rarity": {
+      "file": "icons/rarity.png",
+      "size": "320x320",
+      "lucide_source": "gem",
+      "purpose": "Rarity"
+    },
+    "favorite": {
+      "file": "icons/favorite.png",
+      "size": "320x320",
+      "lucide_source": "heart",
+      "purpose": "Favorite card"
+    },
+    "filter": {
+      "file": "icons/filter.png",
+      "size": "320x320",
+      "lucide_source": "funnel",
+      "purpose": "Filters"
+    },
+    "r2": {
+      "file": "icons/r2.png",
+      "size": "320x320",
+      "lucide_source": "medal",
+      "purpose": "Second place"
+    },
+    "r3": {
+      "file": "icons/r3.png",
+      "size": "320x320",
+      "lucide_source": "medal",
+      "purpose": "Third place"
+    },
+    "cpu": {
+      "file": "icons/cpu.png",
+      "size": "320x320",
+      "lucide_source": "bot",
+      "purpose": "CPU opponent"
+    },
+    "loss": {
+      "file": "icons/loss.png",
+      "size": "320x320",
+      "lucide_source": "skull",
+      "purpose": "Loss and defeat"
+    }
+  },
+  "logos": {
+    "hxcc-avatar.png": "1024x1024 black",
+    "hxcc-stamp.png": "320x320 transparent",
+    "hxcc-watermark.png": "1600x500 transparent"
+  },
+  "aliases": {
+    "grant": "add",
+    "clock": "timer",
+    "time": "timer",
+    "listing": "code",
+    "squad": "panel",
+    "round": "trade"
+  },
+  "license": "Lucide ISC; see LUCIDE-LICENSE.txt"
+}

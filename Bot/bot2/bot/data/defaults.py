@@ -261,7 +261,7 @@ DEFAULT_CONFIG = {
             "damage":       "🩸",
             "miss":         "❔",
             "crit":         "💢",
-            "winner":       "🥇",
+            "winner":       "<:r1:1487355065084936254>",
             "round":        "🔁",
             # ── Stats ─────────────────────────────────────────────
             "strength":     "<:strength:1471199061108588748>",
@@ -309,7 +309,7 @@ DEFAULT_CONFIG = {
             "profile":      "👤",
             "bio":          "📝",
             "social":       "🌐",
-            "star":         "⭐",
+            "star":         "<:stars:1471032797551530145>",
             "top":          "<:Trophy:1469971235453665345>",
             "leaderboard":  "📊",
             "league":       "<:stats_rank:1470382074086031505>",
@@ -385,6 +385,7 @@ _LEGACY_UI_EMOJI_DEFAULTS: dict[str, set[str]] = {
     "attack_special": {"💥"},
     "attack_unique_skill": {"🌀", "✨"},
     "attack_unique_path": {"🛤", "🛤️"},
+    "attack_ultimate": {"🌀"},
     "def_block": {"🛡", "🛡️"},
     "def_dodge": {"💨"},
     "def_parry": {"🪃"},
@@ -415,6 +416,8 @@ _LEGACY_UI_EMOJI_DEFAULTS: dict[str, set[str]] = {
     "top": {"🏆"},
     "league": {"🏟", "🏟️"},
     "stats": {"📈"},
+    "star": {"⭐"},
+    "winner": {"🥇"},
 }
 
 
