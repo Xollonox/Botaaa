@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from bot.utils.ui import e
+
 MAX_MEMBERS = 20
 GANG_CREATION_COST = 10_000
 
@@ -37,8 +39,10 @@ def get_role_label(gang: dict[str, Any], user_id: str) -> str:
     return ROLE_LABELS.get(get_role(gang, user_id), "Member")
 
 
-def get_role_icon(gang: dict[str, Any], user_id: str) -> str:
-    return ROLE_ICONS.get(get_role(gang, user_id), "👤")
+def get_role_icon(gang: dict[str, Any], user_id: str, data: dict[str, Any] | None = None) -> str:
+    role = get_role(gang, user_id)
+    configured = e("vice_head" if role == "vice" else role, data)
+    return configured if configured != "•" else ROLE_ICONS.get(role, "👤")
 
 
 def is_head(gang: dict[str, Any], user_id: str) -> bool:
@@ -128,7 +132,7 @@ def find_gang_by_name(data: dict[str, Any], name: str) -> tuple[str | None, dict
 
 def format_member_line(data: dict[str, Any], gang: dict[str, Any], user_id: str) -> str:
     uid     = str(user_id)
-    icon    = get_role_icon(gang, uid)
+    icon    = get_role_icon(gang, uid, data)
     label   = get_role_label(gang, uid)
     players = data.get("players", {})
     player  = players.get(uid, {}) if isinstance(players, dict) else {}

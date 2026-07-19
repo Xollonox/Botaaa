@@ -134,7 +134,7 @@ class GangsCog(commands.Cog):
             player = players.get(uid, {}) if isinstance(players, dict) else {}
             name   = str((player.get("user") or {}).get("name", uid))
             role   = get_role_label(gang, uid)
-            icon   = get_role_icon(gang, uid)
+            icon   = get_role_icon(gang, uid, data)
             label  = f"{icon} {name}  [{role}]"
             if token and token not in label.lower():
                 continue
@@ -475,7 +475,8 @@ class GangsCog(commands.Cog):
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Promote Failed\n│ {name}\n╰────────────────"))
             return
-        icon = ROLE_ICONS.get(role.value, "•")
+        data = self.bot.storage.load()
+        icon = e("vice_head" if role.value == "vice" else role.value, data)
         await smart_reply(interaction, embed=_ok(
             f"╭─ ⬆️ Member Promoted\n"
             f"│ @{name} → {icon} {role_label}\n"

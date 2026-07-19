@@ -13,7 +13,7 @@ from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_cata
 from bot.utils.checks import ensure_registered
 from bot.utils.interaction_visibility import smart_reply, error_reply
 from bot.utils.squad_logic import compute_squad_power, get_inventory, get_player, get_squad
-from bot.utils.ui import e, make_embed
+from bot.utils.ui import e, make_embed, named_e
 from bot.features.tutorial import advance_tutorial
 
 BASE_HP   = 100
@@ -150,7 +150,7 @@ def _build_fighter_embed(data: dict[str, Any], instance: dict[str, Any]) -> disc
     image_url = str(card_def.get("image_url", "")).strip() if isinstance(card_def, dict) else ""
 
     mastery_list = normalize_mastery_list(card_def.get("mastery", []) if isinstance(card_def, dict) else [])
-    mastery_str  = "  ".join(f"• {m}" for m in mastery_list) if mastery_list else "—"
+    mastery_str  = "  ".join(f"{named_e(m, data, 'mastery')} {m}" for m in mastery_list) if mastery_list else "—"
 
     unique_path,  unique_path_desc  = _resolve_field(card_def.get("unique_path") if isinstance(card_def, dict) else None,
                                                       card_def.get("unique_path_description") if isinstance(card_def, dict) else None)

@@ -74,6 +74,87 @@ _BUTTON_STYLE_KEYWORDS: tuple[tuple[tuple[str, ...], discord.ButtonStyle], ...] 
 
 _PREMIUM_AUTHOR = "LOOKISM HXCC"
 
+_LEADING_EMOJI_KEYS: tuple[tuple[str, str], ...] = (
+    ("⚔️", "battle"), ("⚔", "battle"),
+    ("🗡️", "attack_normal"), ("🗡", "attack_normal"),
+    ("🛡️", "defense"), ("🛡", "defense"),
+    ("🛤️", "attack_ultimate"), ("🛤", "attack_ultimate"),
+    ("❤️", "hp"), ("❤", "hp"),
+    ("✅", "ok"), ("☑️", "confirm"), ("☑", "confirm"),
+    ("➡️", "next"), ("➡", "next"),
+    ("🔒", "locked"),
+    ("🪙", "coin"), ("💰", "coin"), ("💎", "gem"),
+    ("🃏", "catalog"),
+    ("💥", "attack_special"), ("🌀", "attack_unique_skill"),
+    ("🏆", "trophy"), ("🤝", "alliance"), ("👑", "head"),
+    ("💪", "strength"), ("🏃", "speed"), ("🧱", "endurance"),
+    ("🎯", "technique"), ("🧠", "iq"), ("👁️", "biq"), ("👁", "biq"),
+    ("⚡", "boost"),
+    ("🔵", "rare"), ("🟣", "epic"), ("🟠", "legendary"),
+    ("🔴", "mythical"), ("🔥", "infernal"), ("🌌", "abyssal"),
+)
+
+_TEXT_EMOJI_REPLACEMENTS: tuple[tuple[str, str], ...] = (
+    ("⚡ Total Power", "squad_power"),
+    ("⚡ Power", "squad_power"),
+    ("💪 STR", "strength"),
+    ("⚡ SPD", "speed"),
+    ("🏃 SPD", "speed"),
+    ("🛡️ END", "endurance"),
+    ("🛡 END", "endurance"),
+    ("🧱 END", "endurance"),
+    ("🎯 TEC", "technique"),
+    ("🧠 IQ", "iq"),
+    ("🔮 BIQ", "biq"),
+    ("👁️ BIQ", "biq"),
+    ("👁 BIQ", "biq"),
+    ("❤️ HP", "hp"),
+    ("❤ HP", "hp"),
+    ("⚔️", "battle"),
+    ("⚔", "battle"),
+    ("🛡️", "defense"),
+    ("🛡", "defense"),
+    ("✅", "ok"),
+    ("🔒", "locked"),
+    ("🪙", "coin"),
+    ("💰", "coin"),
+    ("💎", "gem"),
+    ("🏆", "trophy"),
+    ("🤝", "alliance"),
+    ("👑", "head"),
+    ("💪", "strength"),
+    ("🏃", "speed"),
+    ("🧱", "endurance"),
+    ("🎯", "technique"),
+    ("🧠", "iq"),
+    ("👁️", "biq"),
+    ("👁", "biq"),
+    ("🔵", "rare"),
+    ("🟣", "epic"),
+    ("🟠", "legendary"),
+    ("🔴", "mythical"),
+    ("🔥", "infernal"),
+    ("🌌", "abyssal"),
+)
+
+_TEXT_EMOJI_LABELS: dict[str, str] = {
+    "⚡ Total Power": "Total Power",
+    "⚡ Power": "Power",
+    "💪 STR": "STR",
+    "⚡ SPD": "SPD",
+    "🏃 SPD": "SPD",
+    "🛡️ END": "END",
+    "🛡 END": "END",
+    "🧱 END": "END",
+    "🎯 TEC": "TEC",
+    "🧠 IQ": "IQ",
+    "🔮 BIQ": "BIQ",
+    "👁️ BIQ": "BIQ",
+    "👁 BIQ": "BIQ",
+    "❤️ HP": "HP",
+    "❤ HP": "HP",
+}
+
 
 def e(key: str, data: dict[str, Any] | None = None) -> str:
     """Return emoji string for *key* from server data, falling back to defaults."""
@@ -85,25 +166,58 @@ def e(key: str, data: dict[str, Any] | None = None) -> str:
     return str(emojis.get(key) or DEFAULT_UI_EMOJIS.get(key) or "•")
 
 
+def named_e(label: str, data: dict[str, Any] | None = None, fallback: str = "dot") -> str:
+    """Resolve a display label such as ``Strength Mastery`` to an emoji key."""
+    normalized = str(label or "").strip().lower().replace(" mastery", "")
+    normalized = normalized.replace(" ", "_").replace("-", "_")
+    value = e(normalized, data)
+    return value if value != "•" else e(fallback, data)
+
+
 def _safe_component_emoji(key: str, data: dict[str, Any] | None = None) -> str | None:
     """Return emoji safe for Discord component fields.
 
-    Discord rejects:
-    - Custom emoji strings like <:name:id> in some contexts
-    - Emoji with variation selector \uFE0F in SelectOption.emoji.name
+    discord.py parses custom emoji strings such as ``<:name:id>`` into a
+    PartialEmoji. Unicode variation selectors are removed for select options.
 
     Returns a clean unicode emoji or None if it would be invalid.
     """
     raw = e(key, data)
     if not raw or raw == "•":
         return None
-    # Custom emoji — skip (discord.py handles <:name:id> itself when set as emoji=)
-    # But in SelectOption emoji.name Discord rejects variation selectors
-    # Strip variation selector U+FE0F
     cleaned = raw.replace("\uFE0F", "").replace("️", "").strip()
     if not cleaned or cleaned == "•":
         return None
     return cleaned
+
+
+def _replace_text_emojis(text: Any, data: dict[str, Any] | None = None) -> str:
+    """Replace legacy Unicode UI icons in embed text with configured emojis."""
+    rendered = str(text or "")
+    for token, key in _TEXT_EMOJI_REPLACEMENTS:
+        if token in rendered:
+            label = _TEXT_EMOJI_LABELS.get(token, "")
+            replacement = f"{e(key, data)} {label}" if label else e(key, data)
+            rendered = rendered.replace(token, replacement)
+    return rendered
+
+
+def _pop_leading_emoji(label: str) -> tuple[str | None, str]:
+    """Return a configured key and a label with its legacy leading icon removed."""
+    stripped = str(label or "").strip()
+    for token, key in _LEADING_EMOJI_KEYS:
+        if stripped.startswith(token):
+            return key, stripped[len(token):].strip()
+    return None, stripped
+
+
+def _configured_component_emoji(raw: Any, data: dict[str, Any] | None = None) -> str | None:
+    rendered = str(raw or "").replace("\uFE0F", "").replace("️", "").strip()
+    for token, key in _LEADING_EMOJI_KEYS:
+        normalized = token.replace("\uFE0F", "").replace("️", "")
+        if rendered == normalized:
+            return _safe_component_emoji(key, data)
+    return None
 
 
 def divider(data: dict[str, Any] | None = None, width: int = 18) -> str:
@@ -205,8 +319,8 @@ def make_embed(
     thumbnail_url: str | None = None,
 ) -> discord.Embed:
     """Build a standard LOOKISM HXCC Discord embed."""
-    clean_title = _trim(title or "Interface", 256)
-    clean_description = _prepare_description(data, description)
+    clean_title = _trim(_replace_text_emojis(title or "Interface", data), 256)
+    clean_description = _prepare_description(data, _replace_text_emojis(description, data))
     chosen_color = _choose_color(clean_title, clean_description, color, variant)
 
     embed = discord.Embed(
@@ -226,8 +340,8 @@ def make_embed(
     if fields:
         for name, value, inline in fields[:25]:
             embed.add_field(
-                name=_decorate_field_name(data, name),
-                value=_decorate_field_value(value),
+                name=_decorate_field_name(data, _replace_text_emojis(name, data)),
+                value=_decorate_field_value(_replace_text_emojis(value, data)),
                 inline=bool(inline),
             )
 
@@ -250,10 +364,18 @@ def skin_embed(embed: discord.Embed, interaction: Any | None = None, data: dict[
     if not embed.title:
         embed.title = "LOOKISM HXCC"
     else:
-        embed.title = _trim(embed.title, 256)
+        embed.title = _trim(_replace_text_emojis(embed.title, data), 256)
 
     if embed.description:
-        embed.description = _trim(embed.description, 4096)
+        embed.description = _trim(_replace_text_emojis(embed.description, data), 4096)
+
+    for index, field in enumerate(embed.fields):
+        embed.set_field_at(
+            index,
+            name=_trim(_replace_text_emojis(field.name, data), 256),
+            value=_trim(_replace_text_emojis(field.value, data), 1024),
+            inline=field.inline,
+        )
 
     if not embed.color or int(embed.color) == 0:
         embed.color = _choose_color(str(embed.title or ""), str(embed.description or ""), None, "info")
@@ -297,13 +419,19 @@ def style_view(view: discord.ui.View, data: dict[str, Any] | None = None) -> dis
     for child in getattr(view, "children", []):
         if isinstance(child, discord.ui.Button):
             label = str(child.label or "").strip()
+            explicit_key, label = _pop_leading_emoji(label)
+            if explicit_key:
+                child.label = label or None
             if not label and child.emoji is None:
                 label = "Action"
                 child.label = label
 
             emoji_key = _match_keyword(label, _BUTTON_EMOJI_KEYWORDS)
-            if child.emoji is None and emoji_key:
-                child.emoji = _safe_component_emoji(str(emoji_key), data)
+            configured_existing = _configured_component_emoji(child.emoji, data)
+            if configured_existing:
+                child.emoji = configured_existing
+            elif child.emoji is None and (explicit_key or emoji_key):
+                child.emoji = _safe_component_emoji(str(explicit_key or emoji_key), data)
 
             mapped_style = _match_keyword(label, _BUTTON_STYLE_KEYWORDS)
             if mapped_style is not None and child.style in {
@@ -327,15 +455,20 @@ def style_view(view: discord.ui.View, data: dict[str, Any] | None = None) -> dis
             rebuilt: list[discord.SelectOption] = []
             for idx, opt in enumerate(list(child.options)[:25], start=1):
                 label = _trim(getattr(opt, "label", "") or f"Option {idx}", 100)
+                explicit_key, label = _pop_leading_emoji(label)
+                label = _trim(label or f"Option {idx}", 100)
                 value = str(getattr(opt, "value", "") or f"option_{idx}")
                 description = getattr(opt, "description", None)
                 if isinstance(description, str):
                     description = _trim(description, 100)
                 emoji = getattr(opt, "emoji", None)
-                if emoji is None:
+                configured_existing = _configured_component_emoji(emoji, data)
+                if configured_existing:
+                    emoji = configured_existing
+                elif emoji is None:
                     emoji_key = _match_keyword(label, _BUTTON_EMOJI_KEYWORDS)
-                    if emoji_key:
-                        emoji = _safe_component_emoji(str(emoji_key), data)
+                    if explicit_key or emoji_key:
+                        emoji = _safe_component_emoji(str(explicit_key or emoji_key), data)
                 rebuilt.append(
                     discord.SelectOption(
                         label=label,

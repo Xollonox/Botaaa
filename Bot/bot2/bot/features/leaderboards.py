@@ -49,8 +49,9 @@ class LeaderboardPanel(discord.ui.View):
             trophies = int(row.get("trophies", 0))
             name = row.get("name", row.get("user_id", "?"))
             rank = row.get("rank", "")
-            extra = f" · {rank}" if rank else ""
-            lines.append(f"{idx}. {name}{extra} · 🏆 {trophies}")
+            rank_icon = e(str(rank).lower(), data) if rank else ""
+            extra = f" · {rank_icon} {rank}" if rank else ""
+            lines.append(f"{idx}. {name}{extra} · {e('trophy', data)} {trophies}")
         if not lines:
             lines = ["No data yet."]
         body = box(f"{self.title} — Page {self.page}/{self.total_pages}", lines)
@@ -118,7 +119,7 @@ class LeaderboardPanel(discord.ui.View):
         from bot.utils.ui import box
         threshold_lines = [f"{e(n.lower(), data) or '•'} {n}: {band}" for n, band in league_order]
         count_lines = [f"{e(n.lower(), data) or '•'} {n}: {counts.get(n, 0)}" for n, _ in league_order]
-        body = box("Trophy Thresholds", threshold_lines) + "\n" + box("League Distribution", count_lines) + "\n" + box("Summary", [f"👥 Total Players: {total_players}"])
+        body = box("Trophy Thresholds", threshold_lines) + "\n" + box("League Distribution", count_lines) + "\n" + box("Summary", [f"{e('member', data)} Total Players: {total_players}"])
         embed = make_embed(data, f"{e('league', data)} League Overview", body)
         await interaction.response.send_message(embed=embed, ephemeral=True)
 

@@ -9,7 +9,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card, normalize_mastery_list
-from bot.utils.ui import e, make_embed
+from bot.utils.ui import e, make_embed, named_e
 from bot.utils.interaction_visibility import smart_reply, error_reply
 
 
@@ -80,7 +80,7 @@ def _build_catalog_card_embed(data: dict[str, Any], card: dict[str, Any]) -> dis
     power  = compute_power(scaled)
 
     mastery_list = normalize_mastery_list(card.get("mastery", card.get("masteries", [])))
-    mastery_str  = "  ".join(f"• {m}" for m in mastery_list) if mastery_list else "—"
+    mastery_str  = "  ".join(f"{named_e(m, data, 'mastery')} {m}" for m in mastery_list) if mastery_list else "—"
 
     unique_path,  unique_path_desc  = _resolve_field(card.get("unique_path"),  card.get("unique_path_description"))
     unique_skill, unique_skill_desc = _resolve_unique_skills(card)

@@ -11,7 +11,7 @@ from discord.ext import commands
 from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card, get_flat_stat_bonus, normalize_mastery_list, rarity_rank
 from bot.utils.checks import ensure_registered
 from bot.utils.interaction_visibility import smart_reply, error_reply
-from bot.utils.ui import e, make_embed, simple_embed
+from bot.utils.ui import e, make_embed, named_e, simple_embed
 
 PAGE_SIZE = 25
 SEPARATOR = "━" * 20
@@ -792,7 +792,7 @@ class InventoryCog(commands.Cog):
             unique_skill_2, unique_skill_2_desc = _resolve_field(card_def.get("unique_skill_2"))
             unique_skill_3, unique_skill_3_desc = _resolve_field(card_def.get("unique_skill_3"))
         mastery_list: list[str] = normalize_mastery_list(card_def.get("mastery", card_def.get("masteries", [])) if isinstance(card_def, dict) else [])
-        mastery_str = "  ".join(f"• {m}" for m in mastery_list) if mastery_list else "—"
+        mastery_str = "  ".join(f"{named_e(m, data, 'mastery')} {m}" for m in mastery_list) if mastery_list else "—"
 
         # All unique skills unlock at ★3 — show them in one box like /card_info
         all_skills = [s for s in [unique_skill, unique_skill_2, unique_skill_3] if s and s != "—"]
