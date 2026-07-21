@@ -45,15 +45,8 @@ SUPPLIED_EMOJIS = {
     "<:strength:1471199061108588748>",
     "<:technique:1471199020989943975>",
     "<:vice_head:1470759664999207115>",
-    "<a:Arrow:803883583387336724>",
-    "<a:Diamond:790495062550773772>",
-    "<a:done:739167640169349260>",
-    "<a:BlackFire_BlackRedFire:1520716253977903115>",
-    "<a:FireYellow:1520728309883867267>",
-    "<a:pink:1520715694516338760>",
-    "<a:GreenFire:1520727822052888686>",
-    "<a:blue_fire:1520715548705423401>",
-    "<a:vip_chug:1453447357084598436>",
+    "<:stars:1471032797551530145>",
+    "<:r1:1487355065084936254>",
 }
 
 
@@ -61,7 +54,7 @@ def test_all_supplied_emojis_are_registered() -> None:
     assert SUPPLIED_EMOJIS <= set(DEFAULT_UI_EMOJIS.values())
 
 
-def test_legacy_defaults_upgrade_without_overwriting_owner_customization() -> None:
+def test_legacy_defaults_upgrade_removes_unsupported_custom_emojis() -> None:
     data = {
         "ui": {
             "emojis": {
@@ -74,7 +67,7 @@ def test_legacy_defaults_upgrade_without_overwriting_owner_customization() -> No
     upgraded = ensure_structure(data)["ui"]["emojis"]
 
     assert upgraded["coin"] == "<:currency:1469410492010463458>"
-    assert upgraded["battle"] == "<:owner_battle:123456789012345678>"
+    assert upgraded["battle"] == "<:battle:1470382015437213697>"
 
 
 def test_embed_skin_replaces_legacy_stat_and_currency_icons() -> None:
@@ -88,7 +81,7 @@ def test_embed_skin_replaces_legacy_stat_and_currency_icons() -> None:
     assert "<:strength:1471199061108588748> STR: 99" in embed.description
     assert "<:speed:1471198923665178740> SPD: 88" in embed.description
     assert "<:endurance:1471199091483476080> END: 77" in embed.description
-    assert "<a:Diamond:790495062550773772> 50" in embed.description
+    assert "💎 50" in embed.description
     assert "<:currency:1469410492010463458> 100" in embed.description
 
 
@@ -110,7 +103,7 @@ def test_view_skin_moves_legacy_icons_into_component_emoji_fields() -> None:
     assert button.label == "Battle"
     assert str(button.emoji) == "<:battle:1470382015437213697>"
     assert select.options[0].label == "Premium"
-    assert str(select.options[0].emoji) == "<a:Diamond:790495062550773772>"
+    assert str(select.options[0].emoji) == "💎"
 
 
 def test_named_mastery_emojis_use_matching_custom_icons() -> None:

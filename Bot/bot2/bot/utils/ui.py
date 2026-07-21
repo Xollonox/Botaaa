@@ -7,7 +7,7 @@ from typing import Any, Iterable
 
 import discord
 
-from bot.data.defaults import DEFAULT_UI_EMOJIS
+from bot.data.defaults import DEFAULT_UI_EMOJIS, SUPPORTED_CUSTOM_UI_EMOJIS
 
 EMBED_COLORS = {
     "info": 0x2B2D31,
@@ -494,8 +494,18 @@ def list_keys(data: dict[str, Any]) -> list[str]:
     return sorted(DEFAULT_UI_EMOJIS.keys())
 
 
+def is_supported_emoji_value(value: Any) -> bool:
+    """Return whether *value* is Unicode or one of the supplied custom emojis."""
+    rendered = str(value or "").strip()
+    return not rendered.startswith(("<:", "<a:")) or rendered in SUPPORTED_CUSTOM_UI_EMOJIS
+
+
 def set_emoji(data: dict[str, Any], key: str, value: str) -> None:
-    """Set *key* emoji to *value* in *data*."""
+    """Set *key* to a Unicode emoji or a custom emoji from the supplied allowlist."""
+    value = str(value or "").strip()
+    if not is_supported_emoji_value(value):
+        value = DEFAULT_UI_EMOJIS.get(key, "•")
+
     ui = data.setdefault("ui", {})
     if not isinstance(ui, dict):
         ui = {}

@@ -160,7 +160,7 @@ DEFAULT_CONFIG = {
         "footer": "LOOKISM HXCC • /help",
         "emojis": {
             # ── Core UI ──────────────────────────────────────────
-            "ok":           "<a:done:739167640169349260>",
+            "ok":           "✅",
             "no":           "❌",
             "warning":      "⚠",
             "info":         "ℹ",
@@ -169,9 +169,9 @@ DEFAULT_CONFIG = {
             "line":         "━",
             "box":          "▣",
             "prev":         "⬅",
-            "next":         "<a:Arrow:803883583387336724>",
+            "next":         "➡",
             "cancel":       "🚫",
-            "confirm":      "<a:done:739167640169349260>",
+            "confirm":      "✅",
             "lock":         "<:locked:1470383807311122615>",
             "unlock":       "🔓",
             "settings":     "⚙",
@@ -198,8 +198,8 @@ DEFAULT_CONFIG = {
             "coin":         "<:currency:1469410492010463458>",
             "coins":        "<:currency:1469410492010463458>",
             "currency":     "<:currency:1469410492010463458>",
-            "gem":          "<a:Diamond:790495062550773772>",
-            "premium":      "<a:vip_chug:1453447357084598436>",
+            "gem":          "💎",
+            "premium":      "💎",
             "reward":       "<:gold_bars:1470374537836232785>",
             "store":        "🏬",
             "shop":         "🛒",
@@ -217,12 +217,12 @@ DEFAULT_CONFIG = {
             "featured":     "<:catalog:1470375205682548961>",
             "rarity":       "💠",
             "common":       "⚪",
-            "rare":         "<a:GreenFire:1520727822052888686>",
-            "epic":         "<a:blue_fire:1520715548705423401>",
-            "legendary":    "<a:FireYellow:1520728309883867267>",
-            "mythical":     "<a:pink:1520715694516338760>",
-            "infernal":     "<a:BlackFire_BlackRedFire:1520716253977903115>",
-            "abyssal":      "<a:BlackFire_BlackRedFire:1520716253977903115>",
+            "rare":         "🔵",
+            "epic":         "🟣",
+            "legendary":    "🟠",
+            "mythical":     "🔴",
+            "infernal":     "🔥",
+            "abyssal":      "🌌",
             # ── Market & Trade ────────────────────────────────────
             "market":       "🏪",
             "listing":      "🧾",
@@ -283,7 +283,7 @@ DEFAULT_CONFIG = {
             "backup":       "🟡",
             # ── Season / Tournament ───────────────────────────────
             "season":       "🗓",
-            "pass":         "<a:vip_chug:1453447357084598436>",
+            "pass":         "🎟",
             "tournament":   "<:Trophy:1469971235453665345>",
             "trophy":       "<:Trophy:1469971235453665345>",
             "tier":         "🧱",
@@ -310,6 +310,7 @@ DEFAULT_CONFIG = {
             "bio":          "📝",
             "social":       "🌐",
             "star":         "<:stars:1471032797551530145>",
+            "stars":        "<:stars:1471032797551530145>",
             "top":          "<:Trophy:1469971235453665345>",
             "leaderboard":  "📊",
             "league":       "<:stats_rank:1470382074086031505>",
@@ -324,6 +325,7 @@ DEFAULT_CONFIG = {
             "platinum":     "<:platinum:1469958087359332415>",
             "sapphire":     "<:sapphire:1469958126462570669>",
             "ruby":         "<:ruby:1470383178374971476>",
+            "r1":           "<:r1:1487355065084936254>",
             # ── Misc ──────────────────────────────────────────────
             "grant":        "➕",
             "start":        "🪪",
@@ -354,6 +356,15 @@ DEFAULT_CONFIG = {
 }
 
 DEFAULT_UI_EMOJIS = deepcopy(DEFAULT_CONFIG["ui"]["emojis"])
+
+# Custom emojis that are available in the bot's Discord server. Other custom
+# emoji IDs must be removed from persisted UI settings because Discord renders
+# unavailable IDs as broken text rather than an emoji.
+SUPPORTED_CUSTOM_UI_EMOJIS = frozenset(
+    value for value in DEFAULT_UI_EMOJIS.values()
+    if value.startswith("<:") or value.startswith("<a:")
+)
+_CUSTOM_EMOJI_PREFIXES = ("<:", "<a:")
 
 # Existing installations persist UI emoji values in lookism_data.json. Upgrade
 # only values that still match the former built-in Unicode defaults so owner
@@ -426,6 +437,13 @@ def _upgrade_legacy_ui_emojis(emojis: dict[str, Any]) -> None:
         current = str(emojis.get(key, ""))
         if current in legacy_values:
             emojis[key] = DEFAULT_UI_EMOJIS[key]
+
+    # Retire custom emoji IDs from earlier skins unless they are in the
+    # supplied allowlist above. Their standard Unicode default remains usable.
+    for key, current in list(emojis.items()):
+        value = str(current or "")
+        if value.startswith(_CUSTOM_EMOJI_PREFIXES) and value not in SUPPORTED_CUSTOM_UI_EMOJIS:
+            emojis[key] = DEFAULT_UI_EMOJIS.get(key, "•")
 
 
 DEFAULT_PLAYER = {

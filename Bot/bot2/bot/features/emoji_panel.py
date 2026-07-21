@@ -8,7 +8,10 @@ from discord.ext import commands
 
 from bot.config import OWNER_GUILD_ID
 from bot.utils.checks import is_owner
-from bot.utils.ui import box, e, list_keys, make_embed, reset_emoji, set_emoji, reset_all_emojis
+from bot.utils.ui import (
+    box, e, is_supported_emoji_value, list_keys, make_embed, reset_emoji,
+    set_emoji, reset_all_emojis,
+)
 from bot.utils.interaction_visibility import smart_reply
 
 OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
@@ -150,6 +153,11 @@ class EmojiPanelView(discord.ui.View):
         if not await self._guard(interaction): return
         chosen = interaction.data["values"][0]
         if chosen == "__none__" or not self.sel_key: await interaction.response.defer(); return
+        if not is_supported_emoji_value(chosen):
+            await interaction.response.send_message(
+                "That custom emoji is not in the configured emoji set.", ephemeral=True,
+            )
+            return
         await interaction.response.defer()
         key = self.sel_key
         self.cog.bot.storage.with_lock(lambda d: set_emoji(d, key, chosen))
@@ -209,9 +217,19 @@ class EmojiPanelCog(commands.Cog):
             await interaction.response.send_message("Owner only.", ephemeral=True)
             return
         k, v = str(key).strip().lower(), str(emoji).strip()
+        if not is_supported_emoji_value(v):
+            await interaction.response.send_message(
+                "Use a Unicode emoji or one from the configured custom emoji set.",
+                ephemeral=True,
+            )
+            return
         self.bot.storage.with_lock(lambda d: set_emoji(d, k, v))
         data = self.bot.storage.load()
-        await smart_reply(interaction, embed=make_embed(data, f"{e('ok',data)} Emoji Updated", f"Set `{k}` → {v}"), ephemeral=True)
+        await smart_reply(
+            interaction,
+            embed=make_embed(data, f"{e('ok',data)} Emoji Updated", f"Set `{k}` → {e(k, data)}"),
+            ephemeral=True,
+        )
 
     @o_emoji_set.autocomplete("key")
     async def _key_ac(self, _: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
