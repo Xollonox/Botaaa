@@ -1,1 +1,64 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024"><defs><linearGradient id="c" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".32" stop-color="#888"/><stop offset=".52" stop-color="#f7f7f7"/><stop offset=".76" stop-color="#686868"/><stop offset="1" stop-color="#ddd"/></linearGradient><linearGradient id="i" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="24"><stop offset="0" stop-color="#fff"/><stop offset=".32" stop-color="#888"/><stop offset=".52" stop-color="#f7f7f7"/><stop offset=".76" stop-color="#686868"/><stop offset="1" stop-color="#ddd"/></linearGradient><radialGradient id="p" cx="38%" cy="30%" r="72%"><stop offset="0" stop-color="#292929"/><stop offset=".55" stop-color="#111"/><stop offset="1" stop-color="#020202"/></radialGradient><filter id="s" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#000" flood-opacity=".85"/></filter></defs><rect width="100%" height="100%" fill="#050505"/><g transform="translate(512.0 512.0) scale(1.8285714285714285) translate(-280 -280)" filter="url(#s)"><circle cx="280" cy="280" r="232" fill="url(#p)" stroke="#000" stroke-width="12"/><path d="M280 40a240 240 0 0 1 205 115M500 205a240 240 0 0 1-55 245M390 493a240 240 0 0 1-256-28M80 415a240 240 0 0 1-19-255M105 117a240 240 0 0 1 115-65" fill="none" stroke="url(#c)" stroke-width="14"/><path d="M158 155v250M158 280h142M300 155v250" fill="none" stroke="url(#c)" stroke-width="45"/><path d="M284 155l122 250M406 155L284 405" fill="none" stroke="#f3f3f3" stroke-width="36"/><path d="M270 151l25 51M345 306l25 51" stroke="#050505" stroke-width="12"/><circle cx="280" cy="280" r="199" fill="none" stroke="#4d4d4d" stroke-width="3"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5865F2"/>
+      <stop offset="100%" style="stop-color:#8B5CF6"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#A78BFA"/>
+      <stop offset="100%" style="stop-color:#EC4899"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="220" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+
+  <!-- Bot head -->
+  <rect x="156" y="170" width="200" height="145" rx="32" fill="white" filter="url(#shadow)"/>
+
+  <!-- Antenna -->
+  <line x1="256" y1="170" x2="256" y2="120" stroke="white" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="256" cy="112" r="12" fill="url(#accent)"/>
+
+  <!-- Eyes -->
+  <ellipse cx="210" cy="235" rx="18" ry="20" fill="#1E1B4B"/>
+  <ellipse cx="302" cy="235" rx="18" ry="20" fill="#1E1B4B"/>
+
+  <!-- Eye highlights -->
+  <circle cx="205" cy="228" r="6" fill="white" opacity="0.8"/>
+  <circle cx="297" cy="228" r="6" fill="white" opacity="0.8"/>
+
+  <!-- Mouth / display -->
+  <rect x="196" y="270" width="120" height="20" rx="10" fill="#E0E7FF"/>
+
+  <!-- Display text dots -->
+  <circle cx="226" cy="280" r="3" fill="#5865F2"/>
+  <circle cx="240" cy="280" r="3" fill="#5865F2"/>
+  <circle cx="254" cy="280" r="3" fill="#8B5CF6"/>
+  <circle cx="268" cy="280" r="3" fill="#EC4899"/>
+  <circle cx="282" cy="280" r="3" fill="#5865F2"/>
+
+  <!-- Side panels -->
+  <rect x="140" y="220" width="16" height="50" rx="8" fill="white" opacity="0.9"/>
+  <circle cx="148" cy="235" r="4" fill="url(#accent)"/>
+  <circle cx="148" cy="255" r="4" fill="url(#accent)"/>
+
+  <rect x="356" y="220" width="16" height="50" rx="8" fill="white" opacity="0.9"/>
+  <circle cx="364" cy="235" r="4" fill="url(#accent)"/>
+  <circle cx="364" cy="255" r="4" fill="url(#accent)"/>
+
+  <!-- "B" initial on body -->
+  <text x="256" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="120" font-weight="900" fill="white" filter="url(#shadow)">B</text>
+
+  <!-- Orbit ring -->
+  <circle cx="256" cy="256" r="230" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" stroke-dasharray="8 8" transform="rotate(-15 256 256)"/>
+
+  <!-- Orbiting dots -->
+  <circle cx="480" cy="200" r="8" fill="url(#accent)" opacity="0.8"/>
+  <circle cx="80" cy="320" r="6" fill="#A78BFA" opacity="0.6"/>
+  <circle cx="430" cy="380" r="5" fill="#F472B6" opacity="0.5"/>
+</svg>

@@ -171,8 +171,8 @@ DEFAULT_CONFIG = {
             "prev":         "⬅",
             "next":         "➡",
             "cancel":       "🚫",
-            "confirm":      "✅",
-            "lock":         "<:locked:1470383807311122615>",
+            "confirm":      "☑",
+            "lock":         "🔒",
             "unlock":       "🔓",
             "settings":     "⚙",
             "create":       "🛠",
@@ -195,12 +195,10 @@ DEFAULT_CONFIG = {
             "send":         "📤",
             "assign":       "🧷",
             # ── Economy ──────────────────────────────────────────
-            "coin":         "<:currency:1469410492010463458>",
-            "coins":        "<:currency:1469410492010463458>",
-            "currency":     "<:currency:1469410492010463458>",
+            "coin":         "🪙",
+            "coins":        "🪙",
             "gem":          "💎",
-            "premium":      "💎",
-            "reward":       "<:gold_bars:1470374537836232785>",
+            "reward":       "🎁",
             "store":        "🏬",
             "shop":         "🛒",
             "fee":          "💸",
@@ -209,12 +207,11 @@ DEFAULT_CONFIG = {
             "limit":        "⛔",
             "uses":         "🔢",
             # ── Cards & Packs ─────────────────────────────────────
-            "card":         "<:catalog:1470375205682548961>",
-            "catalog":      "<:catalog:1470375205682548961>",
+            "card":         "🃏",
             "pack":         "🎴",
             "open":         "🎁",
             "roll":         "🎲",
-            "featured":     "<:catalog:1470375205682548961>",
+            "featured":     "🃏",
             "rarity":       "💠",
             "common":       "⚪",
             "rare":         "🔵",
@@ -227,81 +224,70 @@ DEFAULT_CONFIG = {
             "market":       "🏪",
             "listing":      "🧾",
             "buy":          "🛍",
-            "sell":         "<:gold_bars:1470374537836232785>",
-            "price":        "<:gold_bars:1470374537836232785>",
-            "gold_bars":    "<:gold_bars:1470374537836232785>",
+            "sell":         "💰",
+            "price":        "💲",
             "seller":       "🧑",
             "stock":        "📦",
             "quick_sell":   "⚡",
             "trade":        "🔁",
             # ── Battle ────────────────────────────────────────────
-            "battle":       "<:battle:1470382015437213697>",
-            "vs":           "<:battle:1470382015437213697>",
-            "friendly":     "<:battle:1470382015437213697>",
+            "battle":       "⚔",
+            "vs":           "⚔",
+            "friendly":     "🤝",
             "ranked":       "🏅",
-            "attacks":      "<:battle:1470382015437213697>",
-            "normal":       "<:normal:1471030412015960269>",
-            "special":      "<:special:1471032701132865566>",
-            "skill":        "<:skill:1471196099912929443>",
-            "ultimate":     "<:Ultimate:1471032754245337120>",
-            "attack_normal":       "<:normal:1471030412015960269>",
-            "attack_special":      "<:special:1471032701132865566>",
-            "attack_ultimate":     "<:Ultimate:1471032754245337120>",
-            "attack_unique_skill": "<:skill:1471196099912929443>",
-            "attack_unique_path":  "<:Ultimate:1471032754245337120>",
-            "defense":      "<:defense:1471196697659965461>",
-            "def_block":    "<:defense:1471196697659965461>",
-            "def_dodge":    "<:defense:1471196697659965461>",
-            "def_parry":    "<:defense:1471196697659965461>",
-            "def_revert":   "<:defense:1471196697659965461>",
-            "def_tank":     "<:defense:1471196697659965461>",
+            "attacks":      "⚔",
+            "attack_normal":    "🗡",
+            "attack_special":   "💥",
+            "attack_unique_skill":  "🌀",
+            "attack_unique_skill": "✨",
+            "attack_unique_path":  "🛤",
+            "def_block":    "🛡",
+            "def_dodge":    "💨",
+            "def_parry":    "🪃",
+            "def_revert":   "🩹",
+            "def_tank":     "💪",
             "switch":       "🔄",
             "forfeit":      "🏳",
-            "hp":           "<:heart:1470383079548780625>",
+            "hp":           "❤",
             "damage":       "🩸",
             "miss":         "❔",
             "crit":         "💢",
-            "winner":       "<:r1:1487355065084936254>",
+            "winner":       "🥇",
             "round":        "🔁",
             # ── Stats ─────────────────────────────────────────────
-            "strength":     "<:strength:1471199061108588748>",
-            "speed":        "<:speed:1471198923665178740>",
-            "endurance":    "<:endurance:1471199091483476080>",
-            "technique":    "<:technique:1471199020989943975>",
-            "iq":           "<:emoji_22:1470382114699743457>",
-            "biq":          "<:stats_rank:1470382074086031505>",
-            "conviction":   "<:conviction:1471198977859915962>",
-            "mastermind":   "<:mastermind:1471199662596816999>",
+            "strength":     "💪",
+            "speed":        "🏃",
+            "endurance":    "🧱",
+            "technique":    "🎯",
+            "iq":           "🧠",
+            "biq":          "👁",
             "mastery":      "🧬",
-            "xp":           "<:boost:1470334901319635108>",
-            "level":        "<:boost:1470334901319635108>",
-            "boost":        "<:boost:1470334901319635108>",
+            "xp":           "✨",
+            "level":        "📶",
             # ── Squad ─────────────────────────────────────────────
             "squad":        "🧩",
-            "squad_power":  "<:squad_power:1469972804408574033>",
+            "squad_power":  "⚡",
             "active":       "🟢",
             "backup":       "🟡",
             # ── Season / Tournament ───────────────────────────────
             "season":       "🗓",
             "pass":         "🎟",
-            "tournament":   "<:Trophy:1469971235453665345>",
-            "trophy":       "<:Trophy:1469971235453665345>",
+            "tournament":   "🏆",
+            "trophy":       "🏆",
             "tier":         "🧱",
-            "rank":         "<:stats_rank:1470382074086031505>",
-            "stats_rank":   "<:stats_rank:1470382074086031505>",
+            "rank":         "🏅",
             "achievement":  "🏅",
             "earned":       "✅",
-            "locked":       "<:locked:1470383807311122615>",
+            "locked":       "🔒",
             "cp":           "🎯",
             # ── Gang / Alliance ───────────────────────────────────
-            "gang":         "<:gang:1470719084848222368>",
-            "alliance":     "<:alliance:1471027139003547732>",
-            "head":         "<:head:1470759627238019209>",
-            "vice":         "<:vice_head:1470759664999207115>",
-            "vice_head":    "<:vice_head:1470759664999207115>",
-            "recruiter":    "<:recruiter:1470759718107746441>",
-            "elder":        "<:elder:1470762649817186409>",
-            "member":       "<:member:1470761309430616259>",
+            "gang":         "👥",
+            "alliance":     "🤝",
+            "head":         "👑",
+            "vice":         "🛡",
+            "recruiter":    "📨",
+            "elder":        "🧓",
+            "member":       "🙂",
             "members":      "👥",
             "invite":       "✉",
             "leave":        "🚪",
@@ -309,23 +295,11 @@ DEFAULT_CONFIG = {
             "profile":      "👤",
             "bio":          "📝",
             "social":       "🌐",
-            "star":         "<:stars:1471032797551530145>",
-            "stars":        "<:stars:1471032797551530145>",
-            "top":          "<:Trophy:1469971235453665345>",
+            "star":         "⭐",
+            "top":          "🏆",
             "leaderboard":  "📊",
-            "league":       "<:stats_rank:1470382074086031505>",
-            "stats":        "<:stats_rank:1470382074086031505>",
-            # ── Competitive ranks ────────────────────────────────
-            "copper":       "<:copper:1471033174070001849>",
-            "iron":         "<:iron:1469956766321344606>",
-            "bronze":       "<:bronze:1469956844423221410>",
-            "silver":       "<:silver:1469956922454311003>",
-            "gold":         "<:gold:1469956985574264874>",
-            "diamond":      "<:diamond:1469958014197956659>",
-            "platinum":     "<:platinum:1469958087359332415>",
-            "sapphire":     "<:sapphire:1469958126462570669>",
-            "ruby":         "<:ruby:1470383178374971476>",
-            "r1":           "<:r1:1487355065084936254>",
+            "league":       "🏟",
+            "stats":        "📈",
             # ── Misc ──────────────────────────────────────────────
             "grant":        "➕",
             "start":        "🪪",
@@ -356,94 +330,6 @@ DEFAULT_CONFIG = {
 }
 
 DEFAULT_UI_EMOJIS = deepcopy(DEFAULT_CONFIG["ui"]["emojis"])
-
-# Custom emojis that are available in the bot's Discord server. Other custom
-# emoji IDs must be removed from persisted UI settings because Discord renders
-# unavailable IDs as broken text rather than an emoji.
-SUPPORTED_CUSTOM_UI_EMOJIS = frozenset(
-    value for value in DEFAULT_UI_EMOJIS.values()
-    if value.startswith("<:") or value.startswith("<a:")
-)
-_CUSTOM_EMOJI_PREFIXES = ("<:", "<a:")
-
-# Existing installations persist UI emoji values in lookism_data.json. Upgrade
-# only values that still match the former built-in Unicode defaults so owner
-# overrides made through /o_emoji_panel remain authoritative.
-_LEGACY_UI_EMOJI_DEFAULTS: dict[str, set[str]] = {
-    "ok": {"✅"},
-    "next": {"➡"},
-    "confirm": {"☑"},
-    "lock": {"🔒"},
-    "coin": {"🪙"},
-    "coins": {"🪙"},
-    "gem": {"💎"},
-    "reward": {"🎁"},
-    "card": {"🃏"},
-    "featured": {"🃏"},
-    "rare": {"🔵"},
-    "epic": {"🟣"},
-    "legendary": {"🟠"},
-    "mythical": {"🔴"},
-    "infernal": {"🔥"},
-    "abyssal": {"🌌"},
-    "sell": {"💰"},
-    "price": {"💲"},
-    "battle": {"⚔", "⚔️"},
-    "vs": {"⚔", "⚔️"},
-    "friendly": {"🤝"},
-    "attacks": {"⚔", "⚔️"},
-    "attack_normal": {"🗡", "🗡️"},
-    "attack_special": {"💥"},
-    "attack_unique_skill": {"🌀", "✨"},
-    "attack_unique_path": {"🛤", "🛤️"},
-    "attack_ultimate": {"🌀"},
-    "def_block": {"🛡", "🛡️"},
-    "def_dodge": {"💨"},
-    "def_parry": {"🪃"},
-    "def_revert": {"🩹"},
-    "def_tank": {"💪"},
-    "hp": {"❤", "❤️"},
-    "strength": {"💪"},
-    "speed": {"🏃"},
-    "endurance": {"🧱"},
-    "technique": {"🎯"},
-    "iq": {"🧠"},
-    "biq": {"👁", "👁️"},
-    "xp": {"✨"},
-    "level": {"📶"},
-    "squad_power": {"⚡"},
-    "pass": {"🎟", "🎟️"},
-    "tournament": {"🏆"},
-    "trophy": {"🏆"},
-    "rank": {"🏅"},
-    "locked": {"🔒"},
-    "gang": {"👥"},
-    "alliance": {"🤝"},
-    "head": {"👑"},
-    "vice": {"🛡", "🛡️"},
-    "recruiter": {"📨"},
-    "elder": {"🧓"},
-    "member": {"🙂"},
-    "top": {"🏆"},
-    "league": {"🏟", "🏟️"},
-    "stats": {"📈"},
-    "star": {"⭐"},
-    "winner": {"🥇"},
-}
-
-
-def _upgrade_legacy_ui_emojis(emojis: dict[str, Any]) -> None:
-    for key, legacy_values in _LEGACY_UI_EMOJI_DEFAULTS.items():
-        current = str(emojis.get(key, ""))
-        if current in legacy_values:
-            emojis[key] = DEFAULT_UI_EMOJIS[key]
-
-    # Retire custom emoji IDs from earlier skins unless they are in the
-    # supplied allowlist above. Their standard Unicode default remains usable.
-    for key, current in list(emojis.items()):
-        value = str(current or "")
-        if value.startswith(_CUSTOM_EMOJI_PREFIXES) and value not in SUPPORTED_CUSTOM_UI_EMOJIS:
-            emojis[key] = DEFAULT_UI_EMOJIS.get(key, "•")
 
 
 DEFAULT_PLAYER = {
@@ -792,7 +678,6 @@ def ensure_structure(data: Any) -> dict[str, Any]:
             ui_root["emojis"] = deepcopy(DEFAULT_UI_EMOJIS)
         else:
             _merge_dict(emojis, DEFAULT_UI_EMOJIS)
-            _upgrade_legacy_ui_emojis(emojis)
 
     players = data.get("players")
     if isinstance(players, dict):
