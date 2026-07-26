@@ -20,13 +20,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from bot.config import (
-    DATA_PATH,
-    FIREBASE_CREDENTIALS_JSON,
-    FIREBASE_CREDENTIALS_PATH,
-    FIREBASE_PROJECT_ID,
-    SQLITE_PATH,
-)
+from bot.config import DATA_PATH, FIREBASE_CREDENTIALS_PATH, FIREBASE_PROJECT_ID, SQLITE_PATH
 from bot.data.defaults import build_default_data, ensure_structure
 from bot.data.firestore_client import get_firestore_client
 from bot.data.firestore_storage import FirestoreStorage
@@ -176,16 +170,14 @@ def migrate_battle(client, conn: sqlite3.Connection) -> None:
 
 
 def main() -> None:
-    if not FIREBASE_PROJECT_ID:
-        raise SystemExit("FIREBASE_PROJECT_ID must be set in Bot/bot2/.env before migrating.")
-    if not FIREBASE_CREDENTIALS_JSON and not FIREBASE_CREDENTIALS_PATH:
+    if not FIREBASE_PROJECT_ID or not FIREBASE_CREDENTIALS_PATH:
         raise SystemExit(
-            "Either FIREBASE_CREDENTIALS_JSON or FIREBASE_CREDENTIALS_PATH must be set in Bot/bot2/.env before migrating."
+            "FIREBASE_PROJECT_ID and FIREBASE_CREDENTIALS_PATH must be set in Bot/bot2/.env before migrating."
         )
-    if not FIREBASE_CREDENTIALS_JSON and FIREBASE_CREDENTIALS_PATH and not os.path.isfile(FIREBASE_CREDENTIALS_PATH):
+    if not os.path.isfile(FIREBASE_CREDENTIALS_PATH):
         raise SystemExit(f"FIREBASE_CREDENTIALS_PATH does not point to a file: {FIREBASE_CREDENTIALS_PATH}")
 
-    client = get_firestore_client(FIREBASE_PROJECT_ID, FIREBASE_CREDENTIALS_PATH, FIREBASE_CREDENTIALS_JSON)
+    client = get_firestore_client(FIREBASE_PROJECT_ID, FIREBASE_CREDENTIALS_PATH)
 
     migrate_json_blob(client)
 

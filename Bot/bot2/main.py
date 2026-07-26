@@ -23,7 +23,6 @@ sys.path.insert(0, os.path.dirname(__file__))
 from bot.config import (
     BOT_TOKEN,
     DATA_PATH,
-    FIREBASE_CREDENTIALS_JSON,
     FIREBASE_CREDENTIALS_PATH,
     FIREBASE_PROJECT_ID,
     OWNER_GUILD_ID,
@@ -165,9 +164,7 @@ class LookismBot(commands.Bot):
             help_command=None,
             tree_cls=LookismCommandTree,
         )
-        firestore_client = get_firestore_client(
-            FIREBASE_PROJECT_ID, FIREBASE_CREDENTIALS_PATH, FIREBASE_CREDENTIALS_JSON
-        )
+        firestore_client = get_firestore_client(FIREBASE_PROJECT_ID, FIREBASE_CREDENTIALS_PATH)
         self.storage = FirestoreStorage(firestore_client)
         # In-memory set of user IDs who have accepted terms — avoids a
         # storage.load() + deepcopy on every slash-command interaction.
