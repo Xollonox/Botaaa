@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 import discord
 from discord import app_commands
 from discord.ext import commands, tasks
@@ -9,6 +11,8 @@ from datetime import datetime
 import random
 
 from bot.config import OWNER_GUILD_ID
+
+logger = logging.getLogger(__name__)
 from bot.utils.checks import is_owner
 from bot.utils.ui import e, make_embed
 from bot.utils.interaction_visibility import smart_reply
@@ -79,7 +83,10 @@ class AnnounceOwnerCog(commands.Cog):
         try:
             await target_channel.send(embed=embed)
         except Exception:
-            pass
+            logger.exception(
+                "[CARD_OF_THE_DAY] failed to send announcement to channel %s",
+                announce_channel_id,
+            )
 
     @card_of_the_day.before_loop
     async def before_card_of_the_day(self) -> None:
@@ -157,7 +164,10 @@ class AnnounceOwnerCog(commands.Cog):
         try:
             await target_channel.send(embed=embed)
         except Exception:
-            pass
+            logger.exception(
+                "[WEEKLY_BOUNTY] failed to send announcement to channel %s",
+                announce_channel_id,
+            )
 
     @weekly_bounty.before_loop
     async def before_weekly_bounty(self) -> None:
@@ -288,7 +298,10 @@ class AnnounceOwnerCog(commands.Cog):
                 if isinstance(channel, (discord.TextChannel, discord.Thread)):
                     await channel.send(embed=embed)
             except Exception:
-                pass
+                logger.exception(
+                    "[EVENT_ANNOUNCE] failed to send event announcement to channel %s",
+                    announce_channel_id,
+                )
 
         await smart_reply(
             interaction,

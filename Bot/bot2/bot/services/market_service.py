@@ -4,12 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from bot.data.sqlite_store import SQLiteMarketRepository
 from bot.utils.market_logic import ensure_market_structure
 
 
 class MarketService:
-    def __init__(self, repo: SQLiteMarketRepository, storage: Any) -> None:
+    def __init__(self, repo: Any, storage: Any) -> None:
         self.repo = repo
         self.storage = storage
 

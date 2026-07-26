@@ -355,8 +355,15 @@ class LookismBot(commands.Bot):
 
         self._log_registered_slash_commands()
 
-        # Unlock any cards left trade_locked from a crash
-        await self._unlock_stale_trades()
+        # Unlock any cards left trade_locked from a crash. Runs in the
+        # background so a full-players scan can't stall setup_hook and push
+        # Discord's connect handshake past its grace period.
+        task = asyncio.create_task(self._unlock_stale_trades())
+        task.add_done_callback(
+            lambda t: logger.exception(
+                "[BOOT] Stale-trade unlock failed: %s", t.exception()
+            ) if t.exception() else None
+        )
 
         battle_cog = self.get_cog("BattleCog")
         if battle_cog is not None and hasattr(battle_cog, "recover_active_battles_after_restart"):

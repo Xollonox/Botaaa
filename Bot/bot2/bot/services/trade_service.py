@@ -4,12 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from bot.data.sqlite_store import SQLiteTradeRepository
 from bot.utils.timeutil import now_ts
 
 
 class TradeService:
-    def __init__(self, repo: SQLiteTradeRepository, storage: Any) -> None:
+    def __init__(self, repo: Any, storage: Any) -> None:
         self.repo = repo
         self.storage = storage
 

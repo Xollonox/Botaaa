@@ -4,12 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from bot.data.sqlite_store import SQLiteBattleRepository
 from bot.utils.timeutil import now_ts
 
 
 class BattleService:
-    def __init__(self, repo: SQLiteBattleRepository, storage: Any) -> None:
+    def __init__(self, repo: Any, storage: Any) -> None:
         self.repo = repo
         self.storage = storage
 
