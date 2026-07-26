@@ -310,10 +310,15 @@ class LookismBot(commands.Bot):
 
     async def setup_hook(self) -> None:
         """Load all cogs and sync slash commands."""
-        # Bootstrap SQLite repos from JSON (must run before cogs start handling commands)
+        # Bootstrap Firestore repos from legacy JSON on first boot (idempotent).
+        # Must run before cogs start handling commands.
         await self.market_service.bootstrap_from_json()
         await self.trade_service.bootstrap_from_json()
         await self.battle_service.bootstrap_from_json()
+
+        # Re-open any offers left in 'processing' state by a prior crash.
+        # Kept off __init__ so bot construction can't block on Firestore I/O.
+        await self.trade_repo.recover_stale_processing_offers()
 
         failed: list[str] = []
         for ext in EXTENSIONS:

@@ -165,7 +165,7 @@ class FirestoreStorage:
     async def async_save(self, data: dict[str, Any]) -> None:
         import asyncio
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, self.save, data)
 
     def with_lock(self, fn: Callable[[dict[str, Any]], T]) -> T:

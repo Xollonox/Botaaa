@@ -33,18 +33,23 @@ class FirestoreTradeRepository:
 
     def __init__(self, client: Client) -> None:
         self._db = client
-        self._recover_stale_processing_offers()
 
-    def _recover_stale_processing_offers(self) -> None:
+    def _sync_recover_stale_processing_offers(self) -> None:
         """A process may die after claiming an offer but before finalizing it.
 
         Claims are process-local, so make them available again on restart —
         mirrors SQLite's boot-time ``UPDATE ... SET status = 'open' WHERE
-        status = 'processing'``.
+        status = 'processing'``. Called explicitly from an async startup hook
+        (never from ``__init__``) so a slow/unreachable Firestore doesn't
+        block bot construction.
         """
         coll = self._db.collection(_OFFER_COLLECTION)
         for doc in coll.where(filter=FieldFilter("status", "==", "processing")).stream():
             doc.reference.set({"status": "open"}, merge=True)
+
+    async def recover_stale_processing_offers(self) -> None:
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self._sync_recover_stale_processing_offers)
 
     # ------------------------------------------------------------------
     # Sync implementations (private)
@@ -145,9 +150,13 @@ class FirestoreTradeRepository:
         coll = self._db.collection(_HISTORY_COLLECTION)
         coll.add(payload)
 
-        # Keep history bounded, dropping the oldest beyond the limit.
-        docs = list(coll.order_by("resolved_at", direction=firestore.Query.DESCENDING).stream())
-        for doc in docs[_HISTORY_LIMIT:]:
+        # Keep history bounded, dropping only the ones *past* the limit.
+        # Skipping the first _HISTORY_LIMIT via offset() avoids the previous
+        # read-every-doc-on-every-append pattern.
+        stale = coll.order_by(
+            "resolved_at", direction=firestore.Query.DESCENDING
+        ).offset(_HISTORY_LIMIT).stream()
+        for doc in stale:
             doc.reference.delete()
 
     def _sync_recent_history_for_user(self, user_id: str, limit: int = 50) -> list[dict[str, Any]]:

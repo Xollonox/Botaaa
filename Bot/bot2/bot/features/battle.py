@@ -1295,14 +1295,14 @@ class BattleCog(commands.Cog):
             except Exception:
                 logger.exception("[QUEUE_LOOP_MATCH] failed user=%s", user_id)
 
-            # Check if user is still in queue (could have been removed by forfeit)
-            def still_queued(data: dict[str, Any]) -> bool:
-                queue = self._battle_root(data).get("queue", [])
-                return any(
-                    isinstance(q, dict) and str(q.get("user_id", "")) == str(user_id)
-                    for q in queue
-                )
-            if not self.bot.storage.with_lock(still_queued):
+            # Check if user is still in queue (could have been removed by forfeit).
+            # Read-only, so bypass with_lock — this ticks every 10s per queued user
+            # and doesn't need to serialize with writers.
+            queue = self._battle_root(self.bot.storage.load_readonly()).get("queue", [])
+            if not any(
+                isinstance(q, dict) and str(q.get("user_id", "")) == str(user_id)
+                for q in queue
+            ):
                 logger.info("[QUEUE_LOOP] user=%s no longer in queue, ending loop", user_id)
                 return
 

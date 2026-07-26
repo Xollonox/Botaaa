@@ -15,10 +15,14 @@ from bot.utils.interaction_visibility import smart_reply
 def effective_owner_ids() -> set[int]:
     """Return configured bot owner IDs from environment.
 
-    Reads OWNER_IDS from bot.config dynamically so tests that reload the
-    config module (or runtime env changes) are picked up.
+    Reads ``LOOKISM_OWNER_IDS`` directly from the process environment each
+    call — reloading ``bot.config`` re-runs ``load_dotenv()`` and would
+    re-inject a value the caller just cleared, so we skip that cache.
     """
-    return _config.OWNER_IDS
+    raw = os.environ.get("LOOKISM_OWNER_IDS", "").strip()
+    if not raw:
+        return set()
+    return _config._parse_owner_ids(raw)
 
 
 def is_owner(interaction: discord.Interaction) -> bool:
