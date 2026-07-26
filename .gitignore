@@ -64,3 +64,8 @@ node_modules/
 bot_memory.json
 bot_settings.json
 lookism_data.json
+
+# Firebase service account keys — never commit
+*firebase-adminsdk*.json
+firebase-service-account*.json
+**/serviceAccountKey*.json

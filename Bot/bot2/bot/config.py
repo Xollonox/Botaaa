@@ -40,6 +40,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(BASE_DIR, "lookism_data.json")
 SQLITE_PATH = os.getenv("LOOKISM_SQLITE_PATH", os.path.join(BASE_DIR, "lookism_data.sqlite3"))
 
+# Firestore is the persistence backend; both are required at runtime.
+FIREBASE_PROJECT_ID = os.environ.get("FIREBASE_PROJECT_ID")
+FIREBASE_CREDENTIALS_PATH = os.environ.get("FIREBASE_CREDENTIALS_PATH")
+
 # Set to a list of guild IDs for fast development sync, or None for global sync.
 GUILD_IDS = None
 
@@ -56,4 +60,13 @@ def assert_runtime_config() -> None:
         raise ValueError(
             "BOT_TOKEN environment variable is not set. "
             "Please set it in your .env file or as an environment variable."
+        )
+    if not FIREBASE_PROJECT_ID or not FIREBASE_CREDENTIALS_PATH:
+        raise ValueError(
+            "FIREBASE_PROJECT_ID and FIREBASE_CREDENTIALS_PATH must both be set. "
+            "Please set them in your .env file or as environment variables."
+        )
+    if not os.path.isfile(FIREBASE_CREDENTIALS_PATH):
+        raise ValueError(
+            f"FIREBASE_CREDENTIALS_PATH does not point to a file: {FIREBASE_CREDENTIALS_PATH}"
         )

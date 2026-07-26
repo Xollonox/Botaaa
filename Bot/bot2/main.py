@@ -20,10 +20,20 @@ from discord.ext import commands
 # ---------------------------------------------------------------------------
 sys.path.insert(0, os.path.dirname(__file__))
 
-from bot.config import BOT_TOKEN, DATA_PATH, OWNER_GUILD_ID, SQLITE_PATH, assert_runtime_config
+from bot.config import (
+    BOT_TOKEN,
+    DATA_PATH,
+    FIREBASE_CREDENTIALS_PATH,
+    FIREBASE_PROJECT_ID,
+    OWNER_GUILD_ID,
+    assert_runtime_config,
+)
 from bot.features.onboarding import TermsGateView, build_terms_embed, has_user_accepted_terms
-from bot.data.storage import Storage
-from bot.data.sqlite_store import SQLiteBattleRepository, SQLiteMarketRepository, SQLiteTradeRepository
+from bot.data.firestore_client import get_firestore_client
+from bot.data.firestore_storage import FirestoreStorage
+from bot.data.firestore_battle_repo import FirestoreBattleRepository
+from bot.data.firestore_market_repo import FirestoreMarketRepository
+from bot.data.firestore_trade_repo import FirestoreTradeRepository
 from bot.services.battle_service import BattleService
 from bot.services.market_service import MarketService
 from bot.services.trade_service import TradeService
@@ -154,16 +164,17 @@ class LookismBot(commands.Bot):
             help_command=None,
             tree_cls=LookismCommandTree,
         )
-        self.storage = Storage(DATA_PATH)
+        firestore_client = get_firestore_client(FIREBASE_PROJECT_ID, FIREBASE_CREDENTIALS_PATH)
+        self.storage = FirestoreStorage(firestore_client)
         # In-memory set of user IDs who have accepted terms — avoids a
         # storage.load() + deepcopy on every slash-command interaction.
         # Populated lazily on first cache miss; invalidated via mark_terms_accepted().
         self._terms_cache: set[int] = set()
-        self.market_repo = SQLiteMarketRepository(SQLITE_PATH)
+        self.market_repo = FirestoreMarketRepository(firestore_client)
         self.market_service = MarketService(self.market_repo, self.storage)
-        self.trade_repo = SQLiteTradeRepository(SQLITE_PATH)
+        self.trade_repo = FirestoreTradeRepository(firestore_client)
         self.trade_service = TradeService(self.trade_repo, self.storage)
-        self.battle_repo = SQLiteBattleRepository(SQLITE_PATH)
+        self.battle_repo = FirestoreBattleRepository(firestore_client)
         self.battle_service = BattleService(self.battle_repo, self.storage)
 
     def mark_terms_accepted(self, user_id: int) -> None:
