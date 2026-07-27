@@ -18,15 +18,12 @@ BOT_TOKEN = "REDACTED — rotated, now loaded from env var"
 - Modify server settings where bot has permissions
 - **Immediate action:** [Revoke this token in Discord Developer Portal](https://discord.com/developers/applications)
 
-### 1.2 Supabase Service Role Key (Exposed)
-**Location:** `Bot/bot2/bot/data/supabase_sync.py:8`
-```python
-SUPABASE_KEY = "REDACTED — rotated, now loaded from env var"
-```
-**Impact:** Full Supabase database access:
-- Read/write/delete all bot data
-- User data, game economy state
-- **Immediate action:** [Rotate the anon/service role key in Supabase Dashboard](https://app.supabase.com)
+### 1.2 Supabase Service Role Key (Exposed) — **RESOLVED / NO LONGER APPLICABLE**
+**Original location:** `Bot/bot2/bot/data/supabase_sync.py:8` (file removed 2026-07)
+
+The Supabase mirror sync was removed during the Firestore migration. `supabase_sync.py` no longer exists in the repository and bot2 has no code path that reads `SUPABASE_SERVICE_ROLE_KEY`.
+
+**If the key was ever committed to git history:** still rotate at [Supabase Dashboard](https://app.supabase.com) as a precaution, since git history retains the exposure. See `docs/ROTATE_NOW.md`.
 
 ### 1.3 Bot1 API Keys (Potentially Exposed)
 **Location:** `Bot/bot1/config.py` reads from `.env`, but if `.env` is committed:
@@ -71,9 +68,10 @@ SUPABASE_KEY = "REDACTED — rotated, now loaded from env var"
 - **Mitigation:** Implement log rotation
 
 ### 2.6 No HTTPS Certificate Validation Override (Minor)
-- `supabase_sync.py` uses `urllib.request` with default SSL context
 - `aiohttp` sessions across both bots use default SSL
+- Firebase Admin SDK (bot2 persistence) uses its own vetted TLS stack
 - Generally safe, but no custom certificate pinning
+- ~~`supabase_sync.py`~~ removed 2026-07-27
 
 ---
 
@@ -134,12 +132,13 @@ OLLAMA_API_KEY=your_key
 CLOUDFLARE_ACCOUNT_ID=your_id
 CLOUDFLARE_API_TOKEN=your_token
 
-# Supabase
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your_key
-
-# Bot2
-LOOKISM_SQLITE_PATH=lookism_data.sqlite3
+# Bot2 (Firestore-backed)
+BOT_TOKEN=your_bot_token
+LOOKISM_OWNER_IDS=id1,id2
+FIREBASE_PROJECT_ID=your-firebase-project
+FIREBASE_CREDENTIALS_PATH=/path/to/service-account.json
+# or:
+# FIREBASE_CREDENTIALS_JSON={"type":"service_account",...}
 EOF
 
 # Update config files to read from env only (no fallbacks)

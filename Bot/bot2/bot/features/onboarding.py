@@ -37,25 +37,34 @@ def has_user_accepted_terms(data: dict[str, Any], user_id: str) -> bool:
 
 
 def build_terms_embed() -> discord.Embed:
+    R = "\u001b[0m"
+    RED = "\u001b[1;31m"
+    GOLD = "\u001b[1;33m"
+    CYAN = "\u001b[1;36m"
+    YELLOW = "\u001b[0;33m"
     embed = discord.Embed(
         title="⚠️ LOOKISM HXCC • Access",
         color=TERMS_COLOR,
         description=(
-            "**TERMS OF SERVICE**\n\n"
-            "╭─ Rules\n"
-            "│ • Respect all users\n"
-            "│ • No harassment or hate speech\n"
-            "│ • Exploiting bugs is prohibited\n"
-            "│ • Alt-account farming is not allowed\n"
-            "╰────────────────\n"
-            "╭─ Data Notice\n"
-            "│ • Player progress is stored securely\n"
-            "│ • Game economy may change for balance\n"
-            "│ • Abuse may result in account reset\n"
-            "╰────────────────\n"
-            "╭─ Access Requirement\n"
-            "│ Accept these terms before using commands.\n"
-            "╰────────────────"
+            "```ansi\n"
+            f"{RED}╔═══════════════════════════════════════╗{R}\n"
+            f"{RED}║{R}           {GOLD}TERMS OF SERVICE{R}            {RED}║{R}\n"
+            f"{RED}╚═══════════════════════════════════════╝{R}\n"
+            "\n"
+            f"{CYAN}▸ RULES{R}\n"
+            "  • Respect all users\n"
+            "  • No harassment or hate speech\n"
+            "  • Exploiting bugs is prohibited\n"
+            "  • Alt-account farming is not allowed\n"
+            "\n"
+            f"{CYAN}▸ DATA NOTICE{R}\n"
+            "  • Player progress is stored securely\n"
+            "  • Game economy may change for balance\n"
+            "  • Abuse may result in account reset\n"
+            "\n"
+            f"{CYAN}▸ ACCESS REQUIREMENT{R}\n"
+            f"  {YELLOW}Accept these terms before using commands.{R}\n"
+            "```"
         ),
     )
     embed.set_footer(text="Terms of Service")
@@ -63,29 +72,39 @@ def build_terms_embed() -> discord.Embed:
 
 
 def build_start_embed(username: str) -> discord.Embed:
+    # ANSI color palette for Discord's ```ansi``` code blocks.
+    # Discord ANSI supports: 30 gray, 31 red, 32 green, 33 yellow, 34 blue,
+    # 35 pink, 36 cyan, 37 white; style 1 is bold; 0 resets.
+    R = "\u001b[0m"           # reset
+    RED = "\u001b[1;31m"      # bold red — outer border
+    GOLD = "\u001b[1;33m"     # bold gold — title + numeric values
+    CYAN = "\u001b[1;36m"     # bold cyan — section headers
+    GREEN = "\u001b[0;32m"    # green — slash commands
     embed = discord.Embed(
         title="LOOKISM HXCC • Account",
         color=TERMS_COLOR,
         description=(
-            "**ACCOUNT INITIALIZED**\n\n"
-            f"Welcome, {username}\n\n"
-            "╭─ Starter Package\n"
-            f"│ Coins: {STARTER_COINS}\n"
-            "│ Gems: 0\n"
-            "╰────────────────\n"
-            "╭─ Your Journey\n"
-            "│ • Collect fighters\n"
-            "│ • Build squads\n"
-            "│ • Battle opponents\n"
-            "│ • Climb league ranks\n"
-            "╰────────────────\n"
-            "╭─ Begin\n"
-            "│ /help\n"
-            "│ /tutorial\n"
-            "│ /shop\n"
-            "│ /squad\n"
-            "│ /battle\n"
-            "╰────────────────"
+            f"Welcome, {username}\n"
+            "```ansi\n"
+            f"{RED}╔═══════════════════════════════════════╗{R}\n"
+            f"{RED}║{R}          {GOLD}ACCOUNT INITIALIZED{R}          {RED}║{R}\n"
+            f"{RED}╚═══════════════════════════════════════╝{R}\n"
+            "\n"
+            f"{CYAN}▸ STARTER PACKAGE{R}\n"
+            f"  Coins ................... {GOLD}{STARTER_COINS:,}{R}\n"
+            f"  Gems ........................ {GOLD}0{R}\n"
+            f"  Packs ....................... {GOLD}{STARTER_NEWBIE_PACKS}{R}\n"
+            "\n"
+            f"{CYAN}▸ YOUR JOURNEY{R}\n"
+            "  • Collect powerful fighters\n"
+            "  • Build squads for battle\n"
+            "  • Battle opponents in leagues\n"
+            "  • Climb the ranks\n"
+            "\n"
+            f"{CYAN}▸ BEGIN{R}\n"
+            f"  {GREEN}/help{R}    {GREEN}/tutorial{R}    {GREEN}/shop{R}\n"
+            f"  {GREEN}/squad{R}   {GREEN}/battle{R}\n"
+            "```"
         ),
     )
     embed.set_footer(text="Account Registration")
@@ -93,39 +112,43 @@ def build_start_embed(username: str) -> discord.Embed:
 
 
 def build_about_embed() -> discord.Embed:
+    R = "\u001b[0m"
+    RED = "\u001b[1;31m"
+    GOLD = "\u001b[1;33m"
+    CYAN = "\u001b[1;36m"
+    GREEN = "\u001b[0;32m"
     embed = discord.Embed(
-        title="LOOKISM HXCC • System",
         color=TERMS_COLOR,
         description=(
-            "**SYSTEM OVERVIEW**\n\n"
-            "╭─ Combat\n"
-            "│ Ranked squad battles\n"
-            "│ Competitive leagues\n"
-            "│ PvP progression\n"
-            "╰────────────────\n"
-            "╭─ Cards\n"
-            "│ Collect powerful fighters\n"
-            "│ Upgrade star levels\n"
-            "│ Build squads for battle\n"
-            "╰────────────────\n"
-            "╭─ Economy\n"
-            "│ Player market trading\n"
-            "│ Official store and pack rolls\n"
-            "│ Hourly / daily / weekly rewards\n"
-            "╰────────────────\n"
-            "╭─ Social\n"
-            "│ Create or join gangs\n"
-            "│ Seasonal milestones\n"
-            "│ Achievements and leaderboards\n"
-            "╰────────────────\n"
-            "╭─ Quick Start\n"
-            "│ /start\n"
-            "│ /help\n"
-            "│ /shop\n"
-            "│ Buy packs from the /shop panel\n"
-            "│ /squad\n"
-            "│ /battle\n"
-            "╰────────────────"
+            "```ansi\n"
+            f"{RED}╔═══════════════════════════════════════╗{R}\n"
+            f"{RED}║{R}            {GOLD}SYSTEM OVERVIEW{R}            {RED}║{R}\n"
+            f"{RED}╚═══════════════════════════════════════╝{R}\n"
+            "\n"
+            f"{CYAN}▸ COMBAT{R}\n"
+            "  • Ranked squad battles\n"
+            "  • Competitive leagues\n"
+            "  • PvP progression\n"
+            "\n"
+            f"{CYAN}▸ CARDS{R}\n"
+            "  • Collect powerful fighters\n"
+            "  • Upgrade star levels\n"
+            "  • Build squads for battle\n"
+            "\n"
+            f"{CYAN}▸ ECONOMY{R}\n"
+            "  • Player market trading\n"
+            "  • Store and pack rolls\n"
+            "  • Hourly / daily / weekly rewards\n"
+            "\n"
+            f"{CYAN}▸ SOCIAL{R}\n"
+            "  • Create or join gangs\n"
+            "  • Seasonal milestones\n"
+            "  • Achievements and leaderboards\n"
+            "\n"
+            f"{CYAN}▸ QUICK START{R}\n"
+            f"  {GREEN}/start{R}    {GREEN}/help{R}    {GREEN}/tutorial{R}\n"
+            f"  {GREEN}/shop{R}     {GREEN}/squad{R}   {GREEN}/battle{R}\n"
+            "```"
         ),
     )
     embed.set_footer(text="System Info")
@@ -203,7 +226,7 @@ class TermsGateView(discord.ui.View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return int(interaction.user.id) == self.user_id
 
-    @discord.ui.button(label="✔ Accept Terms", style=discord.ButtonStyle.success, row=0)
+    @discord.ui.button(label="Accept Terms", style=discord.ButtonStyle.success, row=0)
     async def accept_terms(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         user_id = str(interaction.user.id)
         username = interaction.user.name
@@ -221,7 +244,7 @@ class TermsGateView(discord.ui.View):
         else:
             await interaction.response.send_message("Terms accepted successfully.")
 
-    @discord.ui.button(label="▶ Start", style=discord.ButtonStyle.primary, row=0)
+    @discord.ui.button(label="Start", style=discord.ButtonStyle.primary, row=0)
     async def start_panel(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         data = self.bot.storage.load()
         if not has_user_accepted_terms(data, str(interaction.user.id)):
@@ -231,7 +254,7 @@ class TermsGateView(discord.ui.View):
                 await interaction.response.send_message("You must accept the terms first.")
             return
 
-        embed = build_start_embed(interaction.user.name)
+        embed = build_start_embed(interaction.user.mention)
         view = StartQuickLinksView(self.bot)
         if interaction.response.is_done():
             await interaction.followup.send(embed=embed, view=view)
@@ -470,7 +493,7 @@ class OnboardingCog(commands.Cog):
         if hasattr(self.bot, "mark_terms_accepted"):
             self.bot.mark_terms_accepted(interaction.user.id)
 
-        embed = build_start_embed(interaction.user.name)
+        embed = build_start_embed(interaction.user.mention)
         view = StartQuickLinksView(self.bot)
         if interaction.response.is_done():
             await interaction.followup.send(embed=embed, view=view)

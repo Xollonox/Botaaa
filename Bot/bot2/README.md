@@ -11,7 +11,7 @@ cd Bot/bot2
 python main.py
 ```
 
-Requires `BOT_TOKEN` and `LOOKISM_OWNER_IDS` in environment or `.env`. See `bot/config.py`.
+Requires `BOT_TOKEN` and `LOOKISM_OWNER_IDS` in environment or `.env`, plus Firestore credentials: `FIREBASE_PROJECT_ID` and either `FIREBASE_CREDENTIALS_PATH` (path to service account key file) or `FIREBASE_CREDENTIALS_JSON` (raw JSON content). See `bot/config.py`.
 
 ---
 
@@ -21,10 +21,10 @@ Requires `BOT_TOKEN` and `LOOKISM_OWNER_IDS` in environment or `.env`. See `bot/
 main.py
 │
 └── LookismBot (discord.Bot subclass)
-    ├── storage            # bot/data/storage.py — JSON load/save + with_lock
-    ├── market_service     # bot/services/market_service.py — SQLite + JSON
-    ├── trade_service      # bot/services/trade_service.py — SQLite + JSON
-    └── battle_service     # bot/services/battle_service.py — SQLite + JSON
+    ├── storage            # bot/data/firestore_storage.py — Firestore-backed load/save + with_lock
+    ├── market_service     # bot/services/market_service.py — Firestore repo
+    ├── trade_service      # bot/services/trade_service.py — Firestore repo
+    └── battle_service     # bot/services/battle_service.py — Firestore repo
          │
          └── 30+ feature cogs (bot/features/*.py)
                │
@@ -32,12 +32,13 @@ main.py
 ```
 
 **Boot order** (main.py):
-1. Bootstrap JSON state (`lookism_data.json`) via `build_default_data()` + `ensure_structure()`
-2. Bootstrap SQLite repos from JSON state
-3. Load all `EXTENSIONS` (feature cogs)
-4. Sync guild-scoped and global slash commands
-5. Unlock stale trade locks (crashed trades)
-6. Recover active battles from persistent state
+1. Bootstrap Firestore client via `bot/data/firestore_client.py` (Firebase Admin SDK)
+2. Bootstrap game state via `build_default_data()` + `ensure_structure()`
+3. Bootstrap Firestore repos (market/trade/battle)
+4. Load all `EXTENSIONS` (feature cogs)
+5. Sync guild-scoped and global slash commands
+6. Unlock stale trade locks (crashed trades)
+7. Recover active battles from persistent state
 
 ---
 
@@ -47,20 +48,21 @@ main.py
 |---|---|
 | `main.py` | Full app bootstrap |
 | `bot/config.py` | Token, owner IDs, data paths, guild sync config |
-| `bot/data/` | JSON defaults, constants, schema, storage, sqlite, sync |
+| `bot/data/` | Defaults, constants, schema, Firestore storage + repos |
 | `bot/data/cards.json` | Seed catalog of 122 card definitions |
 | `bot/data/constants.py` | Rarity order, price bands, trophy thresholds, stamina costs |
 | `bot/data/defaults.py` | Default player/user data, card normalization, data structure sync |
 | `bot/data/schemas.py` | Schema migration helpers |
-| `bot/data/storage.py` | Thread-safe JSON load/save with in-memory cache and atomic writes |
-| `bot/data/sqlite_store.py` | SQLite-backed service repos with bootstrap from JSON |
+| `bot/data/firestore_client.py` | Firebase Admin SDK bootstrap |
+| `bot/data/firestore_storage.py` | Firestore-backed `Storage` (same public API: `load`, `load_readonly`, `with_lock`, `save`, `async_save`) |
+| `bot/data/firestore_market_repo.py` | Firestore repo for market listings/settings |
+| `bot/data/firestore_trade_repo.py` | Firestore repo for trades/offers |
+| `bot/data/firestore_battle_repo.py` | Firestore repo for battle queue/active/pending |
 | `bot/features/` | All slash command cogs and Discord UI views |
 | `bot/services/` | Battle/market/trade persistence service layer |
 | `bot/utils/` | Shared business logic and helpers |
 | `tests/` | Pytest regression and subsystem tests |
 | `logs/bot.log` | Runtime structured log output |
-| `lookism_data.json` | Primary JSON runtime state file |
-| `lookism_data.sqlite3` | SQLite state file (if no env override) |
 
 ---
 
@@ -323,8 +325,9 @@ All under the grouped `/o` surface unless noted:
 | `BOT_TOKEN` | Discord bot token (env or .env) |
 | `LOOKISM_OWNER_IDS` | Comma-separated owner user IDs |
 | `BASE_DIR` | bot2 base directory |
-| `DATA_PATH` | Path to `lookism_data.json` |
-| `SQLITE_PATH` | Path to SQLite file (overridable by `LOOKISM_SQLITE_PATH`) |
+| `FIREBASE_PROJECT_ID` | Firestore project ID (required) |
+| `FIREBASE_CREDENTIALS_PATH` | Path to service account key file (or use JSON variant) |
+| `FIREBASE_CREDENTIALS_JSON` | Raw service account JSON (alternative to path — for hosts where file upload is inconvenient) |
 | `GUILD_IDS` | Optional fast-sync guild list |
 | `OWNER_GUILD_ID` | Guild for owner-only command sync |
 
@@ -334,8 +337,7 @@ All under the grouped `/o` surface unless noted:
 
 | File | Role |
 |---|---|
-| `lookism_data.json` | Primary JSON state — players, cards, market, gangs, etc. |
-| `lookism_data.sqlite3` | SQLite state for services (market listings, trades, battles) |
+| Firestore (remote) | Primary state — players, cards, market, gangs, trades, battles |
 | `data/cards.json` | Seed card catalog (read at boot, merged into data) |
 | `logs/bot.log` | Structured runtime log |
 
@@ -352,8 +354,6 @@ pytest -q
 pytest -q tests/test_battle_engine.py tests/test_battle_freeze_regressions.py
 pytest -q tests/test_owner_admin_helpers.py
 pytest -q tests/test_trade_lifecycle.py tests/test_command_text_and_queue.py
-pytest -q tests/test_sqlite_bootstrap.py
-pytest -q tests/test_storage.py tests/test_race_conditions.py
 pytest -q tests/test_onboarding_starter.py tests/test_tournament_rank_gate.py
 
 # Syntax check
@@ -379,7 +379,7 @@ python main.py
 |---|---|---|
 | Startup/sync | `main.py`, `config.py` | Extension load, command sync, token/paths |
 | Content/admin | `cards_admin.py`, `cards_logic.py`, `attacks_logic.py` | Card and attack mutation |
-| Persistence | `storage.py`, `sqlite_store.py` | State integrity, atomic writes |
+| Persistence | `firestore_storage.py`, `firestore_client.py`, `firestore_*_repo.py` | State integrity, Firestore reads/writes |
 | Battle runtime | `battle.py`, `battle_views.py` | Timers, live-edited embeds, views |
 | Market/trade | `market.py`, `trades.py`, `trade_logic.py` | Locked cards, listing state |
 | Social | `gangs.py`, `alliance.py`, `gang_war.py` | Multi-user state changes |
@@ -438,7 +438,7 @@ When bot2 breaks:
 | `packs_panel.py` | Pack shop UI |
 | `profile.py` | Profile display |
 | `profile_owner.py` | Owner profile config |
-| `profile_render.py` | Profile image rendering |
+| `profile_embed.py` | PIL-free ANSI-colored text-embed profile |
 | `redeem.py` | Code redemption |
 | `rewards.py` | Hourly/daily/weekly/monthly |
 | `season.py` | Season pass, missions |
@@ -491,17 +491,19 @@ When bot2 breaks:
 
 | File | Role |
 |---|---|
-| `battle_service.py` | Battle state persistence |
-| `market_service.py` | SQLite market listings |
-| `trade_service.py` | SQLite trade state |
+| `battle_service.py` | Battle state persistence (Firestore-backed) |
+| `market_service.py` | Market listings (Firestore-backed) |
+| `trade_service.py` | Trade state (Firestore-backed) |
 
 ### `bot/data/`
 
 | File | Role |
 |---|---|
-| `storage.py` | JSON load/save + lock management |
-| `sqlite_store.py` | SQLite repos + bootstrap |
-| `supabase_sync.py` | Extra sync surface |
+| `firestore_client.py` | Firebase Admin SDK bootstrap |
+| `firestore_storage.py` | Firestore-backed `Storage`: `load`, `load_readonly`, `with_lock`, `save`, `async_save` |
+| `firestore_market_repo.py` | Firestore market repo |
+| `firestore_trade_repo.py` | Firestore trade repo |
+| `firestore_battle_repo.py` | Firestore battle repo |
 | `defaults.py` | Default state + card normalization |
 | `schemas.py` | Schema migration helpers |
 | `constants.py` | All game constants |
@@ -511,8 +513,8 @@ When bot2 breaks:
 
 ## Key Design Notes
 
-- **State is JSON-first.** All runtime state lives in `lookism_data.json`. SQLite is a secondary service layer for market/trade/battle persistence.
-- **All writes go through `with_lock`.** The storage layer acquires a thread lock, deep-copies the data dict, passes it to the mutation closure, writes the result atomically.
+- **State is Firestore-backed.** All runtime state lives in Firestore. The `Storage` public API (`load`, `load_readonly`, `with_lock`, `save`, `async_save`) is preserved from the previous JSON layer, and market/trade/battle repos have Firestore equivalents matching the old SQLite repo signatures.
+- **All writes go through `with_lock`.** The storage layer acquires a thread lock, deep-copies the data dict, passes it to the mutation closure, writes the result back to Firestore.
 - **Cog pattern:** Each feature file exports a `setup(bot)` function that `add_cog(bot, CogClass(bot))`. The `main.py` extension loader calls `bot.load_extension()` for each.
 - **Card catalog vs card instances:** Card *definitions* live under `data["cards"]` (keyed by unique name). Card *instances* in player inventory have a `card_name` field pointing to the definition. Always use `find_catalog_card()` (not raw `catalog.get()`) to handle key/name mismatches.
 - **Pack rewards:** Openable packs live in `user["pack_inventory"]` as pack-entry dicts. Reward flows should grant packs through `pack_logic._add_packs_to_inventory()` so `/packs` can open them; do not write new rewards only to legacy `owned_packs`.

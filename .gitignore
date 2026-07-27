@@ -65,6 +65,9 @@ bot_memory.json
 bot_settings.json
 lookism_data.json
 
+# Runtime clean-shutdown marker (used by Bot/bot2/main.py boot recovery)
+**/.clean_shutdown
+
 # Firebase service account keys — never commit
 *firebase-adminsdk*.json
 firebase-service-account*.json

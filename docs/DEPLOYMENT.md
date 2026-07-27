@@ -17,8 +17,17 @@
 | Discord Intents | Message Content + Members + Server Members |
 
 ### Recommended
-- **Pillow fonts:** `apt install fonts-dejavu` (for profile card rendering)
-- **SQLite3:** Built into Python (for bot2 state)
+- **Firestore credentials:** Firebase service account key (see below)
+
+### Bot2 Firestore Configuration
+Bot2 persists all state to Firestore via the Firebase Admin SDK. Configure:
+
+- `FIREBASE_PROJECT_ID` — Firestore project ID (required)
+- One of:
+  - `FIREBASE_CREDENTIALS_PATH` — filesystem path to the downloaded service account JSON, or
+  - `FIREBASE_CREDENTIALS_JSON` — raw JSON contents of the key (useful on hosts where uploading a file is inconvenient)
+
+Legacy: `LOOKISM_SQLITE_PATH` is retained only as a no-op env var; the SQLite backend was removed during the Firestore migration and this variable is now ignored. `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` are similarly unused by bot2.
 
 ---
 
@@ -54,7 +63,6 @@ python main.py
 
 ### Termux-Specific Notes
 - Run `pkg install python` if Python isn't installed
-- Install `pkg install fontconfig` for PIL font support
 - Keep the terminal alive: use `tmux` or `nohup`
 
 ---
@@ -137,10 +145,10 @@ python launcher.py
 ```
 
 **Important Panel Notes:**
-1. **Persist data:** Mount `lookism_data.json` and `.sqlite3` to persistent storage
+1. **Persist data:** Bot2 state now lives in Firestore (remote), so no local data files need to be mounted. Ensure Firebase credentials are configured via env vars.
 2. **Avoid dirty repo:** Set `git fetch origin main && git reset --hard origin/main` as deploy command
 3. **Watch for:** `Bot/bot2/logs/bot.log` being tracked in git (make it ignored)
-4. **Environment:** Set all tokens as panel environment variables
+4. **Environment:** Set all tokens (Discord + Firebase credentials) as panel environment variables
 
 **Safe Deploy Flow:**
 ```bash
@@ -156,7 +164,7 @@ python launcher.py
 
 ### Zero-Downtime Updates (Theoretical)
 ```bash
-# Bot2 stores state in JSON + SQLite, not in-memory
+# Bot2 stores state in Firestore, not in-memory
 # Restarting is safe as long as:
 1. No active battles (or they'll be auto-resolved as "abandoned")
 2. No pending trades (or cards remain locked until restart cleanup)
@@ -204,8 +212,8 @@ python main.py
 ```bash
 cd Bot/bot2
 python main.py
-# Requires: DISCORD_TOKEN in bot/config.py or env
-# Supports: SQLITE_PATH env override
+# Requires: BOT_TOKEN, LOOKISM_OWNER_IDS in env or .env
+# Requires: FIREBASE_PROJECT_ID + (FIREBASE_CREDENTIALS_PATH or FIREBASE_CREDENTIALS_JSON)
 ```
 
 ---
@@ -216,9 +224,8 @@ python main.py
 ```python
 # Every 60 seconds, check:
 # 1. Bot is connected to Discord Gateway
-# 2. Storage file is readable
-# 3. SQLite database is accessible
-# 4. Background tasks are running
+# 2. Firestore client is reachable
+# 3. Background tasks are running
 ```
 
 ### Log Files
@@ -234,8 +241,7 @@ journalctl -u botaaa   →  System-level logs
 | CPU usage | >80% sustained | >95% |
 | Response time (battle) | >3s | >8s |
 | LLM failure rate | >10% | >30% |
-| SQLite file size | >50MB | >100MB |
-| JSON file size | >10MB | >20MB |
+| Firestore latency | >200ms typical | >1s sustained |
 | Log file size | >100MB | >500MB |
 
 ---
@@ -255,16 +261,15 @@ journalctl -u botaaa   →  System-level logs
 |---------|-------|-----|
 | `could not reach AI backend` | All LLM providers down | Check provider status pages |
 | `Battle error` | Bad state from crash | `/o_battle_unstuck` or restart |
-| `JSON decode error` | Corrupted file | Restore from backup or delete (auto-rebuilds) |
-| `SQLite locked` | Concurrent write conflict | Wait or restart |
+| `Firestore permission denied` | Bad/missing credentials | Verify `FIREBASE_PROJECT_ID` and credential env var |
+| `Firestore unavailable` | Network / quota | Check Firebase status and project quotas |
 | `Card not found` | Missing in catalog | `/o add_card` or add to `cards.json` |
 
 ### Performance Issues
 | Issue | Likely Cause | Solution |
 |-------|-------------|----------|
-| Slow battle responses | JSON lock contention | Move more state to SQLite |
+| Slow battle responses | Storage lock contention or Firestore latency | Split hot subsystems into dedicated repos; check Firestore region |
 | Image generation timeout | Cloudflare API slow | Switch to Pollinations (faster, lower quality) |
-| Profile card rendering fails | Missing fonts | `apt install fonts-dejavu` |
 | Memory leak | `generated_image_messages` dict | Restart bot periodically |
 
 ---
@@ -276,7 +281,7 @@ journalctl -u botaaa   →  System-level logs
 - [ ] Git history cleaned of secrets (if ever exposed)
 - [ ] Rate limiting configured on all commands
 - [ ] Log rotation configured
-- [ ] Backup strategy for JSON + SQLite files
+- [ ] Firestore export / backup strategy in place
 - [ ] Monitoring + alerting set up
 - [ ] Graceful shutdown tested
 - [ ] Disaster recovery plan documented
@@ -285,26 +290,16 @@ journalctl -u botaaa   →  System-level logs
 
 ## 10. 💾 Backup Strategy
 
-### Automatic Backups (cron)
-```bash
-# /etc/cron.d/botaaa-backup
-0 */6 * * * botaaa cp /home/botaaa/Botaaa/lookism_data.json /backups/botaaa/data_$(date +\%Y\%m\%d_\%H\%M\%S).json
-0 */6 * * * botaaa cp /home/botaaa/Botaaa/lookism_data.sqlite3 /backups/botaaa/sqlite_$(date +\%Y\%m\%d_\%H\%M\%S).sqlite3
+### Firestore Backups
+Bot2 state now lives in Firestore. Use Firebase's export tooling (`gcloud firestore export`) or scheduled exports configured in the Firebase console. There is no local `lookism_data.json` / `lookism_data.sqlite3` to copy anymore.
 
-# Keep last 7 days
-0 3 * * * botaaa find /backups/botaaa/ -mtime +7 -delete
+### Manual Backup (bot1 only)
+```bash
+cp bot_memory.json bot_memory.json.bak
 ```
 
-### Manual Backup
+### Firestore Restore
 ```bash
-cp lookism_data.json lookism_data.json.bak
-cp lookism_data.sqlite3 lookism_data.sqlite3.bak
-cp bot_memory.json bot_memory.json.bak  # If running bot1
-```
-
-### Restore
-```bash
-cp lookism_data.json.bak lookism_data.json
-cp lookism_data.sqlite3.bak lookism_data.sqlite3
+gcloud firestore import gs://your-bucket/exports/EXPORT_NAME
 sudo systemctl restart botaaa
 ```

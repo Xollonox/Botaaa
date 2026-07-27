@@ -1,7 +1,7 @@
 # 🎮 Bot2: Lookism HXCC — Complete Architecture
 
 > **Role:** Full-featured gacha game bot with cards, battles, economy, social systems
-> **Files:** `Bot/bot2/` (70+ source files, 17 test files, 127 tests)
+> **Files:** `Bot/bot2/` (70+ source files, pytest regression suite)
 > **Entry:** `main.py` → `LookismBot` class
 
 ---
@@ -11,19 +11,23 @@
 ### Core
 | File | Lines | Purpose |
 |------|-------|---------|
-| `main.py` | ~390 | Bot bootstrap, 32 cogs, SQLite bootstrap, command sync |
-| `bot/config.py` | ~20 | **⚠️ HARDCODED TOKEN**, owner IDs, paths |
+| `main.py` | ~390 | Bot bootstrap, 32 cogs, Firestore bootstrap, command sync |
+| `bot/config.py` | ~20 | Env-loaded token, owner IDs, paths |
 
 ### Data Layer (`bot/data/`)
-| File | Lines | Purpose |
-|------|-------|---------|
-| `storage.py` | ~160 | Thread-safe JSON storage with cache |
-| `sqlite_store.py` | ~700 | SQLite repos: Market, Trade, Battle |
-| `supabase_sync.py` | ~70 | Background Supabase sync |
-| `constants.py` | ~80 | Ranks, prices, icons, colors |
-| `defaults.py` | ~600 | Complete default game state |
-| `schemas.py` | ~100 | TypedDict definitions |
-| `cards.json` | ~2600 | 26 card definitions |
+| File | Purpose |
+|------|---------|
+| `firestore_client.py` | Firebase Admin SDK bootstrap |
+| `firestore_storage.py` | Firestore-backed `Storage` (preserves `load`, `load_readonly`, `with_lock`, `save`, `async_save`) |
+| `firestore_market_repo.py` | Firestore market repo (matches previous SQLite signatures) |
+| `firestore_trade_repo.py` | Firestore trade repo |
+| `firestore_battle_repo.py` | Firestore battle repo |
+| `constants.py` | Ranks, prices, icons, colors |
+| `defaults.py` | Complete default game state |
+| `schemas.py` | TypedDict definitions |
+| `cards.json` | Card catalog definitions |
+
+> **Migration note (2026-07):** Bot2 was migrated off dual JSON + SQLite persistence and off the background Supabase sync. The old `storage.py`, `sqlite_store.py`, and `supabase_sync.py` modules were removed and replaced with the `firestore_*` files above. The `Storage` public API is unchanged so cogs and services continue to use `storage.with_lock(fn)` as before.
 
 ### Features (`bot/features/`)
 | File | Lines | Complexity |
@@ -37,7 +41,7 @@
 | `market.py` | 500 | Market commands + owner |
 | `trade_views.py` | 520 | Trade panel + confirmation |
 | `trades.py` | 310 | Trade commands |
-| `profile_render.py` | 700 | PIL-based profile card image |
+| `profile_embed.py` | — | PIL-free ANSI-colored text-embed profile (replaces the old PIL `profile_render.py`) |
 | `cards_admin.py` | 1308 | Visual card editor |
 | `season.py` | 600 | Season pass + missions |
 | `gang_war.py` | 520 | Full war system |
@@ -72,28 +76,23 @@
 ```
 LookismBot.__init__()
 │
-├── 1. Create Storage(DATA_PATH) — thread-safe JSON
-│       Sets up threading.Lock, cache, corruption backup
+├── 1. Bootstrap Firestore client (firestore_client.py, Firebase Admin SDK)
+│       Reads FIREBASE_PROJECT_ID + one of FIREBASE_CREDENTIALS_PATH / FIREBASE_CREDENTIALS_JSON
 │
-├── 2. Create SQLite repositories
-│       ├── SQLiteMarketRepository — WAL mode
-│       ├── SQLiteTradeRepository
-│       └── SQLiteBattleRepository
+├── 2. Create Storage(firestore_storage.py) — thread-safe Firestore-backed
+│       Same public API as before: load, load_readonly, with_lock, save, async_save
 │
-├── 3. Create service wrappers
+├── 3. Create Firestore repositories
+│       ├── FirestoreMarketRepository
+│       ├── FirestoreTradeRepository
+│       └── FirestoreBattleRepository
+│
+├── 4. Create service wrappers
 │       ├── MarketService(repo, storage)
 │       ├── TradeService(repo, storage)
 │       └── BattleService(repo, storage)
 │
-└── 4. Setup hook → setup_hook()
-    │
-    ├── 5. Bootstrap services from JSON → SQLite
-    │       ├── market_service.bootstrap_from_json()
-    │       │   Check: already completed? → skip
-    │       │   Check: SQLite has state? → mark completed, skip
-    │       │   Else: read JSON → seed SQLite
-    │       ├── trade_service.bootstrap_from_json()
-    │       └── battle_service.bootstrap_from_json()
+└── 5. Setup hook → setup_hook()
     │
     ├── 6. Load 32 extension cogs (all in bot.features.*)
     │       Failures logged but bot continues
@@ -186,27 +185,32 @@ Every slash command goes through:
 
 ---
 
-## 4. 💾 Storage Architecture (Dual System)
+## 4. 💾 Storage Architecture (Firestore)
 
-### JSON Storage (`storage.py`)
+### Firestore Storage (`firestore_storage.py`)
 ```python
 class Storage:
-    """Thread-safe JSON with in-memory caching."""
+    """Thread-safe Firestore-backed storage with in-memory caching.
 
-    def __init__(self, path):
+    Public API preserved from the previous JSON-blob layer, so callers
+    still write mutations as `storage.with_lock(fn)` closures.
+    """
+
+    def __init__(self, client):
         self.lock = threading.Lock()
-        self._cache = None  # Lazy-loaded
+        self._cache = None  # Lazy-loaded from Firestore
 
     def load(self):
         return deepcopy(self._live_data())
 
+    def load_readonly(self):
+        return self._live_data()
+
     def save(self, data):
-        self._cache = data  # Update cache immediately
-        # Atomic write:
-        tmp = path + ".tmp"
-        json.dump(sanitized, tmp)
-        fsync(tmp)
-        os.replace(tmp, path)
+        # Persist to Firestore, then update cache
+
+    def async_save(self, data):
+        # Non-blocking write dispatched to a worker
 
     def with_lock(self, fn):
         with self.lock:
@@ -216,27 +220,10 @@ class Storage:
         return result
 ```
 
-### SQLite Repositories (`sqlite_store.py`)
-All repositories use WAL mode with `NORMAL` synchronous:
-- `market_settings` — 1 row, market config
-- `market_store_items` — Official store items
-- `market_listings` — Active listings
-- `trade_pending` — User IDs in active trades
-- `trade_history` — Completed trade records
-- `trade_offer_board` — Open trade offers
-- `battle_queue` — Ranked queue entries
-- `battle_pending_friendly` — Friendly challenges
-- `battle_active_by_user` — User→battle mapping
-- `app_migrations` — Bootstrap migration tracking
+### Firestore Repositories
+The market, trade, and battle repos (`firestore_market_repo.py`, `firestore_trade_repo.py`, `firestore_battle_repo.py`) match the method signatures of the previous SQLite repos so `MarketService` / `TradeService` / `BattleService` are unchanged. Collections cover the same conceptual data (market settings, market store items, market listings, trade pending, trade history, trade offer board, battle queue, pending friendlies, active-by-user).
 
-### Supabase Sync (`supabase_sync.py`)
-```
-Fire-and-forget background thread:
-1. Serialize data to JSON
-2. POST to Supabase REST API
-3. dedup: skip if a sync is already pending
-4. 5-second timeout
-```
+> **Historical note:** Before 2026-07 bot2 used JSON (`storage.py`) as its primary state plus SQLite repos (`sqlite_store.py`) for high-churn subsystems, with an optional background Supabase mirror (`supabase_sync.py`). All three of those modules were removed when the Firestore migration completed. See git history for the pre-migration architecture.
 
 ---
 
@@ -494,13 +481,9 @@ Queue → Match Found → Prep Phase (5 min)
 | `test_onboarding_starter.py` | — | Starter pack grants |
 | `test_shop_purchase_flow.py` | — | Pack buying |
 | `test_trade_lifecycle.py` | — | Trade validation |
-| `test_sqlite_bootstrap.py` | — | JSON→SQLite migration |
-| `test_storage.py` | — | Cache consistency |
-| `test_race_conditions.py` | — | Concurrent mutations |
 | `test_daily_trophy_cap.py` | — | CPU trophy cap |
 | `test_tournament_rank_gate.py` | — | Min-rank filter |
 | `test_swap_cap.py` | — | 1-swap limit |
-| `test_profile_context.py` | — | Profile data extraction |
 | `test_owner_admin_helpers.py` | — | Card/attack admin |
 | `test_constants.py` | — | Rarity/color checks |
 | `test_command_text_and_queue.py` | — | Command registry |
@@ -517,10 +500,8 @@ Queue → Match Found → Prep Phase (5 min)
 
 | Issue | Location | Impact |
 |-------|----------|--------|
-| **Hardcoded Discord Token** | `config.py:5` | Account takeover risk |
-| **Supabase Service Role Key** | `supabase_sync.py` | Full database access |
-| **JSON file corruption risk** | `storage.py` | Race on crash during write |
 | **No input rate limiting** | All commands | API abuse potential |
-| **SQLite + JSON dual state drift** | `services/` | Possible inconsistency |
 | **No graceful shutdown** | `launcher.py` | Stale state on restart |
 | **Bot log unbounded growth** | `logs/bot.log` | Disk space exhaustion |
+
+> Prior hardcoded-token / hardcoded-Supabase-key / JSON-corruption / dual-state-drift issues were resolved by the Firestore migration and env-loaded config. See `docs/Report.md` and `docs/SECURITY.md` for the historical findings.

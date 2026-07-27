@@ -1,4 +1,4 @@
-"""Profile cog — slash commands & UI views. Rendering logic in profile_render.py."""
+"""Profile cog — slash commands & UI views. Embeds built in profile_embed.py."""
 
 from __future__ import annotations
 
@@ -9,17 +9,16 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from bot.features.profile_render import (
+from bot.features.profile_embed import (
     _MAX_BIO_LENGTH,
     _RARITY_ORDER,
     _resolve_card_by_uid,
     _sanitize_bio,
     build_featured_card_embed,
     build_profile_embed,
-    render_profile_card,
 )
 from bot.utils.checks import ensure_registered
-from bot.utils.ui import make_embed, simple_embed
+from bot.utils.ui import make_embed
 
 logger = logging.getLogger(__name__)
 
@@ -120,52 +119,22 @@ class ProfileCog(commands.Cog):
         if not await ensure_registered(interaction, self.bot.storage):
             return
         await interaction.response.defer()
-        data      = self.bot.storage.load()
-        target    = user or interaction.user
+        data = self.bot.storage.load()
+        target = user or interaction.user
         target_id = str(target.id)
-        players   = data.get("players", {})
+        players = data.get("players", {})
         if not isinstance(players, dict) or target_id not in players:
             await interaction.followup.send("That user is not registered.", ephemeral=True)
             return
-        player    = players.get(target_id, {}) if isinstance(players, dict) else {}
-        user_data = player.get("user", {}) if isinstance(player, dict) else {}
-        rival     = user_data.get("rival", {}) if isinstance(user_data, dict) else {}
         view = ProfileActionView(self, interaction.user.id, target) if target.id == interaction.user.id else None
 
-        def _rival_embed() -> discord.Embed | None:
-            if not rival or not rival.get("rival_id"):
-                return None
-            rival_name = str(rival.get("rival_name", "Unknown"))
-            losses = int(rival.get("losses_to", 0))
-            wins   = int(rival.get("wins_vs", 0))
-            return make_embed(None, f"⚔️ Rival — {rival_name}",
-                f"W {wins}  ·  L {losses}  ·  {wins}W-{losses}L", footer="Rival System")
-
-        try:
-            file = await render_profile_card(data, target)
-            embed = simple_embed("", footer="Player Profile")
-            embed.set_image(url="attachment://profile_card.png")
-            featured_embed = build_featured_card_embed(data, target)
-            embeds = [embed, featured_embed]
-            re = _rival_embed()
-            if re:
-                embeds.append(re)
-            if view:
-                await interaction.followup.send(embeds=embeds, files=[file], view=view)
-            else:
-                await interaction.followup.send(embeds=embeds, files=[file])
-        except Exception:
-            logger.exception("[PROFILE] Failed to render profile card for user=%s", target_id)
-            embed = build_profile_embed(data, target)
-            featured_embed = build_featured_card_embed(data, target)
-            embeds = [embed, featured_embed]
-            re = _rival_embed()
-            if re:
-                embeds.append(re)
-            if view:
-                await interaction.followup.send(embeds=embeds, view=view)
-            else:
-                await interaction.followup.send(embeds=embeds)
+        embed = build_profile_embed(data, target)
+        featured_embed = build_featured_card_embed(data, target)
+        embeds = [embed, featured_embed]
+        if view:
+            await interaction.followup.send(embeds=embeds, view=view)
+        else:
+            await interaction.followup.send(embeds=embeds)
 
     async def setbio(self, interaction: discord.Interaction, text: str) -> None:
         if not await ensure_registered(interaction, self.bot.storage):

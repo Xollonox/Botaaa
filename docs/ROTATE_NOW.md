@@ -27,9 +27,9 @@ All credentials listed below have been exposed in the repository and must be rot
 ✅ **Status:** Hardcoded token removed, now loads from environment
 ✅ **Action:** Already fixed — loads `BOT_TOKEN` from env vars
 
-### Bot/bot2/bot/data/supabase_sync.py (NOW FIXED)
-✅ **Status:** No longer has hardcoded defaults, uses env vars only
-✅ **Action:** Already fixed — gracefully handles missing `SUPABASE_SERVICE_ROLE_KEY`
+### Bot/bot2/bot/data/supabase_sync.py — **REMOVED, no longer applicable**
+✅ **Status:** File deleted during the Firestore migration (2026-07). Bot2 no longer has a Supabase mirror; `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are unused.
+ℹ️ **Action:** If the Supabase service-role key was ever committed to git history, still rotate it at the Supabase Dashboard as a precaution (see Step 6 below).
 
 ---
 
@@ -98,13 +98,17 @@ All credentials listed below have been exposed in the repository and must be rot
 
 ⚠️ **Note on CLOUDFLARE_ACCOUNT_ID:** This is less critical than the API token, but consider it exposed. No formal "rotation" needed—it's tied to your account. Focus on rotating the API token.
 
-### 6. Supabase (Bot/bot2 - If Used)
-**Status:** Currently optional and not exposed in code, but store securely if enabled
-1. If you plan to enable Supabase sync in bot2:
-   - Go to [Supabase Dashboard](https://supabase.com/dashboard)
-   - Create or retrieve a service role key
-   - Store it ONLY in `.env` (never commit to git)
-   - Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in `Bot/bot2/.env`
+### 6. Supabase (Bot/bot2) — **NO LONGER APPLICABLE**
+**Status:** Supabase sync was removed 2026-07-27 (migration to Firestore). `supabase_sync.py` is gone and bot2 does not read `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`.
+
+If a Supabase service-role key was previously committed to git history, still rotate it at [Supabase Dashboard](https://supabase.com/dashboard) as a precaution — historical git objects retain the exposure regardless of current code.
+
+### 7. Firebase / Firestore (Bot/bot2)
+Bot2 now persists to Firestore. If credentials were ever exposed:
+1. Go to Firebase Console → Project Settings → Service Accounts
+2. Revoke the compromised service-account key
+3. Generate a new key
+4. Update `FIREBASE_CREDENTIALS_PATH` or `FIREBASE_CREDENTIALS_JSON` in `Bot/bot2/.env`
 
 ---
 
@@ -146,11 +150,13 @@ CLOUDFLARE_ACCOUNT_ID=<existing_id>
 ### Bot/bot2/.env (Create if not exists)
 ```env
 BOT_TOKEN=<your_discord_bot_token>
-LOOKISM_SQLITE_PATH=  # optional
-SUPABASE_URL=         # optional
-SUPABASE_SERVICE_ROLE_KEY=  # optional
+LOOKISM_OWNER_IDS=<comma_separated_ids>
+FIREBASE_PROJECT_ID=<your_firebase_project_id>
+FIREBASE_CREDENTIALS_PATH=/path/to/service-account.json
+# or use FIREBASE_CREDENTIALS_JSON=<raw JSON> instead
 GANG_WAR_PREP_SECONDS=86400
 GANG_WAR_BATTLE_SECONDS=86400
+# LOOKISM_SQLITE_PATH, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY are legacy/unused (Firestore migration 2026-07-27)
 ```
 
 ---

@@ -22,7 +22,7 @@ This workspace hosts two Discord bots that run concurrently via `launcher.py`:
 | Bot | Directory | Purpose | Stack |
 |-----|-----------|---------|-------|
 | **Miss Kim** | `Bot/bot1/` | Conversational AI with image generation, vision, mood system | discord.py, OpenAI-compat LLMs (Cerebras, Groq, Ollama), Cloudflare AI |
-| **Lookism HXCC** | `Bot/bot2/` | Gacha game bot: cards, battles, market, trades, gangs, wars, tournaments | discord.py, SQLite + JSON, PIL, Supabase sync |
+| **Lookism HXCC** | `Bot/bot2/` | Gacha game bot: cards, battles, market, trades, gangs, wars, tournaments | discord.py, Firestore |
 
 Each bot owns its commands, tests, and runtime data.
 
@@ -48,8 +48,11 @@ python launcher.py
 | `GROQ_API_KEY` | No | bot1 |
 | `OLLAMA_API_KEY` | No | bot1 (up to 5 keys) |
 | `CLOUDFLARE_API_TOKEN` | No | bot1 |
-| `SUPABASE_URL` | No | bot2 |
-| `SUPABASE_SERVICE_ROLE_KEY` | No | bot2 |
+| `FIREBASE_PROJECT_ID` | Yes | bot2 |
+| `FIREBASE_CREDENTIALS_PATH` | Yes* | bot2 (path to service account JSON) |
+| `FIREBASE_CREDENTIALS_JSON` | Yes* | bot2 (raw JSON alternative to path) |
+
+*One of `FIREBASE_CREDENTIALS_PATH` or `FIREBASE_CREDENTIALS_JSON` is required.
 
 See `.env.example` files in each bot directory for the full list.
 
@@ -79,11 +82,11 @@ Botaaa/
 │       ├── main.py               # LookismBot bootstrap (32 cogs)
 │       ├── bot/
 │       │   ├── config.py
-│       │   ├── data/             # Storage (JSON, SQLite, Supabase)
+│       │   ├── data/             # Firestore-backed storage + repos
 │       │   ├── services/         # Battle, market, trade logic
 │       │   ├── features/         # 32 slash-command cogs
 │       │   └── utils/            # 25 utility modules
-│       └── tests/                # 17 test files, 127 tests
+│       └── tests/                # Pytest regression suite
 │   │
 │
 ├── assets/                       # Logo and branding
@@ -127,7 +130,7 @@ Full-featured gacha card game bot with 80+ slash commands.
 | **Squad** | Squad management, defensive setup, weapon equipping, keystone system |
 | **Admin** | Visual card editor, owner economy controls, emoji customizer, server settings |
 
-**Storage:** Dual JSON + SQLite architecture with atomic writes and optional Supabase sync for web integration when `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are configured.
+**Storage:** Firestore-backed persistence via the Firebase Admin SDK. The same `Storage` public API (`load`, `load_readonly`, `with_lock`, `save`, `async_save`) is preserved, and market/trade/battle repos have Firestore equivalents (`firestore_market_repo`, `firestore_trade_repo`, `firestore_battle_repo`). Requires `FIREBASE_PROJECT_ID` plus either `FIREBASE_CREDENTIALS_PATH` or `FIREBASE_CREDENTIALS_JSON`.
 
 ---
 
@@ -141,13 +144,11 @@ cd Bot/bot2 && pytest -q
 # Focused suites
 cd Bot/bot2
 pytest -q tests/test_battle_engine.py
-pytest -q tests/test_storage.py tests/test_race_conditions.py
 pytest -q tests/test_trade_lifecycle.py
 ```
 
-Tests across the workspace cover Discord command registration, SQLite migrations,
-AI routing, reminders, event automation, battle formulas, storage races, trade
-lifecycle, and more.
+Tests across the workspace cover Discord command registration, AI routing,
+reminders, event automation, battle formulas, trade lifecycle, and more.
 
 ---
 
@@ -155,11 +156,11 @@ lifecycle, and more.
 
 ```
 discord.py               # Bot framework
-openai==1.37.1           # LLM API client
-Pillow>=10.0.0           # Image processing
+openai==1.37.1           # LLM API client (bot1)
 aiohttp==3.10.10         # Async HTTP
 pydantic==1.10.15        # Data validation
 python-dotenv>=1.0.0     # .env loading
+firebase-admin>=6.0.0    # Firestore persistence (bot2)
 ```
 
 ---

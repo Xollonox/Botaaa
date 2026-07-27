@@ -16,6 +16,8 @@ Botaaa is a dual-bot Discord workspace comprising:
 
 **Architecture:** Python 3.10+, discord.py, dual JSON + SQLite storage, 4 LLM providers with fallback, Supabase sync
 
+> **UPDATE 2026-07-27:** Bot2 was migrated to Firestore (`firestore_storage.py`, `firestore_market_repo.py`, `firestore_trade_repo.py`, `firestore_battle_repo.py`, `firestore_client.py`). The old `storage.py`, `sqlite_store.py`, `supabase_sync.py`, and PIL-based `profile_render.py` were removed. Findings below that reference those files are annotated **RESOLVED — file removed 2026-07-27**; the original finding text is preserved for audit-trail purposes.
+
 **Critical Assessment:** The codebase is **feature-complete but production-unsafe**. Hardcoded secrets, data corruption races, crash-on-battle cards, and schema incompatibilities mean this **cannot be deployed publicly without immediate remediation**. The 15 CRITICAL findings alone represent account takeover risk, permanent data loss, and guaranteed crashes under normal gameplay.
 
 ---
@@ -59,8 +61,8 @@ BOT_TOKEN = "REDACTED — rotated, now loaded from env var"
 
 ---
 
-### 1.2 Hardcoded Supabase Service Role Key — **FINDING #2** 🔴
-**File:** `Bot/bot2/bot/data/supabase_sync.py:9-10`
+### 1.2 Hardcoded Supabase Service Role Key — **FINDING #2** 🔴 — **RESOLVED — file removed 2026-07-27**
+**File:** `Bot/bot2/bot/data/supabase_sync.py:9-10` (module deleted during Firestore migration)
 ```python
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")  # was hardcoded, now env-only
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")  # was hardcoded, rotated
@@ -119,8 +121,8 @@ No log rotation configured. Disk will fill. Logs may contain sensitive data (use
 
 ## 2. Data Integrity & Storage
 
-### 2.1 `storage.load()` Calls `save()` Without Lock — **FINDING #7** 🔴
-**File:** `Bot/bot2/bot/data/storage.py:56-78`
+### 2.1 `storage.load()` Calls `save()` Without Lock — **FINDING #7** 🔴 — **RESOLVED — file removed 2026-07-27**
+**File:** `Bot/bot2/bot/data/storage.py:56-78` (module replaced by `firestore_storage.py`)
 
 ```python
 def load(self) -> dict[str, Any]:
@@ -138,8 +140,8 @@ def _load_from_disk(self) -> dict[str, Any]:
 
 ---
 
-### 2.2 `save()` Updates Cache Before Disk Write — **FINDING #8** 🔴
-**File:** `Bot/bot2/bot/data/storage.py:90-110`
+### 2.2 `save()` Updates Cache Before Disk Write — **FINDING #8** 🔴 — **RESOLVED — file removed 2026-07-27**
+**File:** `Bot/bot2/bot/data/storage.py:90-110` (module replaced by `firestore_storage.py`)
 
 ```python
 def save(self, data: dict[str, Any]) -> None:
@@ -157,8 +159,8 @@ def save(self, data: dict[str, Any]) -> None:
 
 ---
 
-### 2.3 `_sanitize_for_json` Irreversibly Destroys Set Data — **FINDING #9** 🔴
-**File:** `Bot/bot2/bot/data/storage.py:17-32`
+### 2.3 `_sanitize_for_json` Irreversibly Destroys Set Data — **FINDING #9** 🔴 — **RESOLVED — file removed 2026-07-27**
+**File:** `Bot/bot2/bot/data/storage.py:17-32` (module replaced by `firestore_storage.py`)
 
 ```python
 if isinstance(value, set):
@@ -173,8 +175,8 @@ if isinstance(value, set):
 
 ---
 
-### 2.4 SQLite `trade_pending` Rollback Is No-Op in Autocommit — **FINDING #10** 🔴
-**File:** `Bot/bot2/bot/data/sqlite_store.py:389-407`
+### 2.4 SQLite `trade_pending` Rollback Is No-Op in Autocommit — **FINDING #10** 🔴 — **RESOLVED — file removed 2026-07-27**
+**File:** `Bot/bot2/bot/data/sqlite_store.py:389-407` (module replaced by `firestore_trade_repo.py`)
 
 ```python
 def _sync_add_pending_pair(self, a_id: str, b_id: str) -> bool:
@@ -192,8 +194,8 @@ def _sync_add_pending_pair(self, a_id: str, b_id: str) -> bool:
 
 ---
 
-### 2.5 JSON↔SQLite One-Shot Bootstrap — No Ongoing Sync — **FINDING #11** 🔴
-**File:** `Bot/bot2/bot/data/sqlite_store.py` (all three repos: `MarketRepository`, `TradeRepository`, `BattleRepository`)
+### 2.5 JSON↔SQLite One-Shot Bootstrap — No Ongoing Sync — **FINDING #11** 🔴 — **RESOLVED — file removed 2026-07-27**
+**File:** `Bot/bot2/bot/data/sqlite_store.py` (all three repos: `MarketRepository`, `TradeRepository`, `BattleRepository`) — replaced by `firestore_market_repo.py`, `firestore_trade_repo.py`, `firestore_battle_repo.py`. There is no longer a dual-store to keep in sync.
 
 Bootstrap pattern:
 ```python
@@ -207,8 +209,8 @@ def seed_from_json_market(self, market_data: dict) -> None:
 
 ---
 
-### 2.6 Service Setters Write SQLite Then JSON — No Rollback on JSON Failure — **FINDING #12** 🔴
-**File:** `Bot/bot2/bot/services/market_service.py:65-72` (and `trade_service.py`, `battle_service.py`)
+### 2.6 Service Setters Write SQLite Then JSON — No Rollback on JSON Failure — **FINDING #12** 🔴 — **RESOLVED — SQLite backend removed 2026-07-27**
+**File:** `Bot/bot2/bot/services/market_service.py:65-72` (and `trade_service.py`, `battle_service.py`). Services now write only Firestore via `firestore_*_repo.py`; there is no second store to diverge from.
 
 ```python
 def set_fee_percent(self, percent: int) -> None:
@@ -236,8 +238,8 @@ def set_quick_sell_value(self, rarity: str, value: int) -> None:
 
 ---
 
-### 2.8 `storage.save()` No fsync on Parent Directory — **FINDING #14** 🟠
-**File:** `Bot/bot2/bot/data/storage.py:100-110`
+### 2.8 `storage.save()` No fsync on Parent Directory — **FINDING #14** 🟠 — **RESOLVED — file removed 2026-07-27**
+**File:** `Bot/bot2/bot/data/storage.py:100-110` (module replaced by `firestore_storage.py`; Firestore handles durability server-side)
 
 `os.replace(tmp_path, self.path)` is atomic for the file, but parent directory metadata not synced. Power loss between replace and dir fsync can lose the file on some filesystems.
 
@@ -1312,8 +1314,8 @@ import random as _random  # Module already has `import random`
 
 ---
 
-### 8.40 Font Loading No Success Logging — **FINDING #104** 🟢
-**File:** `Bot/bot2/bot/features/profile_render.py`
+### 8.40 Font Loading No Success Logging — **FINDING #104** 🟢 — **RESOLVED — file removed 2026-07-27**
+**File:** `Bot/bot2/bot/features/profile_render.py` (module removed; profile is now rendered as a text embed by `profile_embed.py`, no fonts involved)
 
 ```python
 for font_path in font_paths:
@@ -1419,8 +1421,8 @@ self._attempts: dict[str, list[int]] = {}
 
 ---
 
-### 9.2 Profile Render Sequential Image Fetching — **FINDING #113** 🟠
-**File:** `Bot/bot2/bot/features/profile_render.py`
+### 9.2 Profile Render Sequential Image Fetching — **FINDING #113** 🟠 — **RESOLVED — file removed 2026-07-27**
+**File:** `Bot/bot2/bot/features/profile_render.py` (module removed; `profile_embed.py` uses a PIL-free text embed and does not fetch external images at render time)
 
 ```python
 # Fetches 4 images sequentially:
@@ -1447,10 +1449,10 @@ pool.extend(matching * w)  # If weight=100, pool += 100 copies
 
 ---
 
-### 9.4 JSON File Rewrite on Every Mutation — **FINDING #115** 🟡
-**File:** `Bot/bot2/bot/data/storage.py`
+### 9.4 JSON File Rewrite on Every Mutation — **FINDING #115** 🟡 — **RESOLVED — file removed 2026-07-27**
+**File:** `Bot/bot2/bot/data/storage.py` (module replaced by `firestore_storage.py`)
 
-`lookism_data.json` ~15KB+. Every command rewrites entire file. Under load, disk I/O bottleneck.
+`lookism_data.json` ~15KB+. Every command rewrites entire file. Under load, disk I/O bottleneck. Storage now persists to Firestore instead of a local JSON blob; the per-mutation full-rewrite characteristic no longer applies.
 
 ---
 
@@ -1477,7 +1479,7 @@ generated_image_messages = {}  # message_id → {prompt, backend}
 | Dead code (`attacks_owner.py`, `_ensure_inventory_defaults`) | 3+ files | Confusion |
 | No docstrings on complex functions | `battle_state.py`, `pack_logic.py` | Maintenance burden |
 | Long functions (>200 lines) | `battle.py` (2922), `battle_state.py` (1371) | Hard to test/reason about |
-| Circular import risk | `defaults.py` ↔ `storage.py` ↔ `sqlite_store.py` | Startup fragility |
+| Circular import risk | ~~`defaults.py` ↔ `storage.py` ↔ `sqlite_store.py`~~ | **RESOLVED — `storage.py` and `sqlite_store.py` removed 2026-07-27**; layout is now `defaults.py` ↔ `firestore_storage.py` ↔ `firestore_*_repo.py` |
 
 ---
 
@@ -1499,7 +1501,7 @@ All 127 tests are unit tests. No test simulates:
 | `tournament.py` | 1 (`test_tournament_rank_gate.py`) | Bracket progression, prize split |
 | `season.py` | 0 | Mission logic, pass tiers, reset |
 | `redeem.py` | 0 | Rate limiting, code validation |
-| `profile_render.py` | 0 | Image fetching, rendering |
+| ~~`profile_render.py`~~ | — | **RESOLVED — file removed 2026-07-27**; replaced by `profile_embed.py` (PIL-free text embed) |
 
 ### 11.3 Flaky Tests
 - `test_battle_freeze_regressions.py` — depends on timing
@@ -1531,10 +1533,12 @@ youtube-search-python
 pydantic==1.10.15
 httpx==0.27.2
 aiohttp==3.10.10
-Pillow>=10.0.0
 python-dotenv>=1.0.0
 ```
-Breaking upstream changes in `discord.py`, `aiohttp`, `Pillow` will hit without warning.
+
+> **UPDATE 2026-07-27:** `Bot/bot2/requirements.txt` has been trimmed to `discord.py>=2.3.0,<3`, `python-dotenv>=1.0.0,<2`, `aiohttp>=3.9.0,<4`, `pytest>=8.0.0,<10`, `firebase-admin>=6.0.0,<8`. Pillow was removed entirely (profile is now a text embed). Version ranges are now bounded, so breaking upstream changes will not silently ship.
+
+Breaking upstream changes in `discord.py`, `aiohttp` (root repo `requirements.txt`) will hit without warning.
 
 ### 12.4 `Bot/bot2/main.py` Extension Load Failures Silent — **FINDING #120** 🟡
 ```python
@@ -1622,23 +1626,25 @@ Bot/bot1/
 Bot/bot2/
 ├── main.py                 # LookismBot bootstrap
 ├── bot/
-│   ├── config.py           # HARDCODED TOKEN (#1)
+│   ├── config.py           # Env-loaded token (was #1, resolved)
 │   ├── data/
-│   │   ├── storage.py      # JSON storage (#7, #8, #9)
-│   │   ├── sqlite_store.py # SQLite repos (#10, #11, #14)
-│   │   ├── supabase_sync.py# HARDCODED SUPABASE KEY (#2)
+│   │   ├── firestore_client.py       # Firebase Admin SDK bootstrap
+│   │   ├── firestore_storage.py      # Firestore-backed Storage (replaces storage.py — #7/#8/#9/#14 resolved)
+│   │   ├── firestore_market_repo.py  # Replaces sqlite_store.py MarketRepository (#11, #12 resolved)
+│   │   ├── firestore_trade_repo.py   # Replaces sqlite_store.py TradeRepository (#10, #11 resolved)
+│   │   ├── firestore_battle_repo.py  # Replaces sqlite_store.py BattleRepository (#11 resolved)
 │   │   ├── defaults.py     # Duplicate schema (#15)
 │   │   ├── schemas.py      # Incomplete TypedDicts (#16)
 │   │   ├── constants.py
-│   │   └── cards.json      # 26 cards (#17, #18, #19, #46, #61)
+│   │   └── cards.json      # (#17, #18, #19, #46, #61)
 │   ├── services/
-│   │   ├── market_service.py  # #12, #13
-│   │   ├── trade_service.py   # #10, #31
-│   │   └── battle_service.py  # #12
-│   ├── features/           # 32 cogs (#23-#106)
+│   │   ├── market_service.py  # #12 (resolved — Firestore-only), #13
+│   │   ├── trade_service.py   # #10 (resolved), #31
+│   │   └── battle_service.py  # #12 (resolved)
+│   ├── features/           # 32 cogs (#23-#106); profile_render.py removed → profile_embed.py
 │   ├── utils/              # 25 modules (#22, #34, #35, #46-#111)
-│   └── tests/              # 17 files, 127 tests (gaps in #11.2)
-└── lookism_data.json       # Runtime state
+│   └── tests/              # Pytest suite (gaps in #11.2; storage/sqlite/supabase/profile_render tests removed with their modules)
+└── (state persisted to Firestore — no local JSON/SQLite runtime files)
 ```
 
 ---
