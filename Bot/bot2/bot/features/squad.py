@@ -9,7 +9,16 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card, normalize_mastery_list, rarity_rank
+from bot.utils.cards_logic import (
+    compute_power,
+    compute_scaled_stats,
+    find_catalog_card,
+    rarity_rank,
+    resolve_mastery_list,
+    resolve_unique_path,
+    resolve_unique_skills,
+    wrap_box_lines,
+)
 from bot.utils.checks import ensure_registered
 from bot.utils.interaction_visibility import smart_reply, error_reply
 from bot.utils.squad_logic import compute_squad_power, get_inventory, get_player, get_squad
@@ -63,13 +72,6 @@ def _instance_hp(data: dict[str, Any], instance: dict[str, Any]) -> tuple[int, i
     scaled   = compute_scaled_stats(card_def if isinstance(card_def, dict) else {}, int(instance.get("stars", 0)))
     max_hp   = max(BASE_HP, math.floor(compute_power(scaled) / 5) + BASE_HP)
     return max(0, min(int(instance.get("hp", max_hp)), max_hp)), max_hp
-
-def _resolve_field(raw: Any, desc_raw: Any = None) -> tuple[str, str]:
-    if isinstance(raw, dict):
-        return (str(raw.get("name", raw.get("title", "—"))).strip() or "—",
-                str(raw.get("description", raw.get("desc", ""))).strip() or "—")
-    return str(raw or "").strip() or "—", str(desc_raw or "").strip() or "—"
-
 
 # ── embed builders ────────────────────────────────────────────────────────────
 
@@ -149,22 +151,22 @@ def _build_fighter_embed(data: dict[str, Any], instance: dict[str, Any]) -> disc
     power     = compute_power(scaled)
     image_url = str(card_def.get("image_url", "")).strip() if isinstance(card_def, dict) else ""
 
-    mastery_list = normalize_mastery_list(card_def.get("mastery", []) if isinstance(card_def, dict) else [])
+    card_def_dict = card_def if isinstance(card_def, dict) else {}
+    mastery_list = resolve_mastery_list(card_def_dict)
     mastery_str  = "  ".join(f"• {m}" for m in mastery_list) if mastery_list else "—"
 
-    unique_path,  unique_path_desc  = _resolve_field(card_def.get("unique_path") if isinstance(card_def, dict) else None,
-                                                      card_def.get("unique_path_description") if isinstance(card_def, dict) else None)
-    unique_skill, unique_skill_desc = _resolve_field(card_def.get("unique_skill") if isinstance(card_def, dict) else None,
-                                                      card_def.get("unique_skill_description") if isinstance(card_def, dict) else None)
+    skills = resolve_unique_skills(card_def_dict)
+    path_name, path_desc, path_active = resolve_unique_path(card_def_dict)
 
     heading = f"{_rarity_icon(rarity)} {rarity} • {card_name}"
     if title:
         heading += f"\n{title}"
 
+    bio_body = "\n".join(wrap_box_lines(bio or "—"))
     body = (
         f"{heading}\n\n"
         "╭─ Bio\n"
-        f"│ {bio or '—'}\n"
+        f"{bio_body}\n"
         "╰────────────────\n"
         "╭─ Combat Stats\n"
         f"│ 💪 STR: {int(scaled.get('strength', 0))}\n"
@@ -178,19 +180,37 @@ def _build_fighter_embed(data: dict[str, Any], instance: dict[str, Any]) -> disc
         f"│ ⭐ Stars: {_star_string(stars)}\n"
         f"│ ⚡ Power: {power:,}\n"
         f"│ {'🔒 Status: Locked' if locked else '🔓 Status: Unlocked'}\n"
-        "╰────────────────\n"
-        "╭─ Mastery\n"
-        f"│ {mastery_str}\n"
-        "╰────────────────\n"
-        "╭─ Unique Path\n"
-        f"│ {unique_path}\n"
-        f"│ {unique_path_desc}\n"
-        "╰────────────────\n"
-        "╭─ Unique Skill\n"
-        f"│ {unique_skill}\n"
-        f"│ {unique_skill_desc}\n"
         "╰────────────────"
     )
+
+    if mastery_list:
+        body += (
+            "\n╭─ Mastery\n"
+            f"│ {mastery_str}\n"
+            "╰────────────────"
+        )
+
+    if skills:
+        if stars < 3:
+            body += "\n╭─ Unique Skill\n│ 🔒 Unlocks at ★3\n╰────────────────"
+        else:
+            skill_lines: list[str] = []
+            for name, desc in skills:
+                skill_lines.append(f"│ • {name}")
+                if desc:
+                    skill_lines.extend(wrap_box_lines(desc, prefix="│   "))
+            body += "\n╭─ Unique Skill\n" + "\n".join(skill_lines) + "\n╰────────────────"
+
+    if path_name:
+        path_kind = " [Active]" if path_active else " [Passive]"
+        if stars < 5:
+            body += f"\n╭─ Unique Path{path_kind}\n│ 🔒 Unlocks at ★5\n╰────────────────"
+        else:
+            path_lines = [f"│ • {path_name}"]
+            if path_desc:
+                path_lines.extend(wrap_box_lines(path_desc, prefix="│   "))
+            body += f"\n╭─ Unique Path{path_kind}\n" + "\n".join(path_lines) + "\n╰────────────────"
+
     embed = make_embed(None, "LOOKISM CG • FIGHTER", body, color=0xE11D48, image_url=image_url, footer="Squad • Fighter Detail")
     return embed
 

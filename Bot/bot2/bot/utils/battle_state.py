@@ -10,7 +10,7 @@ from typing import Any
 
 from bot.utils.attacks_logic import ensure_attacks_structure
 from bot.utils.battle_engine_pdf import normalize_attack_type
-from bot.utils.cards_logic import compute_scaled_stats, find_catalog_card, normalize_mastery_list
+from bot.utils.cards_logic import compute_scaled_stats, find_catalog_card, normalize_mastery_list, resolve_mastery_list
 from bot.utils.squad_logic import get_player
 from bot.utils.timeutil import now_ts
 from bot.utils import achievement_logic as _ach
@@ -197,8 +197,7 @@ def _build_hp(stats: dict[str, int], mastery: list[str]) -> int:
 
 
 def _catalog_mastery(card_def: dict[str, Any]) -> list[str]:
-    raw = card_def.get("mastery", card_def.get("masteries", []))
-    return [str(m).lower() for m in normalize_mastery_list(raw)]
+    return [str(m).lower() for m in resolve_mastery_list(card_def)]
 
 
 def _build_cpu_side(data: dict[str, Any], team_size: int = 4, min_rarity: str = "Rare", player_trophies: int = 0) -> dict[str, Any]:

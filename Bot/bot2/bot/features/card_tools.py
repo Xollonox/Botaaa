@@ -8,7 +8,15 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card, normalize_mastery_list
+from bot.utils.cards_logic import (
+    compute_power,
+    compute_scaled_stats,
+    find_catalog_card,
+    resolve_mastery_list,
+    resolve_unique_path,
+    resolve_unique_skills,
+    wrap_box_lines,
+)
 from bot.utils.ui import e, make_embed
 from bot.utils.interaction_visibility import smart_reply, error_reply
 
@@ -16,26 +24,6 @@ from bot.utils.interaction_visibility import smart_reply, error_reply
 def _rarity_icon(rarity: str) -> str:
     from bot.data.constants import rarity_icon
     return rarity_icon(str(rarity).title()) or "⚪"
-
-
-def _resolve_field(raw: Any, desc_raw: Any = None) -> tuple[str, str]:
-    """Handle both plain-string and dict-stored skill/path fields."""
-    if isinstance(raw, dict):
-        name = str(raw.get("name", raw.get("title", "—"))).strip() or "—"
-        desc = str(raw.get("description", raw.get("desc", ""))).strip() or "—"
-        return name, desc
-    name = str(raw or "").strip() or "—"
-    desc = str(desc_raw or "").strip() or "—"
-    return name, desc
-
-
-def _resolve_unique_skills(card: dict[str, Any]) -> tuple[str, str]:
-    skill_names = card.get("unique_skills")
-    if isinstance(skill_names, list):
-        names = [str(name).strip() for name in skill_names if str(name).strip()]
-        if names:
-            return "\n│ ".join(f"• {n}" for n in names), ""
-    return _resolve_field(card.get("unique_skill"), card.get("unique_skill_description"))
 
 
 def _card_name_choices(data: dict[str, Any], current: str) -> list[app_commands.Choice[str]]:
@@ -72,27 +60,27 @@ def _build_catalog_card_embed(data: dict[str, Any], card: dict[str, Any]) -> dis
     title     = str(card.get("title", "")).strip()
     bio       = str(card.get("description", "")).strip() or "—"
     rarity     = str(card.get("rarity", "Common"))
-    raw_stats  = card.get("stats", {})
     image_url  = str(card.get("image_url", "")).strip()
 
     # Catalog cards have no stars — show base stats at 0 stars
     scaled = compute_scaled_stats(card, 0)
     power  = compute_power(scaled)
 
-    mastery_list = normalize_mastery_list(card.get("mastery", card.get("masteries", [])))
+    mastery_list = resolve_mastery_list(card)
     mastery_str  = "  ".join(f"• {m}" for m in mastery_list) if mastery_list else "—"
 
-    unique_path,  unique_path_desc  = _resolve_field(card.get("unique_path"),  card.get("unique_path_description"))
-    unique_skill, unique_skill_desc = _resolve_unique_skills(card)
+    skills = resolve_unique_skills(card)
+    path_name, path_desc, path_active = resolve_unique_path(card)
 
     heading = f"{_rarity_icon(rarity)} {rarity} • {card_name}"
     if title:
         heading += f"\n{title}"
 
+    bio_body = "\n".join(wrap_box_lines(bio))
     body = (
         f"{heading}\n\n"
         "╭─ Description\n"
-        f"│ {bio}\n"
+        f"{bio_body}\n"
         "╰────────────────\n"
         "╭─ Combat Stats\n"
         f"│ 💪 STR: {int(scaled.get('strength', 0))}\n"
@@ -109,7 +97,6 @@ def _build_catalog_card_embed(data: dict[str, Any], card: dict[str, Any]) -> dis
         "╰────────────────"
     )
 
-    # Only show Mastery if the card has it
     if mastery_list:
         body += (
             "\n╭─ Mastery\n"
@@ -117,22 +104,20 @@ def _build_catalog_card_embed(data: dict[str, Any], card: dict[str, Any]) -> dis
             "╰────────────────"
         )
 
-    # Only show Unique Skill if the card has it
-    if unique_skill and unique_skill != "—":
-        skill_block = f"\n╭─ Unique Skill\n│ {unique_skill}\n"
-        if unique_skill_desc and unique_skill_desc != "—":
-            skill_block += f"│ {unique_skill_desc}\n"
-        skill_block += "╰────────────────"
-        body += skill_block
+    if skills:
+        skill_lines: list[str] = []
+        for name, desc in skills:
+            skill_lines.append(f"│ • {name}")
+            if desc:
+                skill_lines.extend(wrap_box_lines(desc, prefix="│   "))
+        body += "\n╭─ Unique Skill\n" + "\n".join(skill_lines) + "\n╰────────────────"
 
-    # Only show Unique Path if the card has it
-    if unique_path and unique_path != "—":
-        body += (
-            "\n╭─ Unique Path\n"
-            f"│ {unique_path}\n"
-            f"│ {unique_path_desc}\n"
-            "╰────────────────"
-        )
+    if path_name:
+        path_kind = " [Active]" if path_active else " [Passive]"
+        path_lines = [f"│ • {path_name}"]
+        if path_desc:
+            path_lines.extend(wrap_box_lines(path_desc, prefix="│   "))
+        body += f"\n╭─ Unique Path{path_kind}\n" + "\n".join(path_lines) + "\n╰────────────────"
 
     return make_embed(None, "LOOKISM CG • FIGHTER", body, color=0xE11D48, footer="Card Catalog", image_url=image_url)
 

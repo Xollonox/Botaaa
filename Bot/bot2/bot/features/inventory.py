@@ -8,7 +8,18 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card, get_flat_stat_bonus, normalize_mastery_list, rarity_rank
+from bot.utils.cards_logic import (
+    compute_power,
+    compute_scaled_stats,
+    find_catalog_card,
+    get_flat_stat_bonus,
+    normalize_mastery_list,
+    rarity_rank,
+    resolve_mastery_list,
+    resolve_unique_path,
+    resolve_unique_skills,
+    wrap_box_lines,
+)
 from bot.utils.checks import ensure_registered
 from bot.utils.interaction_visibility import smart_reply, error_reply
 from bot.utils.ui import e, make_embed
@@ -740,44 +751,16 @@ class InventoryCog(commands.Cog):
         locked = bool(item.get("locked", False) or item.get("market_locked", False) or item.get("squad_locked", False))
         title = str(card_def.get("title", "")).strip() if isinstance(card_def, dict) else ""
         bio = str(card_def.get("description", "")).strip() if isinstance(card_def, dict) else ""
-        def _resolve_field(raw: Any, desc_raw: Any = None) -> tuple[str, str]:
-            """Handle both plain-string and dict-stored skill/path fields."""
-            if isinstance(raw, dict):
-                name = str(raw.get("name", raw.get("title", "—"))).strip() or "—"
-                desc = str(raw.get("description", raw.get("desc", ""))).strip() or "—"
-                return name, desc
-            name = str(raw or "").strip() or "—"
-            desc = str(desc_raw or "").strip() or "—"
-            return name, desc
 
-        unique_path, unique_path_desc = _resolve_field(
-            card_def.get("unique_path"), card_def.get("unique_path_description")
-        )
-        # Support both singular fields and plural "unique_skills" list from cards.json
-        _skills_list = card_def.get("unique_skills", []) if isinstance(card_def, dict) else []
-        if isinstance(_skills_list, list) and _skills_list and not card_def.get("unique_skill"):
-            unique_skill, unique_skill_desc = _skills_list[0] if isinstance(_skills_list[0], (list, tuple)) else (_skills_list[0], ""), ""
-            unique_skill_2, unique_skill_2_desc = (_skills_list[1], "") if len(_skills_list) > 1 else ("", "")
-            unique_skill_3, unique_skill_3_desc = (_skills_list[2], "") if len(_skills_list) > 2 else ("", "")
-            if isinstance(unique_skill, str):
-                unique_skill_desc = ""
-            if isinstance(unique_skill_2, str):
-                unique_skill_2_desc = ""
-            if isinstance(unique_skill_3, str):
-                unique_skill_3_desc = ""
-        else:
-            unique_skill, unique_skill_desc = _resolve_field(
-                card_def.get("unique_skill"), card_def.get("unique_skill_description")
-            )
-            unique_skill_2, unique_skill_2_desc = _resolve_field(card_def.get("unique_skill_2"))
-            unique_skill_3, unique_skill_3_desc = _resolve_field(card_def.get("unique_skill_3"))
-        mastery_list: list[str] = normalize_mastery_list(card_def.get("mastery", card_def.get("masteries", [])) if isinstance(card_def, dict) else [])
+        card_def_dict = card_def if isinstance(card_def, dict) else {}
+        skills = resolve_unique_skills(card_def_dict)
+        path_name, path_desc, path_active = resolve_unique_path(card_def_dict)
+        mastery_list = resolve_mastery_list(card_def_dict)
         mastery_str = "  ".join(f"• {m}" for m in mastery_list) if mastery_list else "—"
 
-        # All unique skills unlock at ★3 — show them in one box like /card_info
-        all_skills = [s for s in [unique_skill, unique_skill_2, unique_skill_3] if s and s != "—"]
+        # All unique skills unlock at ★3 — show name(s) plus wrapped descriptions when present
         skill_blocks = ""
-        if all_skills:
+        if skills:
             if stars < 3:
                 skill_blocks = (
                     "╭─ Unique Skill\n"
@@ -785,32 +768,28 @@ class InventoryCog(commands.Cog):
                     "╰────────────────\n"
                 )
             else:
-                lines = "\n".join(f"│ • {s}" for s in all_skills)
-                skill_blocks = (
-                    f"╭─ Unique Skill\n"
-                    f"{lines}\n"
+                skill_lines: list[str] = []
+                for name, desc in skills:
+                    skill_lines.append(f"│ • {name}")
+                    if desc:
+                        skill_lines.extend(wrap_box_lines(desc, prefix="│   "))
+                skill_blocks = "╭─ Unique Skill\n" + "\n".join(skill_lines) + "\n╰────────────────\n"
+
+        # Unique Path unlocks at ★5 — mirrors skill formatting for consistency
+        path_block = ""
+        if path_name:
+            path_kind = " [Active]" if path_active else " [Passive]"
+            if stars < 5:
+                path_block = (
+                    f"╭─ Unique Path{path_kind}\n"
+                    "│ 🔒 Unlocks at ★5\n"
                     "╰────────────────\n"
                 )
-
-        path_raw = card_def.get("unique_path")
-        path_kind = ""
-        if isinstance(path_raw, dict):
-            path_kind = " [Active]" if path_raw.get("active", True) else " [Passive]"
-        if path_raw and stars < 5:
-            path_block = (
-                f"╭─ Unique Path{path_kind}\n"
-                "│ 🔒 Unlocks at ★5\n"
-                "╰────────────────\n"
-            )
-        elif path_raw:
-            path_block = (
-                f"╭─ Unique Path{path_kind}\n"
-                f"│ {unique_path}\n"
-                f"│ {unique_path_desc}\n"
-                "╰────────────────\n"
-            )
-        else:
-            path_block = ""
+            else:
+                path_lines = [f"│ • {path_name}"]
+                if path_desc:
+                    path_lines.extend(wrap_box_lines(path_desc, prefix="│   "))
+                path_block = f"╭─ Unique Path{path_kind}\n" + "\n".join(path_lines) + "\n╰────────────────\n"
 
         # Weapon slot
         weapon_uid = item.get("weapon_uid")
@@ -828,10 +807,11 @@ class InventoryCog(commands.Cog):
         if title:
             heading += f"\n{title}"
 
+        bio_body = "\n".join(wrap_box_lines(bio or "—"))
         body = (
             f"{heading}\n\n"
             "╭─ Description\n"
-            f"│ {bio or '—'}\n"
+            f"{bio_body}\n"
             "╰────────────────\n"
             "╭─ Combat Stats\n"
             f"│ 💪 STR: {stats['strength']}\n"
@@ -845,8 +825,8 @@ class InventoryCog(commands.Cog):
             f"│ ⭐ Stars: {_star_string(stars)}\n"
             f"│ ⚡ Power: {power:,}\n"
             f"│ {'🔒 Status: Locked' if locked else '🔓 Status: Unlocked'}\n"
-            f"│ {weapon_line}"
-            "╰────────────────\n"
+            + (f"│ {weapon_line}" if weapon_line else "")
+            + "╰────────────────\n"
             + (f"╭─ Mastery\n│ {mastery_str}\n╰────────────────\n" if mastery_list else "")
             + skill_blocks + path_block
         ).rstrip()

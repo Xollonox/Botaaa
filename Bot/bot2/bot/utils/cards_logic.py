@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import random
+import textwrap
 import uuid
 from typing import Any
 
@@ -167,6 +168,94 @@ def normalize_mastery_list(values: list[str] | tuple[str, ...] | set[str] | Any)
             normalized = normalized.removesuffix(" mastery").strip()
         wanted.add(normalized)
     return [m for m in MASTERY_VALUES if m.lower() in wanted]
+
+
+BOX_WRAP_WIDTH = 48
+
+
+def wrap_box_lines(text: str, prefix: str = "│ ", width: int = BOX_WRAP_WIDTH) -> list[str]:
+    """Wrap *text* so each output line carries *prefix* — keeps the ╭─╰ box border intact.
+
+    Discord embed bodies auto-wrap plain text, but our overflow lines lose the │ border.
+    Wrapping explicitly and re-prepending the prefix keeps every visible line inside the box.
+    """
+    body = str(text or "").strip()
+    if not body:
+        return [f"{prefix}—"]
+    wrapped = textwrap.wrap(body, width=width, break_long_words=False, break_on_hyphens=False)
+    return [f"{prefix}{line}" for line in wrapped] if wrapped else [f"{prefix}—"]
+
+
+def resolve_unique_skills(card: dict[str, Any]) -> list[tuple[str, str]]:
+    """Return (name, description) pairs for a card's unique skills.
+
+    Handles both the plural ``unique_skills`` list (of strings or {name, description} dicts)
+    and the singular ``unique_skill`` / ``unique_skill_2`` / ``unique_skill_3`` fields.
+    """
+    if not isinstance(card, dict):
+        return []
+    result: list[tuple[str, str]] = []
+    plural = card.get("unique_skills")
+    if isinstance(plural, list) and plural:
+        for entry in plural:
+            if isinstance(entry, dict):
+                name = str(entry.get("name", "")).strip()
+                desc = str(entry.get("description", entry.get("desc", "")) or "").strip()
+                if name:
+                    result.append((name, desc))
+            elif entry:
+                name = str(entry).strip()
+                if name:
+                    result.append((name, ""))
+        return result
+    for key, desc_key in (
+        ("unique_skill", "unique_skill_description"),
+        ("unique_skill_2", "unique_skill_2_description"),
+        ("unique_skill_3", "unique_skill_3_description"),
+    ):
+        raw = card.get(key)
+        if isinstance(raw, dict):
+            name = str(raw.get("name", "")).strip()
+            desc = str(raw.get("description", raw.get("desc", "")) or "").strip()
+            if name:
+                result.append((name, desc))
+        elif isinstance(raw, str) and raw.strip():
+            result.append((raw.strip(), str(card.get(desc_key) or "").strip()))
+    return result
+
+
+def resolve_mastery_list(card: dict[str, Any]) -> list[str]:
+    """Return the card's mastery categories, checking every historical shape.
+
+    defaults.py rewrites ``card["mastery"]`` to ``{"type": None, ...}`` for cards that only
+    have plural ``masteries``. A naive ``get("mastery", card.get("masteries"))`` reads that
+    null dict first and never falls through — this helper picks whichever field has data.
+    """
+    if not isinstance(card, dict):
+        return []
+    for candidate in (card.get("masteries"), card.get("mastery")):
+        result = normalize_mastery_list(candidate)
+        if result:
+            return result
+    return []
+
+
+def resolve_unique_path(card: dict[str, Any]) -> tuple[str, str, bool]:
+    """Return (name, description, active) for a card's unique path.
+
+    Supports both dict and plain-string ``unique_path`` shapes.
+    """
+    if not isinstance(card, dict):
+        return "", "", True
+    raw = card.get("unique_path")
+    if isinstance(raw, dict):
+        name = str(raw.get("name", "")).strip()
+        desc = str(raw.get("description", raw.get("desc", "")) or "").strip()
+        active = bool(raw.get("active", True))
+        return name, desc, active
+    if isinstance(raw, str) and raw.strip():
+        return raw.strip(), str(card.get("unique_path_description") or "").strip(), True
+    return "", "", True
 
 
 def mastery_list_from_flags(
