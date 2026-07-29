@@ -56,7 +56,7 @@ python launcher.py
 cd Bot/bot1
 python main.py
 
-# Lookism HXCC only
+# Lookism CG only
 cd Bot/bot2
 python main.py
 ```
@@ -208,7 +208,7 @@ python main.py
 # Works without: Cerebras, Groq, Ollama keys (will use fallback chain)
 ```
 
-### Running Bot2 Only (Lookism HXCC)
+### Running Bot2 Only (Lookism CG)
 ```bash
 cd Bot/bot2
 python main.py

@@ -22,7 +22,7 @@ from bot.utils.checks import ensure_registered, is_owner
 from bot.utils.squad_logic import get_player, get_squad
 from bot.utils.server_rules import check_battle_channel_allowed
 from bot.utils.timeutil import now_ts
-from bot.utils.ui import e, make_embed, mini_bar, style_view
+from bot.utils.ui import e, make_embed, style_view
 from bot.utils.interaction_visibility import smart_reply, error_reply
 
 from bot.features.battle_helpers import (
@@ -34,14 +34,11 @@ from bot.features.battle_helpers import (
     parse_int_or_none,
     card_image_url,
     option_emoji,
-    clean_option_label,
-    get_assigned_attacks,
     normalize_card_moves,
     json_safe_battle_state,
     CPU_NAMES,
     CPU_PERSONALITIES,
     CPU_TROPHY_OFFSET,
-    IDLE_SKIP_LIMIT_VS_CPU,
 )
 
 from bot.features.battle_views import (
@@ -52,7 +49,6 @@ from bot.features.battle_views import (
 )
 
 from bot.features.battle_cpu import (
-    _cpu_pick_move,
     choose_cpu_move as _choose_cpu_move_impl,
 )
 from bot.features.battle_embeds import (
@@ -1184,7 +1180,7 @@ class BattleCog(commands.Cog):
                 if isinstance(pending, dict):
                     pending.pop(str(clear_pending_target_id), None)
 
-            bid = create_battle_state(data, mode, cid, oid, team_a, team_b, now, participant_a=None, participant_b=cpu_opponent)
+            bid = create_battle_state(data, mode, cid, oid, team_a, team_b, now, participant_b=cpu_opponent)
             self._init_attack_uses_for_battle(data, bid)
             return {"ok": True, "battle_id": bid}
 

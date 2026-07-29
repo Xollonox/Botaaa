@@ -19,7 +19,7 @@ OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 PRIZE_SPLIT = [0.40, 0.20, 0.12, 0.08, 0.05, 0.05, 0.025, 0.025, 0.025, 0.025]
 
 def _e(desc: str, color: int = 0x2B2D31) -> discord.Embed:
-    return make_embed(None, "LOOKISM HXCC • TOURNAMENT", desc, color=color, footer="Tournament System")
+    return make_embed(None, "LOOKISM CG • TOURNAMENT", desc, color=color, footer="Tournament System")
 
 def _ok(d: str)  -> discord.Embed: return _e(d, 0x2ECC71)
 def _err(d: str) -> discord.Embed: return _e(d, 0xE74C3C)

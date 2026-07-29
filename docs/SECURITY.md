@@ -39,11 +39,13 @@ The Supabase mirror sync was removed during the Firestore migration. `supabase_s
 
 ## 2. 🟠 Security Concerns
 
-### 2.1 No Input Rate Limiting (Bot2)
-- All 80+ slash commands have no global rate limiting
-- A malicious user could spam API calls
-- `with_lock()` operations on JSON file become serialization bottleneck
-- **Mitigation:** Add per-user cooldowns or use Discord's built-in cooldown system
+### 2.1 Input Rate Limiting (Bot2) — IMPLEMENTED
+- `LookismCommandTree.interaction_check` enforces 5 commands / 10s per user,
+  and runs BEFORE the restriction/terms gates (which can cost a full
+  `storage.load()` deepcopy), closing the previous unthrottled-read amplification
+- The per-user deque map is pruned when it exceeds 10k entries
+- Per-command Discord cooldowns are still not used on individual cogs
+- `with_lock()` still serializes all storage mutations (single writer by design)
 
 ### 2.2 No Owner Command Authentication
 - Owner commands check `is_owner(interaction)` which checks `OWNER_IDS`

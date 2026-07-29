@@ -1,16 +1,22 @@
-"""Trade service backed by SQLite with JSON mirror compatibility."""
+"""Trade service backed by the Firestore trade repo with state-mirror compatibility."""
 
 from __future__ import annotations
 
+import time
 from typing import Any
 
 from bot.utils.timeutil import now_ts
+
+# Minimum seconds between offer-expiry sweeps triggered by read paths.
+# Prevents every `/trade board` read from running a full expire transaction set.
+_EXPIRE_SWEEP_INTERVAL = 60.0
 
 
 class TradeService:
     def __init__(self, repo: Any, storage: Any) -> None:
         self.repo = repo
         self.storage = storage
+        self._last_expire_sweep = 0.0
 
     async def bootstrap_from_json(self) -> None:
         if await self.repo.json_bootstrap_completed():
@@ -92,7 +98,13 @@ class TradeService:
         await self.repo.post_offer(offer_id, poster_id, poster_name, have_card, want_card, item_uid, created_at, expires_at)
 
     async def get_open_offers(self, limit: int = 10) -> list[dict[str, Any]]:
-        await self.expire_offers()
+        # Expired offers are already filtered out client-side by the repo, so
+        # a sweep is only needed to unlock cards — rate-limit it to keep
+        # the read path from triggering O(N) transactions per call.
+        now = time.monotonic()
+        if now - self._last_expire_sweep >= _EXPIRE_SWEEP_INTERVAL:
+            self._last_expire_sweep = now
+            await self.expire_offers()
         return await self.repo.get_open_offers(limit)
 
     async def cancel_offer(self, offer_id: str, poster_id: str) -> bool:

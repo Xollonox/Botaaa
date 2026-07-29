@@ -76,7 +76,7 @@ class KeystonesCog(commands.Cog):
                 f"│ Keystone: {info['keystone']}\n"
                 "╰────────────────"
             )
-            await smart_reply(interaction, embed=make_embed(data, "LOOKISM HXCC • KEYSTONE", body, color=0x9B59B6))
+            await smart_reply(interaction, embed=make_embed(data, "LOOKISM CG • KEYSTONE", body, color=0x9B59B6))
         elif result == "unequipped":
             body = (
                 f"╭─ Keystone Unequipped\n"
@@ -84,7 +84,7 @@ class KeystonesCog(commands.Cog):
                 f"│ Keystone: {info['keystone']}\n"
                 "╰────────────────"
             )
-            await smart_reply(interaction, embed=make_embed(data, "LOOKISM HXCC • KEYSTONE", body, color=0x95A5A6))
+            await smart_reply(interaction, embed=make_embed(data, "LOOKISM CG • KEYSTONE", body, color=0x95A5A6))
         elif result == "wrong_rarity":
             await error_reply(interaction, f"Keystones are only available for Mythical, Infernal, and Abyssal cards. This card is {info.get('rarity')}.")
         elif result == "no_keystone":
@@ -143,7 +143,7 @@ class KeystonesCog(commands.Cog):
             f"│ {keystone.get('effect', '—')}\n"
             "╰────────────────"
         )
-        await smart_reply(interaction, embed=make_embed(data, "LOOKISM HXCC • KEYSTONE", body, color=0x9B59B6))
+        await smart_reply(interaction, embed=make_embed(data, "LOOKISM CG • KEYSTONE", body, color=0x9B59B6))
 
 
 async def setup(bot: commands.Bot) -> None:

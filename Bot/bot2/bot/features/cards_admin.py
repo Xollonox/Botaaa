@@ -1,4 +1,4 @@
-"""Owner card creation/editor commands for LOOKISM HXCC."""
+"""Owner card creation/editor commands for LOOKISM CG."""
 
 from __future__ import annotations
 
@@ -14,7 +14,6 @@ from bot.utils.attacks_logic import (
     CATALOG_ATTACK_TYPES,
     OWNER_DEFENSE_TYPES,
     add_attack_to_catalog,
-    assigned_cards_for_attack,
     assign_attack_to_card,
     card_attack_keys,
     create_attack_entry,
@@ -35,7 +34,7 @@ from bot.utils.cards_logic import (
 )
 from bot.utils.checks import is_owner
 from bot.utils.ui import make_embed
-from bot.utils.typing_matchup import TYPES as TYPING_TYPES, normalize_typing as _norm_typing_list, parse_typing_input
+from bot.utils.typing_matchup import normalize_typing as _norm_typing_list
 OWNER_GUILD = discord.Object(id=OWNER_GUILD_ID)
 
 
@@ -214,7 +213,7 @@ def _editor_embed(payload: dict[str, Any]) -> discord.Embed:
     )
 
     return make_embed(
-        None, "LOOKISM HXCC • CARD EDITOR", body, color=0xE11D48,
+        None, "LOOKISM CG • CARD EDITOR", body, color=0xE11D48,
         footer="Admin Control",
         image_url=str(payload.get("image_url", "")).strip() or None,
     )
@@ -250,13 +249,13 @@ def _created_embed(payload: dict[str, Any]) -> discord.Embed:
         "╰────────────────"
     )
     return make_embed(
-        None, "LOOKISM HXCC • CARD CREATED", body, color=0xE11D48,
+        None, "LOOKISM CG • CARD CREATED", body, color=0xE11D48,
         footer="Admin Control",
         image_url=str(payload.get("image_url", "")).strip() or None,
     )
 
 
-class AddCardModal(discord.ui.Modal, title="LOOKISM HXCC • Add Card"):
+class AddCardModal(discord.ui.Modal, title="LOOKISM CG • Add Card"):
     basic_info = discord.ui.TextInput(
         label="Basic Info",
         style=discord.TextStyle.paragraph,

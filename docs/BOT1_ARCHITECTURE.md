@@ -113,7 +113,7 @@ class OllamaClient:
         return key
 ```
 
-**⚠️ Known Issue:** Ollama rotates keys on every call, even successful ones. This wastes working keys.
+**✅ Fixed (2026-07-29):** Ollama keys are now sticky on success and rotate only on failure (429 / error / exception), matching the Cerebras/Groq clients.
 
 ---
 
@@ -243,7 +243,7 @@ CHAT_IMAGE_TRIGGERS = {
 
 ### Mood Definitions
 ```python
-VALID_MOODS = {"calm", "warm", "serious", "sarcastic", "playful"}
+VALID_MOODS = {"calm", "warm", "serious", "sarcastic", "playful", "angry", "sad", "happy"}
 
 MOOD_TONES = {
     "calm": "Composed, direct, slightly cryptic. Speak with quiet authority.",
@@ -360,11 +360,11 @@ Tests 7 scenarios:
 
 | Issue | Impact | Location |
 |-------|--------|----------|
-| No TTL on `generated_image_messages` | Memory leak | `events.py:39` |
-| Ollama rotates keys on every call | Wastes working keys | `llm.py:106` |
+| ~~No TTL on `generated_image_messages`~~ ✅ capped OrderedDict (500, FIFO) | — | — |
+| ~~Ollama rotates keys on every call~~ ✅ failure-only rotation | — | — |
 | Exact-match trigger detection | "hello there" won't match "hello" | `events.py` |
 | String-based topic detection | Over-matches ("game" in "gameplay") | `memory.py` |
-| Vision responses not stored in memory | Lost context | `events.py:chat handler` |
+| Vision responses not stored in memory | Lost context (still open) | `events.py:chat handler` |
 | No mood persistence across restarts | Defaults to "calm" daily | `memory.py` |
 | 300-char summary truncation | Destroys nuance | `memory.py` |
-| Synchronous `_save_json_file()` in async context | Blocks event loop | `memory.py:35, 53` |
+| ~~Synchronous `_save_json_file()` in async context~~ ✅ snapshot under `asyncio.Lock`, write in executor | — | — |

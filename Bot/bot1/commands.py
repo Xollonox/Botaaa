@@ -450,30 +450,6 @@ class CommandsCog(commands.Cog):
         await set_mood(ctx.channel.id, mood.value)
         await ctx.send(f"Miss Kim mood set to **{mood.name}** in this channel.")
 
-    # ── /roast ────────────────────────────────────────────────────────────────
-    @app_commands.command(name="roast", description="Set Miss Kim to roast mode")
-    @app_commands.describe(level="Roast intensity")
-    @app_commands.choices(
-        level=[
-            app_commands.Choice(name="🔥 Low — mild teasing", value="roast_low"),
-            app_commands.Choice(name="🔥🔥 Medium — spicy shade", value="roast_medium"),
-            app_commands.Choice(name="🔥🔥🔥 Extreme — no filter, all out", value="roast_extreme"),
-        ]
-    )
-    async def roast(
-        self, interaction: discord.Interaction, level: app_commands.Choice[str]
-    ) -> None:
-        if not is_power_user(interaction.user):
-            await interaction.response.send_message("No permission.", ephemeral=True)
-            return
-        await set_mood(interaction.channel_id, level.value)
-        emoji = {"roast_low": "🔥", "roast_medium": "🔥🔥", "roast_extreme": "🔥🔥🔥"}
-        msg = (
-            f"{emoji.get(level.value, '🔥')} Roast mode set to **{level.name}**. "
-            + ("Let em have it." if level.value == "roast_extreme" else "Go easy... kinda.")
-        )
-        await interaction.response.send_message(msg)
-
     # ── /angry ────────────────────────────────────────────────────────────────
     @app_commands.command(name="angry", description="Set Miss Kim mood to angry")
     async def angry(self, interaction: discord.Interaction) -> None:

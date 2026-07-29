@@ -157,7 +157,7 @@ DEFAULT_CONFIG = {
         "monthly": 8000,
     },
     "ui": {
-        "footer": "LOOKISM HXCC • /help",
+        "footer": "LOOKISM CG • /help",
         "emojis": {
             # ── Core UI ──────────────────────────────────────────
             "ok":           "✅",

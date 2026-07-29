@@ -1,12 +1,65 @@
 # Bot2 Fix Notes
 
+## Battle Block Fix, Persona Cleanup, Rebrand, Dead-Code Purge
+
+Date: 2026-07-29
+
+### Summary
+
+Combined review-driven fixes across both bots plus a full rebrand:
+
+- **Battle engine:** a successful Block subtracted the 20 HP impact penalty from
+  the *attacker* (`me`/`my_uid`) instead of the blocker. Now applied to
+  `opp`/`opp_uid`, matching `Bot/bot2/BATTLE_MECHANICS.md`. Elimination flow
+  re-reads HP after the defense step, so an impact kill still eliminates.
+- **Interaction gates:** the 5 cmd/10s rate limiter in `main.py` now runs before
+  the restriction/terms gates (which can cost a full `storage.load()` deepcopy),
+  and the per-user deque map is pruned past 10k entries.
+- **Firebase credentials:** `FIREBASE_CREDENTIALS_JSON` (raw service-account
+  JSON) is actually supported again in `get_firestore_client()` — the 2026-07
+  docs always claimed it; the revert made them wrong until now.
+- **Storage layer:** `with_lock` no longer deep-copies twice (diffs against the
+  cache snapshot); `_commit_diff` commits players + global doc in one atomic
+  Firestore batch on the common path; set sanitizer preserves element types.
+- **Rewards:** `/hourly`, `/daily`, `/weekly`, `/monthly` now honor amounts set
+  via `/o_set_*` (they previously read hardcoded/static constants).
+- **Trade service:** offer-expiry sweeps triggered by reads are rate-limited to
+  once per 60s (repo already filters expired offers client-side).
+- **Quick-sell** (pack roll view) now also excludes `market_locked` /
+  `trade_locked` cards, not just user/squad locks.
+- **Bot1 Ollama client:** keys are sticky on success and rotate only on failure
+  (429/error/exception), mirroring the Cerebras/Groq clients.
+- **Bot1 jailbreak removal:** `roast_low/medium/extreme` moods, the `/roast`
+  command, and the "ALL SAFETY RULES SUSPENDED" prompt-override block were
+  removed (exposed via `/mood` **and** `/roast`). Normal moods kept.
+- **Dead code removed:** `trade_logic.py` (193 lines, zero callers), empty
+  `attacks_owner.py` cog, `build_weapon_instance`, `format_rates_table`,
+  `_ensure_inventory_defaults`, `participant_a` param, ~12 stale imports.
+- **Launcher:** preflight env checks incl. Firebase credentials variants;
+  exponential restart backoff (10s→300s, reset after 60s stable).
+- **Rebrand:** Lookism HXCC → **Lookism CG** in all user-facing strings and
+  docs. The `HXCC_CLEAR_GLOBAL_COMMANDS_ONCE` env var name is unchanged for
+  deployment compatibility.
+
+### Verification
+
+```bash
+cd Bot/bot2 && pytest -q   # 162 passed
+cd Bot/bot1 && pytest -q   # 10 passed
+cd ../.. && pytest tests/ -q  # 13 passed (root suite)
+vulture bot/ main.py --min-confidence 90   # clean
+```
+
+---
+
+
 ## Pack Inventory and New-Card Stat Lookup Fix
 
 Date: 2026-07-07
 
 ### Summary
 
-Fixed two connected runtime issues in the Lookism HXCC bot:
+Fixed two connected runtime issues in the Lookism CG bot:
 
 - Pack rewards were granted into `user["owned_packs"]`, but the pack opener reads
   `user["pack_inventory"]`, making rewarded packs invisible in the packs panel.

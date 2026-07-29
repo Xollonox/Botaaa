@@ -12,13 +12,15 @@
 
 Botaaa is a dual-bot Discord workspace comprising:
 - **Bot1 (Miss Kim):** Conversational AI with image generation, vision, mood system, and Lookism lore
-- **Bot2 (Lookism HXCC):** Full-featured gacha game bot with cards, battles, economy, gangs, alliances, wars, tournaments, seasons
+- **Bot2 (Lookism CG):** Full-featured gacha game bot with cards, battles, economy, gangs, alliances, wars, tournaments, seasons
 
 **Architecture:** Python 3.10+, discord.py, dual JSON + SQLite storage, 4 LLM providers with fallback, Supabase sync
 
 > **UPDATE 2026-07-27:** Bot2 was migrated to Firestore (`firestore_storage.py`, `firestore_market_repo.py`, `firestore_trade_repo.py`, `firestore_battle_repo.py`, `firestore_client.py`). The old `storage.py`, `sqlite_store.py`, `supabase_sync.py`, and PIL-based `profile_render.py` were removed. Findings below that reference those files are annotated **RESOLVED — file removed 2026-07-27**; the original finding text is preserved for audit-trail purposes.
 
 **Critical Assessment:** The codebase is **feature-complete but production-unsafe**. Hardcoded secrets, data corruption races, crash-on-battle cards, and schema incompatibilities mean this **cannot be deployed publicly without immediate remediation**. The 15 CRITICAL findings alone represent account takeover risk, permanent data loss, and guaranteed crashes under normal gameplay.
+
+> **UPDATE 2026-07-29 (second review pass):** Beyond the Firestore migration resolutions, a follow-up review fixed in code and verified by tests: **#22** (dead pending read removed), **#36/#42** (pack/card reward handlers), **#37** (and identical daily/weekly/monthly config ignorance), **#53** (quick-sell now lock-guarded incl. market/trade locks), **#55** (board-accept clears `trade_locked`), **#60** (upgrade filter checks `trade_locked`), **#92** (dead method removed), **#97** (empty cog removed), **#114** (`random.choices` weights, no pool ballooning). New issues found and fixed: **Block defense applied its 20 HP impact to the attacker** instead of the blocker; **the rate limiter ran after full-`load()` gates** (DoS amplification for unregistered users); **`FIREBASE_CREDENTIALS_JSON` was documented but unsupported**; **`with_lock` cost/atomicity** (double deepcopy halved, single-batch commit path); **live `/roast` + `roast_extreme` jailbreak personas with a slur list removed from bot1**; **Ollama per-call key rotation**. **#47** is recorded here as an audit **false positive** (Python 3 true division). Remaining accepted debt: `bot_state/global` doc granularity, `load_readonly()` mutable-cache exposure, unbounded `bot.log`. Full details: `docs/FIX_NOTES.md`.
 
 ---
 
@@ -1621,7 +1623,7 @@ Bot/bot1/
     └── test_remember_line.py
 ```
 
-### Bot2 (Lookism HXCC)
+### Bot2 (Lookism CG)
 ```
 Bot/bot2/
 ├── main.py                 # LookismBot bootstrap

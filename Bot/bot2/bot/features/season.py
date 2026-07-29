@@ -20,7 +20,7 @@ PASS_COST    = 200   # gems
 SEP          = "━" * 32
 
 def _embed(desc: str, color: int = 0x9B59B6) -> discord.Embed:
-    return make_embed(None, "LOOKISM HXCC • SEASON", desc, color=color, footer="Season System")
+    return make_embed(None, "LOOKISM CG • SEASON", desc, color=color, footer="Season System")
 
 def _ok(d: str)  -> discord.Embed: return _embed(d, 0x2ECC71)
 def _err(d: str) -> discord.Embed: return _embed(d, 0xE74C3C)
@@ -130,7 +130,7 @@ def _grant_reward(data: dict[str, Any], user_id: str, reward_str: str) -> str:
                 descriptions.append(f"💎 +{amt} gems")
                 matched = True
 
-        # Packs — robust substring matching
+        # Packs — substring matching
         if not matched:
             pack_patterns = {
                 "newbie": "newbie_pack",

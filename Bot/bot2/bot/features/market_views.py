@@ -211,7 +211,7 @@ class BuyConfirmView(discord.ui.View):
             "│ Card added to your inventory\n"
             "╰────────────────"
         )
-        embed = make_embed(None, "LOOKISM HXCC • MARKET", body, color=0x2ECC71)
+        embed = make_embed(None, "LOOKISM CG • MARKET", body, color=0x2ECC71)
         for child in self.children:
             if hasattr(child, "disabled"):
                 child.disabled = True
@@ -384,6 +384,6 @@ class MarketPanel(discord.ui.View):
             "│ Are you sure?\n"
             "╰────────────────"
         )
-        embed = make_embed(None, "LOOKISM HXCC • MARKET", body, color=0xE11D48)
+        embed = make_embed(None, "LOOKISM CG • MARKET", body, color=0xE11D48)
         view = BuyConfirmView(self.cog, str(interaction.user.id), self.selected_id, price, card_name)
         await interaction.response.send_message(embed=embed, view=view, ephemeral=True)

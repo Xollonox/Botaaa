@@ -3,6 +3,18 @@
 **Reviewer:** Senior AI/Chatbot Engineer  
 **Scope:** `/data/data/com.termux/files/home/botaaa/Bot/bot1/main.py` (1878 lines)
 
+> **RESOLUTION STATUS (2026-07-29):** Bot1 was since split into focused modules
+> (`main.py` is now a 65-line bootstrap). Verified fixed: jailbreak personas —
+> `lust`/`dark` were removed earlier and a **surviving `roast_low/medium/extreme`
+> set plus the `/roast` command (including an "ALL SAFETY RULES SUSPENDED"
+> prompt with a slur list) was removed in this pass**; power-user prompt
+> injection removed (§1.2); Ollama per-call key rotation → failure-only (§1.13);
+> `generated_image_messages` unbounded growth → OrderedDict capped at 500 (§1.14);
+> `/reset_memmory` typo fixed → `/reset_memory` (§3.4); async memory saves go
+> through `asyncio.Lock` + executor snapshot (§1.7). Still open as documented:
+> thin context window, exact-match triggers, hardcoded topic keywords, dead
+> `AUTO_REVIVE_*` config.
+
 ---
 
 ## EXECUTIVE SUMMARY

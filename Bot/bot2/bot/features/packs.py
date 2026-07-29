@@ -14,7 +14,7 @@ from bot.config import OWNER_GUILD_ID
 from bot.utils.cards_logic import build_card_instance
 from bot.utils.checks import ensure_registered, is_owner
 from bot.utils.timeutil import now_ts as _now_ts
-from bot.utils.pack_logic import ensure_packs_structure, format_rates_table, get_pack_by_name, normalize_pack_key
+from bot.utils.pack_logic import ensure_packs_structure, get_pack_by_name, normalize_pack_key
 from bot.utils.timeutil import now_ts
 from bot.utils.ui import box, e, make_embed
 from bot.utils.interaction_visibility import smart_reply, error_reply

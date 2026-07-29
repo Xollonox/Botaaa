@@ -113,7 +113,7 @@ class MarketCog(commands.Cog):
                 "arc":         card_arc,
                 "stock":       int(stock),
                 "seller_id":   "owner",
-                "seller_name": "HXCC Staff",
+                "seller_name": "Lookism CG Staff",
                 "image_url":   image_url,
                 "expires_at":  now_ts() + expires_hours * 3600,
             }
@@ -129,7 +129,7 @@ class MarketCog(commands.Cog):
             f"│ ⏳ {expires_hours}h\n"
             "╰────────────────"
         )
-        embed = make_embed(None, "LOOKISM HXCC • MARKET", body, color=0xF39C12)
+        embed = make_embed(None, "LOOKISM CG • MARKET", body, color=0xF39C12)
         await smart_reply(interaction, embed=embed, ephemeral=True)
 
     @o_feature_card.autocomplete("card_name")
@@ -168,7 +168,7 @@ class MarketCog(commands.Cog):
                 "arc":         card_arc,
                 "stock":       int(stock),
                 "seller_id":   "owner",
-                "seller_name": "HXCC Staff",
+                "seller_name": "Lookism CG Staff",
                 "image_url":   image_url,
                 "expires_at":  now_ts() + expires_hours * 3600,
             }
@@ -184,7 +184,7 @@ class MarketCog(commands.Cog):
             f"│ ⏳ {expires_hours}h\n"
             "╰────────────────"
         )
-        embed = make_embed(None, "LOOKISM HXCC • MARKET", body, color=0xE11D48)
+        embed = make_embed(None, "LOOKISM CG • MARKET", body, color=0xE11D48)
         await smart_reply(interaction, embed=embed, ephemeral=True)
 
     @o_special_offer.autocomplete("card_name")
@@ -387,7 +387,7 @@ class MarketGroup(app_commands.Group):
             "│ Use /market browse to view\n"
             "╰────────────────"
         )
-        embed = make_embed(None, "LOOKISM HXCC • MARKET", body, color=0x2ECC71)
+        embed = make_embed(None, "LOOKISM CG • MARKET", body, color=0x2ECC71)
         await smart_reply(interaction, embed=embed, ephemeral=True)
 
     @add.autocomplete("card_name")

@@ -1,4 +1,4 @@
-"""Card lookup command for LOOKISM HXCC."""
+"""Card lookup command for LOOKISM CG."""
 
 from __future__ import annotations
 
@@ -134,7 +134,7 @@ def _build_catalog_card_embed(data: dict[str, Any], card: dict[str, Any]) -> dis
             "╰────────────────"
         )
 
-    return make_embed(None, "LOOKISM HXCC • FIGHTER", body, color=0xE11D48, footer="Card Catalog", image_url=image_url)
+    return make_embed(None, "LOOKISM CG • FIGHTER", body, color=0xE11D48, footer="Card Catalog", image_url=image_url)
 
 
 class CardToolsCog(commands.Cog):

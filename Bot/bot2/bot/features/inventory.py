@@ -11,7 +11,7 @@ from discord.ext import commands
 from bot.utils.cards_logic import compute_power, compute_scaled_stats, find_catalog_card, get_flat_stat_bonus, normalize_mastery_list, rarity_rank
 from bot.utils.checks import ensure_registered
 from bot.utils.interaction_visibility import smart_reply, error_reply
-from bot.utils.ui import e, make_embed, simple_embed
+from bot.utils.ui import e, make_embed
 
 PAGE_SIZE = 25
 SEPARATOR = "━" * 20
@@ -583,7 +583,7 @@ class CollectionGalleryView(discord.ui.View):
             "╰────────────────\n"
             "Select a fighter below to view."
         )
-        embed = make_embed(None, "LOOKISM HXCC • COLLECTION", body, color=0xE11D48, footer=f"Card Collection • Page {self.page}/{self.total_pages}")
+        embed = make_embed(None, "LOOKISM CG • COLLECTION", body, color=0xE11D48, footer=f"Card Collection • Page {self.page}/{self.total_pages}")
         return embed
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
@@ -620,26 +620,6 @@ class CollectionGalleryView(discord.ui.View):
 class InventoryCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-
-    def _ensure_inventory_defaults(self, user_id: str) -> None:
-        def mutate(data: dict[str, Any]) -> None:
-            inv = data.get("players", {}).get(user_id, {}).get("user", {}).get("inventory", [])
-            if not isinstance(inv, list):
-                return
-            for item in inv:
-                if not isinstance(item, dict):
-                    continue
-                if "stars" not in item:
-                    item["stars"] = 0
-                item["stars"] = _clamp_stars(item.get("stars", 0))
-                if "name" not in item and "card_name" in item:
-                    item["name"] = item.get("card_name", "")
-                if "favourite" not in item and "favorite" in item:
-                    item["favourite"] = bool(item.get("favorite", False))
-                if "favorite" not in item and "favourite" in item:
-                    item["favorite"] = bool(item.get("favourite", False))
-
-        self.bot.storage.with_lock(mutate)
 
     def _get_entries(self, data: dict[str, Any], user_id: str, filter_value: str, sort_value: str) -> list[dict[str, Any]]:
         inventory = data.get("players", {}).get(user_id, {}).get("user", {}).get("inventory", [])
@@ -732,13 +712,13 @@ class InventoryCog(commands.Cog):
             f"│ 💰 Coins: {cost:,}\n"
             "╰────────────────"
         )
-        embed = make_embed(None, "LOOKISM HXCC • UPGRADE", body, color=0xE11D48, footer="Star Upgrade")
+        embed = make_embed(None, "LOOKISM CG • UPGRADE", body, color=0xE11D48, footer="Star Upgrade")
         return embed
 
     def _build_card_view_embed(self, data: dict[str, Any], user_id: str, uid: str, mode: str) -> discord.Embed:
         item = self._find_item(data, user_id, uid)
         if item is None:
-            embed = make_embed(None, "LOOKISM HXCC • FIGHTER", "Card not found.", color=0xE11D48, footer="Card Collection")
+            embed = make_embed(None, "LOOKISM CG • FIGHTER", "Card not found.", color=0xE11D48, footer="Card Collection")
             return embed
 
         stars = _clamp_stars(item.get("stars", 0))
@@ -753,7 +733,7 @@ class InventoryCog(commands.Cog):
                 f"{card_name} {_star_string(stars)}\n"
                 f"⚡ Power: {power:,}"
             )
-            embed = make_embed(None, "LOOKISM HXCC • FIGHTER", body, color=0xE11D48, image_url=image_url, footer="Card Collection")
+            embed = make_embed(None, "LOOKISM CG • FIGHTER", body, color=0xE11D48, image_url=image_url, footer="Card Collection")
             return embed
 
         stats = _effective_stats(data, item, stars_override=stars)
@@ -870,7 +850,7 @@ class InventoryCog(commands.Cog):
             + (f"╭─ Mastery\n│ {mastery_str}\n╰────────────────\n" if mastery_list else "")
             + skill_blocks + path_block
         ).rstrip()
-        embed = make_embed(None, "LOOKISM HXCC • FIGHTER", body, color=0xE11D48, image_url=image_url, footer="Card Collection")
+        embed = make_embed(None, "LOOKISM CG • FIGHTER", body, color=0xE11D48, image_url=image_url, footer="Card Collection")
         return embed
 
 

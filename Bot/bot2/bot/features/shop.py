@@ -12,7 +12,7 @@ from discord.ext import commands
 
 from bot.config import OWNER_GUILD_ID
 from bot.utils.checks import is_owner
-from bot.utils.pack_logic import ensure_packs_structure, format_rates_table, get_pack_by_name
+from bot.utils.pack_logic import ensure_packs_structure, get_pack_by_name
 from bot.utils.ui import box, e, make_embed
 from bot.utils.interaction_visibility import smart_reply, error_reply
 from bot.features.packs import _add_packs_to_inventory, _open_pack_from_inventory, _packs_root, _wallet_balance, _set_wallet_balance

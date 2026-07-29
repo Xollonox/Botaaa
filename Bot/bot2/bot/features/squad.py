@@ -1,4 +1,4 @@
-"""Squad panel for LOOKISM HXCC — full interactive management."""
+"""Squad panel for LOOKISM CG — full interactive management."""
 
 from __future__ import annotations
 
@@ -130,7 +130,7 @@ def _build_squad_embed(
 
     body = overview + "\n\n" + "\n\n".join(blocks)
 
-    embed = make_embed(None, "LOOKISM HXCC • SQUAD", body, color=0xE11D48, footer=f"Viewing {_slot_label(current_slot)} • Squad Management", thumbnail_url=user.display_avatar.url)
+    embed = make_embed(None, "LOOKISM CG • SQUAD", body, color=0xE11D48, footer=f"Viewing {_slot_label(current_slot)} • Squad Management", thumbnail_url=user.display_avatar.url)
     return embed
 
 
@@ -191,7 +191,7 @@ def _build_fighter_embed(data: dict[str, Any], instance: dict[str, Any]) -> disc
         f"│ {unique_skill_desc}\n"
         "╰────────────────"
     )
-    embed = make_embed(None, "LOOKISM HXCC • FIGHTER", body, color=0xE11D48, image_url=image_url, footer="Squad • Fighter Detail")
+    embed = make_embed(None, "LOOKISM CG • FIGHTER", body, color=0xE11D48, image_url=image_url, footer="Squad • Fighter Detail")
     return embed
 
 

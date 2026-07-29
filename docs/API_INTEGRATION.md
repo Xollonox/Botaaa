@@ -43,8 +43,9 @@ Error Handling:
   - 429 → rotate key, retry
   - Other → log, return error message
 
-Key rotation: ROUND-ROBIN on EVERY call
-  ⚠️ Known issue: even successful calls advance the key index
+Key rotation: STICKY — the current key is reused on success and only
+advanced on failure (429 / error / exception), same policy as the
+Cerebras/Groq clients. (Previously rotated on every call; fixed 2026-07-29.)
 ```
 
 ### 2.2 Cerebras
@@ -178,28 +179,32 @@ Error: Returns descriptive error message string
 
 ---
 
-## 5. 🗄️ Supabase (Bot2)
+## 5. 🗄️ Firestore (Bot2) — persistence backend
 
 ```
-URL: https://vbvvllaprptilxufsaxv.supabase.co
-Auth: Service Role Key (full access)
-Endpoint: POST /rest/v1/bot_data
-Timeout: 5 seconds
-Strategy: Fire-and-forget background thread (dedup: skip if sync pending)
+Auth: Firebase Admin SDK service account
+      (FIREBASE_CREDENTIALS_PATH file or FIREBASE_CREDENTIALS_JSON env content)
+Client: google-cloud-firestore (sync client; all blocking calls are wrapped
+        in run_in_executor so the event loop is never blocked)
 
-Request:
-  POST with headers:
-    Content-Type: application/json
-    apikey: {SERVICE_ROLE_KEY}
-    Authorization: Bearer {SERVICE_ROLE_KEY}
-    Prefer: resolution=merge-duplicates
-  Body: {"id": "main", "data": {full_state}}
+Layout:
+  players/{user_id}              one doc per player (1MB/doc headroom)
+  bot_state/global               everything else (cards, gangs, season, config, mirrors)
+  market_settings|store_items|listings, trade_pending|history|offer_board,
+  battle_queue|pending_friendly|active_by_user, app_migrations
 
-Error Handling:
-  - Silently logs warning "Supabase sync failed: {error}"
-  - Does NOT retry on failure
-  - Does NOT block the main thread
+Writes:
+  storage.with_lock() → deepcopy → mutate → _commit_diff() vs cache snapshot
+  → single Firestore batch (≤400 player docs + global doc) on the common path
+Compare-and-swap (trade claim/finish, pending reservation) uses
+  Firestore transactions with automatic retry on contention.
 ```
+
+### Supabase — REMOVED (2026-07)
+The old fire-and-forget Supabase mirror (`supabase_sync.py`) was deleted
+during the Firestore migration. Bot2 has no code path that reads
+SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY. Rotate the historical key once
+as a precautionary measure (it lives in git history).
 
 ---
 
@@ -233,7 +238,7 @@ Timeout: 12 seconds
 | Groq | 50-500 | Free tier | ~3% |
 | Cloudflare AI | 50-500 | Per-image | ~10% |
 | Pollinations | 20-200 | Free | ~5% |
-| Supabase | 1,000-10,000 | Free tier | ~1% |
+| Firestore | 1,000-10,000 (batched) | Blaze pay-per-op | <1% |
 
 ---
 
@@ -244,7 +249,7 @@ Timeout: 12 seconds
 | Discord | Token theft = full bot access | Rotate token, use env vars |
 | LLM Providers | Key abuse, billing | Rate limit, monitor usage |
 | Cloudflare | Key abuse, billing | Restrict to specific models |
-| Supabase | Full DB access with service key | Rotate key, restrict IP |
+| Firestore | Full DB access with service account | Rotate key, tighten security rules |
 | Pollinations | No auth (public) | Rate limit requests |
 
 ---

@@ -70,7 +70,7 @@ def _panel_embed(user_id: str, slot: int, pack_inv: list[dict[str, Any]], player
 
     if not keys:
         desc = overview + "\n\n╭─ No Packs\n│ Buy packs from /shop!\n╰────────────────"
-        return make_embed(None, "LOOKISM HXCC • PACKS", desc, color=0xE11D48, footer="Pack Inventory")
+        return make_embed(None, "LOOKISM CG • PACKS", desc, color=0xE11D48, footer="Pack Inventory")
 
     slot = max(0, min(slot, len(keys) - 1))
 
@@ -99,7 +99,7 @@ def _panel_embed(user_id: str, slot: int, pack_inv: list[dict[str, Any]], player
             f"╭─ {marker}{names[k]}\n│ Quantity: ×{counts[k]}\n│ Secret contents inside...{pity_str}\n╰────────────────"
         )
 
-    return make_embed(None, "LOOKISM HXCC • PACKS", "\n\n".join(blocks), color=0xE11D48, footer=f"Pack Inventory • Slot {slot + 1}/{len(keys)}")
+    return make_embed(None, "LOOKISM CG • PACKS", "\n\n".join(blocks), color=0xE11D48, footer=f"Pack Inventory • Slot {slot + 1}/{len(keys)}")
 
 
 def _card_reveal_embed(roll: dict[str, str], idx: int, total: int, pack_name: str) -> discord.Embed:
@@ -121,12 +121,12 @@ def _card_reveal_embed(roll: dict[str, str], idx: int, total: int, pack_name: st
         body += f"\n\n{sep}\n  ⚠️  {rarity.upper()} PULL!\n{sep}"
 
     img = str(roll.get("image_url", "")).strip() or None
-    return make_embed(None, "LOOKISM HXCC • PACKS", body, color=color, footer=f"Card {idx} of {total} • Pack Reveal", image_url=img)
+    return make_embed(None, "LOOKISM CG • PACKS", body, color=color, footer=f"Card {idx} of {total} • Pack Reveal", image_url=img)
 
 
 def _anim_embed(title: str, slots: str, caption: str, color: int = 0xE11D48) -> discord.Embed:
     return make_embed(
-        None, "LOOKISM HXCC • PACKS",
+        None, "LOOKISM CG • PACKS",
         f"╭─ {title}\n│ {slots}\n│ {caption}\n╰────────────────",
         color=color, footer="Opening...",
     )
@@ -300,7 +300,9 @@ class PostRevealView(discord.ui.View):
                         if isinstance(item, dict)
                         and str(item.get("uid", "")) == uid
                         and not item.get("locked")
-                        and not item.get("squad_locked")), None)
+                        and not item.get("squad_locked")
+                        and not item.get("market_locked")
+                        and not item.get("trade_locked")), None)
             if idx is None:
                 return False, 0
             inv.pop(idx)
@@ -325,7 +327,7 @@ class PostRevealView(discord.ui.View):
             f"│ 💰 +{value:,} coins\n"
             "╰────────────────"
         )
-        e = make_embed(None, "LOOKISM HXCC • PACKS", body, color=0x2B2D31, footer=f"Card {self.idx + 1} of {len(self.rolls)} • Sold")
+        e = make_embed(None, "LOOKISM CG • PACKS", body, color=0x2B2D31, footer=f"Card {self.idx + 1} of {len(self.rolls)} • Sold")
         await interaction.response.edit_message(embed=e, view=self)
 
     @discord.ui.button(label="🪖 Add to Squad", style=discord.ButtonStyle.primary, row=1)
@@ -385,7 +387,7 @@ class PostRevealView(discord.ui.View):
             "│ Use /squad to manage your formation\n"
             "╰────────────────"
         )
-        e = make_embed(None, "LOOKISM HXCC • PACKS", body, color=0x3498DB, footer=f"Card {self.idx + 1} of {len(self.rolls)} • Added")
+        e = make_embed(None, "LOOKISM CG • PACKS", body, color=0x3498DB, footer=f"Card {self.idx + 1} of {len(self.rolls)} • Added")
         await interaction.response.edit_message(embed=e, view=self)
 
     # Row 2 — Back to pack panel (or shop if main_panel has _shop_view)

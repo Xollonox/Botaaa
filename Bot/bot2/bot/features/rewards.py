@@ -84,7 +84,7 @@ def _streak_multiplier(streak: int) -> float:
 
 
 def _reward_embed(*, panel: str, footer: str, body: str, color: int) -> discord.Embed:
-    return make_embed(None, f"LOOKISM HXCC • {panel.upper()}", body, color=color, footer=footer)
+    return make_embed(None, f"LOOKISM CG • {panel.upper()}", body, color=color, footer=footer)
 
 
 def _pick_card_by_rarity(data: dict[str, Any], rarity: str) -> dict[str, Any] | None:
@@ -252,20 +252,24 @@ class RewardsCog(commands.Cog):
         user_id = str(interaction.user.id)
         now = now_ts()
 
-        def mutate(data: dict[str, Any]) -> tuple[bool, int, int]:
+        def mutate(data: dict[str, Any]) -> tuple[bool, int, int, int]:
             player = data["players"][user_id]
             user = player["user"]
             cooldowns = user.setdefault("cooldowns", {})
             last = int(cooldowns.get("hourly", 0))
             remaining = cooldown_remaining(last, REWARD_COOLDOWNS["hourly"], now)
             if remaining > 0:
-                return False, remaining, int(user.get("balance", 0))
+                return False, remaining, int(user.get("balance", 0)), 0
 
-            user["balance"] = int(user.get("balance", 0)) + 100
+            # Honor owner-configured amount (/o_set_hourly -> data["config"]["rewards"]["hourly"]),
+            # falling back to the REWARD_COIN_BONUS default.
+            rewards_cfg = data.get("config", {}).get("rewards", {}) if isinstance(data.get("config", {}), dict) else {}
+            amount = int(rewards_cfg.get("hourly", REWARD_COIN_BONUS.get("hourly", 100)))
+            user["balance"] = int(user.get("balance", 0)) + amount
             cooldowns["hourly"] = now
-            return True, 0, int(user.get("balance", 0))
+            return True, 0, int(user.get("balance", 0)), amount
 
-        claimed, remaining, new_balance = self.bot.storage.with_lock(mutate)
+        claimed, remaining, new_balance, amount = self.bot.storage.with_lock(mutate)
 
         if not claimed:
             embed = _reward_embed(
@@ -288,7 +292,7 @@ class RewardsCog(commands.Cog):
             body=(
                 "**HOURLY REWARD**\n\n"
                 "╭─ Reward\n"
-                "│ Coins Earned: +100\n"
+                f"│ Coins Earned: +{amount:,}\n"
                 f"│ New Balance: {new_balance:,}\n"
                 "╰────────────────\n"
                 "Next Hourly: 1h"
@@ -304,7 +308,6 @@ class RewardsCog(commands.Cog):
         await interaction.response.defer()
 
         rates       = REWARD_RATES.get(reward_type, {REWARD_CARD_RARITY[reward_type]: 1})
-        coin_amount = int(REWARD_COIN_BONUS.get(reward_type, 0))
         coin_chance = float(REWARD_COIN_CHANCE.get(reward_type, 0.5))
         now = now_ts()
         user_id = str(interaction.user.id)
@@ -317,6 +320,11 @@ class RewardsCog(commands.Cog):
             remaining = cooldown_remaining(last, REWARD_COOLDOWNS[reward_type], now)
             if remaining > 0:
                 return False, remaining, None, None, "", 0, False, 0, 0, 1.0
+
+            # Honor owner-configured amounts (/o_set_daily etc. -> data["config"]["rewards"]),
+            # falling back to the REWARD_COIN_BONUS defaults.
+            rewards_cfg = data.get("config", {}).get("rewards", {}) if isinstance(data.get("config", {}), dict) else {}
+            coin_amount = int(rewards_cfg.get(reward_type, REWARD_COIN_BONUS.get(reward_type, 0)))
 
             # Handle daily login streak
             streak = 0

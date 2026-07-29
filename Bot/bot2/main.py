@@ -23,6 +23,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from bot.config import (
     BOT_TOKEN,
     DATA_PATH,
+    FIREBASE_CREDENTIALS_JSON,
     FIREBASE_CREDENTIALS_PATH,
     FIREBASE_PROJECT_ID,
     OWNER_GUILD_ID,
@@ -42,11 +43,6 @@ from bot.utils.logging_setup import setup_logging
 
 setup_logging()
 logger = logging.getLogger(__name__)
-
-# Marker file used to distinguish clean shutdown from crash recovery.
-# Present after a graceful close(); absent means the previous process
-# died without running the shutdown path.
-CLEAN_SHUTDOWN_MARKER = os.path.join(os.path.dirname(DATA_PATH), ".clean_shutdown")
 
 # Marker file for one-shot global commands clear.
 # Prevents re-running the clear on every restart if HXCC_CLEAR_GLOBAL_COMMANDS_ONCE is left set.
@@ -138,7 +134,6 @@ EXTENSIONS = [
     "bot.features.gangs",
     "bot.features.server_settings",
     "bot.features.announce_owner",
-    "bot.features.attacks_owner",
     "bot.features.moderation_owner",
     "bot.features.packs_panel",
     "bot.features.emoji_panel",
@@ -164,7 +159,9 @@ class LookismBot(commands.Bot):
             help_command=None,
             tree_cls=LookismCommandTree,
         )
-        firestore_client = get_firestore_client(FIREBASE_PROJECT_ID, FIREBASE_CREDENTIALS_PATH)
+        firestore_client = get_firestore_client(
+            FIREBASE_PROJECT_ID, FIREBASE_CREDENTIALS_PATH, FIREBASE_CREDENTIALS_JSON
+        )
         self.storage = FirestoreStorage(firestore_client)
         # In-memory set of user IDs who have accepted terms — avoids a
         # storage.load() + deepcopy on every slash-command interaction.
@@ -195,12 +192,6 @@ class LookismBot(commands.Bot):
 
     async def _unlock_stale_trades(self) -> None:
         """Clear non-persistent trade panels while preserving live board offers."""
-        if os.path.exists(CLEAN_SHUTDOWN_MARKER):
-            try:
-                os.remove(CLEAN_SHUTDOWN_MARKER)
-            except OSError as exc:
-                logger.warning("[BOOT] Could not remove clean-shutdown marker: %s", exc)
-
         live_offers = await self.trade_service.get_open_offers(limit=10_000)
         live_locks = {
             (str(row.get("poster_id", "")), str(row.get("item_uid", "")))
@@ -233,20 +224,6 @@ class LookismBot(commands.Bot):
             pending_count,
             count,
         )
-
-    def _write_clean_shutdown_marker(self) -> None:
-        """Best-effort write of the clean-shutdown marker file."""
-        try:
-            os.makedirs(os.path.dirname(CLEAN_SHUTDOWN_MARKER), exist_ok=True)
-            with open(CLEAN_SHUTDOWN_MARKER, "w", encoding="utf-8") as fh:
-                fh.write("ok")
-        except OSError as exc:
-            logger.warning("[SHUTDOWN] Could not write clean-shutdown marker: %s", exc)
-
-    async def close(self) -> None:
-        """Override to drop the clean-shutdown marker before disconnecting."""
-        self._write_clean_shutdown_marker()
-        await super().close()
 
     async def _global_terms_gate(self, interaction: discord.Interaction) -> bool:
         command = getattr(interaction, "command", None)
@@ -347,8 +324,6 @@ class LookismBot(commands.Bot):
             _write_global_commands_marker(env_value)
             logger.info("[BOOT] Cleared and synced empty global command registry.")
 
-        # Per-guild dev sync removed: GUILD_IDS was always None (global sync only).
-
         # Sync owner-guild-only commands (o_ commands registered via @app_commands.guilds(OWNER_GUILD)).
         # Do NOT use copy_global_to here — that would push all 100+ global commands into the guild.
         await self.tree.sync(guild=owner_guild)
@@ -405,7 +380,7 @@ class LookismBot(commands.Bot):
 
     async def on_ready(self) -> None:
         logger.info("[READY] Logged in as %s (ID: %s)", self.user, self.user.id if self.user else "?")
-        activity = discord.Activity(type=discord.ActivityType.watching, name="Lookism | /help")
+        activity = discord.Activity(type=discord.ActivityType.watching, name="Lookism CG | /help")
         await self.change_presence(status=discord.Status.online, activity=activity)
 
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
@@ -422,11 +397,10 @@ class LookismCommandTree(app_commands.CommandTree["LookismBot"]):
             return True
         if interaction.type is discord.InteractionType.autocomplete:
             return True
-        if not await self.client._global_restriction_gate(interaction):
-            return False
-        if not await self.client._global_terms_gate(interaction):
-            return False
 
+        # Rate limit FIRST — the restriction/terms gates below can cost a full
+        # storage.load() deepcopy for uncached users, so throttling must run
+        # before any gate can reject an interaction.
         now = time.monotonic()
         user_times = self._command_times[int(interaction.user.id)]
         while user_times and now - user_times[0] >= 10.0:
@@ -442,6 +416,15 @@ class LookismCommandTree(app_commands.CommandTree["LookismBot"]):
                 pass
             return False
         user_times.append(now)
+        # Bound the per-user deque map so it can't grow forever.
+        if len(self._command_times) > 10_000:
+            for stale_uid in [uid for uid, dq in self._command_times.items() if not dq]:
+                self._command_times.pop(stale_uid, None)
+
+        if not await self.client._global_restriction_gate(interaction):
+            return False
+        if not await self.client._global_terms_gate(interaction):
+            return False
 
         from bot.utils.server_rules import check_single_mode_allowed, is_admin
         from bot.utils.ui import e, make_embed

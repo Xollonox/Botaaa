@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import uuid
 from typing import Any
 
 from bot.utils.cards_logic import _FLAT_BONUS, find_catalog_card
@@ -16,18 +15,6 @@ _UPGRADE_BASE_COSTS: dict[str, int] = {
     "Infernal":  14000,
     "Abyssal":   20000,
 }
-
-
-def build_weapon_instance(weapon_def: dict[str, Any], acquired_at: int = 0, stars: int = 0) -> dict[str, Any]:
-    return {
-        "uid": str(uuid.uuid4()),
-        "weapon_name": str(weapon_def.get("name", "")),
-        "rarity": str(weapon_def.get("rarity", "Common")),
-        "stars": int(stars),
-        "locked": False,
-        "equipped_to": None,
-        "acquired_at": int(acquired_at),
-    }
 
 
 def get_weapon_buffs(weapon_instance: dict[str, Any], weapon_catalog: dict[str, Any]) -> dict[str, int]:

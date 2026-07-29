@@ -8,7 +8,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/discord.py-latest-5865F2.svg" alt="discord.py">
-  <img src="https://img.shields.io/badge/tests-197-green.svg" alt="197 tests">
+  <img src="https://img.shields.io/badge/tests-185-green.svg" alt="185 tests">
   <img src="https://img.shields.io/badge/commands-100+-purple.svg" alt="100+ commands">
   <img src="https://img.shields.io/badge/license-MIT-yellow.svg" alt="MIT">
 </p>
@@ -22,7 +22,7 @@ This workspace hosts two Discord bots that run concurrently via `launcher.py`:
 | Bot | Directory | Purpose | Stack |
 |-----|-----------|---------|-------|
 | **Miss Kim** | `Bot/bot1/` | Conversational AI with image generation, vision, mood system | discord.py, OpenAI-compat LLMs (Cerebras, Groq, Ollama), Cloudflare AI |
-| **Lookism HXCC** | `Bot/bot2/` | Gacha game bot: cards, battles, market, trades, gangs, wars, tournaments | discord.py, Firestore |
+| **Lookism CG** | `Bot/bot2/` | Gacha game bot: cards, battles, market, trades, gangs, wars, tournaments | discord.py, Firestore |
 
 Each bot owns its commands, tests, and runtime data.
 
@@ -78,14 +78,14 @@ Botaaa/
 │   │   ├── llm.py                # Multi-provider LLM with failover
 │   │   └── tests/                # Regression tests
 │   │
-│   ├── bot2/                     # Lookism HXCC — Game Bot
-│       ├── main.py               # LookismBot bootstrap (32 cogs)
+│   ├── bot2/                     # Lookism CG — Game Bot
+│       ├── main.py               # LookismBot bootstrap (33 cogs)
 │       ├── bot/
 │       │   ├── config.py
 │       │   ├── data/             # Firestore-backed storage + repos
 │       │   ├── services/         # Battle, market, trade logic
 │       │   ├── features/         # 32 slash-command cogs
-│       │   └── utils/            # 25 utility modules
+│       │   └── utils/            # 29 utility modules
 │       └── tests/                # Pytest regression suite
 │   │
 │
@@ -111,7 +111,7 @@ Conversational AI that roleplays as Yeonu Kim from the Lookism universe.
 
 ---
 
-## Bot2: Lookism HXCC
+## Bot2: Lookism CG
 
 Full-featured gacha card game bot with 80+ slash commands.
 

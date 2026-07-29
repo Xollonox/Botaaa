@@ -81,20 +81,6 @@ def default_rates() -> dict[str, int]:
     }
 
 
-def format_rates_table(rates: dict[str, int]) -> str:
-    """Format a rates dict as a table string."""
-    if not isinstance(rates, dict):
-        return "No rates."
-    total = sum(int(v) for v in rates.values())
-    lines = []
-    for rarity in RARITIES:
-        val = int(rates.get(rarity, 0))
-        if val > 0:
-            pct = f"{val / total * 100:.1f}%" if total > 0 else "0%"
-            lines.append(f"{rarity}: {val} ({pct})")
-    return "\n".join(lines) if lines else "All rates are 0."
-
-
 def _add_packs_to_inventory(data: dict[str, Any], user_id: str, pack_key: str, qty: int) -> None:
     """Store unopened packs on the user's pack inventory.
 

@@ -1,6 +1,6 @@
 # Card Stats Reference
 
-> Bot2 - Lookism HXCC Card Catalog
+> Bot2 - Lookism CG Card Catalog
 
 ## Battle Connection
 

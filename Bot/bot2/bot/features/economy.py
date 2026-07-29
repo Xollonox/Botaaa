@@ -54,7 +54,7 @@ class EconomyCog(commands.Cog):
 
         embed = make_embed(
             None,
-            "LOOKISM HXCC • WALLET",
+            "LOOKISM CG • WALLET",
             (
                 f"**WALLET — {interaction.user.display_name}**\n\n"
                 "╭─ Currency\n"

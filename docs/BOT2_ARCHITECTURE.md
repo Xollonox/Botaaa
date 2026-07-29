@@ -1,4 +1,4 @@
-# 🎮 Bot2: Lookism HXCC — Complete Architecture
+# 🎮 Bot2: Lookism CG — Complete Architecture
 
 > **Role:** Full-featured gacha game bot with cards, battles, economy, social systems
 > **Files:** `Bot/bot2/` (70+ source files, pytest regression suite)
@@ -11,7 +11,7 @@
 ### Core
 | File | Lines | Purpose |
 |------|-------|---------|
-| `main.py` | ~390 | Bot bootstrap, 32 cogs, Firestore bootstrap, command sync |
+| `main.py` | ~390 | Bot bootstrap, 33 cogs, Firestore bootstrap, command sync |
 | `bot/config.py` | ~20 | Env-loaded token, owner IDs, paths |
 
 ### Data Layer (`bot/data/`)
@@ -65,7 +65,7 @@
 | `economy_logic.py` | 80 | Balance/cooldown helpers |
 | `typing_matchup.py` | 120 | 6-type system |
 | `ui.py` | 250 | Emojis, embeds, boxes, styling |
-| `ganG_logic.py` | 120 | Role hierarchy |
+| `gang_logic.py` | 120 | Role hierarchy |
 | `war_logic.py` | 200 | War matchmaking |
 | `season_logic.py` | 100 | Season pass |
 
@@ -95,7 +95,7 @@ LookismBot.__init__()
 └── 5. Setup hook → setup_hook()
     │
     ├── 6. Load 32 extension cogs (all in bot.features.*)
-    │       Failures logged but bot continues
+    │       Failures raise — setup aborts (fail-fast)
     │
     ├── 7. Sync slash commands
     │       ├── Copy global to guilds (if GUILD_IDS set)
@@ -137,12 +137,17 @@ LookismBot.__init__()
 24. gangs           — economy
 25. server_settings — (none)
 26. announce_owner  — server_settings
-27. attacks_owner   — cards_admin
+27. moderation_owner — (none)
 28. packs_panel     — packs
 29. emoji_panel     — (none)
 30. gang_war        — gangs, battle
 31. keystones       — cards_admin
 32. weapons         — inventory, cards_admin
+33. stats_preview   — cards_admin
+```
+
+> Note: the list above is grouped by dependency, not literal load order;
+> `main.py:EXTENSIONS` is the authoritative load order (33 cogs).
 ```
 
 ---
@@ -156,7 +161,12 @@ Every slash command goes through:
    │
    ├── Autocomplete? → Allow through
    │
-   └── Command?
+   ├── Rate limiter (5 commands / 10s per user) → BLOCK when exceeded
+   │   (runs FIRST — gate checks below can cost a full storage.load())
+   │
+   ├── Restriction gate: load_readonly() → banned/muted? → BLOCK
+   │
+   └── Terms gate
        ├── Check _terms_cache (in-memory set)
        ├── Cache miss? → storage.load() → check has_user_accepted_terms()
        ├── Not accepted? → Send Terms embed + TermsGateView → BLOCK
@@ -169,16 +179,15 @@ Every slash command goes through:
    │
    ├── storage.with_lock(mutate_function)
    │   ├── Acquire threading.Lock
-   │   ├── Read live data from _cache (or disk if cold)
-   │   ├── Execute mutation function
-   │   ├── Save data atomically:
-   │   │   ├── Sanitize for JSON
-   │   │   ├── Write to .tmp file
-   │   │   ├── fsync()
-   │   │   └── os.replace(.tmp → .json)
+   │   ├── Deepcopy live data from _cache (hydrates from Firestore if cold)
+   │   ├── Execute mutation function on the deepcopy
+   │   ├── _commit_diff() vs the cache snapshot:
+   │   │   ├── Single Firestore batch (≤400 player docs + global doc) — atomic
+   │   │   └── Slow path: player chunks first, global doc last
+   │   ├── Update _cache
    │   └── Release lock
    │
-   ├── (Optional) SQLite update via service layer
+   ├── (Optional) Firestore repo update via service layer
    │
    └── Send response (embed + view)
 ```
@@ -495,13 +504,21 @@ Queue → Match Found → Prep Phase (5 min)
 | Commit | Issue | Fix |
 |--------|-------|-----|
 | `f889cf6` | **IQ/BIQ missing from cards.json** — All 26 cards had only STR/SPD/END/TEC in their stats. IQ and BIQ defaulted to 0 everywhere (collection, battle, card_info) | Added correct `iq` and `battle_iq` values extracted from runtime `lookism_data.json` to `cards.json`. Restart required to clear stat cache. |
+| 2026-07-29 | **Block defense hit the wrong side** — a successful block subtracted the 20 HP impact penalty from the *attacker* (`me`/`my_uid`) instead of the blocker | Penalty now applied to `opp`/`opp_uid`, matching this doc's spec |
+| 2026-07-29 | **Rate limiter ran after the expensive gates** — unregistered users got unthrottled full-`storage.load()` deepcopies per interaction | Rate limiter (5 cmd/10s) now runs first in `interaction_check`; `_command_times` pruned when >10k entries |
+| 2026-07-29 | **`FIREBASE_CREDENTIALS_JSON` documented but unsupported** (support had been reverted) | `firestore_client.get_firestore_client()` accepts raw service-account JSON or a path; config/launcher validate either variant |
+| 2026-07-29 | **`with_lock` double deepcopy + non-atomic multi-batch commits** | `_commit_diff` diffs against the cache snapshot (one deepcopy total) and commits player docs + global doc in a single atomic batch on the common path |
+| 2026-07-29 | **Hourly reward ignored owner config** (`+100` hardcoded) — daily/weekly/monthly also read static constants | Reward handlers now read `data["config"]["rewards"]` set by `/o_set_*` commands |
+| 2026-07-29 | **Jailbreak personas exposed via `/mood` and `/roast`** (`roast_low/medium/extreme`, incl. an "ALL SAFETY RULES SUSPENDED" prompt with a slur list) | Roast moods, `/roast` command, and the prompt-override block removed from bot1 |
+| 2026-07-29 | **Dead code purge** | Removed: `trade_logic.py` (193 lines, zero callers), empty `attacks_owner.py` cog, `build_weapon_instance`, `format_rates_table`, `_ensure_inventory_defaults`, `participant_a` param, ~12 stale imports |
+| 2026-07-29 | **Rebrand** | Bot2 renamed Lookism HXCC → **Lookism CG** (all user-facing strings; `HXCC_CLEAR_GLOBAL_COMMANDS_ONCE` env var kept for deploy compat) |
 
 ## 13. ⚠️ Current Critical Issues
 
 | Issue | Location | Impact |
 |-------|----------|--------|
-| **No input rate limiting** | All commands | API abuse potential |
-| **No graceful shutdown** | `launcher.py` | Stale state on restart |
-| **Bot log unbounded growth** | `logs/bot.log` | Disk space exhaustion |
+| **Bot log unbounded growth** | `logs/bot.log` | Disk space exhaustion — add log rotation |
+| **`bot_state/global` is one coarse doc** | `firestore_storage.py` | Any non-player change rewrites the whole doc; 1MB cap as catalog grows — split per-domain before scale |
+| **`load_readonly()` exposes the mutable cache** | `firestore_storage.py` | Callers must not mutate the returned dict (currently safe; unguarded) |
 
 > Prior hardcoded-token / hardcoded-Supabase-key / JSON-corruption / dual-state-drift issues were resolved by the Firestore migration and env-loaded config. See `docs/Report.md` and `docs/SECURITY.md` for the historical findings.

@@ -43,7 +43,7 @@ def build_terms_embed() -> discord.Embed:
     CYAN = "\u001b[1;36m"
     YELLOW = "\u001b[0;33m"
     embed = discord.Embed(
-        title="⚠️ LOOKISM HXCC • Access",
+        title="⚠️ LOOKISM CG • Access",
         color=TERMS_COLOR,
         description=(
             "```ansi\n"
@@ -81,7 +81,7 @@ def build_start_embed(username: str) -> discord.Embed:
     CYAN = "\u001b[1;36m"     # bold cyan — section headers
     GREEN = "\u001b[0;32m"    # green — slash commands
     embed = discord.Embed(
-        title="LOOKISM HXCC • Account",
+        title="LOOKISM CG • Account",
         color=TERMS_COLOR,
         description=(
             f"Welcome, {username}\n"
@@ -312,7 +312,7 @@ def _pipeline_embed() -> discord.Embed:
         f"**Mastermind passive** (per card): +{MASTERMIND_IQ_BONUS} effective IQ "
         f"and +{MASTERMIND_BIQ_BONUS} effective BIQ while active.\n"
     )
-    return make_embed(None, "LOOKISM HXCC • STATS GUIDE", body, color=0xE11D48, footer="How damage works")
+    return make_embed(None, "LOOKISM CG • STATS GUIDE", body, color=0xE11D48, footer="How damage works")
 
 
 def _typing_embed() -> discord.Embed:
@@ -327,7 +327,7 @@ def _typing_embed() -> discord.Embed:
         "• If both cards share the same two types, all effects nullify (×1.00).\n"
         "• Mastermind has no matchup relations — its bonus is a passive IQ/BIQ boost."
     )
-    return make_embed(None, "LOOKISM HXCC • TYPING CHART", "\n".join(lines), color=0xE11D48, footer="Counter-play")
+    return make_embed(None, "LOOKISM CG • TYPING CHART", "\n".join(lines), color=0xE11D48, footer="Counter-play")
 
 
 class HelpPaginatorView(discord.ui.View):

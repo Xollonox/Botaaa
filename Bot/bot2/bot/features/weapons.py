@@ -10,7 +10,7 @@ from discord.ext import commands
 
 from bot.data.constants import rarity_icon, RARITY_RANK
 from bot.utils.weapon_logic import (
-    build_weapon_instance, get_weapon_buffs,
+    get_weapon_buffs,
     equip_weapon, unequip_weapon, upgrade_weapon,
 )
 from bot.utils.checks import ensure_registered
@@ -58,7 +58,7 @@ class WeaponDetailView(discord.ui.View):
         weapon_inv = player.get("user", {}).get("weapon_inventory", []) if isinstance(player, dict) else []
         weapon = next((w for w in weapon_inv if isinstance(w, dict) and str(w.get("uid", "")) == self.weapon_uid), None)
         if weapon is None:
-            return make_embed(data, "LOOKISM HXCC • WEAPON", "Weapon not found.", color=0xE74C3C)
+            return make_embed(data, "LOOKISM CG • WEAPON", "Weapon not found.", color=0xE74C3C)
 
         weapons_catalog = data.get("weapons", {})
         weapon_name = str(weapon.get("weapon_name", "")).lower()
@@ -95,7 +95,7 @@ class WeaponDetailView(discord.ui.View):
             f"│ {', '.join(compatible) if compatible else '—'}\n"
             "╰────────────────"
         )
-        return make_embed(data, "LOOKISM HXCC • WEAPON", body, color=0xE67E22, image_url=image_url)
+        return make_embed(data, "LOOKISM CG • WEAPON", body, color=0xE67E22, image_url=image_url)
 
     @discord.ui.button(label="Equip", style=discord.ButtonStyle.green, custom_id="weapon_equip")
     async def equip_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
@@ -244,7 +244,7 @@ class WeaponGalleryView(discord.ui.View):
 
         return make_embed(
             data,
-            f"LOOKISM HXCC • WEAPONS ({total})",
+            f"LOOKISM CG • WEAPONS ({total})",
             body,
             color=0xE67E22,
             footer=f"Page {self.page + 1}/{total_pages} • Select a weapon to view details",

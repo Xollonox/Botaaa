@@ -29,7 +29,7 @@ SEP = "\u2501" * 32
 
 
 def _e(desc: str, color: int = 0x9B59B6) -> discord.Embed:
-    return make_embed(None, "LOOKISM HXCC • GANG WAR", desc, color=color, footer="Gang Wars")
+    return make_embed(None, "LOOKISM CG • GANG WAR", desc, color=color, footer="Gang Wars")
 
 def _ok(d: str) -> discord.Embed: return _e(d, 0x2ECC71)
 def _err(d: str) -> discord.Embed: return _e(d, 0xE74C3C)

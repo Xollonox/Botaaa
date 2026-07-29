@@ -1,4 +1,4 @@
-# LOOKISM HXCC — Bot2
+# LOOKISM CG — Bot2
 
 Discord card-collection battling game themed around the webtoon *Lookism*. Players collect fighters, build squads, battle PvP/CPU, trade on the market, join gangs and alliances, progress through seasons, and earn achievements.
 
@@ -26,7 +26,7 @@ main.py
     ├── trade_service      # bot/services/trade_service.py — Firestore repo
     └── battle_service     # bot/services/battle_service.py — Firestore repo
          │
-         └── 30+ feature cogs (bot/features/*.py)
+         └── 33 feature cogs (bot/features/*.py)
                │
                └── bot/utils/ — shared business logic
 ```
@@ -82,7 +82,7 @@ Extensions load in this order in `main.py`:
 | tournament/league | `tournament`, `leaderboards` |
 | progression | `achievements`, `season` |
 | social | `gangs`, `alliance`, `gang_war` |
-| settings/admin | `server_settings`, `announce_owner`, `cards_admin`, `attacks_owner`, `emoji_panel` |
+| settings/admin | `server_settings`, `announce_owner`, `cards_admin`, `emoji_panel` |
 
 ---
 
@@ -381,7 +381,7 @@ python main.py
 | Content/admin | `cards_admin.py`, `cards_logic.py`, `attacks_logic.py` | Card and attack mutation |
 | Persistence | `firestore_storage.py`, `firestore_client.py`, `firestore_*_repo.py` | State integrity, Firestore reads/writes |
 | Battle runtime | `battle.py`, `battle_views.py` | Timers, live-edited embeds, views |
-| Market/trade | `market.py`, `trades.py`, `trade_logic.py` | Locked cards, listing state |
+| Market/trade | `market.py`, `trades.py` | Locked cards, listing state |
 | Social | `gangs.py`, `alliance.py`, `gang_war.py` | Multi-user state changes |
 | Season/rewards | `season.py`, `rewards.py` | Recurring progression |
 
@@ -412,7 +412,6 @@ When bot2 breaks:
 | `achievements.py` | Achievement listing + grant commands |
 | `alliance.py` | Alliance CRUD, invites, management |
 | `announce_owner.py` | Owner announcement commands |
-| `attacks_owner.py` | Owner attack catalog CRUD |
 | `battle.py` | PvP/friendly battle queueing, turns, timers |
 | `battle_cpu.py` | CPU battle commands |
 | `battle_embeds.py` | Battle embed rendering |
@@ -480,7 +479,6 @@ When bot2 breaks:
 | `squad_logic.py` | Squad get/set, power compute |
 | `timeutil.py` | `now_ts()` helper |
 | `tournament_logic.py` | Tournament bracket generation |
-| `trade_logic.py` | Trade CRUD, atomic card transfer |
 | `typing_matchup.py` | Type system multipliers |
 | `ui.py` | Embed builder, emoji resolution |
 | `war_logic.py` | Gang war queue, scoring |

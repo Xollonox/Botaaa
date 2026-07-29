@@ -385,7 +385,7 @@ def build_profile_embed(data: dict[str, Any], target: discord.abc.User) -> disco
     )
     avatar_url = getattr(getattr(target, "display_avatar", None), "url", None)
     # Avatar in the top-left circle, next to the author name.
-    embed.set_author(name=f"LOOKISM HXCC · {display_name}", icon_url=avatar_url)
+    embed.set_author(name=f"LOOKISM CG · {display_name}", icon_url=avatar_url)
     embed.set_footer(text="Player Profile")
     return embed
 

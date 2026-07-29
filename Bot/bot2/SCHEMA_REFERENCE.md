@@ -1,4 +1,4 @@
-# LOOKISM HXCC — Schema Reference
+# LOOKISM CG — Schema Reference
 
 Single source of truth for all data structures, constants, formulas, and thresholds. If the code disagrees with this file, the code wins — patch this file.
 
@@ -594,7 +594,7 @@ Same as listing plus:
 ```python
 {
     "seller_id": "owner",
-    "seller_name": "HXCC Staff",
+    "seller_name": "Lookism CG Staff",
 }
 ```
 
@@ -635,7 +635,7 @@ payout = price - int(price * fee_percent / 100)
 }
 ```
 
-TTL: **86,400s** (24h). UI timeout: **600s** (10min).
+TTL: **172,800s** (48h). UI timeout: **600s** (10min).
 
 ---
 
@@ -844,7 +844,7 @@ Reward flows should grant packs through `pack_logic._add_packs_to_inventory()` o
 | Market fee | 5% |
 | Max listings per user | 10 |
 | Listing duration | 7 days (604,800s) |
-| Trade TTL | 24h (86,400s) |
+| Trade offer TTL | 48h (172,800s) |
 | Trade UI timeout | 10 min (600s) |
 | Alliance cooldown | 24h (86,400s) |
 | Gang invite expiry | 10 min |

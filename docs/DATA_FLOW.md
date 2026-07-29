@@ -12,7 +12,7 @@
 └──────────────────┬──────────────────┬──────────────────────┘
                    │                  │
          ┌─────────▼─────────┐  ┌────▼──────────────────────┐
-         │    Bot1: Miss Kim  │  │  Bot2: Lookism HXCC      │
+         │    Bot1: Miss Kim  │  │  Bot2: Lookism CG      │
          │  (JSON memory +    │  │  (Firestore-backed)       │
          │   LLM APIs)        │  │                           │
          └─────────┬─────────┘  └────┬───────────────────────┘
@@ -104,7 +104,7 @@ update_conversation_summary(user_id)
 
 ---
 
-## 3. 🔄 Bot2: Lookism HXCC Data Flow
+## 3. 🔄 Bot2: Lookism CG Data Flow
 
 ### Request Lifecycle
 ```
@@ -236,19 +236,21 @@ battle/ (queue, pending_friendly, active_by_user)
 
 Firestore is now the single source of truth — there is no secondary store to sync into. Mutations through `storage.with_lock` update the in-memory cache and persist to Firestore; the market/trade/battle repos write their subsystem-specific collections directly.
 
-### Boot-time Hydration
+### Boot-time Seeding & Recovery
 ```
-Every startup:
-1. battle_service.hydrate_state(data):
-   data["battle"]["queue"] = battle_repo.list_queue()
-   data["battle"]["pending_friendly"] = battle_repo.list_pending_friendly()
-   data["battle"]["active_by_user"] = battle_repo.list_active_by_user()
+Every startup (setup_hook, before cogs serve commands):
+1. market/trade/battle_service.bootstrap_from_json():
+   Idempotent one-shot seed of the Firestore repos from the mirrored
+   in-storage state; guarded by app_migrations markers so it never re-seeds.
+2. trade_repo.recover_stale_processing_offers():
+   Re-opens offers left in 'processing' by a crashed accept flow.
+3. _unlock_stale_trades(): unlocks cards flagged trade_locked with no live offer.
+4. BattleCog.recover_active_battles_after_restart(): ends stale active battles.
 
-2. market_service.hydrate_market_listings(data):
-   data["market"]["listings"] = market_repo.list_active_listings()
-
-3. trade_service.hydrate_trade_state(data):
-   data["trades"]["pending"] = trade_repo.list_pending()
+Feature cogs pull fresh repo state through hydrate helpers on demand:
+   market_service.hydrate_json_market_listings(data)
+   trade_service.hydrate_json_trade_state(data)
+   battle_service.hydrate_json_state(data)
 ```
 
 ---
@@ -258,7 +260,7 @@ Every startup:
 | Operation | Latency | Frequency |
 |-----------|---------|-----------|
 | storage.load() | ~0.5ms (cached) / ~depends on Firestore round-trip (cold) | Every command |
-| storage.with_lock() | ~5-100ms (depends on data size + Firestore latency) | Every mutation |
+| storage.with_lock() | ~1 deepcopy of dataset + diff vs cache; 1 Firestore batch on the common path | Every mutation |
 | Firestore repo write | Network-bound (~tens of ms typical) | Every battle/market/trade action |
 | LLM call (bot1) | ~1-8s | Every AI reply |
 | Image generation | ~3-15s | Every /imagine |

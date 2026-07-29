@@ -1,4 +1,4 @@
-"""LOOKISM HXCC UI helpers: emoji lookup, embed construction, and view styling."""
+"""LOOKISM CG UI helpers: emoji lookup, embed construction, and view styling."""
 
 from __future__ import annotations
 
@@ -72,7 +72,7 @@ _BUTTON_STYLE_KEYWORDS: tuple[tuple[tuple[str, ...], discord.ButtonStyle], ...] 
     (("upgrade",), discord.ButtonStyle.success),
 )
 
-_PREMIUM_AUTHOR = "LOOKISM HXCC"
+_PREMIUM_AUTHOR = "LOOKISM CG"
 
 
 def e(key: str, data: dict[str, Any] | None = None) -> str:
@@ -167,7 +167,7 @@ def _footer_text(data: dict[str, Any] | None) -> str:
                 footer = str(ui_cfg.get("footer", "")).strip()
                 if footer:
                     return footer
-    return "LOOKISM HXCC • /help"
+    return "LOOKISM CG • /help"
 
 
 def _prepare_description(data: dict[str, Any] | None, description: str) -> str:
@@ -204,7 +204,7 @@ def make_embed(
     image_url: str | None = None,
     thumbnail_url: str | None = None,
 ) -> discord.Embed:
-    """Build a standard LOOKISM HXCC Discord embed."""
+    """Build a standard LOOKISM CG Discord embed."""
     clean_title = _trim(title or "Interface", 256)
     clean_description = _prepare_description(data, description)
     chosen_color = _choose_color(clean_title, clean_description, color, variant)
@@ -238,7 +238,7 @@ def simple_embed(description: str, color: int = 0x2B2D31, *, author: str = "", f
     """Quick description-only embed with optional styling."""
     embed = discord.Embed(description=description, color=color, timestamp=datetime.now(timezone.utc))
     embed.set_author(name=author or _PREMIUM_AUTHOR)
-    embed.set_footer(text=footer or "LOOKISM HXCC • /help")
+    embed.set_footer(text=footer or "LOOKISM CG • /help")
     return embed
 
 
@@ -248,7 +248,7 @@ def skin_embed(embed: discord.Embed, interaction: Any | None = None, data: dict[
         return embed
 
     if not embed.title:
-        embed.title = "LOOKISM HXCC"
+        embed.title = "LOOKISM CG"
     else:
         embed.title = _trim(embed.title, 256)
 
@@ -265,7 +265,7 @@ def skin_embed(embed: discord.Embed, interaction: Any | None = None, data: dict[
         command_name = getattr(getattr(interaction, "command", None), "name", "") if interaction is not None else ""
         if command_name:
             system = command_name.replace("_", " ").upper()
-            author_name = f"LOOKISM HXCC • {system}"
+            author_name = f"LOOKISM CG • {system}"
         else:
             author_name = _PREMIUM_AUTHOR
         icon_url = None

@@ -54,7 +54,7 @@ class LeaderboardPanel(discord.ui.View):
         if not lines:
             lines = ["No data yet."]
         body = box(f"{self.title} — Page {self.page}/{self.total_pages}", lines)
-        embed = make_embed(None, "LOOKISM HXCC • LEADERBOARD", body, color=0xE11D48, footer="Rankings")
+        embed = make_embed(None, "LOOKISM CG • LEADERBOARD", body, color=0xE11D48, footer="Rankings")
         return embed
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:

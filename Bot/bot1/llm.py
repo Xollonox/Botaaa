@@ -179,12 +179,16 @@ class OllamaClient:
         self.model = model
         self._idx = 0
 
-    def _next_key(self) -> Optional[str]:
-        if not self.keys:
-            return None
-        key = self.keys[self._idx]
-        self._idx = (self._idx + 1) % len(self.keys)
-        return key
+    def _ordered_keys(self) -> List[tuple[int, str]]:
+        """(index, key) pairs starting from the current key.
+
+        The index only advances on failure (see chat_messages), so healthy
+        keys stay sticky instead of burning one key per successful call.
+        """
+        return [
+            (i % len(self.keys), self.keys[i % len(self.keys)])
+            for i in range(self._idx, self._idx + len(self.keys))
+        ]
 
     def _url(self) -> str:
         return f"{self.base_url}/chat"
@@ -219,10 +223,8 @@ class OllamaClient:
             "messages": messages,
             "stream": False,
         }
-        attempts = max(1, len(self.keys))
         last_error = "No API key configured"
-        for _ in range(attempts):
-            key = self._next_key()
+        for key_idx, key in self._ordered_keys():
             try:
                 session = await get_session()
                 async with session.post(
@@ -246,6 +248,8 @@ class OllamaClient:
                         message = data.get("message", {})
                         content = message.get("content", "")
                         if isinstance(content, str) and content.strip():
+                            # Stick to the working key for subsequent calls.
+                            self._idx = key_idx
                             return content.strip()
                         last_error = "Empty Ollama response"
                         logger.warning(
@@ -259,9 +263,10 @@ class OllamaClient:
                         last_error = f"Key rate-limited ({resp.status})"
                         logger.warning(
                             "Ollama API rate-limited | key_index=%s status=%s",
-                            self._idx,
+                            key_idx,
                             resp.status,
                         )
+                        self._idx = (key_idx + 1) % len(self.keys)
                         continue
                     last_error = f"Ollama {resp.status}: {text[:200]}"
                     logger.error(
@@ -271,6 +276,7 @@ class OllamaClient:
                         resp.status,
                         text[:500],
                     )
+                    self._idx = (key_idx + 1) % len(self.keys)
             except Exception as exc:
                 last_error = f"Ollama error: {exc}"
                 logger.exception(
@@ -278,6 +284,7 @@ class OllamaClient:
                     self._url(),
                     payload.get("model"),
                 )
+                self._idx = (key_idx + 1) % len(self.keys)
         return f"{ERROR_BACKEND_UNREACHABLE} ({last_error})"
 
 

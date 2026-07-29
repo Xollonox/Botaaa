@@ -151,7 +151,7 @@ class StatsPreviewView(discord.ui.View):
     def build_embed(self) -> discord.Embed:
         page = self.pages[self.page]
         embed = discord.Embed(
-            title="LOOKISM HXCC - Stats Reference",
+            title="LOOKISM CG - Stats Reference",
             description=page.body[:4096],
             color=0xE11D48,
         )

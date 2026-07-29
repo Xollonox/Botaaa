@@ -175,7 +175,7 @@ def build_battle_stats_embed(battle_state: dict, winner_name: str) -> discord.Em
 
     description = "\n".join(blocks)
     embed = discord.Embed(title="⚔️ Battle Results", description=description, color=0xFFD700)
-    embed.set_footer(text="Battle Results • Lookism HXCC")
+    embed.set_footer(text="Battle Results • Lookism CG")
     return embed
 
 

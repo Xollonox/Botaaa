@@ -1,4 +1,4 @@
-# LOOKISM HXCC — Battle Mechanics Reference
+# LOOKISM CG — Battle Mechanics Reference
 
 Single source of truth for how stats turn into damage. All numbers here are pulled directly from `bot/utils/battle_state.py` (`calculate_stat_damage`, `_apply_defense_and_finalize_damage`, `_build_hp`, `_get_technique_bonus_multiplier`, `_strength_bonus`) and `bot/utils/typing_matchup.py`. If this file disagrees with code, code wins — patch this file.
 

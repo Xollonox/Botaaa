@@ -40,14 +40,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(BASE_DIR, "lookism_data.json")
 SQLITE_PATH = os.getenv("LOOKISM_SQLITE_PATH", os.path.join(BASE_DIR, "lookism_data.sqlite3"))
 
-# Firestore is the persistence backend; both are required at runtime.
+# Firestore is the persistence backend. FIREBASE_PROJECT_ID plus one of the
+# two credentials variants is required at runtime.
 FIREBASE_PROJECT_ID = os.environ.get("FIREBASE_PROJECT_ID")
 FIREBASE_CREDENTIALS_PATH = os.environ.get("FIREBASE_CREDENTIALS_PATH")
+FIREBASE_CREDENTIALS_JSON = os.environ.get("FIREBASE_CREDENTIALS_JSON")
 
 # Set to a list of guild IDs for fast development sync, or None for global sync.
 GUILD_IDS = None
 
-OWNER_GUILD_ID = 1447875474364829748
+OWNER_GUILD_ID = int(os.environ.get("LOOKISM_OWNER_GUILD_ID", "1447875474364829748"))
 
 
 def assert_runtime_config() -> None:
@@ -61,12 +63,17 @@ def assert_runtime_config() -> None:
             "BOT_TOKEN environment variable is not set. "
             "Please set it in your .env file or as an environment variable."
         )
-    if not FIREBASE_PROJECT_ID or not FIREBASE_CREDENTIALS_PATH:
+    if not FIREBASE_PROJECT_ID:
         raise ValueError(
-            "FIREBASE_PROJECT_ID and FIREBASE_CREDENTIALS_PATH must both be set. "
-            "Please set them in your .env file or as environment variables."
+            "FIREBASE_PROJECT_ID is not set. "
+            "Please set it in your .env file or as an environment variable."
         )
-    if not os.path.isfile(FIREBASE_CREDENTIALS_PATH):
+    if not FIREBASE_CREDENTIALS_PATH and not FIREBASE_CREDENTIALS_JSON:
+        raise ValueError(
+            "Neither FIREBASE_CREDENTIALS_PATH nor FIREBASE_CREDENTIALS_JSON is set. "
+            "Set one of them in your .env file or as environment variables."
+        )
+    if FIREBASE_CREDENTIALS_PATH and not os.path.isfile(FIREBASE_CREDENTIALS_PATH):
         raise ValueError(
             f"FIREBASE_CREDENTIALS_PATH does not point to a file: {FIREBASE_CREDENTIALS_PATH}"
         )

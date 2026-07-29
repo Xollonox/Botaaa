@@ -1,18 +1,10 @@
-"""Firestore-backed replacement for the JSON ``Storage`` class.
+"""Firestore-backed storage with the old JSON ``Storage`` public API
+(``load``, ``load_readonly``, ``with_lock``, ``save``, ``async_save``).
 
-Preserves the exact public API of :class:`bot.data.storage.Storage`
-(``load``, ``load_readonly``, ``with_lock``, ``save``, ``async_save``) so
-every existing call site (``self.bot.storage.with_lock(lambda data: ...)``)
-keeps working unmodified. Only the backing store changes: instead of a
-single JSON file, data is split between a ``players`` collection (one
-document per user id, to stay well under Firestore's 1MB/document limit)
-and a single ``bot_state/global`` document holding everything else
-(cards, weapons, keystones, season, gangs, server_settings, ai, ...).
-
-``with_lock``/``save`` remain synchronous, blocking network calls to
-Firestore for the duration — this matches the original synchronous
-``Storage.with_lock`` contract that ~60+ call sites rely on (none of them
-``await`` it). This is a deliberate interface-parity tradeoff.
+Data is split between a ``players`` collection (one doc per user id, to
+stay under Firestore's 1MB/doc limit) and a ``bot_state/global`` doc for
+everything else. ``with_lock``/``save`` are synchronous blocking network
+calls; the ~60+ call sites rely on that contract (none ``await`` them).
 """
 
 from __future__ import annotations
@@ -48,7 +40,9 @@ def _sanitize_for_firestore(value: Any, path: str = "root") -> Any:
     if isinstance(value, set):
         sample = next(iter(value), None)
         logger.warning("[FIRESTORE_SANITIZE] Converted set at path %s to list (len=%s sample=%r)", path, len(value), sample)
-        normalized = sorted(str(x) for x in value)
+        # Preserve element types ({100, 200} -> [100, 200], not ["100", "200"]).
+        # Sorting is only for deterministic output; key= handles mixed types.
+        normalized = sorted(value, key=lambda x: str(x))
         return [_sanitize_for_firestore(v, f"{path}[{i}]") for i, v in enumerate(normalized)]
     if value is None or isinstance(value, (str, int, float, bool)):
         return value
@@ -141,20 +135,34 @@ class FirestoreStorage:
         if not ops and not rest_changed:
             return
 
-        for i in range(0, len(ops), _BATCH_LIMIT):
+        global_ref = self._db.collection(GLOBAL_COLLECTION).document(GLOBAL_DOC_ID)
+
+        # Fast path: everything fits in one batch → atomic commit.
+        if len(ops) + (1 if rest_changed else 0) <= _BATCH_LIMIT:
             batch = self._db.batch()
-            chunk = ops[i : i + _BATCH_LIMIT]
-            for kind, uid, payload in chunk:
+            for kind, uid, payload in ops:
                 if kind == "set":
                     batch.set(coll.document(uid), payload)
                 else:
                     batch.delete(coll.document(uid))
-            if rest_changed and i == 0:
-                batch.set(self._db.collection(GLOBAL_COLLECTION).document(GLOBAL_DOC_ID), rest)
+            if rest_changed:
+                batch.set(global_ref, rest)
             batch.commit()
+            return
 
-        if rest_changed and not ops:
-            self._db.collection(GLOBAL_COLLECTION).document(GLOBAL_DOC_ID).set(rest)
+        # Slow path: >_BATCH_LIMIT player docs changed (e.g. season reset).
+        # Players commit in chunks, global doc last; on mid-way failure the
+        # unchanged cache forces a full re-diff on next save → retry self-heals.
+        for i in range(0, len(ops), _BATCH_LIMIT):
+            batch = self._db.batch()
+            for kind, uid, payload in ops[i : i + _BATCH_LIMIT]:
+                if kind == "set":
+                    batch.set(coll.document(uid), payload)
+                else:
+                    batch.delete(coll.document(uid))
+            batch.commit()
+        if rest_changed:
+            global_ref.set(rest)
 
     def save(self, data: dict[str, Any]) -> None:
         """Persist *data*, diffing against the current cache to minimize writes."""
@@ -177,8 +185,10 @@ class FirestoreStorage:
         """
         with self.lock:
             data = deepcopy(self._live_data())
-            before = deepcopy(data)
+            # `self._cache` still points at the pre-mutation snapshot — fn()
+            # mutates only the deepcopy — so it serves as `before` for the
+            # diff. This avoids a second full-dataset deepcopy per mutation.
             result = fn(data)
-            self._commit_diff(data, before)
+            self._commit_diff(data, self._cache)
             self._cache = data
             return result

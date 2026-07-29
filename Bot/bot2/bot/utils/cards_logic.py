@@ -414,23 +414,23 @@ def grant_random_bonus_card(
     if not isinstance(rates, dict) or not rates:
         return {"granted": False, "reason": "no_rates"}
 
-    # Build pool weighted by rates
+    # Build pool weighted by rates without duplicating entries.
+    # (Previously: pool.extend(matching * w) — ballooned the pool with copies.)
     pool: list[tuple[str, dict[str, Any]]] = []
+    weights: list[int] = []
     for rarity, weight in rates.items():
         w = int(weight or 0)
         if w <= 0:
             continue
-        matching = [
-            (name, card)
-            for name, card in catalog.items()
-            if isinstance(card, dict) and str(card.get("rarity", "")) == rarity
-        ]
-        pool.extend(matching * w)
+        for name, card in catalog.items():
+            if isinstance(card, dict) and str(card.get("rarity", "")) == rarity:
+                pool.append((name, card))
+                weights.append(w)
 
     if not pool:
         return {"granted": False, "reason": "no_pool"}
 
-    card_name, card_def = random.choice(pool)
+    card_name, card_def = random.choices(pool, weights=weights, k=1)[0]
     instance = build_card_instance(card_def, acquired_at=now)
 
     players = data.setdefault("players", {})

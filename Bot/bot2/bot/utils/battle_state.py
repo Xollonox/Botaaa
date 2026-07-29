@@ -585,7 +585,6 @@ def create_battle_state(
     team_a: list[str],
     team_b: list[str],
     now: int,
-    participant_a: dict[str, Any] | None = None,
     participant_b: dict[str, Any] | None = None,
 ) -> str:
     battle_id = str(uuid.uuid4())
@@ -805,8 +804,6 @@ def _compute_attack_damage(data: dict, me: dict, opp: dict, my_uid: str, opp_uid
     if fighter_name and cotd.get("card_name") == fighter_name:
         damage = int(damage * 1.15)
 
-    pending = me.get("pending_defense_by_char_uid", {}) if isinstance(me.get("pending_defense_by_char_uid"), dict) else {}
-    # Actually pending is on state keyed by opp_uid — re-read from state
     return damage, _move_group(mnorm)
 
 
@@ -844,9 +841,10 @@ def _apply_defense_and_finalize_damage(state: dict, me: dict, opp: dict, my_uid:
         if atk_str - def_end >= REJECTION_THRESHOLD:
             state.setdefault("log", []).append("block_rejected")
         elif def_end > atk_str:
-            me_hp = me.get("hp", {}) if isinstance(me.get("hp"), dict) else {}
-            me_hp[my_uid] = max(0, int(me_hp.get(my_uid, 0)) - 20)
-            me["hp"] = me_hp
+            # Successful block: the blocker loses 20 HP from the impact.
+            opp_hp = opp.get("hp", {}) if isinstance(opp.get("hp"), dict) else {}
+            opp_hp[opp_uid] = max(0, int(opp_hp.get(opp_uid, 0)) - 20)
+            opp["hp"] = opp_hp
             damage = 0
     elif pending_move == "dodge":
         if atk_spd - def_spd >= REJECTION_THRESHOLD:

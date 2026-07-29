@@ -148,7 +148,7 @@ def _panel_embed(session: dict[str, Any], locked_a: bool, locked_b: bool) -> dis
         "╰────────────────"
     )
     color = 0x2ECC71 if (locked_a and locked_b) else 0x3498DB
-    return make_embed(None, "LOOKISM HXCC • TRADE", body, color=color, footer="10 minute session • Rules enforced")
+    return make_embed(None, "LOOKISM CG • TRADE", body, color=color, footer="10 minute session • Rules enforced")
 
 
 class CoinsModal(discord.ui.Modal, title="Offer Coins"):
@@ -331,7 +331,7 @@ class TradePanel(discord.ui.View):
         self.cog.unregister_panel(self)
         if self.message:
             try:
-                e = make_embed(None, "LOOKISM HXCC • TRADE", "╭─ ⏰ Trade Expired\n│ Session timed out.\n╰────────────────", color=0x636E72)
+                e = make_embed(None, "LOOKISM CG • TRADE", "╭─ ⏰ Trade Expired\n│ Session timed out.\n╰────────────────", color=0x636E72)
                 await self.message.edit(embed=e, view=None)
             except Exception:
                 logger.exception("Failed to edit expired trade panel message")
@@ -438,7 +438,7 @@ class TradePanel(discord.ui.View):
         await self.cog.bot.trade_service.remove_pending_pair(self.a_id, self.b_id, mirror_json=False)
         self.cog.unregister_panel(self)
         self.stop()
-        e = make_embed(None, "LOOKISM HXCC • TRADE", f"╭─ 🚫 Trade Cancelled\n│ Cancelled by @{interaction.user.name}\n╰────────────────", color=0xE74C3C)
+        e = make_embed(None, "LOOKISM CG • TRADE", f"╭─ 🚫 Trade Cancelled\n│ Cancelled by @{interaction.user.name}\n╰────────────────", color=0xE74C3C)
         await interaction.response.edit_message(embed=e, view=None)
 
 
@@ -571,7 +571,7 @@ class ConfirmView(discord.ui.View):
             f"│ @{s['b_name']} gave:  {b_gave}\n"
             "╰────────────────"
         )
-        embed = make_embed(None, "LOOKISM HXCC • TRADE", body, color=0x2ECC71)
+        embed = make_embed(None, "LOOKISM CG • TRADE", body, color=0x2ECC71)
         await interaction.response.edit_message(embed=embed, view=None)
 
     @discord.ui.button(label="✏️ Edit Offer", style=discord.ButtonStyle.secondary, row=0)
@@ -599,7 +599,7 @@ class ConfirmView(discord.ui.View):
         await self.cog.bot.trade_service.remove_pending_pair(self.panel.a_id, self.panel.b_id, mirror_json=False)
         self.cog.unregister_panel(self.panel)
         self.stop()
-        e = make_embed(None, "LOOKISM HXCC • TRADE", f"╭─ 🚫 Trade Cancelled\n│ Cancelled by @{interaction.user.name}\n╰────────────────", color=0xE74C3C)
+        e = make_embed(None, "LOOKISM CG • TRADE", f"╭─ 🚫 Trade Cancelled\n│ Cancelled by @{interaction.user.name}\n╰────────────────", color=0xE74C3C)
         await interaction.response.edit_message(embed=e, view=None)
 
 
@@ -607,7 +607,7 @@ def _history_embed_rows(user_id: str, username: str, rows: list[dict[str, Any]])
     mine = list(rows[:20])
     if not mine:
         body = "╭─ 📜 Trade History\n│ No trades yet.\n╰────────────────"
-        return make_embed(None, "LOOKISM HXCC • TRADE", body, color=0x2B2D31)
+        return make_embed(None, "LOOKISM CG • TRADE", body, color=0x2B2D31)
 
     STATUS_ICONS = {"accepted": "✅", "declined": "❌", "cancelled": "🚫", "expired": "⏰"}
     lines = []
@@ -620,4 +620,4 @@ def _history_embed_rows(user_id: str, username: str, rows: list[dict[str, Any]])
         lines.append(f"│ {i}. {icon} {a_gave} ↔ {b_gave}  •  @{other}  •  {_ago(ts)}")
 
     body = f"╭─ 📜 Trade History — @{username}\n" + "\n".join(lines) + "\n╰────────────────"
-    return make_embed(None, "LOOKISM HXCC • TRADE", body, color=0x2B2D31, footer="Last 10 trades")
+    return make_embed(None, "LOOKISM CG • TRADE", body, color=0x2B2D31, footer="Last 10 trades")

@@ -23,7 +23,7 @@ from bot.utils.interaction_visibility import smart_reply, error_reply
 SEP = "━" * 28
 
 def _embed(desc: str, color: int = 0x2B2D31) -> discord.Embed:
-    return make_embed(None, "LOOKISM HXCC • GANGS", desc, color=color, footer="Gang System")
+    return make_embed(None, "LOOKISM CG • GANGS", desc, color=color, footer="Gang System")
 
 def _ok(desc: str)  -> discord.Embed: return _embed(desc, 0x2ECC71)
 def _err(desc: str) -> discord.Embed: return _embed(desc, 0xE74C3C)
