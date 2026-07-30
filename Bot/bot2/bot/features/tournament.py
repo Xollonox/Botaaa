@@ -273,7 +273,7 @@ class TournamentCog(commands.Cog):
                                 tq2.remove(p)
                     self.bot.storage.with_lock(start)
                     ok2, _ = await battle_cog.start_battle_or_fail(
-                        interaction, uid, opponent, "tournament"
+                        interaction, uid, opponent, "tournament", dm_mode=True
                     )
                 else:
                     # CPU fallback
@@ -283,7 +283,7 @@ class TournamentCog(commands.Cog):
                         if uid in tq3: tq3.remove(uid)
                     self.bot.storage.with_lock(remove_q)
                     await battle_cog.start_battle_or_fail(
-                        interaction, uid, cpu["cpu_key"], "tournament", cpu_opponent=cpu
+                        interaction, uid, cpu["cpu_key"], "tournament", dm_mode=True, cpu_opponent=cpu
                     )
 
             asyncio.create_task(try_match())

@@ -1416,7 +1416,22 @@ class BattleCog(commands.Cog):
         try:
             if interaction.channel is None:
                 raise RuntimeError("missing_channel")
-            await self._start_battle(interaction.channel, battle_id, dm_mode=dm_mode)
+            try:
+                await self._start_battle(interaction.channel, battle_id, dm_mode=dm_mode)
+            except Exception as dm_exc:
+                if not dm_mode:
+                    raise
+                logger.warning("[BATTLE_START] DM start failed (%s) — falling back to channel battle_id=%s", type(dm_exc).__name__, battle_id)
+                try:
+                    data_fb = await self._load_battle_data()
+                    await interaction.channel.send(embed=make_embed(
+                        data_fb,
+                        f"{e('warning', data_fb)} DMs Unavailable",
+                        "A player has DMs closed — the battle will run in this channel instead.",
+                    ))
+                except Exception:
+                    pass
+                await self._start_battle(interaction.channel, battle_id, dm_mode=False)
             logger.info("[BATTLE_START] success mode=%s battle_id=%s c=%s o=%s", mode, battle_id, challenger_id, opponent_id)
             return True, "ok"
         except Exception as exc:
@@ -1471,14 +1486,14 @@ class BattleCog(commands.Cog):
             if not isinstance(target, dict):
                 return {"ok": False, "error": "no_match"}
 
-            return {"ok": True, "opp_id": str(target.get("user_id", "")), "dm": bool(me.get("dm", False)) and bool(target.get("dm", False))}
+            return {"ok": True, "opp_id": str(target.get("user_id", ""))}
 
         picked = self.bot.storage.with_lock(mutate_pick)
         if not picked.get("ok"):
             return False
 
         opp_id = str(picked.get("opp_id", ""))
-        ok, reason = await self.start_battle_or_fail(interaction, str(user_id), opp_id, "ranked", dm_mode=bool(picked.get("dm", False)))
+        ok, reason = await self.start_battle_or_fail(interaction, str(user_id), opp_id, "ranked", dm_mode=True)
         if not ok:
             logger.warning("[RANKED_MATCH_START] failed user=%s opp=%s reason=%s", user_id, opp_id, reason)
             data = await self._load_battle_data()
@@ -1690,7 +1705,7 @@ class BattleCog(commands.Cog):
             if not isinstance(me, dict):
                 return {"ok": False, "error": "not_queued"}
             root["queue"] = [q for q in queue if not (isinstance(q, dict) and str(q.get("user_id", "")) == str(user_id))]
-            return {"ok": True, "dm": bool(me.get("dm", False))}
+            return {"ok": True}
 
         popped = self.bot.storage.with_lock(mutate)
         if not popped.get("ok"):
@@ -1702,7 +1717,7 @@ class BattleCog(commands.Cog):
         self._cancel_ranked_queue_task(user_id)
         data = await self._load_battle_data()
         cpu = self._make_cpu_participant(data, self._player_trophies(data, user_id))
-        ok, reason = await self.start_battle_or_fail(interaction, str(user_id), cpu["cpu_key"], "ranked", dm_mode=bool(popped.get("dm", False)), cpu_opponent=cpu)
+        ok, reason = await self.start_battle_or_fail(interaction, str(user_id), cpu["cpu_key"], "ranked", dm_mode=True, cpu_opponent=cpu)
         if not ok:
             logger.warning("[RANKED_CPU_START] failed user=%s reason=%s", user_id, reason)
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Failed", str(reason)), ephemeral=True)
@@ -1878,7 +1893,7 @@ class BattleCog(commands.Cog):
                     embed=make_embed(
                         data,
                         f"{e('friendly', data)} Friendly Challenge!",
-                        f"<@{cid}> has challenged <@{tid}> to a friendly battle!\n✅ **Accept** to fight here — or **📩 Accept (DM)** to battle privately in your DMs.",
+                        f"<@{cid}> has challenged <@{tid}> to a friendly battle!\n✅ **Accept** and the battle plays out privately in your **DMs**.",
                         fields=[
                             (f"{e('timer', data)} Expires In", "60 seconds", True),
                             ("Type", "Friendly — No trophy change", True),
@@ -1949,7 +1964,7 @@ class BattleCog(commands.Cog):
 
             data = await self._load_battle_data()
             cpu = self._make_cpu_participant(data, self._player_trophies(data, challenger))
-            ok, reason = await self.start_battle_or_fail(interaction, challenger, cpu["cpu_key"], "friendly", cpu_opponent=cpu)
+            ok, reason = await self.start_battle_or_fail(interaction, challenger, cpu["cpu_key"], "friendly", dm_mode=True, cpu_opponent=cpu)
             if not ok:
                 logger.warning("[FRIENDLY_TIMEOUT_CPU_START] failed challenger=%s target=%s reason=%s", challenger, target, reason)
                 return
@@ -2027,7 +2042,7 @@ class BattleCog(commands.Cog):
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Failed", str(reason)), ephemeral=True)
             return
 
-        ok, reason = await self.start_battle_or_fail(interaction, challenger, target, "friendly", dm_mode=dm_mode, clear_pending_target_id=target)
+        ok, reason = await self.start_battle_or_fail(interaction, challenger, target, "friendly", dm_mode=True, clear_pending_target_id=target)
         data = await self._load_battle_data()
         if not ok:
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Failed", str(reason)), ephemeral=True)
