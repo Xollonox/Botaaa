@@ -1,5 +1,52 @@
 # Bot2 Fix Notes
 
+## Battles in DMs by Default, DM Recaps, Dead-Interaction Hardening
+
+Date: 2026-07-30
+
+### Summary
+
+Battles moved into player DMs and the post-restart interaction-expiry class of
+errors was closed out:
+
+- **Battles run in DMs by default.** Ranked matches (PvP + CPU fallback),
+  friendly accepts + friendly-CPU timeout, and tournament battles all start as
+  **DM battles**: `_start_battle(..., dm_mode=True)` sends each human player a
+  private 3-embed battle panel + TurnView in their DM. Battle states carry
+  `dm_mode`, `summary_channel_id`, and `dm_messages` (per-player DM message
+  refs). `_battle_targets()` / `_resolve_target_channel()` / `_summary_channel()`
+  centralize message routing; `_refresh_battle_message()` and `_tick_timer()`
+  now loop over all panel copies. Closed DMs → graceful fallback to a channel
+  battle with a "DMs Unavailable" notice.
+- **Channel summary + DM recap.** On battle end the detailed stats embed posts
+  to the origin channel, and each player gets a personalized DM recap (Victory/
+  Defeat/Draw, trophies delta, coins/XP/CP, jump link). Both fire exactly once
+  through the persisted `stats_sent` gate.
+- **Restart recovery** re-sends panels to every DM copy (or the legacy channel
+  message when `dm_mode=False`), and repersists fresh message IDs.
+- **Cold-start 10062 fix.** The first interaction after boot previously hydrated
+  all of Firestore inside Discord's 3s ack window. `setup_hook` now warms the
+  storage cache (`storage.load()` in an executor) before cogs serve commands.
+- **Ack-order fixes.** `/battle`, `/friendly`, `/forfeit` defers are guarded
+  against dead interactions; the DM-mode toggle (briefly shipped, then removed
+  per product decision) learned to ack before its Firestore write; ephemeral
+  queue panels are edited via `edit_original_response` (raw `Message.edit` hits
+  10008 on ephemeral messages).
+- **Error noise downgraded.** `NotFound` code 10062 inside command errors now
+  logs a one-line warning instead of a full traceback.
+
+### Verification
+
+```bash
+cd Bot/bot2 && pytest -q            # 162 passed
+python3 -m py_compile main.py bot/features/battle.py bot/features/battle_views.py bot/features/tournament.py
+# Smoke-tested: DM start/persist, per-player panel refresh sync,
+# closed-DMs → channel fallback, legacy channel targets unchanged.
+```
+
+---
+
+
 ## Battle Block Fix, Persona Cleanup, Rebrand, Dead-Code Purge
 
 Date: 2026-07-29

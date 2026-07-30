@@ -331,6 +331,8 @@ Valid move types are: **Normal**, **Special**, **Unique Skill**, **Path**.
 ### Battle UI Rendering
 All battle UI (including `build_battle_stats_embed`) now uses description-based ╭─│╰ box styling instead of Discord embed fields. This provides consistent formatting across all battle displays.
 
+**Battles run in DMs by default (2026-07-30).** `start_battle_or_fail(..., dm_mode=True)` for ranked (PvP and CPU fallback), friendly (accept and CPU timeout), and tournament battles. Each human player receives a private 3-embed panel + TurnView in their DM (`battle["dm_messages"][user_id] = {channel_id, message_id}`); `_battle_targets()` enumerates the live panels and `_refresh_battle_message()` / `_tick_timer()` keep them in sync. The origin guild channel is stored on `battle["summary_channel_id"]` and receives the post-battle stats embed, while each player also receives a personalized DM recap (result, trophies, coin/XP/CP, jump link). Closed DMs trigger a graceful fallback to a channel battle with a notice embed. Restart recovery re-sends panels into every DM copy (or the legacy channel message for `dm_mode=False` battles).
+
 ---
 
 ## 6. 💰 Economy System

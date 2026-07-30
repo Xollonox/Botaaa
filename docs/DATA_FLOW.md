@@ -188,11 +188,18 @@ setup_hook()
     5. Every 10s: check for match
     │   ├── Found: remove both from queue, create_battle_state()
     │   └── Timeout: CPU fallback
-    6. Battle progresses → apply_move() modifies state + Firestore
-    7. Battle ends → end_battle() updates:
+    6. Battle UI opens in each player's DM (dm_mode default since 2026-07-30):
+    │   ├── Per-player 3-embed panels + TurnView stored in battle["dm_messages"]
+    │   ├── Origin channel recorded in battle["summary_channel_id"]
+    │   └── Closed DMs → falls back to a classic channel battle panel
+    7. Battle progresses → apply_move() modifies state + Firestore; every
+    │  live DM panel copy is re-synced via _refresh_battle_message()
+    8. Battle ends → end_battle() updates:
     │   ├── State: clear active battle, update player data
     │   ├── Firestore: clear active-by-user
-    │   └── Grant XP/CP/trophies/rewards
+    │   ├── Grant XP/CP/trophies/rewards
+    │   ├── Stats embed posted once to the origin channel
+    │   └── Personalized DM recap sent once to each player
 ```
 
 ---

@@ -413,7 +413,9 @@ if double_coins event active: cp_gain *= 1.5
 
 ---
 
-## 12. 🎨 Battle UI (3 Embeds)
+## 12. 🎨 Battle UI (3 Embeds) — Runs in DMs
+
+> **Since 2026-07-30: battles play out in the players' DMs by default.** Ranked matches, ranked CPU fallback, friendly accepts, friendly-CPU timeout, and tournament battles all open a private battle panel in each player's DM. There is no opt-in toggle — DM is simply where battles happen. If any player's DMs are closed, `_start_battle` falls back to a classic channel battle with a "DMs Unavailable" notice in the origin channel.
 
 ```
 Embed A — Side A Info:
@@ -429,10 +431,28 @@ Embed C — Battle Log:
   - Turn number and timer
 ```
 
+### Message model (DM mode)
+Each battle state now carries:
+
+```python
+"dm_mode": bool,                 # True = per-player DM panels (default at start)
+"summary_channel_id": str,       # origin guild channel for the public result summary
+"dm_messages": {                 # populated in DM mode
+    user_id: {"channel_id": str, "message_id": str}   # one live panel per player
+}
+# Legacy channel-mode fields (used on channel fallback):
+"message_channel_id": str, "message_id": str
+```
+
+- Every player gets their **own copy** of the 3-embed panel + TurnView in their DM; `_battle_targets()` resolves all live message targets, and `_refresh_battle_message()` / `_tick_timer()` keep every copy in sync.
+- Whoever acts sees the full wind-up / hit-flash / HP-drain animation; the opponent's copy syncs to the final frame.
+- On battle end: the detailed stats embed posts to the **origin channel** (`summary_channel_id`), and each player gets a **personalized DM recap** (result, trophy delta, coins/XP/CP, jump link back to the battle post). Both fire exactly once, gated by a persisted `stats_sent` flag.
+- Restart recovery rebuilds fresh panels in each player's DM (or the single channel message on fallback mode).
+
 ### Views
-- **TurnView:** Attack select (1), Defense select (2), Switch select (3), Forfeit button
-- **FriendlyInviteView:** Accept/Decline buttons
-- **RankedQueueView:** CPU Battle / Forfeit buttons
+- **TurnView:** Attack select (1), Defense select (2), Switch select (3), Forfeit button — one instance per DM copy
+- **FriendlyInviteView:** Accept/Decline buttons (accept starts the battle in DMs)
+- **RankedQueueView:** CPU Battle / Forfeit buttons (CPU fallback starts in DM)
 
 ### Turn Timer
 ```
