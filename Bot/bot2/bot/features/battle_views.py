@@ -295,6 +295,8 @@ class RankedQueueView(discord.ui.View):
         if self.message is not None:
             try:
                 await self.message.edit(view=self)
+            except discord.NotFound:
+                pass  # ephemeral panel already gone — nothing left to disable
             except Exception:
                 logger.exception("[RANKED_QUEUE_VIEW_TIMEOUT] failed to disable queue view user=%s", self.user_id)
 
@@ -308,15 +310,28 @@ class RankedQueueView(discord.ui.View):
         if ok:
             for item in self.children:
                 item.disabled = True
-            if interaction.message is not None:
-                try:
+            try:
+                # The queue panel is an ephemeral followup — raw Message.edit hits
+                # 10008 Unknown Message; edit via the interaction webhook instead.
+                if interaction.response.is_done():
+                    await interaction.edit_original_response(view=self)
+                elif interaction.message is not None:
                     await interaction.message.edit(view=self)
-                except Exception:
-                    logger.exception("[RANKED_QUEUE_VIEW] failed to disable CPU button view user=%s", self.user_id)
+            except (discord.NotFound, discord.HTTPException):
+                logger.info("[RANKED_QUEUE_VIEW] queue panel already gone before disable (user=%s)", self.user_id)
+            except Exception:
+                logger.exception("[RANKED_QUEUE_VIEW] failed to disable CPU button view user=%s", self.user_id)
 
     @discord.ui.button(label="\U0001F4E9 DM Mode", style=discord.ButtonStyle.secondary, row=0)
     async def dm_mode_button(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         """Toggle DM battles for this queue entry; ranked match goes to DMs only if BOTH players enabled it."""
+        # Ack the component FIRST — the toggle writes through to Firestore
+        # (with_lock commit), which can exceed Discord's 3s ack window on a
+        # slow host and kill the interaction token (10062).
+        try:
+            await defer_component_update(interaction)
+        except Exception:
+            return
         uid = self.user_id
 
         def mutate(data: dict) -> Any:
@@ -329,14 +344,17 @@ class RankedQueueView(discord.ui.View):
 
         dm_on = self.cog.bot.storage.with_lock(mutate)
         data = self.cog.bot.storage.load()
-        if dm_on is None:
-            await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)
-            return
-        if dm_on:
-            note = "DM Mode is **ON** — if your next match also has it on, the battle plays out privately in your DMs."
-        else:
-            note = "DM Mode is **OFF** — battles will play out in the channel."
-        await smart_reply(interaction, embed=make_embed(data, f"{e('ok', data)} DM Mode {'ON' if dm_on else 'OFF'}", note), ephemeral=True)
+        try:
+            if dm_on is None:
+                await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)
+                return
+            if dm_on:
+                note = "DM Mode is **ON** — if your next match also has it on, the battle plays out privately in your DMs."
+            else:
+                note = "DM Mode is **OFF** — battles will play out in the channel."
+            await smart_reply(interaction, embed=make_embed(data, f"{e('ok', data)} DM Mode {'ON' if dm_on else 'OFF'}", note), ephemeral=True)
+        except discord.NotFound:
+            logger.info("[RANKED_QUEUE_VIEW] DM toggle reply lost (interaction/token gone, user=%s)", self.user_id)
 
     @discord.ui.button(label="Forfeit", style=discord.ButtonStyle.danger, row=0)
     async def forfeit_button(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
