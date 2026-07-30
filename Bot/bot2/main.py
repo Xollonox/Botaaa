@@ -297,6 +297,12 @@ class LookismBot(commands.Bot):
         # Kept off __init__ so bot construction can't block on Firestore I/O.
         await self.trade_repo.recover_stale_processing_offers()
 
+        # Warm the Firestore-backed storage cache so the first user interaction
+        # doesn't pay the hydrate round-trip inside Discord's 3s ack window
+        # (cold cache + slow first read used to kill interactions with 10062).
+        await asyncio.get_running_loop().run_in_executor(None, self.storage.load)
+        logger.info("[BOOT] Storage cache warmed")
+
         failed: list[str] = []
         for ext in EXTENSIONS:
             try:
@@ -461,6 +467,16 @@ class LookismCommandTree(app_commands.CommandTree["LookismBot"]):
         interaction: discord.Interaction,
         error: app_commands.AppCommandError,
     ) -> None:
+        # 10062 Unknown interaction — token died before the bot acked (client lag,
+        # cold start, double-fire). Nothing can be replied to; log and move on.
+        original = getattr(error, "original", error)
+        if isinstance(original, discord.NotFound) and getattr(original, "code", None) == 10062:
+            logger.warning(
+                "[CMD] interaction expired before ack (command=%s user=%s)",
+                getattr(interaction.command, "qualified_name", "?"),
+                getattr(interaction.user, "id", "?"),
+            )
+            return
         if isinstance(error, app_commands.CommandOnCooldown):
             msg = f"⏳ Command on cooldown. Try again in **{error.retry_after:.0f}s**."
             try:

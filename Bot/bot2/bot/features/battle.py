@@ -107,29 +107,29 @@ class BattleCog(commands.Cog):
                 task.cancel()
 
     async def _tick_timer(self, battle_id: str, total: int) -> None:
-        """E. Live turn timer — edit battle message every 10 seconds with updated countdown."""
+        """E. Live turn timer — edit battle message(s) every 10 seconds with updated countdown."""
         for remaining in range(total - 10, 0, -10):
             await asyncio.sleep(10)
             data = self.bot.storage.load()
             battle = self._battle_root(data).get("active", {}).get(battle_id)
             if not isinstance(battle, dict) or bool(battle.get("ended", False)):
                 return
-            channel_id = int(str(battle.get("message_channel_id", 0)) or 0)
-            message_id = int(str(battle.get("message_id", 0)) or 0)
-            if not channel_id or not message_id:
+            targets = self._battle_targets(battle)
+            if not targets:
                 return
-            channel = self.bot.get_channel(channel_id)
-            if channel is None or not hasattr(channel, "fetch_message"):
-                return
-            try:
-                msg = await channel.fetch_message(message_id)
-            except Exception:
-                return
-            embed_a, embed_b, embed_c, _view = self._build_embed_view(data, battle_id)
-            try:
-                await msg.edit(embeds=[emb for emb in (embed_a, embed_b, embed_c) if emb is not None])
-            except Exception:
-                logger.debug("[TIMER_TICK] edit failed battle_id=%s remaining=%s", battle_id, remaining)
+            for target in targets:
+                channel = await self._resolve_target_channel(target)
+                if channel is None or not hasattr(channel, "fetch_message"):
+                    continue
+                try:
+                    msg = await channel.fetch_message(int(str(target.get("message_id", "0")) or 0))
+                except Exception:
+                    continue
+                embed_a, embed_b, embed_c, _view = self._build_embed_view(data, battle_id)
+                try:
+                    await msg.edit(embeds=[emb for emb in (embed_a, embed_b, embed_c) if emb is not None])
+                except Exception:
+                    logger.debug("[TIMER_TICK] edit failed battle_id=%s remaining=%s", battle_id, remaining)
 
     async def _apply_battle_message_update(self, interaction: discord.Interaction, *, embeds: list[discord.Embed], view: discord.ui.View | None) -> None:
         if view is not None:
@@ -619,6 +619,7 @@ class BattleCog(commands.Cog):
         first = self.bot.storage.with_lock(_try_mark)
         if first:
             await self._send_battle_stats_embed(channel, battle)
+            await self._dm_battle_recap(battle)
         return first
 
     async def _send_battle_stats_embed(self, channel: Any, battle: dict) -> None:
@@ -640,43 +641,256 @@ class BattleCog(commands.Cog):
         except Exception:
             logger.exception("[BATTLE_STATS] failed to send stats embed")
 
+    def _battle_message_link(self, battle: dict) -> str:
+        """Public message link for the battle UI (empty if unknown / not a guild channel)."""
+        try:
+            channel_id = int(str(battle.get("message_channel_id", "0")) or 0)
+            message_id = int(str(battle.get("message_id", "0")) or 0)
+            if not channel_id or not message_id:
+                return ""
+            channel = self.bot.get_channel(channel_id)
+            guild_id = getattr(getattr(channel, "guild", None), "id", None)
+            if not guild_id:
+                return ""
+            return f"https://discord.com/channels/{guild_id}/{channel_id}/{message_id}"
+        except Exception:
+            return ""
+
+    async def _dm_battle_recap(self, battle: dict) -> None:
+        """DM a personalized battle recap to every human player. Best-effort, never raises."""
+        try:
+            players: dict = battle.get("players", {}) if isinstance(battle.get("players"), dict) else {}
+            if not players:
+                return
+
+            winner_id = str(battle.get("winner_id", ""))
+            reason = str(battle.get("reason", ""))
+            battle_type = str(battle.get("type", "ranked"))
+            no_contest = reason in {"timeout_abandoned", "abandoned", "no_contest"}
+            is_draw = reason == "draw" or (not winner_id and not no_contest)
+            rounds = int(battle.get("round", 1) or 1)
+
+            labels: dict[str, str] = {}
+            for pid, ps in players.items():
+                spid = str(pid)
+                if isinstance(ps, dict) and bool(ps.get("is_cpu", False)):
+                    cpu_meta = ps.get("cpu_meta", {}) or {}
+                    labels[spid] = str(cpu_meta.get("display_name", "\U0001F916 CPU")) if isinstance(cpu_meta, dict) else "\U0001F916 CPU"
+                else:
+                    labels[spid] = f"<@{spid}>"
+
+            trophy_changes = battle.get("pvp_trophy_changes", {}) if isinstance(battle.get("pvp_trophy_changes"), dict) else {}
+            cpu_trophy = int(battle.get("cpu_trophy_change", 0) or 0)
+            coin_reward = int(battle.get("coin_reward", 0) or 0)
+            w_xp = int(battle.get("winner_xp", 0) or 0)
+            l_xp = int(battle.get("loser_xp", 0) or 0)
+            w_cp = int(battle.get("winner_cp", 0) or 0)
+            l_cp = int(battle.get("loser_cp", 0) or 0)
+            jump = self._battle_message_link(battle)
+
+            for pid in [str(pid) for pid in players.keys()]:
+                pstate = players.get(pid) if isinstance(players.get(pid), dict) else None
+                if isinstance(pstate, dict) and bool(pstate.get("is_cpu", False)):
+                    continue  # no DM for CPU side
+                others = [p for p in players.keys() if str(p) != pid]
+                opp_label = labels.get(str(others[0]), "opponent") if others else "opponent"
+
+                if no_contest:
+                    title, color, result_line = "\U0001F91D Battle Ended", 0x9AA0A6, "No contest \u2014 the battle was abandoned."
+                elif is_draw:
+                    title, color, result_line = "\U0001F91D Draw", 0x9AA0A6, f"You drew against {opp_label}."
+                elif pid == winner_id:
+                    title, color, result_line = "\U0001F3C6 Victory!", 0x57F287, f"You defeated {opp_label}."
+                else:
+                    title, color, result_line = "\U0001F480 Defeat", 0xED4245, f"{opp_label} defeated you."
+
+                lines = [result_line, f"Type: **{battle_type.title()}** \u00b7 Rounds: **{rounds}**"]
+
+                if battle_type == "ranked" and not no_contest:
+                    if pid in trophy_changes:
+                        delta = int(trophy_changes.get(pid, 0) or 0)
+                        lines.append(f"\U0001F3C6 Trophies: **{'+' if delta >= 0 else ''}{delta}**")
+                    elif cpu_trophy:
+                        lines.append(f"\U0001F3C6 Trophies: **{'+' if cpu_trophy >= 0 else ''}{cpu_trophy}**")
+
+                rewards: list[str] = []
+                if pid == winner_id and not no_contest:
+                    if coin_reward:
+                        rewards.append(f"\U0001FA99 {coin_reward} coins")
+                    if w_xp:
+                        rewards.append(f"\u2728 {w_xp} XP")
+                    if w_cp:
+                        rewards.append(f"\U0001F396\uFE0F {w_cp} CP")
+                elif not no_contest:
+                    if l_xp:
+                        rewards.append(f"\u2728 {l_xp} XP")
+                    if l_cp:
+                        rewards.append(f"\U0001F396\uFE0F {l_cp} CP")
+                if rewards:
+                    lines.append("Rewards: " + " \u00b7 ".join(rewards))
+
+                if jump:
+                    lines.append(f"[View battle post]({jump})")
+
+                embed = discord.Embed(title=title, description="\n".join(lines), color=color)
+                try:
+                    user = self.bot.get_user(int(pid)) or await self.bot.fetch_user(int(pid))
+                    await user.send(embed=embed)
+                    logger.info("[BATTLE_DM] recap sent user=%s battle_id=%s", pid, battle.get("battle_id"))
+                except discord.Forbidden:
+                    logger.info("[BATTLE_DM] DMs closed for user=%s \u2014 skipping recap", pid)
+                except Exception:
+                    logger.exception("[BATTLE_DM] failed to DM recap user=%s", pid)
+        except Exception:
+            logger.exception("[BATTLE_DM] recap builder failed")
+
+    def _battle_targets(self, battle: dict) -> list[dict[str, str]]:
+        """Message targets for a battle: channel-mode = one message, DM-mode = per-player DM messages."""
+        targets: list[dict[str, str]] = []
+        dm_msgs = battle.get("dm_messages", {}) if isinstance(battle.get("dm_messages"), dict) else {}
+        if bool(battle.get("dm_mode", False)) and dm_msgs:
+            for uid, entry in dm_msgs.items():
+                if not isinstance(entry, dict):
+                    continue
+                cid = str(entry.get("channel_id", "") or "")
+                mid = str(entry.get("message_id", "") or "")
+                if cid and mid:
+                    targets.append({"user_id": str(uid), "channel_id": cid, "message_id": mid})
+            return targets
+        cid = str(battle.get("message_channel_id", "") or "")
+        mid = str(battle.get("message_id", "") or "")
+        if cid and mid and cid != "0" and mid != "0":
+            targets.append({"user_id": "", "channel_id": cid, "message_id": mid})
+        return targets
+
+    async def _resolve_target_channel(self, target: dict) -> Any | None:
+        """Resolve a battle message target to a Discord channel (guild channel or player DM)."""
+        cid = int(str(target.get("channel_id", "0")) or 0)
+        channel = self.bot.get_channel(cid)
+        if channel is not None:
+            return channel
+        uid = str(target.get("user_id", "") or "")
+        if uid and uid.isdigit():
+            try:
+                user = self.bot.get_user(int(uid)) or await self.bot.fetch_user(int(uid))
+            except Exception:
+                return None
+            if user is None:
+                return None
+            try:
+                return user.dm_channel or await user.create_dm()
+            except Exception:
+                return None
+        return None
+
+    async def _summary_channel(self, battle: dict) -> Any | None:
+        """Channel where post-battle summaries go: the stored origin channel, else first resolvable target."""
+        cid = int(str(battle.get("summary_channel_id", "0")) or 0)
+        if cid:
+            channel = self.bot.get_channel(cid)
+            if channel is not None:
+                return channel
+        for target in self._battle_targets(battle):
+            channel = await self._resolve_target_channel(target)
+            if channel is not None:
+                return channel
+        return None
+
     async def _refresh_battle_message(self, battle_id: str) -> None:
         data = self.bot.storage.load()
         battle = self._lookup_battle(data, battle_id)
         if not isinstance(battle, dict):
             return
-        channel_id = int(str(battle.get("message_channel_id", "0")) or 0)
-        message_id = int(str(battle.get("message_id", "0")) or 0)
-        if not channel_id or not message_id:
+        targets = self._battle_targets(battle)
+        if not targets:
             return
 
-        channel = self.bot.get_channel(channel_id)
-        if channel is None or not hasattr(channel, "fetch_message"):
-            return
-        try:
-            msg = await channel.fetch_message(message_id)
-        except Exception:
-            logger.exception("[BATTLE_REFRESH] failed to fetch message battle_id=%s channel=%s message=%s", battle_id, channel_id, message_id)
-            return
+        for target in targets:
+            channel = await self._resolve_target_channel(target)
+            if channel is None or not hasattr(channel, "fetch_message"):
+                continue
+            try:
+                msg = await channel.fetch_message(int(str(target.get("message_id", "0")) or 0))
+            except Exception:
+                logger.exception("[BATTLE_REFRESH] failed to fetch message battle_id=%s channel=%s message=%s", battle_id, target.get("channel_id"), target.get("message_id"))
+                continue
 
-        embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
-        if view is not None:
-            style_view(view, data)
-        try:
-            await msg.edit(embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None], view=view, attachments=[])
-        except Exception:
-            logger.exception("[BATTLE_REFRESH] failed to edit message battle_id=%s channel=%s message=%s", battle_id, channel_id, message_id)
+            embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
+            if view is not None:
+                style_view(view, data)
+                if hasattr(view, "message"):
+                    view.message = msg
+            try:
+                await msg.edit(embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None], view=view, attachments=[])
+            except Exception:
+                logger.exception("[BATTLE_REFRESH] failed to edit message battle_id=%s channel=%s message=%s", battle_id, target.get("channel_id"), target.get("message_id"))
 
         # Send stats summary once when the battle is freshly over
         if bool(battle.get("ended", False)):
-            if await self._send_stats_once(battle_id, battle, channel):
+            channel = await self._summary_channel(battle)
+            if channel is not None and await self._send_stats_once(battle_id, battle, channel):
                 logger.info("[BATTLE_STATS] sent stats embed for ended battle_id=%s", battle_id)
 
     def _schedule_timeout(self, battle_id: str) -> None:
         pass
 
-    async def _start_battle(self, channel: discord.abc.Messageable, battle_id: str) -> None:
+    async def _start_battle(self, channel: discord.abc.Messageable, battle_id: str, *, dm_mode: bool = False) -> None:
         data = self.bot.storage.load()
+        summary_cid = str(getattr(channel, "id", "") or "")
+
+        if dm_mode:
+            battle_state = self._lookup_battle(data, battle_id)
+            players = battle_state.get("players", {}) if isinstance(battle_state, dict) else {}
+            sent: list[tuple[str, discord.Message]] = []
+            try:
+                for pid, ps in players.items():
+                    if isinstance(ps, dict) and bool(ps.get("is_cpu", False)):
+                        continue
+                    if not str(pid).isdigit():
+                        continue
+                    user = self.bot.get_user(int(pid)) or await self.bot.fetch_user(int(pid))
+                    if user is None:
+                        raise RuntimeError(f"dm_user_missing:{pid}")
+                    dm = user.dm_channel or await user.create_dm()
+                    pa, pb, pc, pview = self._build_embed_view(data, battle_id)
+                    if pview is not None:
+                        style_view(pview, data)
+                    msg = await dm.send(embeds=[e for e in (pa, pb, pc) if e is not None], view=pview)
+                    if pview is not None and hasattr(pview, "message"):
+                        pview.message = msg
+                    sent.append((str(pid), msg))
+            except Exception:
+                logger.error("[BATTLE_UI] failed to open DM battle for battle_id=%s\n%s", battle_id, traceback.format_exc())
+                for _uid, m in sent:
+                    try:
+                        await m.delete()
+                    except Exception:
+                        pass
+                raise
+
+            dm_messages = {uid: {"channel_id": str(m.channel.id), "message_id": str(m.id)} for uid, m in sent}
+            if channel is not None:
+                try:
+                    await channel.send(embed=make_embed(
+                        data,
+                        f"{e('ranked', data)} Battle Started in DMs",
+                        "The battle UI has been sent to each player's **DMs**. The result summary will be posted here.",
+                    ))
+                except Exception:
+                    logger.info("[BATTLE_DM] failed to post origin notice battle_id=%s", battle_id)
+
+            def mutate_dm(state: dict[str, Any]) -> None:
+                battle = self._battle_root(state).get("active", {}).get(battle_id)
+                if isinstance(battle, dict):
+                    battle["dm_mode"] = True
+                    battle["dm_messages"] = dm_messages
+                    battle["summary_channel_id"] = summary_cid
+
+            self.bot.storage.with_lock(mutate_dm)
+            self._schedule_timeout(battle_id)
+            await self._maybe_run_cpu_turn(battle_id)
+            return
+
         embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
         try:
             if view is not None:
@@ -693,6 +907,8 @@ class BattleCog(commands.Cog):
             if isinstance(battle, dict):
                 battle["message_channel_id"] = str(msg.channel.id)
                 battle["message_id"] = str(msg.id)
+                battle["dm_mode"] = False
+                battle["summary_channel_id"] = summary_cid
 
         self.bot.storage.with_lock(mutate)
         self._schedule_timeout(battle_id)
@@ -934,17 +1150,16 @@ class BattleCog(commands.Cog):
             self._cancel_battle_runtime_tasks(battle_id)
             # Send the battle stats summary if not already sent (atomic check)
             if isinstance(battle, dict):
-                channel = getattr(interaction, "channel", None)
-                if channel is None:
-                    try:
-                        channel = await interaction.original_response()
-                        channel = getattr(channel, "channel", None)
-                    except Exception:
-                        channel = None
+                channel = await self._summary_channel(battle)
                 if channel is not None:
                     if await self._send_stats_once(battle_id, battle, channel):
                         logger.info("[BATTLE_STATS] sent stats embed for ended battle_id=%s", battle_id)
+            if isinstance(battle, dict) and bool(battle.get("dm_mode", False)):
+                await self._refresh_battle_message(battle_id)
             return
+        if isinstance(battle, dict) and bool(battle.get("dm_mode", False)):
+            # DM mode: sync the opponent's private battle copy
+            await self._refresh_battle_message(battle_id)
         self._schedule_timeout(battle_id)
         await self._maybe_run_cpu_turn(battle_id)
 
@@ -1147,7 +1362,7 @@ class BattleCog(commands.Cog):
                 removed += 1
         return removed
 
-    async def start_battle_or_fail(self, interaction: discord.Interaction, challenger_id: str, opponent_id: str, mode: str, *, clear_pending_target_id: str | None = None, cpu_opponent: dict[str, Any] | None = None) -> tuple[bool, str]:
+    async def start_battle_or_fail(self, interaction: discord.Interaction, challenger_id: str, opponent_id: str, mode: str, *, dm_mode: bool = False, clear_pending_target_id: str | None = None, cpu_opponent: dict[str, Any] | None = None) -> tuple[bool, str]:
         now = now_ts()
 
         def mutate_create(data: dict[str, Any]) -> dict[str, Any]:
@@ -1201,7 +1416,7 @@ class BattleCog(commands.Cog):
         try:
             if interaction.channel is None:
                 raise RuntimeError("missing_channel")
-            await self._start_battle(interaction.channel, battle_id)
+            await self._start_battle(interaction.channel, battle_id, dm_mode=dm_mode)
             logger.info("[BATTLE_START] success mode=%s battle_id=%s c=%s o=%s", mode, battle_id, challenger_id, opponent_id)
             return True, "ok"
         except Exception as exc:
@@ -1256,14 +1471,14 @@ class BattleCog(commands.Cog):
             if not isinstance(target, dict):
                 return {"ok": False, "error": "no_match"}
 
-            return {"ok": True, "opp_id": str(target.get("user_id", ""))}
+            return {"ok": True, "opp_id": str(target.get("user_id", "")), "dm": bool(me.get("dm", False)) and bool(target.get("dm", False))}
 
         picked = self.bot.storage.with_lock(mutate_pick)
         if not picked.get("ok"):
             return False
 
         opp_id = str(picked.get("opp_id", ""))
-        ok, reason = await self.start_battle_or_fail(interaction, str(user_id), opp_id, "ranked")
+        ok, reason = await self.start_battle_or_fail(interaction, str(user_id), opp_id, "ranked", dm_mode=bool(picked.get("dm", False)))
         if not ok:
             logger.warning("[RANKED_MATCH_START] failed user=%s opp=%s reason=%s", user_id, opp_id, reason)
             data = await self._load_battle_data()
@@ -1410,30 +1625,41 @@ class BattleCog(commands.Cog):
         for battle_id, battle in list(active.items()):
             if not isinstance(battle, dict) or bool(battle.get("ended", False)):
                 continue
-            channel_id = int(str(battle.get("message_channel_id", "0")) or 0)
-            channel = self.bot.get_channel(channel_id)
-            if channel is None:
+            targets = self._battle_targets(battle)
+            if not targets:
                 continue
-            embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
-            if view is not None:
-                style_view(view, data)
-            msg = await channel.send(
-                embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None],
-                view=view,
-            )
-            if view is not None and hasattr(view, "message"):
-                view.message = msg
+            dm_mode_on = bool(battle.get("dm_mode", False))
+            new_refs: list[tuple[str, int, int]] = []
+            for t in targets:
+                channel = await self._resolve_target_channel(t)
+                if channel is None:
+                    continue
+                embed_a, embed_b, embed_c, view = self._build_embed_view(data, battle_id)
+                if view is not None:
+                    style_view(view, data)
+                msg = await channel.send(
+                    embeds=[e for e in (embed_a, embed_b, embed_c) if e is not None],
+                    view=view,
+                )
+                if view is not None and hasattr(view, "message"):
+                    view.message = msg
+                new_refs.append((str(t.get("user_id", "")), channel.id, msg.id))
+            if not new_refs:
+                continue
 
             # Persist new message IDs
-            def persist(bid: str = battle_id, cid: int = channel.id, mid: int = msg.id) -> None:
+            def persist(bid: str = battle_id, refs: list[tuple[str, int, int]] = new_refs, dm_on: bool = dm_mode_on) -> None:
                 def _save(d: dict[str, Any]) -> None:
                     b = self._battle_root(d).get("active", {}).get(bid)
                     if isinstance(b, dict):
-                        b["message_channel_id"] = str(cid)
-                        b["message_id"] = str(mid)
+                        if dm_on:
+                            b["dm_messages"] = {uid: {"channel_id": str(cid), "message_id": str(mid)} for uid, cid, mid in refs}
+                        else:
+                            b["message_channel_id"] = str(refs[0][1])
+                            b["message_id"] = str(refs[0][2])
                 return _save
 
-            self.bot.storage.with_lock(persist(battle_id, channel.id, msg.id))
+            self.bot.storage.with_lock(persist())
             refreshed_count += 1
 
         if summary["ended"] or summary["cleared"] or refreshed_count:
@@ -1464,7 +1690,7 @@ class BattleCog(commands.Cog):
             if not isinstance(me, dict):
                 return {"ok": False, "error": "not_queued"}
             root["queue"] = [q for q in queue if not (isinstance(q, dict) and str(q.get("user_id", "")) == str(user_id))]
-            return {"ok": True}
+            return {"ok": True, "dm": bool(me.get("dm", False))}
 
         popped = self.bot.storage.with_lock(mutate)
         if not popped.get("ok"):
@@ -1476,7 +1702,7 @@ class BattleCog(commands.Cog):
         self._cancel_ranked_queue_task(user_id)
         data = await self._load_battle_data()
         cpu = self._make_cpu_participant(data, self._player_trophies(data, user_id))
-        ok, reason = await self.start_battle_or_fail(interaction, str(user_id), cpu["cpu_key"], "ranked", cpu_opponent=cpu)
+        ok, reason = await self.start_battle_or_fail(interaction, str(user_id), cpu["cpu_key"], "ranked", dm_mode=bool(popped.get("dm", False)), cpu_opponent=cpu)
         if not ok:
             logger.warning("[RANKED_CPU_START] failed user=%s reason=%s", user_id, reason)
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Failed", str(reason)), ephemeral=True)
@@ -1493,7 +1719,11 @@ class BattleCog(commands.Cog):
         if not await ensure_registered(interaction, self.bot.storage):
             return
 
-        await interaction.response.defer(ephemeral=True, thinking=True)
+        try:
+            await interaction.response.defer(ephemeral=True, thinking=True)
+        except discord.NotFound:
+            logger.info("[BATTLE_CMD] /battle interaction expired before defer (user=%s)", interaction.user.id)
+            return
         uid = str(interaction.user.id)
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
@@ -1591,7 +1821,11 @@ class BattleCog(commands.Cog):
         # A friendly challenge performs storage/SQLite and channel work before
         # sending its confirmation.  Acknowledge immediately so the interaction
         # token remains valid; smart_reply will then use the follow-up webhook.
-        await interaction.response.defer(ephemeral=True, thinking=True)
+        try:
+            await interaction.response.defer(ephemeral=True, thinking=True)
+        except discord.NotFound:
+            logger.info("[BATTLE_CMD] /friendly interaction expired before defer (user=%s)", interaction.user.id)
+            return
         ok_route, reason, route_channel_id = check_battle_channel_allowed(interaction)
         if not ok_route:
             data = await self._load_battle_data()
@@ -1644,7 +1878,7 @@ class BattleCog(commands.Cog):
                     embed=make_embed(
                         data,
                         f"{e('friendly', data)} Friendly Challenge!",
-                        f"<@{cid}> has challenged <@{tid}> to a friendly battle!",
+                        f"<@{cid}> has challenged <@{tid}> to a friendly battle!\n✅ **Accept** to fight here — or **📩 Accept (DM)** to battle privately in your DMs.",
                         fields=[
                             (f"{e('timer', data)} Expires In", "60 seconds", True),
                             ("Type", "Friendly — No trophy change", True),
@@ -1750,7 +1984,7 @@ class BattleCog(commands.Cog):
         finally:
             self.friendly_cpu_tasks.pop(target, None)
 
-    async def accept_friendly(self, interaction: discord.Interaction, challenger_id: str, target_id: str) -> None:
+    async def accept_friendly(self, interaction: discord.Interaction, challenger_id: str, target_id: str, *, dm_mode: bool = False) -> None:
         challenger = str(challenger_id)
         acceptor = str(interaction.user.id)
         target = str(target_id)
@@ -1793,7 +2027,7 @@ class BattleCog(commands.Cog):
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Failed", str(reason)), ephemeral=True)
             return
 
-        ok, reason = await self.start_battle_or_fail(interaction, challenger, target, "friendly", clear_pending_target_id=target)
+        ok, reason = await self.start_battle_or_fail(interaction, challenger, target, "friendly", dm_mode=dm_mode, clear_pending_target_id=target)
         data = await self._load_battle_data()
         if not ok:
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Battle Failed", str(reason)), ephemeral=True)
@@ -1931,7 +2165,11 @@ class BattleCog(commands.Cog):
 
     @app_commands.command(name="forfeit", description="Forfeit your active battle.")
     async def forfeit(self, interaction: discord.Interaction) -> None:
-        await interaction.response.defer(ephemeral=True)
+        try:
+            await interaction.response.defer(ephemeral=True)
+        except discord.NotFound:
+            logger.info("[BATTLE_CMD] /forfeit interaction expired before defer (user=%s)", interaction.user.id)
+            return
         await self.forfeit_internal(interaction, str(interaction.user.id))
 
 

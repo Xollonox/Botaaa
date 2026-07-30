@@ -238,6 +238,11 @@ class FriendlyInviteView(discord.ui.View):
         await defer_component_update(interaction)
         await self.cog.accept_friendly(interaction, self.challenger_id, self.target_id)
 
+    @discord.ui.button(label="\U0001F4E9 Accept (DM)", style=discord.ButtonStyle.primary)
+    async def accept_dm(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
+        await defer_component_update(interaction)
+        await self.cog.accept_friendly(interaction, self.challenger_id, self.target_id, dm_mode=True)
+
     @discord.ui.button(label="❌ Decline", style=discord.ButtonStyle.danger)
     async def decline(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         self.cog._remove_pending_friendly_state(self.target_id, cancel_task=True)
@@ -308,6 +313,30 @@ class RankedQueueView(discord.ui.View):
                     await interaction.message.edit(view=self)
                 except Exception:
                     logger.exception("[RANKED_QUEUE_VIEW] failed to disable CPU button view user=%s", self.user_id)
+
+    @discord.ui.button(label="\U0001F4E9 DM Mode", style=discord.ButtonStyle.secondary, row=0)
+    async def dm_mode_button(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
+        """Toggle DM battles for this queue entry; ranked match goes to DMs only if BOTH players enabled it."""
+        uid = self.user_id
+
+        def mutate(data: dict) -> Any:
+            root = self.cog._battle_root(data)
+            for q in root.get("queue", []):
+                if isinstance(q, dict) and str(q.get("user_id", "")) == uid:
+                    q["dm"] = not bool(q.get("dm", False))
+                    return bool(q["dm"])
+            return None
+
+        dm_on = self.cog.bot.storage.with_lock(mutate)
+        data = self.cog.bot.storage.load()
+        if dm_on is None:
+            await smart_reply(interaction, embed=make_embed(data, f"{e('info', data)} Not Queued", "You are not currently in the ranked queue."), ephemeral=True)
+            return
+        if dm_on:
+            note = "DM Mode is **ON** — if your next match also has it on, the battle plays out privately in your DMs."
+        else:
+            note = "DM Mode is **OFF** — battles will play out in the channel."
+        await smart_reply(interaction, embed=make_embed(data, f"{e('ok', data)} DM Mode {'ON' if dm_on else 'OFF'}", note), ephemeral=True)
 
     @discord.ui.button(label="Forfeit", style=discord.ButtonStyle.danger, row=0)
     async def forfeit_button(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
