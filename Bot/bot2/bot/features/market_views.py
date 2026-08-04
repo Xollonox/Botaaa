@@ -176,7 +176,7 @@ class BuyConfirmView(discord.ui.View):
             return True, "ok", False
 
         try:
-            ok, reason, delete_player_listing = self.cog.bot.storage.with_lock(mutate)
+            ok, reason, delete_player_listing = await self.cog.bot.storage.with_lock(mutate)
         except Exception:
             if claimed_player_listing and isinstance(prefetched_listing, dict):
                 await self.cog.bot.market_service.upsert_listing(self.listing_id, prefetched_listing)

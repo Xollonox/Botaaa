@@ -217,7 +217,9 @@ class TradePanel(discord.ui.View):
         for child in list(self.children):
             self.remove_item(child)
 
-        data = self.cog.bot.storage.load()
+        # Read-only fast path: _rebuild only reads inventory to populate the
+        # card-select dropdowns, never mutates — safe to stay synchronous.
+        data = self.cog.bot.storage.load_readonly()
         a_opts = self._card_opts(data, self.a_id)
         b_opts = self._card_opts(data, self.b_id)
 
@@ -326,7 +328,7 @@ class TradePanel(discord.ui.View):
             t = _trade_root(data)
             t["pending"].pop(self.a_id, None)
             t["pending"].pop(self.b_id, None)
-        self.cog.bot.storage.with_lock(mutate)
+        await self.cog.bot.storage.with_lock(mutate)
         await self.cog.bot.trade_service.remove_pending_pair(self.a_id, self.b_id, mirror_json=False)
         self.cog.unregister_panel(self)
         if self.message:
@@ -349,7 +351,7 @@ class TradePanel(discord.ui.View):
         if uid == "none":
             await interaction.response.defer()
             return
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         player = get_player(data, self.a_id)
         inv = player.get("user", {}).get("inventory", []) if player else []
         card = next((i for i in inv if isinstance(i, dict) and str(i.get("uid","")) == uid), None)
@@ -367,7 +369,7 @@ class TradePanel(discord.ui.View):
         if uid == "none":
             await interaction.response.defer()
             return
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         player = get_player(data, self.b_id)
         inv = player.get("user", {}).get("inventory", []) if player else []
         card = next((i for i in inv if isinstance(i, dict) and str(i.get("uid","")) == uid), None)
@@ -434,7 +436,7 @@ class TradePanel(discord.ui.View):
             t = _trade_root(data)
             t["pending"].pop(self.a_id, None)
             t["pending"].pop(self.b_id, None)
-        self.cog.bot.storage.with_lock(mutate)
+        await self.cog.bot.storage.with_lock(mutate)
         await self.cog.bot.trade_service.remove_pending_pair(self.a_id, self.b_id, mirror_json=False)
         self.cog.unregister_panel(self)
         self.stop()
@@ -528,7 +530,7 @@ class ConfirmView(discord.ui.View):
             t["pending"].pop(b_id, None)
             return True, "ok"
 
-        ok, reason = self.cog.bot.storage.with_lock(mutate)
+        ok, reason = await self.cog.bot.storage.with_lock(mutate)
         if ok:
             try:
                 await self.cog.bot.trade_service.append_history({
@@ -595,7 +597,7 @@ class ConfirmView(discord.ui.View):
             t = _trade_root(data)
             t["pending"].pop(self.panel.a_id, None)
             t["pending"].pop(self.panel.b_id, None)
-        self.cog.bot.storage.with_lock(mutate)
+        await self.cog.bot.storage.with_lock(mutate)
         await self.cog.bot.trade_service.remove_pending_pair(self.panel.a_id, self.panel.b_id, mirror_json=False)
         self.cog.unregister_panel(self.panel)
         self.stop()

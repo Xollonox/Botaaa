@@ -24,7 +24,7 @@ class TradeService:
         if await self.repo.has_persisted_state():
             await self.repo.mark_json_bootstrap_completed()
             return
-        data = self.storage.load()
+        data = await self.storage.load()
         trades = data.get("trades", {})
         if not isinstance(trades, dict):
             trades = {"pending": {}, "history": []}
@@ -44,7 +44,7 @@ class TradeService:
         if not inserted:
             return False
         if mirror_json:
-            self.storage.with_lock(
+            await self.storage.with_lock(
                 lambda d: d.setdefault("trades", {}).setdefault("pending", {}).update(
                     {str(a_id): True, str(b_id): True}
                 )
@@ -54,14 +54,14 @@ class TradeService:
     async def remove_pending(self, user_id: str, *, mirror_json: bool = True) -> bool:
         ok = await self.repo.remove_pending(user_id)
         if ok and mirror_json:
-            self.storage.with_lock(lambda d: d.setdefault("trades", {}).setdefault("pending", {}).pop(str(user_id), None))
+            await self.storage.with_lock(lambda d: d.setdefault("trades", {}).setdefault("pending", {}).pop(str(user_id), None))
         return ok
 
     async def remove_pending_pair(self, a_id: str, b_id: str, *, mirror_json: bool = True) -> None:
         await self.repo.remove_pending_pair(a_id, b_id)
         if not mirror_json:
             return
-        self.storage.with_lock(
+        await self.storage.with_lock(
             lambda d: (
                 d.setdefault("trades", {}).setdefault("pending", {}).pop(str(a_id), None),
                 d.setdefault("trades", {}).setdefault("pending", {}).pop(str(b_id), None),
@@ -70,7 +70,7 @@ class TradeService:
 
     async def clear_pending(self) -> int:
         count = await self.repo.clear_pending()
-        self.storage.with_lock(lambda d: d.setdefault("trades", {}).__setitem__("pending", {}))
+        await self.storage.with_lock(lambda d: d.setdefault("trades", {}).__setitem__("pending", {}))
         return count
 
     @staticmethod
@@ -81,7 +81,7 @@ class TradeService:
 
     async def append_history(self, row: dict[str, Any]) -> None:
         await self.repo.append_history(row)
-        self.storage.with_lock(lambda d: self._json_truncate_history(d, row))
+        await self.storage.with_lock(lambda d: self._json_truncate_history(d, row))
 
     async def history_for_user(self, user_id: str, limit: int = 20) -> list[dict[str, Any]]:
         return await self.repo.recent_history_for_user(user_id, limit=max(1, limit))
@@ -141,5 +141,5 @@ class TradeService:
                         item["trade_locked"] = False
                         break
 
-        self.storage.with_lock(unlock)
+        await self.storage.with_lock(unlock)
         return expired

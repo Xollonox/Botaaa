@@ -18,7 +18,7 @@ class MarketService:
         if await self.repo.has_persisted_state():
             await self.repo.mark_json_bootstrap_completed()
             return
-        data = self.storage.load()
+        data = await self.storage.load()
         ensure_market_structure(data)
         market = data.get("market", {})
         if not isinstance(market, dict):
@@ -31,19 +31,19 @@ class MarketService:
 
     async def set_enabled(self, enabled: bool) -> None:
         await self.repo.update_setting("enabled", bool(enabled))
-        self.storage.with_lock(
+        await self.storage.with_lock(
             lambda d: ensure_market_structure(d)["market"]["settings"].__setitem__("enabled", bool(enabled))
         )
 
     async def set_fee_percent(self, fee_percent: int) -> None:
         await self.repo.update_setting("fee_percent", int(fee_percent))
-        self.storage.with_lock(
+        await self.storage.with_lock(
             lambda d: ensure_market_structure(d)["market"]["settings"].__setitem__("fee_percent", int(fee_percent))
         )
 
     async def set_max_listings(self, max_listings_per_user: int) -> None:
         await self.repo.update_setting("max_listings_per_user", int(max_listings_per_user))
-        self.storage.with_lock(
+        await self.storage.with_lock(
             lambda d: ensure_market_structure(d)["market"]["settings"].__setitem__(
                 "max_listings_per_user", int(max_listings_per_user)
             )
@@ -61,7 +61,7 @@ class MarketService:
             items[card_name] = {"price": price, "stock": int(stock), "enabled": True}
             return True, "ok", price
 
-        ok, reason, price = self.storage.with_lock(mutate)
+        ok, reason, price = await self.storage.with_lock(mutate)
         if not ok:
             return ok, reason
         await self.repo.set_store_item(card_name=card_name, price=price, stock=int(stock), enabled=True)
@@ -69,7 +69,7 @@ class MarketService:
 
     async def remove_store_item(self, card_name: str) -> None:
         await self.repo.remove_store_item(card_name)
-        self.storage.with_lock(lambda d: ensure_market_structure(d)["market"]["store"]["items"].pop(card_name, None))
+        await self.storage.with_lock(lambda d: ensure_market_structure(d)["market"]["store"]["items"].pop(card_name, None))
 
     async def toggle_store_item(self, card_name: str, enabled: bool) -> tuple[bool, str]:
         ok = await self.repo.toggle_store_item(card_name, enabled)
@@ -85,7 +85,7 @@ class MarketService:
             row["enabled"] = bool(enabled)
             return True, "ok"
 
-        return self.storage.with_lock(mutate)
+        return await self.storage.with_lock(mutate)
 
     async def get_settings(self) -> dict[str, Any]:
         return await self.repo.get_settings()
@@ -123,4 +123,4 @@ class MarketService:
             ensure_market_structure(d)
             d["market"]["settings"].setdefault("quick_sell_values", {})[str(rarity)] = int(value)
 
-        self.storage.with_lock(mutate)
+        await self.storage.with_lock(mutate)

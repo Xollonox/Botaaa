@@ -46,7 +46,7 @@ class TradesCog(commands.Cog):
         self.bot.tree.remove_command(self.trade_group.name, type=self.trade_group.type)
 
     async def _load_trade_data(self) -> dict[str, Any]:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         return await self.bot.trade_service.hydrate_json_trade_state(data)
 
     def register_panel(self, panel: TradePanel) -> None:
@@ -102,7 +102,7 @@ class TradeGroup(app_commands.Group):
             pending[b_id] = True
 
         try:
-            self.cog.bot.storage.with_lock(_mirror_pending)
+            await self.cog.bot.storage.with_lock(_mirror_pending)
         except Exception:
             # JSON mutation failed — roll back the SQLite insert so state is consistent.
             await self.cog.bot.trade_service.remove_pending_pair(a_id, b_id, mirror_json=False)
@@ -144,7 +144,7 @@ class TradeGroup(app_commands.Group):
                 pending.pop(panel.a_id, None)
                 pending.pop(panel.b_id, None)
 
-            self.cog.bot.storage.with_lock(mutate)
+            await self.cog.bot.storage.with_lock(mutate)
             await self.cog.bot.trade_service.remove_pending_pair(panel.a_id, panel.b_id, mirror_json=False)
             self.cog.unregister_panel(panel)
             panel.stop()
@@ -223,14 +223,14 @@ class TradeGroup(app_commands.Group):
                             return True
             return False
 
-        if not self.cog.bot.storage.with_lock(lock_card):
+        if not await self.cog.bot.storage.with_lock(lock_card):
             await smart_reply(interaction, embed=make_embed(None, "❌ Card Not Available", "That card is no longer available."), ephemeral=True)
             return
         try:
             await self.cog.bot.trade_service.post_offer(offer_id, user_id, str(interaction.user.display_name), have_card, want_card, item_uid, now, expires_at)
         except Exception:
             logger.exception("Failed to persist trade-board offer %s; unlocking card", offer_id)
-            self.cog.bot.storage.with_lock(
+            await self.cog.bot.storage.with_lock(
                 lambda d: _unlock(
                     (get_player(d, user_id) or {}).get("user", {}).get("inventory", []),
                     item_uid,
@@ -373,7 +373,7 @@ class TradeGroup(app_commands.Group):
             return True, "ok"
 
         try:
-            ok, msg = self.cog.bot.storage.with_lock(execute_trade)
+            ok, msg = await self.cog.bot.storage.with_lock(execute_trade)
         except Exception:
             logger.exception("Failed to execute claimed offer %s", offer_id)
             try:
@@ -414,7 +414,7 @@ class TradeGroup(app_commands.Group):
                 if isinstance(receipt.get("want_item"), dict):
                     acceptor_inv.append(deepcopy(receipt["want_item"]))
 
-            self.cog.bot.storage.with_lock(rollback)
+            await self.cog.bot.storage.with_lock(rollback)
             try:
                 await self.cog.bot.trade_service.finish_offer(offer_id, accepted=False)
             except Exception:
@@ -461,7 +461,7 @@ class TradeGroup(app_commands.Group):
                 if isinstance(inventory, list):
                     _unlock(inventory, item_uid)
 
-        self.cog.bot.storage.with_lock(unlock_card)
+        await self.cog.bot.storage.with_lock(unlock_card)
         await smart_reply(interaction, embed=make_embed(None, "✅ Cancelled", "Your trade offer has been cancelled."), ephemeral=True)
 
 

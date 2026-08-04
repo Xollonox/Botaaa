@@ -78,7 +78,7 @@ class MarketCog(commands.Cog):
         self.bot.tree.remove_command(self.market_group.name, type=self.market_group.type)
 
     async def _load_market_data(self) -> dict[str, Any]:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         return await self.bot.market_service.hydrate_json_market_listings(data)
 
     @app_commands.command(name="o_feature_card", description="Owner: set the featured card of the day.")
@@ -118,7 +118,7 @@ class MarketCog(commands.Cog):
                 "expires_at":  now_ts() + expires_hours * 3600,
             }
 
-        self.bot.storage.with_lock(mutate)
+        await self.bot.storage.with_lock(mutate)
         stock_text = "∞ Unlimited" if stock == -1 else str(stock)
         body = (
             f"╭─ ⭐ Featured Card Set\n"
@@ -173,7 +173,7 @@ class MarketCog(commands.Cog):
                 "expires_at":  now_ts() + expires_hours * 3600,
             }
 
-        self.bot.storage.with_lock(mutate)
+        await self.bot.storage.with_lock(mutate)
         stock_text = "∞ Unlimited" if stock == -1 else str(stock)
         body = (
             f"╭─ 🎁 Special Offer Set\n"
@@ -232,7 +232,7 @@ class MarketCog(commands.Cog):
             return False, False
 
         try:
-            ok, _should_delete_sqlite = self.bot.storage.with_lock(mutate)
+            ok, _should_delete_sqlite = await self.bot.storage.with_lock(mutate)
         except Exception:
             await self.bot.market_service.upsert_listing(listing_id, claimed_payload)
             raise
@@ -339,7 +339,7 @@ class MarketGroup(app_commands.Group):
             m["listings"][lid] = listing_payload
             return True, rarity, lid, listing_payload
 
-        ok, result, listing_id, listing_payload = self.cog.bot.storage.with_lock(mutate)
+        ok, result, listing_id, listing_payload = await self.cog.bot.storage.with_lock(mutate)
         if ok and listing_payload is not None:
             try:
                 await self.cog.bot.market_service.upsert_listing(listing_id, listing_payload)
@@ -360,7 +360,7 @@ class MarketGroup(app_commands.Group):
                             item["market_locked"] = False
                             break
 
-                self.cog.bot.storage.with_lock(rollback)
+                await self.cog.bot.storage.with_lock(rollback)
                 await smart_reply(
                     interaction,
                     embed=make_embed(None, "❌ Listing Failed", "Market storage failed. Your card was not listed."),
@@ -480,7 +480,7 @@ class MarketGroup(app_commands.Group):
             return True, str(l.get("card_name", card_name)), str(lid)
 
         try:
-            ok, result, _removed_lid = self.cog.bot.storage.with_lock(mutate)
+            ok, result, _removed_lid = await self.cog.bot.storage.with_lock(mutate)
         except Exception:
             await self.cog.bot.market_service.upsert_listing(str(claimed_lid), claimed_payload)
             raise
