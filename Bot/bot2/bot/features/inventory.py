@@ -198,6 +198,11 @@ class UpgradeConfirmView(discord.ui.View):
 
     @discord.ui.button(label="✅ Confirm Upgrade", style=discord.ButtonStyle.success)
     async def confirm(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
+        try:
+            await interaction.response.defer()
+        except (discord.NotFound, discord.HTTPException):
+            pass
+
         status, stars, coins = await self.cog._perform_upgrade(str(interaction.user.id), self.uid)
         data = await self.cog.bot.storage.load()
         sep = e("line", data)
@@ -263,18 +268,44 @@ class UpgradeConfirmView(discord.ui.View):
                 (f"{e('coin', data)} Remaining Coins", f"**{coins:,}**", True),
             ],
         )
-        await interaction.response.edit_message(embed=embed, view=self)
+        try:
+            if interaction.response.is_done():
+                await interaction.edit_original_response(embed=embed, view=self)
+            else:
+                await interaction.response.edit_message(embed=embed, view=self)
+        except discord.NotFound:
+            if interaction.message:
+                try:
+                    await interaction.message.edit(embed=embed, view=self)
+                except discord.HTTPException:
+                    pass
+        except discord.HTTPException:
+            pass
 
     @discord.ui.button(label="❌ Cancel", style=discord.ButtonStyle.danger)
     async def cancel(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
+        try:
+            await interaction.response.defer()
+        except (discord.NotFound, discord.HTTPException):
+            pass
         for child in self.children:
             if isinstance(child, discord.ui.Button):
                 child.disabled = True
         data = await self.cog.bot.storage.load()
-        await interaction.response.edit_message(
-            embed=make_embed(data, f"{e('info', data)} Upgrade Cancelled", "No changes were made to this card."),
-            view=self,
-        )
+        embed = make_embed(data, f"{e('info', data)} Upgrade Cancelled", "No changes were made to this card.")
+        try:
+            if interaction.response.is_done():
+                await interaction.edit_original_response(embed=embed, view=self)
+            else:
+                await interaction.response.edit_message(embed=embed, view=self)
+        except discord.NotFound:
+            if interaction.message:
+                try:
+                    await interaction.message.edit(embed=embed, view=self)
+                except discord.HTTPException:
+                    pass
+        except discord.HTTPException:
+            pass
 
 
 class CollectionDetailView(discord.ui.View):

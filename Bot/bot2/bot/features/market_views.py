@@ -215,7 +215,19 @@ class BuyConfirmView(discord.ui.View):
         for child in self.children:
             if hasattr(child, "disabled"):
                 child.disabled = True
-        await interaction.response.edit_message(embed=embed, view=self)
+        try:
+            if interaction.response.is_done():
+                await interaction.edit_original_response(embed=embed, view=self)
+            else:
+                await interaction.response.edit_message(embed=embed, view=self)
+        except discord.NotFound:
+            if interaction.message:
+                try:
+                    await interaction.message.edit(embed=embed, view=self)
+                except discord.HTTPException:
+                    pass
+        except discord.HTTPException:
+            pass
 
     @discord.ui.button(label="✖ Cancel", style=discord.ButtonStyle.danger, row=0)
     async def cancel(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
