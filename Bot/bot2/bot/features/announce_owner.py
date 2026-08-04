@@ -158,7 +158,7 @@ class AnnounceOwnerCog(commands.Cog):
         embed = make_embed(
             data,
             "🎯 WANTED: BOUNTY BOARD",
-            f"**@{target_name}** is on a **{max_streak}-win streak**!\n\nFirst to beat them earns **3,000 bonus coins**!",
+            f"**<@{target_id}>** is on a **{max_streak}-win streak**!\n\nFirst to beat them earns **3,000 bonus coins**!",
         )
         embed.set_footer(text="Bounty Board")
         try:

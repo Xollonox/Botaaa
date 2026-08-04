@@ -150,20 +150,22 @@ def _panel_embed(session: dict[str, Any], locked_a: bool, locked_b: bool) -> dis
     a_text = side_text(session.get("a_card"), session.get("a_coins"), locked_a)
     b_text = side_text(session.get("b_card"), session.get("b_coins"), locked_b)
 
+    a_id = session.get("a_id", "")
+    b_id = session.get("b_id", "")
     if locked_a and locked_b:
         status = "✅ Both sides ready — confirm to complete!"
     elif locked_a:
-        status = f"🔒 @{a_name} locked in — waiting for @{b_name}..."
+        status = f"🔒 <@{a_id}> locked in — waiting for <@{b_id}>..."
     elif locked_b:
-        status = f"🔒 @{b_name} locked in — waiting for @{a_name}..."
+        status = f"🔒 <@{b_id}> locked in — waiting for <@{a_id}>..."
     else:
         status = "⏳ Both sides choose what to offer..."
 
     body = (
         f"╭─ 🔄 Trade Negotiation\n"
-        f"│ @{a_name}  ←→  @{b_name}\n"
+        f"│ <@{a_id}>  ←→  <@{b_id}>\n"
         f"│\n"
-        f"│ @{a_name} offers:        @{b_name} offers:\n"
+        f"│ <@{a_id}> offers:        <@{b_id}> offers:\n"
         f"│ {a_text:<28} {b_text}\n"
         f"│\n"
         f"│ {status}\n"
@@ -612,8 +614,8 @@ class ConfirmView(discord.ui.View):
         b_gave = f"{_ri(s['b_card']['rarity'])} {s['b_card']['card_name']}" if s.get("b_card") else f"💰 {int(s.get('b_coins',0)):,} coins"
         body = (
             f"╭─ ✅ Trade Complete!\n"
-            f"│ @{s['a_name']} gave:  {a_gave}\n"
-            f"│ @{s['b_name']} gave:  {b_gave}\n"
+            f"│ <@{s['a_id']}> gave:  {a_gave}\n"
+            f"│ <@{s['b_id']}> gave:  {b_gave}\n"
             "╰────────────────"
         )
         embed = make_embed(None, "LOOKISM CG • TRADE", body, color=0x2ECC71)
@@ -653,7 +655,7 @@ class ConfirmView(discord.ui.View):
         await self.cog.bot.trade_service.remove_pending_pair(self.panel.a_id, self.panel.b_id, mirror_json=False)
         self.cog.unregister_panel(self.panel)
         self.stop()
-        e = make_embed(None, "LOOKISM CG • TRADE", f"╭─ 🚫 Trade Cancelled\n│ Cancelled by @{interaction.user.name}\n╰────────────────", color=0xE74C3C)
+        e = make_embed(None, "LOOKISM CG • TRADE", f"╭─ 🚫 Trade Cancelled\n│ Cancelled by {interaction.user.mention}\n╰────────────────", color=0xE74C3C)
         await _update_trade_message(interaction, embed=e, view=None, prefer_message=True)
 
 
@@ -667,11 +669,12 @@ def _history_embed_rows(user_id: str, username: str, rows: list[dict[str, Any]])
     lines = []
     for i, h in enumerate(mine[:10], 1):
         icon  = STATUS_ICONS.get(str(h.get("status", "")), "•")
-        other = str(h.get("b_name", "?")) if str(h.get("a_id", "")) == user_id else str(h.get("a_name", "?"))
+        other_id = str(h.get("b_id", "")) if str(h.get("a_id", "")) == user_id else str(h.get("a_id", ""))
+        other = f"<@{other_id}>" if other_id else str(h.get("b_name", "?"))
         ts    = int(h.get("resolved_at", h.get("created_at", 0)))
         a_gave = f"{h['a_card']['card_name']}" if h.get("a_card") else f"💰{int(h.get('a_coins',0)):,}"
         b_gave = f"{h['b_card']['card_name']}" if h.get("b_card") else f"💰{int(h.get('b_coins',0)):,}"
-        lines.append(f"│ {i}. {icon} {a_gave} ↔ {b_gave}  •  @{other}  •  {_ago(ts)}")
+        lines.append(f"│ {i}. {icon} {a_gave} ↔ {b_gave}  •  {other}  •  {_ago(ts)}")
 
-    body = f"╭─ 📜 Trade History — @{username}\n" + "\n".join(lines) + "\n╰────────────────"
+    body = f"╭─ 📜 Trade History — <@{user_id}>\n" + "\n".join(lines) + "\n╰────────────────"
     return make_embed(None, "LOOKISM CG • TRADE", body, color=0x2B2D31, footer="Last 10 trades")

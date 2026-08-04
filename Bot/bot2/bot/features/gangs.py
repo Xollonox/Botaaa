@@ -439,7 +439,7 @@ class GangsCog(commands.Cog):
             return
         await smart_reply(interaction, embed=_ok(
             f"╭─ 🚫 Member Kicked\n"
-            f"│ @{result} removed from **{gang_name}**\n"
+            f"│ <@{target}> removed from **{gang_name}**\n"
             f"│ By: {interaction.user.mention}\n"
             "╰────────────────"
         ))
@@ -485,7 +485,7 @@ class GangsCog(commands.Cog):
         icon = ROLE_ICONS.get(role.value, "•")
         await smart_reply(interaction, embed=_ok(
             f"╭─ ⬆️ Member Promoted\n"
-            f"│ @{name} → {icon} {role_label}\n"
+            f"│ <@{target}> → {icon} {role_label}\n"
             f"│ By: {interaction.user.mention}\n"
             "╰────────────────"
         ))
@@ -523,7 +523,7 @@ class GangsCog(commands.Cog):
             return
         await smart_reply(interaction, embed=_ok(
             f"╭─ ⬇️ Member Demoted\n"
-            f"│ @{result} → 👤 Member\n"
+            f"│ <@{target}> → 👤 Member\n"
             f"│ By: {interaction.user.mention}\n"
             "╰────────────────"
         ))
@@ -592,7 +592,7 @@ class GangsCog(commands.Cog):
             return
         await smart_reply(interaction, embed=_ok(
             f"╭─ 👑 Ownership Transferred\n"
-            f"│ New Head: @{result}\n"
+            f"│ New Head: <@{target}>\n"
             f"│ Previous Head: {interaction.user.mention}\n"
             "╰────────────────"
         ))

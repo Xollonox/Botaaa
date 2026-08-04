@@ -47,7 +47,8 @@ class LeaderboardPanel(discord.ui.View):
         lines = []
         for idx, row in enumerate(chunk, start=start + 1):
             trophies = int(row.get("trophies", 0))
-            name = row.get("name", row.get("user_id", "?"))
+            uid = str(row.get("user_id", ""))
+            name = f"<@{uid}>" if uid else str(row.get("name", "?"))
             rank = row.get("rank", "")
             extra = f" · {rank}" if rank else ""
             lines.append(f"{idx}. {name}{extra} · 🏆 {trophies}")
@@ -142,7 +143,7 @@ class LeaderboardsCog(commands.Cog):
                 out.append(
                     {
                         "user_id": str(uid),
-                        "name": str(user.get("name", uid)),
+                        "name": f"<@{uid}>",
                         "rank": str(user.get("rank", "Copper")),
                         "trophies": int(user.get("trophies", 0)),
                     }

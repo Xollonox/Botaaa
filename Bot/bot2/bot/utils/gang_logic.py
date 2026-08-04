@@ -130,15 +130,4 @@ def format_member_line(data: dict[str, Any], gang: dict[str, Any], user_id: str)
     uid     = str(user_id)
     icon    = get_role_icon(gang, uid)
     label   = get_role_label(gang, uid)
-    players = data.get("players", {})
-    player  = players.get(uid, {}) if isinstance(players, dict) else {}
-    user    = player.get("user", {}) if isinstance(player, dict) else {}
-    # Try name first, then username, then Discord mention as last resort
-    name = None
-    if isinstance(user, dict):
-        name = user.get("name") or user.get("username") or user.get("display_name")
-    if not name or str(name).strip() == uid:
-        name = f"<@{uid}>"  # Discord mention so it shows properly
-    else:
-        name = f"@{str(name).strip()}"
-    return f"{icon} {label:<12} {name}"
+    return f"{icon} {label:<12} <@{uid}>"
