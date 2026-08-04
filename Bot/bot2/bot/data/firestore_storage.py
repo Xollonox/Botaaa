@@ -52,6 +52,15 @@ def _sanitize_for_firestore(value: Any, path: str = "root") -> Any:
     return str(value)
 
 
+class _AwaitableDict(dict):
+    """Dictionary subclass that can be awaited directly in async contexts."""
+
+    def __await__(self):
+        async def _dummy():
+            return self
+        return _dummy().__await__()
+
+
 class FirestoreStorage:
     """Thread-safe Firestore-backed storage matching ``Storage``'s public API."""
 
@@ -97,11 +106,10 @@ class FirestoreStorage:
     # ------------------------------------------------------------------
 
     def _sync_load(self) -> dict[str, Any]:
-        return deepcopy(self._live_data())
+        return _AwaitableDict(deepcopy(self._live_data()))
 
-    async def load(self) -> dict[str, Any]:
-        loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(None, self._sync_load)
+    def load(self) -> dict[str, Any]:
+        return _AwaitableDict(deepcopy(self._live_data()))
 
     def load_readonly(self) -> dict[str, Any]:
         return self._live_data()
