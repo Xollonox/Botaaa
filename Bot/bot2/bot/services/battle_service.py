@@ -18,7 +18,7 @@ class BattleService:
         if await self.repo.has_persisted_state():
             await self.repo.mark_json_bootstrap_completed()
             return
-        data = self.storage.load()
+        data = await self.storage.load()
         battle = data.get("battle", {})
         if not isinstance(battle, dict):
             battle = {"queue": [], "pending_friendly": {}, "active": {}, "active_by_user": {}}

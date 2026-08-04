@@ -43,7 +43,7 @@ class AttackSelect(discord.ui.Select):
             await self.cog.resolve_selected_attack(interaction, self.battle_id, actual_actor, self.values[0])
         except Exception:
             logger.exception("[BATTLE_CALLBACK_ERROR] battle_id=%s actor=%s", self.battle_id, self.actor_id)
-            data = self.cog.bot.storage.load()
+            data = await self.cog.bot.storage.load()
             await smart_reply(
                 interaction,
                 embed=make_embed(data, f"{e('warning', data)} Battle State Error", "A battle state error occurred."),
@@ -76,7 +76,7 @@ class DefenseSelect(discord.ui.Select):
             await self.cog.resolve_selected_attack(interaction, self.battle_id, actual_actor, self.values[0])
         except Exception:
             logger.exception("[BATTLE_CALLBACK_ERROR] battle_id=%s actor=%s", self.battle_id, self.actor_id)
-            data = self.cog.bot.storage.load()
+            data = await self.cog.bot.storage.load()
             await smart_reply(
                 interaction,
                 embed=make_embed(data, f"{e('warning', data)} Battle State Error", "A battle state error occurred."),
@@ -109,7 +109,7 @@ class SwitchSelect(discord.ui.Select):
             await self.cog.resolve_move(interaction, self.battle_id, actual_actor, "switch", self.values[0])
         except Exception:
             logger.exception("[BATTLE_CALLBACK_ERROR] battle_id=%s actor=%s", self.battle_id, self.actor_id)
-            data = self.cog.bot.storage.load()
+            data = await self.cog.bot.storage.load()
             await battle_warn(
                 interaction,
                 make_embed(data, f"{e('warning', data)} Battle State Error", "A battle state error occurred."),
@@ -135,7 +135,7 @@ class ForfeitButton(discord.ui.Button):
             await self.cog.forfeit_internal(interaction, str(interaction.user.id))
         except Exception:
             logger.exception("[BATTLE_FORFEIT_ERROR] battle_id=%s actor=%s", self.battle_id, self.actor_id)
-            data = self.cog.bot.storage.load()
+            data = await self.cog.bot.storage.load()
             await smart_reply(
                 interaction,
                 embed=make_embed(data, f"{e('warning', data)} Battle State Error", "A battle state error occurred."),
@@ -171,7 +171,7 @@ class TurnView(discord.ui.View):
         self.add_item(ForfeitButton(cog, battle_id, actor_id))
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         battle = self.cog._battle_root(data).get("active", {}).get(self.battle_id)
         if not isinstance(battle, dict):
             await battle_warn(
@@ -205,7 +205,7 @@ class FriendlyInviteView(discord.ui.View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if str(interaction.user.id) != self.target_id:
-            data = self.cog.bot.storage.load()
+            data = await self.cog.bot.storage.load()
             await smart_reply(
                 interaction,
                 embed=make_embed(data, f"{e('warning', data)} Not Your Invite", "Only the challenged player can respond to this invite."),
@@ -220,7 +220,7 @@ class FriendlyInviteView(discord.ui.View):
             if hasattr(child, "disabled"):
                 child.disabled = True
         if self.message:
-            data = self.cog.bot.storage.load()
+            data = await self.cog.bot.storage.load()
             try:
                 await self.message.edit(
                     embed=make_embed(
@@ -244,7 +244,7 @@ class FriendlyInviteView(discord.ui.View):
         for child in self.children:
             if hasattr(child, "disabled"):
                 child.disabled = True
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         await smart_reply(
             interaction,
             embed=make_embed(data, f"{e('no', data)} Challenge Declined", "The friendly challenge has been declined."),
@@ -275,7 +275,7 @@ class RankedQueueView(discord.ui.View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if str(interaction.user.id) != self.user_id:
-            data = self.cog.bot.storage.load()
+            data = await self.cog.bot.storage.load()
             await smart_reply(
                 interaction,
                 embed=make_embed(data, f"{e('warning', data)} Not Your Queue", "Only the queued player can use these buttons."),
