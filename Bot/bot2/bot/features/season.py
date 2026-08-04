@@ -235,7 +235,8 @@ class PassPanel(discord.ui.View):
 
     def _rebuild(self) -> None:
         for child in list(self.children): self.remove_item(child)
-        data  = self.cog.bot.storage.load()
+        # Read-only fast path: only builds UI options from tier/pass data, never mutates.
+        data  = self.cog.bot.storage.load_readonly()
         s     = _season_root(data)
         tiers = sorted((s.get("pass_tiers", {}) or {}).items(),
                        key=lambda x: int(x[1].get("cp_required", 0)))
@@ -263,7 +264,8 @@ class PassPanel(discord.ui.View):
             self.add_item(buy)
 
     def _build_embed(self) -> discord.Embed:
-        data      = self.cog.bot.storage.load()
+        # Read-only fast path: only reads CP/tier/claim state to render the embed, never mutates.
+        data      = self.cog.bot.storage.load_readonly()
         s         = _season_root(data)
         uid       = self.uid
         my_cp     = _get_player_cp(data, uid)
@@ -332,7 +334,7 @@ class PassPanel(discord.ui.View):
         await interaction.response.edit_message(embed=self._build_embed(), view=self)
 
     async def _on_next(self, interaction: discord.Interaction) -> None:
-        data  = self.cog.bot.storage.load()
+        data  = await self.cog.bot.storage.load()
         s     = _season_root(data)
         tiers = (s.get("pass_tiers", {}) or {})
         total = max(1, (len(tiers) + 4) // 5)
@@ -353,7 +355,7 @@ class PassPanel(discord.ui.View):
             u["premium_balance"] = gems - PASS_COST
             u.setdefault("season_pass_paid", {})[sn] = True
             return True, "ok"
-        ok, msg = self.cog.bot.storage.with_lock(mutate)
+        ok, msg = await self.cog.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message(msg, ephemeral=True)
             return
@@ -392,7 +394,7 @@ class PassPanel(discord.ui.View):
                     rewards_given.append(desc)
                     count += 1
             return count, rewards_given
-        count, rewards = self.cog.bot.storage.with_lock(mutate)
+        count, rewards = await self.cog.bot.storage.with_lock(mutate)
         if count == 0:
             await interaction.response.send_message("Nothing to claim right now.", ephemeral=True)
             return
@@ -518,8 +520,8 @@ class MissionPanel(discord.ui.View):
                 count    += 1
             return count, total_cp
 
-        cnt, tcp = self.cog.bot.storage.with_lock(mutate)
-        data = self.cog.bot.storage.load()
+        cnt, tcp = await self.cog.bot.storage.with_lock(mutate)
+        data = await self.cog.bot.storage.load()
         if cnt == 0:
             await interaction.response.send_message("Nothing to claim right now.", ephemeral=True)
             return
@@ -566,8 +568,8 @@ class SeasonCog(commands.Cog):
             return
         def mutate(data: dict) -> None:
             self._check_daily_login(data, str(interaction.user.id))
-        self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
         s    = _season_root(data)
         if not s.get("active"):
             await smart_reply(interaction, embed=_inf(
@@ -583,7 +585,7 @@ class SeasonCog(commands.Cog):
 
             @discord.ui.button(label="🌟 Season Info", style=discord.ButtonStyle.primary, row=0)
             async def info_btn(nav_self, i: discord.Interaction, _: discord.ui.Button) -> None:
-                data2 = self.bot.storage.load()
+                data2 = await self.bot.storage.load()
                 await i.response.edit_message(embed=_build_season_embed(data2, uid), view=nav_self)
 
             @discord.ui.button(label="🎫 Season Pass", style=discord.ButtonStyle.secondary, row=0)
@@ -594,7 +596,7 @@ class SeasonCog(commands.Cog):
 
             @discord.ui.button(label="📋 Missions", style=discord.ButtonStyle.secondary, row=0)
             async def missions_btn(nav_self, i: discord.Interaction, _: discord.ui.Button) -> None:
-                data2 = self.bot.storage.load()
+                data2 = await self.bot.storage.load()
                 panel = MissionPanel(self, uid)
                 await i.response.edit_message(embed=panel.build_embed(data2), view=panel)
                 panel.message = await i.original_response()
@@ -605,7 +607,7 @@ class SeasonCog(commands.Cog):
     async def season_pass(self, interaction: discord.Interaction) -> None:
         if not await ensure_registered(interaction, self.bot.storage):
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         s    = _season_root(data)
         if not s.get("active"):
             await error_reply(interaction, embed=_err("╭─ ❌ No Active Season\n╰────────────────────────────────"))
@@ -620,8 +622,8 @@ class SeasonCog(commands.Cog):
             return
         def mutate(data: dict) -> None:
             self._check_daily_login(data, str(interaction.user.id))
-        self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
         s    = _season_root(data)
         if not s.get("active"):
             await error_reply(interaction, embed=_err("╭─ ❌ No Active Season\n╰────────────────────────────────"))
@@ -644,8 +646,8 @@ class SeasonCog(commands.Cog):
             s["reset_type"] = reset
             s["pass_tiers"] = s.get("pass_tiers") or {}
             s["missions"]   = s.get("missions") or {}
-        self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load(); s = _season_root(data)
+        await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load(); s = _season_root(data)
         await smart_reply(interaction, embed=_ok(
             f"╭─ ✅ Season Created!\n│  📅 {name}\n│  Start: {_fmt_date(int(s['start_time']))}\n│  End:   {_fmt_date(int(s['end_time']))}\n│  🔄 Reset: {reset.title()}\n│  ⏳ {duration_days} days\n╰────────────────────────────────"
         ), ephemeral=True)
@@ -669,7 +671,7 @@ class SeasonCog(commands.Cog):
                 u.setdefault("season_cp", {})[snum] = 0; count += 1
             s["active"] = False; s["current_season"] = int(snum) + 1
             return True, count
-        ok, count = self.bot.storage.with_lock(mutate)
+        ok, count = await self.bot.storage.with_lock(mutate)
         if not ok: await error_reply(interaction, embed=_err("❌ No active season.")); return
         await smart_reply(interaction, embed=_ok(f"╭─ 🏁 Season Ended!\n│  🔄 {count} players reset\n│  💾 Archived\n╰────────────────────────────────"), ephemeral=True)
 
@@ -680,7 +682,7 @@ class SeasonCog(commands.Cog):
         if not is_owner(interaction): await error_reply(interaction, embed=_err("❌ Owner only.")); return
         def mutate(data: dict) -> None:
             _season_root(data).setdefault("pass_tiers", {})[str(tier)] = {"cp_required": cp_required, "free_reward": free_reward, "paid_reward": paid_reward}
-        self.bot.storage.with_lock(mutate)
+        await self.bot.storage.with_lock(mutate)
         await smart_reply(interaction, embed=_ok(f"╭─ ✅ Pass Tier Set\n│  Tier {tier}  •  {cp_required:,} CP\n│  🆓 Free: {free_reward}\n│  💎 Paid: {paid_reward}\n╰────────────────────────────────"), ephemeral=True)
 
     @app_commands.command(name="o_season_add_cp", description="Owner: manually add season CP to a player.")
@@ -695,7 +697,7 @@ class SeasonCog(commands.Cog):
             if not isinstance(u, dict): return False, 0
             scp = u.setdefault("season_cp", {}); scp[sn] = int(scp.get(sn, 0)) + amount
             return True, int(scp[sn])
-        ok, total = self.bot.storage.with_lock(mutate)
+        ok, total = await self.bot.storage.with_lock(mutate)
         if not ok: await error_reply(interaction, embed=_err("❌ Player not found.")); return
         await smart_reply(interaction, embed=_ok(f"╭─ ✅ CP Added\n│  {player.mention}  +{amount:,} CP\n│  Total CP: {total:,}\n╰────────────────────────────────"), ephemeral=True)
 
@@ -726,7 +728,7 @@ class SeasonCog(commands.Cog):
                 "title": title.strip(), "type": mission_type.value, "period": period.value,
                 "requirement": requirement.value, "target": int(target), "reward_cp": int(reward_cp),
             }
-        self.bot.storage.with_lock(mutate)
+        await self.bot.storage.with_lock(mutate)
         icon = "🆓" if mission_type.value == "free" else "💎"
         await smart_reply(interaction, embed=_ok(
             f"╭─ ✅ Mission Created\n│  {icon} [{period.name}] {title}\n│  Req: {requirement.name} × {target}\n│  Reward: +{reward_cp:,} CP\n╰────────────────────────────────"

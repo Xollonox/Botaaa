@@ -57,7 +57,7 @@ class TournamentCog(commands.Cog):
         self._end_task: asyncio.Task | None = None
 
     async def cog_load(self) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         tournament = _t_root(data)
         if tournament.get("active"):
             self._schedule_end(max(0, int(tournament.get("end_time", 0)) - now_ts()))
@@ -82,7 +82,7 @@ class TournamentCog(commands.Cog):
     async def tournament(self, interaction: discord.Interaction) -> None:
         if not await ensure_registered(interaction, self.bot.storage):
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         t    = _t_root(data)
         uid  = str(interaction.user.id)
 
@@ -189,12 +189,12 @@ class TournamentCog(commands.Cog):
             parts[uid] = {"name": name, "xp_earned": 0, "joined_at": now_ts()}
             return True, str(len(parts))
 
-        ok, result = self.bot.storage.with_lock(mutate)
+        ok, result = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Join Failed\n│ {result}\n╰────────────────"))
             return
 
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         t    = _t_root(data)
         await smart_reply(interaction, embed=_ok(
             f"╭─ ⚔️ Joined Tournament!\n"
@@ -216,7 +216,7 @@ class TournamentCog(commands.Cog):
 
     async def _start_tournament_battle(self, interaction: discord.Interaction) -> None:
         uid  = str(interaction.user.id)
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         t    = _t_root(data)
 
         if not t.get("active"):
@@ -254,12 +254,12 @@ class TournamentCog(commands.Cog):
                 tq = br.setdefault("tournament_queue", [])
                 if uid not in tq:
                     tq.append(uid)
-            self.bot.storage.with_lock(mutate)
+            await self.bot.storage.with_lock(mutate)
 
             # Schedule auto-match after 15s
             async def try_match() -> None:
                 await asyncio.sleep(15)
-                data2 = self.bot.storage.load()
+                data2 = await self.bot.storage.load()
                 t2    = _t_root(data2)
                 parts2 = t2.get("participants", {}) or {}
                 tq    = data2.get("battle", {}).get("tournament_queue", [])
@@ -271,7 +271,7 @@ class TournamentCog(commands.Cog):
                         for p in [uid, opponent]:
                             if p in tq2:
                                 tq2.remove(p)
-                    self.bot.storage.with_lock(start)
+                    await self.bot.storage.with_lock(start)
                     ok2, _ = await battle_cog.start_battle_or_fail(
                         interaction, uid, opponent, "tournament", dm_mode=True
                     )
@@ -281,7 +281,7 @@ class TournamentCog(commands.Cog):
                     def remove_q(d: dict) -> None:
                         tq3 = d.get("battle", {}).get("tournament_queue", [])
                         if uid in tq3: tq3.remove(uid)
-                    self.bot.storage.with_lock(remove_q)
+                    await self.bot.storage.with_lock(remove_q)
                     await battle_cog.start_battle_or_fail(
                         interaction, uid, cpu["cpu_key"], "tournament", dm_mode=True, cpu_opponent=cpu
                     )
@@ -326,7 +326,7 @@ class TournamentCog(commands.Cog):
             t["tid"]          = str(uuid.uuid4())[:8]
             return True, "ok"
 
-        ok, msg = self.bot.storage.with_lock(mutate)
+        ok, msg = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Failed\n│ {msg}\n╰────────────────"))
             return
@@ -370,7 +370,7 @@ class TournamentCog(commands.Cog):
             t["participants"] = {}
             return True, len(parts), total_refunded
 
-        ok, count, refunded = self.bot.storage.with_lock(mutate)
+        ok, count, refunded = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err("╭─ ❌ No active tournament.\n╰────────────────"))
             return
@@ -407,11 +407,11 @@ class TournamentCog(commands.Cog):
             t["participants"] = {}
             return True, results, pool, name
 
-        ok, results, pool, name = self.bot.storage.with_lock(mutate)
+        ok, results, pool, name = await self.bot.storage.with_lock(mutate)
         if not ok:
             return
 
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         medals = [e("winner",data), "🥈", "🥉"] + [f"{i}." for i in range(4, 11)]
         lines  = [f"│ {medals[i]} {pname:<18} {xp:,} XP  +{prize:,} 💰"
                   for i, (pname, xp, prize) in enumerate(results)]

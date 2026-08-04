@@ -154,7 +154,7 @@ class ParticipantSelect(discord.ui.View):
 
     async def _on_sel(self, i: discord.Interaction) -> None:
         self.sel = set(i.data["values"])
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         self._build(data)
         await i.response.edit_message(
             embed=_inf(_box("Select Members", [f"Selected: {len(self.sel)}/{self.fmt}", "\u26a0 = war pref OUT"])),
@@ -180,7 +180,7 @@ class ParticipantSelect(discord.ui.View):
                 return True, "matched", create_war(d, qid, mqid)
             return True, "queued", qid
 
-        ok, status, ref = self.cog.bot.storage.with_lock(mutate)
+        ok, status, ref = await self.cog.bot.storage.with_lock(mutate)
         if not ok:
             await i.response.edit_message(embed=_err(_box("Error", [status])), view=None); return
         if status == "matched":
@@ -226,7 +226,7 @@ class AttackTargetView(discord.ui.View):
     async def _on_pick(self, i: discord.Interaction) -> None:
         tid = i.data["values"][0]
         uid = self.uid; wid = self.wid
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         war  = _war_root(data)["active_wars"].get(wid)
         if not isinstance(war, dict):
             await i.response.edit_message(embed=_err(_box("Error", ["War not found"])), view=None); return
@@ -246,7 +246,7 @@ class AttackTargetView(discord.ui.View):
             if isinstance(u, dict): u["pending_war_attack"] = {"wid": wid, "target_uid": tid}
             return True
 
-        if not self.cog.bot.storage.with_lock(mutate):
+        if not await self.cog.bot.storage.with_lock(mutate):
             await i.response.edit_message(embed=_err(_box("Error", ["Attack no longer valid"])), view=None); return
         await i.response.edit_message(embed=_ok(_box("Attack Starting!", [
             "Target locked!",
@@ -293,13 +293,13 @@ class DefenseSquadView(discord.ui.View):
 
     async def _on_sel(self, i: discord.Interaction) -> None:
         self.sel = i.data["values"][:4]
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         self._build(data)
         await i.response.edit_message(embed=_inf(_box("Defense Squad", [f"{len(self.sel)}/4 selected"])), view=self)
 
     async def _on_save(self, i: discord.Interaction) -> None:
         uid = self.uid; sel = list(self.sel)
-        self.cog.bot.storage.with_lock(lambda d: set_war_defense_squad(d, uid, sel))
+        await self.cog.bot.storage.with_lock(lambda d: set_war_defense_squad(d, uid, sel))
         await i.response.edit_message(embed=_ok(_box("Defense Squad Saved!", [f"{len(sel)} cards set"])), view=None)
 
 
@@ -327,7 +327,7 @@ class GangWarCog(commands.Cog):
                         mqid = find_match(data, qid)
                         if mqid and mqid in w["queue"]:
                             create_war(data, qid, mqid); return
-                self.bot.storage.with_lock(mutate)
+                await self.bot.storage.with_lock(mutate)
             except Exception as ex:
                 logger.debug("war monitor: %s", ex)
             await asyncio.sleep(60)
@@ -343,7 +343,7 @@ class GangWarCog(commands.Cog):
     ])
     async def war_start(self, i: discord.Interaction, format: app_commands.Choice[int]) -> None:
         if not await ensure_registered(i, self.bot.storage): return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         uid  = str(i.user.id)
         gid, gang = get_user_gang(data, uid)
         if not gid:
@@ -359,7 +359,7 @@ class GangWarCog(commands.Cog):
     @war.command(name="status", description="View current war status.")
     async def war_status(self, i: discord.Interaction) -> None:
         if not await ensure_registered(i, self.bot.storage): return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         uid  = str(i.user.id)
         gid, _ = get_user_gang(data, uid)
         if not gid:
@@ -376,15 +376,15 @@ class GangWarCog(commands.Cog):
                     ]))); return
             await smart_reply(i, embed=_inf(_box("No Active War", ["Use /gang_war start to enter."]))); return
         if check_phase_transition(data, wid) == "ended":
-            self.bot.storage.with_lock(lambda d: grant_war_rewards(d, wid))
-            data = self.bot.storage.load()
+            await self.bot.storage.with_lock(lambda d: grant_war_rewards(d, wid))
+            data = await self.bot.storage.load()
             war  = _war_root(data)["active_wars"].get(wid, {})
         await smart_reply(i, embed=_status_embed(data, wid, war))
 
     @war.command(name="attack", description="Attack an opponent in the war.")
     async def war_attack(self, i: discord.Interaction) -> None:
         if not await ensure_registered(i, self.bot.storage): return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         uid  = str(i.user.id)
         wid, war, side = get_user_active_war(data, uid)
         if not wid:
@@ -401,7 +401,7 @@ class GangWarCog(commands.Cog):
     @war.command(name="record", description="Record your war battle result after fighting.")
     async def war_record(self, i: discord.Interaction) -> None:
         if not await ensure_registered(i, self.bot.storage): return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         uid  = str(i.user.id)
         p    = get_player(data, uid)
         u    = (p.get("user", {}) or {}) if isinstance(p, dict) else {}
@@ -445,7 +445,7 @@ class GangWarCog(commands.Cog):
             uu = pp.get("user", {}) if isinstance(pp, dict) else {}
             if isinstance(uu, dict): uu.pop("pending_war_attack", None)
 
-        self.bot.storage.with_lock(mutate)
+        await self.bot.storage.with_lock(mutate)
         stars = asurv if att_won else 0
         pct   = int(sum(apcts) / max(1, len(apcts))) if att_won and apcts else 0
         result_txt = "WIN ⭐" if att_won else "LOSS ❌"
@@ -457,7 +457,7 @@ class GangWarCog(commands.Cog):
     @war.command(name="cancel_queue", description="Cancel matchmaking — Head/Vice only.")
     async def war_cancel_queue(self, i: discord.Interaction) -> None:
         if not await ensure_registered(i, self.bot.storage): return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         uid  = str(i.user.id)
         gid, gang = get_user_gang(data, uid)
         if not gid or not _is_hv(gang, uid):
@@ -468,7 +468,7 @@ class GangWarCog(commands.Cog):
                 if isinstance(qe, dict) and qe.get("gang_id") == gid:
                     del w["queue"][qid]; return True
             return False
-        if not self.bot.storage.with_lock(mutate):
+        if not await self.bot.storage.with_lock(mutate):
             await error_reply(i, embed=_err(_box("Not in Queue", []))); return
         await smart_reply(i, embed=_ok(_box("Queue Cancelled", ["You can restart anytime."])))
 
@@ -485,13 +485,13 @@ class GangWarCog(commands.Cog):
             p = d.get("players", {}).get(uid, {})
             u = p.get("user", {}) if isinstance(p, dict) else {}
             if isinstance(u, dict): u["war_preference"] = pref
-        self.bot.storage.with_lock(mutate)
+        await self.bot.storage.with_lock(mutate)
         await smart_reply(i, embed=_ok(_box("Preference Updated", [f"You are now: {pref.upper()}"])))
 
     @app_commands.command(name="defensive_squad_setup", description="Set your defensive squad for gang wars.")
     async def def_squad(self, i: discord.Interaction) -> None:
         if not await ensure_registered(i, self.bot.storage): return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         uid  = str(i.user.id)
         wid, war, _ = get_user_active_war(data, uid)
         if wid and isinstance(war, dict) and is_battle_phase(war):
@@ -509,7 +509,7 @@ class GangWarCog(commands.Cog):
     @app_commands.command(name="o_war_start", description="Owner: force-start a war (any format, any gangs).")
     async def o_war_start(self, i: discord.Interaction, gang_a: str, gang_b: str, format: int = 1) -> None:
         if not is_owner(i): await error_reply(i, embed=_err("\u274c Owner only.")); return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         gid_a, ga = find_gang_by_name(data, gang_a)
         gid_b, gb = find_gang_by_name(data, gang_b)
         if not gid_a: await error_reply(i, embed=_err(f"\u274c Gang '{gang_a}' not found.")); return
@@ -519,7 +519,7 @@ class GangWarCog(commands.Cog):
         if not ma or not mb: await error_reply(i, embed=_err("\u274c Need members in both gangs.")); return
         def mutate(d: dict) -> str:
             return create_war(d, queue_war(d, gid_a, format, ma), queue_war(d, gid_b, format, mb))
-        wid = self.bot.storage.with_lock(mutate)
+        wid = await self.bot.storage.with_lock(mutate)
         await smart_reply(i, embed=_ok(_box("War Force-Started!", [f"{gang_a} vs {gang_b}", f"Format: {format}v{format}", f"War ID: {wid}", f"Prep: {PREP_DURATION}s"])), ephemeral=True)
 
     @app_commands.command(name="o_war_end", description="Owner: force-end a war.")
@@ -532,7 +532,7 @@ class GangWarCog(commands.Cog):
             winner = determine_winner(war)
             grant_war_rewards(d, war_id)
             return True, winner
-        ok, winner = self.bot.storage.with_lock(mutate)
+        ok, winner = await self.bot.storage.with_lock(mutate)
         if not ok: await error_reply(i, embed=_err("\u274c War not found.")); return
         await smart_reply(i, embed=_ok(_box("War Ended!", [f"War: {war_id}", f"Winner: Side {winner.upper()}", "Rewards granted."])), ephemeral=True)
 
@@ -544,7 +544,7 @@ class GangWarCog(commands.Cog):
             war = _war_root(d)["active_wars"].get(war_id)
             if not isinstance(war, dict): return False
             war["phase"] = phase.value; war["phase_started_at"] = now_ts(); return True
-        if not self.bot.storage.with_lock(mutate): await error_reply(i, embed=_err("\u274c War not found.")); return
+        if not await self.bot.storage.with_lock(mutate): await error_reply(i, embed=_err("\u274c War not found.")); return
         await smart_reply(i, embed=_ok(_box("Phase Set", [f"War {war_id} \u2192 {phase.value.upper()}"])), ephemeral=True)
 
     @app_commands.command(name="o_war_set_durations", description="Owner: set phase durations in seconds.")
@@ -558,7 +558,7 @@ class GangWarCog(commands.Cog):
     @app_commands.command(name="o_war_list", description="Owner: list all wars and queue.")
     async def o_war_list(self, i: discord.Interaction) -> None:
         if not is_owner(i): await error_reply(i, embed=_err("\u274c Owner only.")); return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         w    = _war_root(data)
         wlines = []
         for wid, war in w.get("active_wars", {}).items():

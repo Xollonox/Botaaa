@@ -95,7 +95,7 @@ class AllianceInviteView(discord.ui.View):
             invite["status"] = "accepted"
             return True, "accepted"
 
-        ok, result = self.bot.storage.with_lock(mutate)
+        ok, result = await self.bot.storage.with_lock(mutate)
         self.stop()
         for child in self.children:
             if hasattr(child, "disabled"):
@@ -202,11 +202,11 @@ class AllianceCog(commands.Cog):
             apply_alliance_id_to_gang_members(data, gid, aid)
             return True, name_clean
 
-        ok, result = self.bot.storage.with_lock(mutate)
+        ok, result = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Alliance Create Failed\n│ {result}\n╰────────────────"))
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         gid, gang = get_user_gang(data, uid)
         await smart_reply(interaction, embed=_ok(
             f"╭─ 🤝 Alliance Created!\n"
@@ -223,7 +223,7 @@ class AllianceCog(commands.Cog):
     async def alliance_info(self, interaction: discord.Interaction, alliance_name: str | None = None) -> None:
         if not await ensure_registered(interaction, self.bot.storage):
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
 
         aid      = None
         alliance = None
@@ -314,12 +314,12 @@ class AllianceCog(commands.Cog):
             a_name = str(alliance.get("name", ""))
             return True, "ok", iid, target_head, a_name
 
-        ok, msg, iid, target_head_id, a_name = self.bot.storage.with_lock(mutate)
+        ok, msg, iid, target_head_id, a_name = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Invite Failed\n│ {msg}\n╰────────────────"))
             return
 
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         gid, my_gang = get_user_gang(data, uid)
         my_gang_name = my_gang.get("name", "?") if my_gang else "?"
 
@@ -378,7 +378,7 @@ class AllianceCog(commands.Cog):
                 alliances.pop(aid, None)
             return True, a_name, str(gang.get("name", ""))
 
-        ok, a_name, gang_name = self.bot.storage.with_lock(mutate)
+        ok, a_name, gang_name = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Leave Failed\n│ {a_name}\n╰────────────────"))
             return
@@ -393,11 +393,11 @@ class AllianceCog(commands.Cog):
 
     @alliance_invite.autocomplete("gang_name")
     async def alliance_invite_ac(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        return self._gang_choices(self.bot.storage.load(), current)
+        return self._gang_choices(await self.bot.storage.load(), current)
 
     @alliance_info.autocomplete("alliance_name")
     async def alliance_info_ac(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        return self._alliance_choices(self.bot.storage.load(), current)
+        return self._alliance_choices(await self.bot.storage.load(), current)
 
 
 async def setup(bot: commands.Bot) -> None:

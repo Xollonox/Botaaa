@@ -85,7 +85,7 @@ class GangInviteView(discord.ui.View):
             invite["status"]  = "accepted"
             return True, "accepted"
 
-        ok, result = self.bot.storage.with_lock(mutate)
+        ok, result = await self.bot.storage.with_lock(mutate)
         self.stop()
         for child in self.children:
             if hasattr(child, "disabled"):
@@ -198,7 +198,7 @@ class GangsCog(commands.Cog):
             player["gang_id"] = gid
             return True, name_clean
 
-        ok, result = self.bot.storage.with_lock(mutate)
+        ok, result = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Gang Create Failed\n│ {result}\n╰────────────────"))
             return
@@ -217,7 +217,7 @@ class GangsCog(commands.Cog):
     async def gang_info(self, interaction: discord.Interaction, gang_name: str | None = None) -> None:
         if not await ensure_registered(interaction, self.bot.storage):
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if gang_name:
             gid, gang = find_gang_by_name(data, gang_name)
         else:
@@ -295,7 +295,7 @@ class GangsCog(commands.Cog):
             }
             return True, "ok", iid, str(gang.get("name", ""))
 
-        ok, msg, iid, gang_name = self.bot.storage.with_lock(mutate)
+        ok, msg, iid, gang_name = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Invite Failed\n│ {msg}\n╰────────────────"))
             return
@@ -354,7 +354,7 @@ class GangsCog(commands.Cog):
             player["gang_id"] = gid
             return True, str(gang.get("name", gang_name))
 
-        ok, result = self.bot.storage.with_lock(mutate)
+        ok, result = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Join Failed\n│ {result}\n╰────────────────"))
             return
@@ -387,7 +387,7 @@ class GangsCog(commands.Cog):
                 player["alliance_id"] = None
             return True, role, str(gang.get("name", ""))
 
-        ok, role, gang_name = self.bot.storage.with_lock(mutate)
+        ok, role, gang_name = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Leave Failed\n│ {role}\n╰────────────────"))
             return
@@ -427,7 +427,7 @@ class GangsCog(commands.Cog):
                 player["alliance_id"] = None
             return True, target_name, str(gang.get("name", ""))
 
-        ok, result, gang_name = self.bot.storage.with_lock(mutate)
+        ok, result, gang_name = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Kick Failed\n│ {result}\n╰────────────────"))
             return
@@ -471,7 +471,7 @@ class GangsCog(commands.Cog):
             target_name = str(_uu.get("name") or _uu.get("username") or f"<@{target}>")
             return True, target_name, ROLE_LABELS.get(role.value, role.value)
 
-        ok, name, role_label = self.bot.storage.with_lock(mutate)
+        ok, name, role_label = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Promote Failed\n│ {name}\n╰────────────────"))
             return
@@ -509,7 +509,7 @@ class GangsCog(commands.Cog):
             target_name = str(_uu.get("name") or _uu.get("username") or f"<@{target}>")
             return True, target_name
 
-        ok, result = self.bot.storage.with_lock(mutate)
+        ok, result = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Demote Failed\n│ {result}\n╰────────────────"))
             return
@@ -526,7 +526,7 @@ class GangsCog(commands.Cog):
     async def gang_members(self, interaction: discord.Interaction, gang_name: str | None = None) -> None:
         if not await ensure_registered(interaction, self.bot.storage):
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if gang_name:
             gid, gang = find_gang_by_name(data, gang_name)
         else:
@@ -576,7 +576,7 @@ class GangsCog(commands.Cog):
             target_name = str(_uu.get("name") or _uu.get("username") or f"<@{target}>")
             return True, target_name
 
-        ok, result = self.bot.storage.with_lock(mutate)
+        ok, result = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Transfer Failed\n│ {result}\n╰────────────────"))
             return
@@ -604,7 +604,7 @@ class GangsCog(commands.Cog):
             gang["description"] = str(text)
             return True, str(gang.get("name", ""))
 
-        ok, result = self.bot.storage.with_lock(mutate)
+        ok, result = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Failed\n│ {result}\n╰────────────────"))
             return
@@ -636,11 +636,11 @@ class GangsCog(commands.Cog):
             gang["status"] = str(status.value)
             return True, str(gang.get("name", ""))
 
-        ok, result = self.bot.storage.with_lock(mutate)
+        ok, result = await self.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, embed=_err(f"╭─ ❌ Failed\n│ {result}\n╰────────────────"))
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         icon = e("unlock", data) if status.value == "open" else e("lock", data)
         await smart_reply(interaction, embed=_ok(
             f"╭─ {icon} Gang Status Updated\n"
@@ -654,7 +654,7 @@ class GangsCog(commands.Cog):
     async def gang_stats(self, interaction: discord.Interaction) -> None:
         if not await ensure_registered(interaction, self.bot.storage):
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         gid, gang = get_user_gang(data, str(interaction.user.id))
         if not gid or not isinstance(gang, dict):
             await error_reply(interaction, embed=_err("╭─ ❌ Not in Gang\n│ You are not in a gang.\n╰────────────────"))
@@ -688,17 +688,17 @@ class GangsCog(commands.Cog):
     @gang_join.autocomplete("gang_name")
     @gang_members.autocomplete("gang_name")
     async def gang_name_ac(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        return self._all_gang_choices(self.bot.storage.load(), current)
+        return self._all_gang_choices(await self.bot.storage.load(), current)
 
     @gang_kick.autocomplete("user_id")
     async def gang_kick_ac(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        return self._member_choices(self.bot.storage.load(), str(interaction.user.id), current)
+        return self._member_choices(await self.bot.storage.load(), str(interaction.user.id), current)
 
     @gang_promote.autocomplete("user_id")
     @gang_demote.autocomplete("user_id")
     @gang_transfer_owner.autocomplete("user_id")
     async def gang_member_ac(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        return self._member_choices(self.bot.storage.load(), str(interaction.user.id), current)
+        return self._member_choices(await self.bot.storage.load(), str(interaction.user.id), current)
 
 
 async def setup(bot: commands.Bot) -> None:
