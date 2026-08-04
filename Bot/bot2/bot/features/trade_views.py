@@ -140,7 +140,7 @@ def _panel_embed(session: dict[str, Any], locked_a: bool, locked_b: bool) -> dis
         if card:
             rarity = str(card.get("rarity", ""))
             name   = str(card.get("card_name", "?"))
-            line   = f"{_ri(rarity)} {name}\n│   [{rarity}]"
+            line   = f"🎴 {_ri(rarity)} {name}"
         elif coins and coins > 0:
             line = f"💰 {coins:,} coins"
         else:
@@ -165,8 +165,8 @@ def _panel_embed(session: dict[str, Any], locked_a: bool, locked_b: bool) -> dis
         f"╭─ 🔄 Trade Negotiation\n"
         f"│ <@{a_id}>  ←→  <@{b_id}>\n"
         f"│\n"
-        f"│ <@{a_id}> offers:        <@{b_id}> offers:\n"
-        f"│ {a_text:<28} {b_text}\n"
+        f"│ <@{a_id}> offers:         <@{b_id}> offers:\n"
+        f"│ {a_text:<24} {b_text}\n"
         f"│\n"
         f"│ {status}\n"
         "╰────────────────"

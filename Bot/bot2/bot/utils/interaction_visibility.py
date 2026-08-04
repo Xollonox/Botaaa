@@ -52,6 +52,9 @@ async def smart_reply(interaction: Any, *args: Any, **kwargs: Any) -> Any:
     if "ephemeral" not in kwargs:
         kwargs["ephemeral"] = False  # owner commands visible to all by default
 
+    if "allowed_mentions" not in kwargs:
+        kwargs["allowed_mentions"] = discord.AllowedMentions.none()
+
     _style_payload(kwargs, interaction)
 
     if interaction.response.is_done():
@@ -64,6 +67,9 @@ async def error_reply(interaction: Any, *args: Any, **kwargs: Any) -> None:
     import asyncio
     kwargs.pop("ephemeral", None)
     kwargs["ephemeral"] = False  # must be non-ephemeral for delete_after to work
+
+    if "allowed_mentions" not in kwargs:
+        kwargs["allowed_mentions"] = discord.AllowedMentions.none()
 
     _style_payload(kwargs, interaction)
 
