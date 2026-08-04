@@ -53,13 +53,13 @@ class AnnounceOwnerCog(commands.Cog):
             channel_id_inner = int(settings.get("announce_channel_id", 0) or 0)
             return selected_inner, channel_id_inner
 
-        result = self.bot.storage.with_lock(_mutate)
+        result = await self.bot.storage.with_lock(_mutate)
         if result is None:
             return
         selected, announce_channel_id = result
 
         # Re-read snapshot for embed rendering (outside the lock).
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
 
         if announce_channel_id <= 0:
             return
@@ -134,7 +134,7 @@ class AnnounceOwnerCog(commands.Cog):
             channel_id_inner = int(settings.get("announce_channel_id", 0) or 0)
             return target_id_inner, target_name_inner, max_streak_inner, channel_id_inner
 
-        result = self.bot.storage.with_lock(_mutate)
+        result = await self.bot.storage.with_lock(_mutate)
         if result is None:
             return
         target_id, target_name, max_streak, announce_channel_id = result
@@ -143,7 +143,7 @@ class AnnounceOwnerCog(commands.Cog):
             return
 
         # Re-read snapshot for embed rendering (outside the lock).
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
 
         target_channel = self.bot.get_channel(announce_channel_id)
         if target_channel is None:
@@ -189,7 +189,7 @@ class AnnounceOwnerCog(commands.Cog):
         image_url: str | None = None,
         ping_role: discord.Role | None = None,
     ) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
@@ -247,7 +247,7 @@ class AnnounceOwnerCog(commands.Cog):
         duration_hours: int = 24,
     ) -> None:
         """Activate a timed event for double XP or coins."""
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
@@ -278,10 +278,10 @@ class AnnounceOwnerCog(commands.Cog):
             settings = data.get("server_settings", {}) if isinstance(data.get("server_settings"), dict) else {}
             return int(settings.get("announce_channel_id", 0) or 0)
 
-        announce_channel_id = self.bot.storage.with_lock(_mutate)
+        announce_channel_id = await self.bot.storage.with_lock(_mutate)
 
         # Re-read snapshot for embed rendering (outside the lock).
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
 
         announce_text = "2x XP 🚀" if event_type == "double_xp" else "1.5x CP Rewards 💰"
         embed = make_embed(

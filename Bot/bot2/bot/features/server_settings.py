@@ -34,7 +34,7 @@ class ServerSettingsCog(commands.Cog):
     @app_commands.describe(mode="Server mode")
     @app_commands.choices(mode=[app_commands.Choice(name="all", value="all"), app_commands.Choice(name="single", value="single")])
     async def server_mode(self, interaction: discord.Interaction, mode: app_commands.Choice[str]) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_admin(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Admin Only", "Not allowed."), ephemeral=True)
             return
@@ -49,8 +49,8 @@ class ServerSettingsCog(commands.Cog):
             settings.setdefault("announce_channel_id", 0)
             settings.setdefault("battle_channel_id", 0)
 
-        self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
         note = ""
         settings = data.get("server_settings", {}) if isinstance(data.get("server_settings"), dict) else {}
         if str(mode.value) == "single" and int(settings.get("locked_channel_id", 0) or 0) == 0:
@@ -63,13 +63,13 @@ class ServerSettingsCog(commands.Cog):
 
     @app_commands.command(name="server_set_channel", description="Admin: set locked channel for single mode.")
     async def server_set_channel(self, interaction: discord.Interaction, channel: discord.TextChannel) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_admin(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Admin Only", "Not allowed."), ephemeral=True)
             return
 
-        self.bot.storage.with_lock(lambda d: d.setdefault("server_settings", {}).update({"locked_channel_id": int(channel.id)}))
-        data = self.bot.storage.load()
+        await self.bot.storage.with_lock(lambda d: d.setdefault("server_settings", {}).update({"locked_channel_id": int(channel.id)}))
+        data = await self.bot.storage.load()
         await smart_reply(interaction, 
             embed=make_embed(data, f"{e('settings', data)} 𝗦𝗘𝗥𝗩𝗘𝗥 𝗦𝗘𝗧𝗧𝗜𝗡𝗚𝗦", self._settings_block(data)),
             ephemeral=True,
@@ -77,13 +77,13 @@ class ServerSettingsCog(commands.Cog):
 
     @app_commands.command(name="server_set_announce", description="Admin: set announce channel.")
     async def server_set_announce(self, interaction: discord.Interaction, channel: discord.TextChannel) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_admin(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Admin Only", "Not allowed."), ephemeral=True)
             return
 
-        self.bot.storage.with_lock(lambda d: d.setdefault("server_settings", {}).update({"announce_channel_id": int(channel.id)}))
-        data = self.bot.storage.load()
+        await self.bot.storage.with_lock(lambda d: d.setdefault("server_settings", {}).update({"announce_channel_id": int(channel.id)}))
+        data = await self.bot.storage.load()
         await smart_reply(interaction, 
             embed=make_embed(data, f"{e('settings', data)} 𝗦𝗘𝗥𝗩𝗘𝗥 𝗦𝗘𝗧𝗧𝗜𝗡𝗚𝗦", self._settings_block(data)),
             ephemeral=True,
@@ -91,13 +91,13 @@ class ServerSettingsCog(commands.Cog):
 
     @app_commands.command(name="server_set_battle", description="Admin: set battle command channel.")
     async def server_set_battle(self, interaction: discord.Interaction, channel: discord.TextChannel) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_admin(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Admin Only", "Not allowed."), ephemeral=True)
             return
 
-        self.bot.storage.with_lock(lambda d: d.setdefault("server_settings", {}).update({"battle_channel_id": int(channel.id)}))
-        data = self.bot.storage.load()
+        await self.bot.storage.with_lock(lambda d: d.setdefault("server_settings", {}).update({"battle_channel_id": int(channel.id)}))
+        data = await self.bot.storage.load()
         await smart_reply(interaction, 
             embed=make_embed(data, f"{e('settings', data)} 𝗦𝗘𝗥𝗩𝗘𝗥 𝗦𝗘𝗧𝗧𝗜𝗡𝗚𝗦", self._settings_block(data)),
             ephemeral=True,

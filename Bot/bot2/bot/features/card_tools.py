@@ -128,7 +128,7 @@ class CardToolsCog(commands.Cog):
 
     @app_commands.command(name="card_info", description="View information about a catalog card.")
     async def card_info(self, interaction: discord.Interaction, card_name: str) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         catalog = data.get("cards", {})
         card = find_catalog_card(catalog, card_name)
         if card is None:
@@ -148,7 +148,7 @@ class CardToolsCog(commands.Cog):
         interaction: discord.Interaction,
         current: str,
     ) -> list[app_commands.Choice[str]]:
-        return _card_name_choices(self.bot.storage.load(), current)
+        return _card_name_choices(await self.bot.storage.load(), current)
 
     async def _set_flag(self, interaction: discord.Interaction, query: str, key: str, value: bool, title_key: str) -> None:
         from bot.utils.checks import ensure_registered
@@ -166,7 +166,7 @@ class CardToolsCog(commands.Cog):
             inv[idx][key] = value
             return state, True
 
-        data, updated = self.bot.storage.with_lock(mutate)
+        data, updated = await self.bot.storage.with_lock(mutate)
         if not updated:
             await smart_reply(
                 interaction,

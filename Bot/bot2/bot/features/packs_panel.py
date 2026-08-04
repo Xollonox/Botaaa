@@ -313,7 +313,7 @@ class PostRevealView(discord.ui.View):
             user["balance"] = bal + value
             return True, value
 
-        ok, value = self.cog.bot.storage.with_lock(mutate)
+        ok, value = await self.cog.bot.storage.with_lock(mutate)
         if not ok:
             await error_reply(interaction, "Could not sell — card may be locked or already sold.")
             return
@@ -373,7 +373,7 @@ class PostRevealView(discord.ui.View):
             card["squad_locked"] = True
             return True, "ok"
 
-        ok, status = self.cog.bot.storage.with_lock(mutate)
+        ok, status = await self.cog.bot.storage.with_lock(mutate)
         if not ok:
             msgs = {"full": "Squad is full (4 slots max).", "exists": "Already in squad.",
                     "missing": "Card not found in inventory."}
@@ -396,12 +396,12 @@ class PostRevealView(discord.ui.View):
         # If opened from shop flow, go back to shop
         if hasattr(self.main_panel, '_shop_view') and self.main_panel._shop_view is not None:
             shop_view: Any = self.main_panel._shop_view
-            data = self.cog.bot.storage.load()
+            data = await self.cog.bot.storage.load()
             shop_view._rebuild_selects()
             await interaction.response.edit_message(embed=shop_view.embed(data), view=shop_view)
             shop_view.message = interaction.message
             return
-        data   = self.cog.bot.storage.load()
+        data   = await self.cog.bot.storage.load()
         player = get_player(data, str(interaction.user.id))
         inv    = _get_player_pack_inventory(player) if player else []
         uid    = str(interaction.user.id)
@@ -503,7 +503,7 @@ class PacksPanel(discord.ui.View):
     # Row 0 — Nav
     @discord.ui.button(label="◀ Prev", style=discord.ButtonStyle.secondary, row=0)
     async def prev_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         keys = self._pack_keys(data)
         if keys: self.current_slot = (self.current_slot - 1) % len(keys)
         player = get_player(data, str(interaction.user.id))
@@ -512,7 +512,7 @@ class PacksPanel(discord.ui.View):
 
     @discord.ui.button(label="Next ▶", style=discord.ButtonStyle.primary, row=0)
     async def next_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         keys = self._pack_keys(data)
         if keys: self.current_slot = (self.current_slot + 1) % len(keys)
         player = get_player(data, str(interaction.user.id))
@@ -526,7 +526,7 @@ class PacksPanel(discord.ui.View):
 
     @discord.ui.button(label="📦 Open All", style=discord.ButtonStyle.success, row=1)
     async def open_all_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         key  = self._current_key(data)
         if not key:
             await error_reply(interaction, "No packs to open.")
@@ -546,7 +546,7 @@ class PacksPanel(discord.ui.View):
         await animate_pack_open(msg, title, rolls, data, self._anim_view)
 
     async def _do_open(self, interaction: discord.Interaction, qty: int) -> None:
-        data  = self.cog.bot.storage.load()
+        data  = await self.cog.bot.storage.load()
         key   = self._current_key(data)
         if not key:
             await error_reply(interaction, "No packs to open.")
@@ -598,7 +598,7 @@ class PacksPanel(discord.ui.View):
                         advance_tutorial(user, "open_pack")
             return rolls
 
-        all_rolls = self.cog.bot.storage.with_lock(mutate)
+        all_rolls = await self.cog.bot.storage.with_lock(mutate)
 
         if not all_rolls:
             if interaction.message:
@@ -616,7 +616,7 @@ class PacksPanel(discord.ui.View):
         await asyncio.sleep(0.3)
 
         # Refresh slot state
-        data2 = self.cog.bot.storage.load()
+        data2 = await self.cog.bot.storage.load()
         keys2 = self._pack_keys(data2)
         self.current_slot = max(0, min(self.current_slot, len(keys2) - 1)) if keys2 else 0
 
@@ -645,7 +645,7 @@ class PacksPanelCog(commands.Cog):
         await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
-        data   = self.bot.storage.load()
+        data   = await self.bot.storage.load()
         uid    = str(interaction.user.id)
         player = get_player(data, uid)
         inv    = _get_player_pack_inventory(player) if player else []

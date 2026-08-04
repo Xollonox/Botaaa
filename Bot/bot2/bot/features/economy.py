@@ -44,7 +44,7 @@ class EconomyCog(commands.Cog):
         if not await ensure_registered(interaction, self.bot.storage):
             return
 
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         user_data = data.get("players", {}).get(str(interaction.user.id), {}).get("user", {})
 
         coins = int(user_data.get("balance", 0))
@@ -78,7 +78,7 @@ class EconomyCog(commands.Cog):
         amount: app_commands.Range[int, 1, None],
     ) -> None:
         if not is_owner(interaction):
-            data = self.bot.storage.load()
+            data = await self.bot.storage.load()
             embed = make_embed(
                 data,
                 f"{e('no', data)} Access Denied",
@@ -97,8 +97,8 @@ class EconomyCog(commands.Cog):
             after = add_balance(user, amount)
             return True, before, after
 
-        ok, before, after = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok, before, after = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
 
         if not ok:
             embed = make_embed(
@@ -131,7 +131,7 @@ class EconomyCog(commands.Cog):
         amount: app_commands.Range[int, 1, None],
     ) -> None:
         if not is_owner(interaction):
-            data = self.bot.storage.load()
+            data = await self.bot.storage.load()
             embed = make_embed(
                 data,
                 f"{e('no', data)} Access Denied",
@@ -151,8 +151,8 @@ class EconomyCog(commands.Cog):
             user["balance"] = after
             return True, before, after
 
-        ok, before, after = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok, before, after = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
 
         if not ok:
             embed = make_embed(
@@ -185,7 +185,7 @@ class EconomyCog(commands.Cog):
         amount: app_commands.Range[int, 1, None],
     ) -> None:
         if not is_owner(interaction):
-            data = self.bot.storage.load()
+            data = await self.bot.storage.load()
             embed = make_embed(
                 data,
                 f"{e('no', data)} Access Denied",
@@ -204,8 +204,8 @@ class EconomyCog(commands.Cog):
             after = add_premium(user, amount)
             return True, before, after
 
-        ok, before, after = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok, before, after = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
 
         if not ok:
             embed = make_embed(

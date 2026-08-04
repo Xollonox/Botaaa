@@ -102,7 +102,7 @@ class WeaponDetailView(discord.ui.View):
         if str(interaction.user.id) != self.user_id:
             await interaction.response.send_message("Not your menu.", ephemeral=True)
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         player = data.get("players", {}).get(self.user_id, {})
         card_inv = player.get("user", {}).get("inventory", []) if isinstance(player, dict) else []
         weapons_catalog = data.get("weapons", {})
@@ -148,8 +148,8 @@ class WeaponDetailView(discord.ui.View):
             def mutate(d: dict[str, Any]) -> tuple[bool, str]:
                 return equip_weapon(d, self.user_id, self.weapon_uid, card_uid)
 
-            ok, msg = self.bot.storage.with_lock(mutate)
-            d = self.bot.storage.load()
+            ok, msg = await self.bot.storage.with_lock(mutate)
+            d = await self.bot.storage.load()
             if ok:
                 await sel_interaction.response.edit_message(
                     embed=self._build_embed(d), view=self,
@@ -171,8 +171,8 @@ class WeaponDetailView(discord.ui.View):
         def mutate(d: dict[str, Any]) -> tuple[bool, str]:
             return unequip_weapon(d, self.user_id, self.weapon_uid)
 
-        ok, msg = self.bot.storage.with_lock(mutate)
-        d = self.bot.storage.load()
+        ok, msg = await self.bot.storage.with_lock(mutate)
+        d = await self.bot.storage.load()
         if ok:
             await interaction.response.edit_message(embed=self._build_embed(d), view=self)
         else:
@@ -187,8 +187,8 @@ class WeaponDetailView(discord.ui.View):
         def mutate(d: dict[str, Any]) -> tuple[str, int, int]:
             return upgrade_weapon(d, self.user_id, self.weapon_uid)
 
-        result, stars, balance = self.bot.storage.with_lock(mutate)
-        d = self.bot.storage.load()
+        result, stars, balance = await self.bot.storage.with_lock(mutate)
+        d = await self.bot.storage.load()
 
         messages = {
             "ok": lambda: f"Upgraded! Now {_star_str(stars)}. Balance: {balance:,} coins.",
@@ -211,7 +211,7 @@ class WeaponDetailView(discord.ui.View):
         if str(interaction.user.id) != self.user_id:
             await interaction.response.send_message("Not your menu.", ephemeral=True)
             return
-        d = self.bot.storage.load()
+        d = await self.bot.storage.load()
         gallery = WeaponGalleryView(self.bot, self.user_id, page=self.parent_page)
         await interaction.response.edit_message(embed=gallery.build_embed(d), view=gallery)
 
@@ -277,7 +277,7 @@ class WeaponGalleryView(discord.ui.View):
                 await sel_interaction.response.send_message("Not your menu.", ephemeral=True)
                 return
             weapon_uid = sel_interaction.data["values"][0]
-            d = self.bot.storage.load()
+            d = await self.bot.storage.load()
             detail_view = WeaponDetailView(self.bot, self.user_id, weapon_uid, parent_page=self.page)
             await sel_interaction.response.edit_message(embed=detail_view._build_embed(d), view=detail_view)
 
@@ -289,7 +289,7 @@ class WeaponGalleryView(discord.ui.View):
         if str(interaction.user.id) != self.user_id:
             await interaction.response.send_message("Not your menu.", ephemeral=True)
             return
-        d = self.bot.storage.load()
+        d = await self.bot.storage.load()
         weapons = self._get_weapons(d)
         total_pages = max(1, (len(weapons) + _PAGE_SIZE - 1) // _PAGE_SIZE)
         self.page = (self.page - 1) % total_pages
@@ -301,7 +301,7 @@ class WeaponGalleryView(discord.ui.View):
         if str(interaction.user.id) != self.user_id:
             await interaction.response.send_message("Not your menu.", ephemeral=True)
             return
-        d = self.bot.storage.load()
+        d = await self.bot.storage.load()
         weapons = self._get_weapons(d)
         total_pages = max(1, (len(weapons) + _PAGE_SIZE - 1) // _PAGE_SIZE)
         self.page = (self.page + 1) % total_pages
@@ -319,7 +319,7 @@ class WeaponsCog(commands.Cog):
             return
 
         user_id = str(interaction.user.id)
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         view = WeaponGalleryView(self.bot, user_id)
         view._rebuild_select(data)
         await smart_reply(interaction, embed=view.build_embed(data), view=view)

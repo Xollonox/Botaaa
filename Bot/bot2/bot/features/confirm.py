@@ -49,8 +49,8 @@ class ConfirmCog(commands.Cog):
                 return False, h_msg
             return True, h_msg
 
-        ok, msg = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok, msg = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
         if not ok:
             await smart_reply(interaction, 
                 embed=make_embed(data, f"{e('warning', data)} Confirm Failed", str(msg)),

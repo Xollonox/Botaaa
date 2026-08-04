@@ -92,7 +92,7 @@ class RedeemCog(commands.Cog):
 
         user_id = str(interaction.user.id)
         limited, retry_in = self._rate_limited(user_id)
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if limited:
             await smart_reply(interaction, 
                 embed=make_embed(
@@ -160,8 +160,8 @@ class RedeemCog(commands.Cog):
 
             return True, "Code redeemed successfully.", row, remaining
 
-        ok, message, code_row, remaining = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok, message, code_row, remaining = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
 
         if not ok:
             await smart_reply(interaction, 
@@ -201,7 +201,7 @@ class RedeemCog(commands.Cog):
         max_uses: app_commands.Range[int, 0, None] = 0,
         note: str | None = None,
     ) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=self._owner_embed(data), ephemeral=True)
             return
@@ -238,8 +238,8 @@ class RedeemCog(commands.Cog):
             }
             return True, "Code created."
 
-        ok, message = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok, message = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
         if not ok:
             await smart_reply(interaction, 
                 embed=make_embed(data, f"{e('warning', data)} Create Failed", message),
@@ -267,7 +267,7 @@ class RedeemCog(commands.Cog):
     @app_commands.command(name="o_redeem_delete", description="Owner: delete redeem code.")
     @app_commands.guilds(OWNER_GUILD)
     async def o_redeem_delete(self, interaction: discord.Interaction, code: str) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=self._owner_embed(data), ephemeral=True)
             return
@@ -281,8 +281,8 @@ class RedeemCog(commands.Cog):
                 return False
             return redeem_codes.pop(normalized, None) is not None
 
-        deleted = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        deleted = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
         title = f"{e('delete', data)} Code Deleted" if deleted else f"{e('warning', data)} Delete Failed"
         desc = f"{e('code', data)} `{normalized}` removed." if deleted else "Code not found."
         await smart_reply(interaction, embed=make_embed(data, title, desc), ephemeral=True)
@@ -290,7 +290,7 @@ class RedeemCog(commands.Cog):
     @app_commands.command(name="o_redeem_list", description="Owner: list redeem codes.")
     @app_commands.guilds(OWNER_GUILD)
     async def o_redeem_list(self, interaction: discord.Interaction, filter: str | None = None) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=self._owner_embed(data), ephemeral=True)
             return
@@ -304,7 +304,7 @@ class RedeemCog(commands.Cog):
         await smart_reply(interaction, embed=view._embed(), view=view, ephemeral=True)
 
     async def _code_choices(self, current: str) -> list[app_commands.Choice[str]]:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         redeem_codes = data.get("redeem_codes", {})
         if not isinstance(redeem_codes, dict):
             return []

@@ -198,8 +198,8 @@ class UpgradeConfirmView(discord.ui.View):
 
     @discord.ui.button(label="✅ Confirm Upgrade", style=discord.ButtonStyle.success)
     async def confirm(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        status, stars, coins = self.cog._perform_upgrade(str(interaction.user.id), self.uid)
-        data = self.cog.bot.storage.load()
+        status, stars, coins = await self.cog._perform_upgrade(str(interaction.user.id), self.uid)
+        data = await self.cog.bot.storage.load()
         sep = e("line", data)
 
         if status == "need_duplicate":
@@ -270,7 +270,7 @@ class UpgradeConfirmView(discord.ui.View):
         for child in self.children:
             if isinstance(child, discord.ui.Button):
                 child.disabled = True
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         await interaction.response.edit_message(
             embed=make_embed(data, f"{e('info', data)} Upgrade Cancelled", "No changes were made to this card."),
             view=self,
@@ -297,7 +297,7 @@ class CollectionDetailView(discord.ui.View):
         self.message: discord.Message | None = None
 
     def _entries(self, interaction: discord.Interaction) -> list[dict[str, Any]]:
-        data = self.cog.bot.storage.load()
+        data = self.cog.bot.storage.load_readonly()
         return self.cog._get_entries(data, str(interaction.user.id), self.filter_value, self.sort_value)
 
     def _mode(self, data: dict[str, Any], user_id: str) -> str:
@@ -339,7 +339,7 @@ class CollectionDetailView(discord.ui.View):
 
     @discord.ui.button(label="Prev", style=discord.ButtonStyle.secondary, row=0)
     async def prev_card(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         entries = self.cog._get_entries(data, str(interaction.user.id), self.filter_value, self.sort_value)
         if not entries:
             return
@@ -357,7 +357,7 @@ class CollectionDetailView(discord.ui.View):
 
     @discord.ui.button(label="Next", style=discord.ButtonStyle.primary, row=0)
     async def next_card(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         entries = self.cog._get_entries(data, str(interaction.user.id), self.filter_value, self.sort_value)
         if not entries:
             return
@@ -375,8 +375,8 @@ class CollectionDetailView(discord.ui.View):
 
     @discord.ui.button(label="Lock / Unlock", style=discord.ButtonStyle.secondary, row=1)
     async def lock_toggle(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        status = self.cog._toggle_lock(str(interaction.user.id), self.card_uid)
-        data = self.cog.bot.storage.load()
+        status = await self.cog._toggle_lock(str(interaction.user.id), self.card_uid)
+        data = await self.cog.bot.storage.load()
         if status != "ok":
             await smart_reply(interaction, "Unable to update lock state.", ephemeral=True)
             return
@@ -387,8 +387,8 @@ class CollectionDetailView(discord.ui.View):
 
     @discord.ui.button(label="Favorite", style=discord.ButtonStyle.primary, row=1)
     async def favorite_toggle(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        status = self.cog._toggle_favorite(str(interaction.user.id), self.card_uid)
-        data = self.cog.bot.storage.load()
+        status = await self.cog._toggle_favorite(str(interaction.user.id), self.card_uid)
+        data = await self.cog.bot.storage.load()
         if status != "ok":
             await smart_reply(interaction, "Unable to update favorite state.", ephemeral=True)
             return
@@ -399,7 +399,7 @@ class CollectionDetailView(discord.ui.View):
 
     @discord.ui.button(label="Upgrade", style=discord.ButtonStyle.success, row=1)
     async def upgrade(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         item = self.cog._find_item(data, str(interaction.user.id), self.card_uid)
         if item is None:
             await smart_reply(interaction, "Card not found.", ephemeral=True)
@@ -428,7 +428,7 @@ class CollectionDetailView(discord.ui.View):
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.secondary, row=1)
     async def back_to_collection(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         entries = self.cog._get_entries(data, str(interaction.user.id), self.filter_value, self.sort_value)
         view = CollectionGalleryView(self.cog, self.invoker_id, self.filter_value, self.sort_value, self.page)
         embed = view.build_embed(data, entries)
@@ -452,7 +452,7 @@ class FilterSelect(discord.ui.Select):
             return
         self.collection_view.filter_value = self.values[0]
         self.collection_view.page = 1
-        data = self.collection_view.cog.bot.storage.load()
+        data = await self.collection_view.cog.bot.storage.load()
         entries = self.collection_view.cog._get_entries(data, str(interaction.user.id), self.collection_view.filter_value, self.collection_view.sort_value)
         self.collection_view.sync_state(entries)
         _sanitize_view(self.collection_view)
@@ -474,7 +474,7 @@ class SortSelect(discord.ui.Select):
             return
         self.collection_view.sort_value = self.values[0]
         self.collection_view.page = 1
-        data = self.collection_view.cog.bot.storage.load()
+        data = await self.collection_view.cog.bot.storage.load()
         entries = self.collection_view.cog._get_entries(data, str(interaction.user.id), self.collection_view.filter_value, self.collection_view.sort_value)
         self.collection_view.sync_state(entries)
         _sanitize_view(self.collection_view)
@@ -521,7 +521,7 @@ class CardSelectMenu(discord.ui.Select):
         if uid == "__none__":
             await interaction.response.defer()
             return
-        data = self.gallery_view.cog.bot.storage.load()
+        data = await self.gallery_view.cog.bot.storage.load()
         item = self.gallery_view.cog._find_item(data, str(interaction.user.id), uid)
         card_def = _get_card_def(data, item or {}) if item else {}
         has_path = bool(str(card_def.get("unique_path", "")).strip())
@@ -615,14 +615,14 @@ class CollectionGalleryView(discord.ui.View):
 
     async def _on_prev(self, interaction: discord.Interaction) -> None:
         self.page -= 1
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         entries = self.cog._get_entries(data, str(interaction.user.id), self.filter_value, self.sort_value)
         _sanitize_view(self)
         await interaction.response.edit_message(embed=self.build_embed(data, entries), view=self)
 
     async def _on_next(self, interaction: discord.Interaction) -> None:
         self.page += 1
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         entries = self.cog._get_entries(data, str(interaction.user.id), self.filter_value, self.sort_value)
         _sanitize_view(self)
         await interaction.response.edit_message(embed=self.build_embed(data, entries), view=self)
@@ -834,7 +834,7 @@ class InventoryCog(commands.Cog):
         return embed
 
 
-    def _toggle_lock(self, user_id: str, uid: str) -> str:
+    async def _toggle_lock(self, user_id: str, uid: str) -> str:
         def mutate(data: dict[str, Any]) -> str:
             item = self._find_item(data, user_id, uid)
             if item is None:
@@ -845,9 +845,9 @@ class InventoryCog(commands.Cog):
             item["locked"] = not current
             return "ok"
 
-        return self.bot.storage.with_lock(mutate)
+        return await self.bot.storage.with_lock(mutate)
 
-    def _toggle_favorite(self, user_id: str, uid: str) -> str:
+    async def _toggle_favorite(self, user_id: str, uid: str) -> str:
         def mutate(data: dict[str, Any]) -> str:
             item = self._find_item(data, user_id, uid)
             if item is None:
@@ -857,9 +857,9 @@ class InventoryCog(commands.Cog):
             item["favourite"] = value
             return "ok"
 
-        return self.bot.storage.with_lock(mutate)
+        return await self.bot.storage.with_lock(mutate)
 
-    def _perform_upgrade(self, user_id: str, uid: str) -> tuple[str, int, int]:
+    async def _perform_upgrade(self, user_id: str, uid: str) -> tuple[str, int, int]:
         def mutate(data: dict[str, Any]) -> tuple[str, int, int]:
             player = data["players"].get(user_id, {})
             user = player.get("user", {}) if isinstance(player, dict) else {}
@@ -887,7 +887,7 @@ class InventoryCog(commands.Cog):
             item["stars"] = stars + 1
             return "ok", stars + 1, int(user.get("balance", user.get("coins", 0)))
 
-        return self.bot.storage.with_lock(mutate)
+        return await self.bot.storage.with_lock(mutate)
 
     def _upgradeable_entries(self, data: dict[str, Any], user_id: str) -> list[dict[str, Any]]:
         """Return owned card instances that can be upgraded right now.
@@ -917,7 +917,7 @@ class InventoryCog(commands.Cog):
             return
 
         user_id = str(interaction.user.id)
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         item = self._find_item(data, user_id, card)
 
         if item is None:
@@ -979,7 +979,7 @@ class InventoryCog(commands.Cog):
             return
 
         user_id = str(interaction.user.id)
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
 
         if user_id not in data.get("players", {}):
             await interaction.response.send_message("Could not load your player data. Please try again.", ephemeral=True)

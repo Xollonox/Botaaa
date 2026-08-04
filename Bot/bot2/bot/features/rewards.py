@@ -146,7 +146,7 @@ class RewardCardActionView(discord.ui.View):
             user["balance"] = int(user.get("balance", 0)) + sold_for
             return True, sold_for
 
-        ok, sold_for = self.bot.storage.with_lock(mutate)
+        ok, sold_for = await self.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message("Card no longer available.", ephemeral=True)
             return
@@ -215,7 +215,7 @@ class RewardCardActionView(discord.ui.View):
             card["squad_locked"] = True
             return True, "ok"
 
-        ok, status = self.bot.storage.with_lock(mutate)
+        ok, status = await self.bot.storage.with_lock(mutate)
         if not ok:
             msg = "Squad is full (4 slots max)." if status == "full" else ("Card already in squad." if status == "exists" else "Unable to add card to squad.")
             await interaction.response.send_message(msg, ephemeral=True)
@@ -269,7 +269,7 @@ class RewardsCog(commands.Cog):
             cooldowns["hourly"] = now
             return True, 0, int(user.get("balance", 0)), amount
 
-        claimed, remaining, new_balance, amount = self.bot.storage.with_lock(mutate)
+        claimed, remaining, new_balance, amount = await self.bot.storage.with_lock(mutate)
 
         if not claimed:
             embed = _reward_embed(
@@ -390,7 +390,7 @@ class RewardsCog(commands.Cog):
         (
             claimed, remaining, card_def, card_instance,
             pulled_rarity, new_balance, coins_path, granted_coins, streak, multiplier,
-        ) = self.bot.storage.with_lock(mutate)
+        ) = await self.bot.storage.with_lock(mutate)
 
         panel_map = {
             "daily": ("Daily Reward", "Daily Reward", DAILY_COLOR, "CARD OBTAINED"),

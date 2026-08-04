@@ -235,7 +235,7 @@ class TermsGateView(discord.ui.View):
             ensure_started_player(data, user_id, username, accept_terms=True)
             return data
 
-        self.bot.storage.with_lock(mutate)
+        await self.bot.storage.with_lock(mutate)
         # Warm the bot-level terms cache so subsequent commands skip storage.load()
         if hasattr(self.bot, "mark_terms_accepted"):
             self.bot.mark_terms_accepted(interaction.user.id)
@@ -246,7 +246,7 @@ class TermsGateView(discord.ui.View):
 
     @discord.ui.button(label="Start", style=discord.ButtonStyle.primary, row=0)
     async def start_panel(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not has_user_accepted_terms(data, str(interaction.user.id)):
             if interaction.response.is_done():
                 await interaction.followup.send("You must accept the terms first.")
@@ -486,7 +486,7 @@ class OnboardingCog(commands.Cog):
             grant_pending_milestone_packs(data, user_id)
             return data
 
-        self.bot.storage.with_lock(mutate)
+        await self.bot.storage.with_lock(mutate)
         granted = result["granted"]
 
         # Warm the bot-level terms cache so subsequent commands skip storage.load()
@@ -503,7 +503,7 @@ class OnboardingCog(commands.Cog):
 
     @app_commands.command(name="help", description="Browse all commands by category.")
     async def help(self, interaction: discord.Interaction) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         view = HelpPaginatorView(interaction.user.id, data, timeout=120)
         await smart_reply(interaction, embed=view._build_embed(), view=view, ephemeral=True)
         view.message = await interaction.original_response()

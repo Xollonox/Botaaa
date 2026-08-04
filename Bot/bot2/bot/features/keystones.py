@@ -66,8 +66,8 @@ class KeystonesCog(commands.Cog):
                 "keystone": str(keystone.get("name", "")),
             }
 
-        result, info = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        result, info = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
 
         if result == "equipped":
             body = (
@@ -101,7 +101,7 @@ class KeystonesCog(commands.Cog):
             return
 
         user_id = str(interaction.user.id)
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
 
         player = data.get("players", {}).get(user_id, {})
         inv = player.get("user", {}).get("inventory", []) if isinstance(player, dict) else []

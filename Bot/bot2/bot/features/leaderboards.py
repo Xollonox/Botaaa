@@ -29,7 +29,7 @@ class LeaderboardPanel(discord.ui.View):
         self.page = 1
         self.page_size = 10
         self.message: discord.Message | None = None
-        self._data = data if data is not None else cog.bot.storage.load()
+        self._data = data if data is not None else cog.bot.storage.load_readonly()
         self._sync()
 
     def _sync(self) -> None:
@@ -182,14 +182,14 @@ class LeaderboardsCog(commands.Cog):
     async def lb_global(self, interaction: discord.Interaction, page: app_commands.Range[int, 1, None] = 1) -> None:
         if not await ensure_registered(interaction, self.bot.storage):
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         await self._send_player_page(interaction, data, self._player_rows(data), "Global", int(page))
 
     @lb.command(name="league", description="League leaderboard")
     async def lb_league(self, interaction: discord.Interaction, league_name: str, page: app_commands.Range[int, 1, None] = 1) -> None:
         if not await ensure_registered(interaction, self.bot.storage):
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         league = str(league_name).strip()
         rows = [row for row in self._player_rows(data) if row.get("rank") == league]
         await self._send_player_page(interaction, data, rows, f"League: {league}", int(page))
@@ -202,7 +202,7 @@ class LeaderboardsCog(commands.Cog):
     async def lb_gang(self, interaction: discord.Interaction, page: app_commands.Range[int, 1, None] = 1) -> None:
         if not await ensure_registered(interaction, self.bot.storage):
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
 
         gangs = data.get("gangs", {})
         if not isinstance(gangs, dict) or not gangs:
@@ -234,7 +234,7 @@ class LeaderboardsCog(commands.Cog):
     async def lb_alliance(self, interaction: discord.Interaction, page: app_commands.Range[int, 1, None] = 1) -> None:
         if not await ensure_registered(interaction, self.bot.storage):
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
 
         alliances = data.get("alliances", {})
         if not isinstance(alliances, dict) or not alliances:

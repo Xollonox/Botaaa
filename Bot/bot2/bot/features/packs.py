@@ -479,7 +479,7 @@ class PackPanelView(discord.ui.View):
         return make_embed(data, "🧰 Pack Management Panel", box("Pack Manager", [l for l in desc.splitlines() if l.strip()]))
 
     async def _refresh(self, interaction: discord.Interaction, note: str = "") -> None:
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         self._rebuild(data)
         embed = self._embed(data, note)
         if interaction.response.is_done():
@@ -573,7 +573,7 @@ class PackPanelView(discord.ui.View):
 
             return True, "No changes."
 
-        ok, msg = self.cog.bot.storage.with_lock(mutate)
+        ok, msg = await self.cog.bot.storage.with_lock(mutate)
         if ok:
             if action == "create_pack":
                 self.selected_pack = create_name
@@ -608,7 +608,7 @@ class PacksCog(commands.Cog):
     @app_commands.command(name="o_pack", description="Owner: open pack management panel.")
     @app_commands.guilds(OWNER_GUILD)
     async def o_pack(self, interaction: discord.Interaction) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
@@ -668,8 +668,8 @@ class PacksCog(commands.Cog):
 
             return True, "ok", {"pack": pack, "quantity": qty, "total_cost": total_cost}
 
-        ok, reason, payload = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok, reason, payload = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
         if not ok:
             reason_text = str(reason)
             if reason_text.startswith("insufficient_coins:"):

@@ -226,10 +226,10 @@ class AssignSelect(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction) -> None:
         uid = self.values[0]
-        status, card_name, power = self.cog._assign_uid_to_slot(
+        status, card_name, power = await self.cog._assign_uid_to_slot(
             str(interaction.user.id), self.panel.current_slot, uid
         )
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         if status != "ok":
             msg = "Could not assign that card to this slot."
             if status == "duplicate_card":
@@ -257,7 +257,7 @@ class SwapSelect(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction) -> None:
         selected = int(self.values[0])
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
 
         if self.first_slot is None:
             # Step 2: pick second slot
@@ -277,7 +277,7 @@ class SwapSelect(discord.ui.Select):
             )
             return
 
-        status, power = self.cog._swap_slots(str(interaction.user.id), self.first_slot, selected)
+        status, power = await self.cog._swap_slots(str(interaction.user.id), self.first_slot, selected)
         if status != "ok":
             await interaction.response.send_message(
                 embed=make_embed(data, f"{e('warning', data)} Swap Failed", "Could not swap those slots."),
@@ -305,8 +305,8 @@ class ClearConfirmView(discord.ui.View):
 
     @discord.ui.button(label="✅ Confirm Clear All", style=discord.ButtonStyle.danger, row=0)
     async def confirm(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        status = self.cog._clear_squad(str(interaction.user.id))
-        data   = self.cog.bot.storage.load()
+        status = await self.cog._clear_squad(str(interaction.user.id))
+        data   = await self.cog.bot.storage.load()
         if status != "ok":
             await interaction.response.send_message(
                 embed=make_embed(data, f"{e('warning', data)} Failed", "Could not clear squad."),
@@ -321,7 +321,7 @@ class ClearConfirmView(discord.ui.View):
 
     @discord.ui.button(label="❌ Cancel", style=discord.ButtonStyle.secondary, row=0)
     async def cancel(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        data   = self.cog.bot.storage.load()
+        data   = await self.cog.bot.storage.load()
         player = get_player(data, str(interaction.user.id))
         embed  = _build_squad_embed(data, interaction.user, player, self.panel.current_slot)
         await interaction.response.edit_message(embed=embed, view=self.panel)
@@ -371,7 +371,7 @@ class SquadPanel(discord.ui.View):
     @discord.ui.button(label="◀ Prev", style=discord.ButtonStyle.secondary, row=0)
     async def prev_slot(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         self.current_slot = (self.current_slot - 1) % NUM_SLOTS
-        data   = self.cog.bot.storage.load()
+        data   = await self.cog.bot.storage.load()
         player = get_player(data, str(interaction.user.id))
         embed  = _build_squad_embed(data, interaction.user, player, self.current_slot)
         await interaction.response.edit_message(embed=embed, view=self)
@@ -379,7 +379,7 @@ class SquadPanel(discord.ui.View):
     @discord.ui.button(label="Next ▶", style=discord.ButtonStyle.primary, row=0)
     async def next_slot(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         self.current_slot = (self.current_slot + 1) % NUM_SLOTS
-        data   = self.cog.bot.storage.load()
+        data   = await self.cog.bot.storage.load()
         player = get_player(data, str(interaction.user.id))
         embed  = _build_squad_embed(data, interaction.user, player, self.current_slot)
         await interaction.response.edit_message(embed=embed, view=self)
@@ -389,7 +389,7 @@ class SquadPanel(discord.ui.View):
     @discord.ui.button(label="📥 Assign", style=discord.ButtonStyle.success, row=1)
     async def assign_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         options = self.cog._inventory_options(str(interaction.user.id), self.current_slot)
-        data    = self.cog.bot.storage.load()
+        data    = await self.cog.bot.storage.load()
         if not options:
             await interaction.response.send_message(
                 embed=make_embed(data, f"{e('warning', data)} No Cards", "No unassigned cards available for this slot."),
@@ -406,8 +406,8 @@ class SquadPanel(discord.ui.View):
 
     @discord.ui.button(label="📤 Remove", style=discord.ButtonStyle.danger, row=1)
     async def remove_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        status, removed_name, power = self.cog._remove_slot(str(interaction.user.id), self.current_slot)
-        data = self.cog.bot.storage.load()
+        status, removed_name, power = await self.cog._remove_slot(str(interaction.user.id), self.current_slot)
+        data = await self.cog.bot.storage.load()
         if status != "ok":
             await interaction.response.send_message(
                 embed=make_embed(data, f"{e('warning', data)} Slot Empty",
@@ -421,7 +421,7 @@ class SquadPanel(discord.ui.View):
 
     @discord.ui.button(label="🔄 Swap", style=discord.ButtonStyle.secondary, row=1)
     async def swap_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         view = _SubView(self.invoker_id)
         view.add_item(SwapSelect(self.cog, self))
         await interaction.response.edit_message(
@@ -433,7 +433,7 @@ class SquadPanel(discord.ui.View):
 
     @discord.ui.button(label="👁 View", style=discord.ButtonStyle.secondary, row=2)
     async def view_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        data   = self.cog.bot.storage.load()
+        data   = await self.cog.bot.storage.load()
         player = get_player(data, str(interaction.user.id))
         squad  = get_squad(player)
         uid    = _get_slot_uid(squad, self.current_slot)
@@ -458,8 +458,8 @@ class SquadPanel(discord.ui.View):
 
     @discord.ui.button(label="⚡ Auto Fill", style=discord.ButtonStyle.success, row=2)
     async def auto_fill_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        status, filled_count = self.cog._auto_fill_squad(str(interaction.user.id))
-        data = self.cog.bot.storage.load()
+        status, filled_count = await self.cog._auto_fill_squad(str(interaction.user.id))
+        data = await self.cog.bot.storage.load()
         if status == "not_enough":
             await interaction.response.send_message(
                 embed=make_embed(data, f"{e('warning', data)} Not Enough Cards",
@@ -481,7 +481,7 @@ class SquadPanel(discord.ui.View):
 
     @discord.ui.button(label="🗑 Clear All", style=discord.ButtonStyle.danger, row=2)
     async def clear_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         await interaction.response.edit_message(
             embed=make_embed(data, "🗑 Clear All Slots",
                              "This will remove **all cards** from your squad.\nAre you sure?"),
@@ -509,7 +509,7 @@ class _BackView(discord.ui.View):
 
     @discord.ui.button(label="← Back to Squad", style=discord.ButtonStyle.secondary, row=0)
     async def back(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
-        data   = self.panel.cog.bot.storage.load()
+        data   = await self.panel.cog.bot.storage.load()
         player = get_player(data, str(interaction.user.id))
         embed  = _build_squad_embed(data, interaction.user, player, self.panel.current_slot)
         await interaction.response.edit_message(embed=embed, view=self.panel)
@@ -525,7 +525,7 @@ class SquadCog(commands.Cog):
     # ── logic helpers ──────────────────────────────────────────────────────
 
     def _inventory_options(self, user_id: str, slot_index: int) -> list[discord.SelectOption]:
-        data      = self.bot.storage.load()
+        data      = self.bot.storage.load_readonly()
         player    = get_player(data, user_id)
         if player is None:
             return []
@@ -559,7 +559,7 @@ class SquadCog(commands.Cog):
                 break
         return options
 
-    def _assign_uid_to_slot(self, user_id: str, slot_index: int, uid: str) -> tuple[str, str, int]:
+    async def _assign_uid_to_slot(self, user_id: str, slot_index: int, uid: str) -> tuple[str, str, int]:
         def mutate(data: dict[str, Any]) -> tuple[str, str, int]:
             player    = get_player(data, user_id)
             if player is None:
@@ -598,9 +598,9 @@ class SquadCog(commands.Cog):
             if isinstance(user, dict):
                 advance_tutorial(user, "assign_squad")
             return "ok", str(inst.get("card_name", "Unknown")), compute_squad_power(data, player)
-        return self.bot.storage.with_lock(mutate)
+        return await self.bot.storage.with_lock(mutate)
 
-    def _remove_slot(self, user_id: str, slot_index: int) -> tuple[str, str, int]:
+    async def _remove_slot(self, user_id: str, slot_index: int) -> tuple[str, str, int]:
         def mutate(data: dict[str, Any]) -> tuple[str, str, int]:
             player    = get_player(data, user_id)
             if player is None:
@@ -620,9 +620,9 @@ class SquadCog(commands.Cog):
                     item["squad_locked"] = still_in
                     break
             return "ok", removed_name, compute_squad_power(data, player)
-        return self.bot.storage.with_lock(mutate)
+        return await self.bot.storage.with_lock(mutate)
 
-    def _swap_slots(self, user_id: str, a: int, b: int) -> tuple[str, int]:
+    async def _swap_slots(self, user_id: str, a: int, b: int) -> tuple[str, int]:
         def mutate(data: dict[str, Any]) -> tuple[str, int]:
             player = get_player(data, user_id)
             if player is None:
@@ -634,9 +634,9 @@ class SquadCog(commands.Cog):
             _set_slot_uid(squad, b, ua)
             _cleanup_slots(squad)
             return "ok", compute_squad_power(data, player)
-        return self.bot.storage.with_lock(mutate)
+        return await self.bot.storage.with_lock(mutate)
 
-    def _clear_squad(self, user_id: str) -> str:
+    async def _clear_squad(self, user_id: str) -> str:
         def mutate(data: dict[str, Any]) -> str:
             player = get_player(data, user_id)
             if player is None:
@@ -650,9 +650,9 @@ class SquadCog(commands.Cog):
                 if str(item.get("uid", "")) in to_unlock:
                     item["squad_locked"] = False
             return "ok"
-        return self.bot.storage.with_lock(mutate)
+        return await self.bot.storage.with_lock(mutate)
 
-    def _auto_fill_squad(self, user_id: str) -> tuple[str, int]:
+    async def _auto_fill_squad(self, user_id: str) -> tuple[str, int]:
         """Auto-fill squad with top 4 strongest cards by power."""
         def mutate(data: dict[str, Any]) -> tuple[str, int]:
             player = get_player(data, user_id)
@@ -718,8 +718,8 @@ class SquadCog(commands.Cog):
                 advance_tutorial(user, "assign_squad")
             
             return "ok", len(top_cards)
-        
-        return self.bot.storage.with_lock(mutate)
+
+        return await self.bot.storage.with_lock(mutate)
 
     # ── command ────────────────────────────────────────────────────────────
 
@@ -728,7 +728,7 @@ class SquadCog(commands.Cog):
         if not await ensure_registered(interaction, self.bot.storage):
             return
 
-        data   = self.bot.storage.load()
+        data   = await self.bot.storage.load()
         player = get_player(data, str(interaction.user.id))
         if player is None:
             await interaction.response.send_message(

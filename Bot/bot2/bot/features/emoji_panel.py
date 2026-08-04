@@ -142,7 +142,7 @@ class EmojiPanelView(discord.ui.View):
         if v == "__empty__": await interaction.response.defer(); return
         await interaction.response.defer()
         self.sel_key = v
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         self._build(data)
         await interaction.edit_original_response(embed=self._embed(data), view=self)
 
@@ -152,8 +152,8 @@ class EmojiPanelView(discord.ui.View):
         if chosen == "__none__" or not self.sel_key: await interaction.response.defer(); return
         await interaction.response.defer()
         key = self.sel_key
-        self.cog.bot.storage.with_lock(lambda d: set_emoji(d, key, chosen))
-        data = self.cog.bot.storage.load()
+        await self.cog.bot.storage.with_lock(lambda d: set_emoji(d, key, chosen))
+        data = await self.cog.bot.storage.load()
         self.keys = sorted(list_keys(data))
         self._build(data)
         await interaction.edit_original_response(embed=self._embed(data), view=self)
@@ -162,7 +162,7 @@ class EmojiPanelView(discord.ui.View):
         if not await self._guard(interaction): return
         await interaction.response.defer()
         self.page = max(0, self.page - 1)
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         self.keys = sorted(list_keys(data))
         self._build(data)
         await interaction.edit_original_response(embed=self._embed(data), view=self)
@@ -171,7 +171,7 @@ class EmojiPanelView(discord.ui.View):
         if not await self._guard(interaction): return
         await interaction.response.defer()
         self.page = min(self._max_page(), self.page + 1)
-        data = self.cog.bot.storage.load()
+        data = await self.cog.bot.storage.load()
         self.keys = sorted(list_keys(data))
         self._build(data)
         await interaction.edit_original_response(embed=self._embed(data), view=self)
@@ -181,8 +181,8 @@ class EmojiPanelView(discord.ui.View):
         if not self.sel_key: await interaction.response.defer(); return
         await interaction.response.defer()
         key = self.sel_key
-        self.cog.bot.storage.with_lock(lambda d: reset_emoji(d, key))
-        data = self.cog.bot.storage.load()
+        await self.cog.bot.storage.with_lock(lambda d: reset_emoji(d, key))
+        data = await self.cog.bot.storage.load()
         self.keys = sorted(list_keys(data))
         self._build(data)
         await interaction.edit_original_response(embed=self._embed(data), view=self)
@@ -198,7 +198,7 @@ class EmojiPanelCog(commands.Cog):
         if not is_owner(interaction):
             await interaction.response.send_message("Owner only.", ephemeral=True)
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         view = EmojiPanelView(self, str(interaction.user.id), data, interaction.guild)
         await smart_reply(interaction, embed=view._embed(data), view=view, ephemeral=True)
 
@@ -209,14 +209,14 @@ class EmojiPanelCog(commands.Cog):
             await interaction.response.send_message("Owner only.", ephemeral=True)
             return
         k, v = str(key).strip().lower(), str(emoji).strip()
-        self.bot.storage.with_lock(lambda d: set_emoji(d, k, v))
-        data = self.bot.storage.load()
+        await self.bot.storage.with_lock(lambda d: set_emoji(d, k, v))
+        data = await self.bot.storage.load()
         await smart_reply(interaction, embed=make_embed(data, f"{e('ok',data)} Emoji Updated", f"Set `{k}` → {v}"), ephemeral=True)
 
     @o_emoji_set.autocomplete("key")
     async def _key_ac(self, _: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         token = current.lower()
-        return [app_commands.Choice(name=k, value=k) for k in sorted(list_keys(self.bot.storage.load())) if token in k][:25]
+        return [app_commands.Choice(name=k, value=k) for k in sorted(list_keys(await self.bot.storage.load())) if token in k][:25]
 
     @app_commands.command(name="o_emoji_reset", description="Owner: reset one emoji key to default.")
     @app_commands.guilds(OWNER_GUILD)
@@ -225,14 +225,14 @@ class EmojiPanelCog(commands.Cog):
             await interaction.response.send_message("Owner only.", ephemeral=True)
             return
         k = str(key).strip().lower()
-        self.bot.storage.with_lock(lambda d: reset_emoji(d, k))
-        data = self.bot.storage.load()
+        await self.bot.storage.with_lock(lambda d: reset_emoji(d, k))
+        data = await self.bot.storage.load()
         await smart_reply(interaction, embed=make_embed(data, f"{e('ok',data)} Emoji Reset", f"Reset `{k}` → {e(k,data)}"), ephemeral=True)
 
     @o_emoji_reset.autocomplete("key")
     async def _reset_ac(self, _: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         token = current.lower()
-        return [app_commands.Choice(name=k, value=k) for k in sorted(list_keys(self.bot.storage.load())) if token in k][:25]
+        return [app_commands.Choice(name=k, value=k) for k in sorted(list_keys(await self.bot.storage.load())) if token in k][:25]
 
     @app_commands.command(name="o_emoji_reset_all", description="Owner: reset all emoji keys to defaults.")
     @app_commands.guilds(OWNER_GUILD)
@@ -240,8 +240,8 @@ class EmojiPanelCog(commands.Cog):
         if not is_owner(interaction):
             await interaction.response.send_message("Owner only.", ephemeral=True)
             return
-        count = self.bot.storage.with_lock(lambda d: reset_all_emojis(d))
-        data  = self.bot.storage.load()
+        count = await self.bot.storage.with_lock(lambda d: reset_all_emojis(d))
+        data  = await self.bot.storage.load()
         await smart_reply(interaction, embed=make_embed(data, f"{e('ok',data)} All Reset", f"Reset {count} keys to defaults."), ephemeral=True)
 
 

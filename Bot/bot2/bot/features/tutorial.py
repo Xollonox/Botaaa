@@ -117,7 +117,7 @@ class TutorialCog(commands.Cog):
 
     @discord.app_commands.command(name="tutorial", description="View your tutorial progress.")
     async def tutorial_cmd(self, interaction: discord.Interaction) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         player = data.get("players", {}).get(str(interaction.user.id))
         if not player:
             await interaction.response.send_message("Use `/start` first!", ephemeral=True)
@@ -131,7 +131,7 @@ class TutorialCog(commands.Cog):
                 u = p.get("user", {})
                 advance_tutorial(u, "view_achievements")
                 return d
-            self.bot.storage.with_lock(mutate)
+            await self.bot.storage.with_lock(mutate)
             step = 5
 
         embed = build_tutorial_embed(step if step < 6 else 6)

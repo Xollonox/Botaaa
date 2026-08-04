@@ -211,7 +211,7 @@ class ShopBuyOpenButtons:
                     rolls.extend(r)
             return True, "ok", rolls
 
-        ok, reason, all_rolls = view.cog.bot.storage.with_lock(mutate)
+        ok, reason, all_rolls = await view.cog.bot.storage.with_lock(mutate)
 
         if not ok:
             msg_text = "Not registered." if reason == "not_registered" else reason
@@ -239,7 +239,7 @@ class ShopBuyOpenButtons:
 
         # 3. Run animation
         if msg and not anim_view.skipped:
-            await animate_pack_open(msg, title, all_rolls, view.cog.bot.storage.load(), anim_view)
+            await animate_pack_open(msg, title, all_rolls, await view.cog.bot.storage.load(), anim_view)
 
         await asyncio.sleep(0.3)
 
@@ -373,7 +373,7 @@ class ShopPages(discord.ui.View):
             if not interaction.response.is_done():
                 await interaction.response.defer()
             self._rebuild_selects()
-            data = self.cog.bot.storage.load()
+            data = await self.cog.bot.storage.load()
             await interaction.edit_original_response(embed=self.embed(data), view=self)
             return True
         except discord.NotFound:
@@ -484,7 +484,7 @@ class OwnerPackListPages(discord.ui.View):
             return
         self.page = max(0, self.page - 1)
         self._refresh()
-        await interaction.response.edit_message(embed=self.embed(self.cog.bot.storage.load()), view=self)
+        await interaction.response.edit_message(embed=self.embed(await self.cog.bot.storage.load()), view=self)
 
     @discord.ui.button(label="Next", style=discord.ButtonStyle.secondary)
     async def next_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
@@ -493,7 +493,7 @@ class OwnerPackListPages(discord.ui.View):
             return
         self.page = min(self._max_page(), self.page + 1)
         self._refresh()
-        await interaction.response.edit_message(embed=self.embed(self.cog.bot.storage.load()), view=self)
+        await interaction.response.edit_message(embed=self.embed(await self.cog.bot.storage.load()), view=self)
 
 
 class ShopCog(commands.Cog):
@@ -524,7 +524,7 @@ class ShopCog(commands.Cog):
 
     @app_commands.command(name="shop", description="Show enabled packs and their drop-rate tables.")
     async def shop(self, interaction: discord.Interaction) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         ensure_packs_structure(data)
         definitions = data.get("packs", {}).get("definitions", {})
         packs: list[dict[str, Any]] = []
@@ -541,7 +541,7 @@ class ShopCog(commands.Cog):
     @app_commands.command(name="o_shop_pack_list", description="Owner: list all packs including disabled.")
     @app_commands.guilds(OWNER_GUILD)
     async def o_shop_pack_list(self, interaction: discord.Interaction) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
@@ -568,7 +568,7 @@ class ShopCog(commands.Cog):
     @app_commands.command(name="o_shop_pack_set_enabled", description="Owner: enable/disable a pack.")
     @app_commands.guilds(OWNER_GUILD)
     async def o_shop_pack_set_enabled(self, interaction: discord.Interaction, pack_name: str, enabled: bool) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Owner Only", "Not allowed."), ephemeral=True)
             return
@@ -581,8 +581,8 @@ class ShopCog(commands.Cog):
             pack["enabled"] = bool(enabled)
             return True, "ok", pack
 
-        ok, reason, pack = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok, reason, pack = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
         if not ok:
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} Update Failed", str(reason)), ephemeral=True)
             return
@@ -595,7 +595,7 @@ class ShopCog(commands.Cog):
 
     @o_shop_pack_set_enabled.autocomplete("pack_name")
     async def o_shop_pack_set_enabled_pack_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        return self._pack_choices(self.bot.storage.load(), current)
+        return self._pack_choices(await self.bot.storage.load(), current)
 
 
 async def setup(bot: commands.Bot) -> None:

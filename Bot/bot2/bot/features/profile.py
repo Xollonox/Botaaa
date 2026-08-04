@@ -61,7 +61,7 @@ class FeaturedCardSelect(discord.ui.Select):
                 return str(card.get("card_name", "Unknown")), str(card.get("rarity", "Common"))
             return "Unknown", "Common"
 
-        card_name, rarity = self.bot.storage.with_lock(mutate)
+        card_name, rarity = await self.bot.storage.with_lock(mutate)
         embed = make_embed(None, "Featured Card Updated", f"🖼️ {card_name}\n{rarity}", footer="Player Profile")
         await interaction.response.send_message(embed=embed)
 
@@ -119,7 +119,7 @@ class ProfileCog(commands.Cog):
         if not await ensure_registered(interaction, self.bot.storage):
             return
         await interaction.response.defer()
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         target = user or interaction.user
         target_id = str(target.id)
         players = data.get("players", {})
@@ -158,14 +158,14 @@ class ProfileCog(commands.Cog):
             if isinstance(profile, dict):
                 profile["bio"] = cleaned
 
-        self.bot.storage.with_lock(mutate)
+        await self.bot.storage.with_lock(mutate)
         embed = make_embed(None, "Bio Updated", f"*{cleaned}*", footer="Player Profile")
         await interaction.response.send_message(embed=embed)
 
     async def setfeatured(self, interaction: discord.Interaction) -> None:
         if not await ensure_registered(interaction, self.bot.storage):
             return
-        data      = self.bot.storage.load()
+        data      = await self.bot.storage.load()
         uid       = str(interaction.user.id)
         players   = data.get("players", {})
         player    = players.get(uid, {}) if isinstance(players, dict) else {}

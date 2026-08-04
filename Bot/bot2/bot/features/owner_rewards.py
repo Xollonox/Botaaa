@@ -35,7 +35,7 @@ class OwnerRewardsCog(commands.Cog):
         rates_infernal: int,
         rates_abyssal: int,
     ) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             embed = make_embed(data, f"{e('no', data)} Owner Only", "You are not allowed to use this command.")
             await smart_reply(interaction, embed=embed, ephemeral=True)
@@ -75,7 +75,7 @@ class OwnerRewardsCog(commands.Cog):
             reward_cfg["rates"] = dict(rates)
             return old_amount, state
 
-        old_amount, updated_data = self.bot.storage.with_lock(mutate)
+        old_amount, updated_data = await self.bot.storage.with_lock(mutate)
         bonus_state = f"Enabled {e('ok', updated_data)}" if bonus_enabled else f"Disabled {e('no', updated_data)}"
 
         embed = make_embed(

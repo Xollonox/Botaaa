@@ -45,7 +45,7 @@ class ProfileOwnerCog(commands.Cog):
     @app_commands.command(name="o_profile_set_default_bg", description="Owner: set global default profile background URL.")
     @app_commands.guilds(OWNER_GUILD)
     async def o_profile_set_default_bg(self, interaction: discord.Interaction, image_url: str) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=self._owner_only_embed(data), ephemeral=True)
             return
@@ -63,14 +63,14 @@ class ProfileOwnerCog(commands.Cog):
             if isinstance(profile_cfg, dict):
                 profile_cfg["default_background_url"] = str(image_url)
 
-        self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
         await smart_reply(interaction, embed=make_embed(data, f"{e('ok', data)} Default Background Updated", image_url or "(cleared)"), ephemeral=True)
 
     @app_commands.command(name="o_profile_set_default_featured", description="Owner: set default featured card by catalog name.")
     @app_commands.guilds(OWNER_GUILD)
     async def o_profile_set_default_featured(self, interaction: discord.Interaction, card_name: str) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=self._owner_only_embed(data), ephemeral=True)
             return
@@ -89,19 +89,19 @@ class ProfileOwnerCog(commands.Cog):
             if isinstance(profile_cfg, dict):
                 profile_cfg["default_featured_card_name"] = str(card_name)
 
-        self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
         await smart_reply(interaction, embed=make_embed(data, f"{e('ok', data)} Default Featured Updated", card_name), ephemeral=True)
 
     @o_profile_set_default_featured.autocomplete("card_name")
     async def o_profile_set_default_featured_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         return self._card_choices(data, current)
 
     @app_commands.command(name="o_profile_set_premium", description="Owner: set premium status for a user.")
     @app_commands.guilds(OWNER_GUILD)
     async def o_profile_set_premium(self, interaction: discord.Interaction, user: discord.User, enabled: bool) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=self._owner_only_embed(data), ephemeral=True)
             return
@@ -116,8 +116,8 @@ class ProfileOwnerCog(commands.Cog):
             user_row["is_premium"] = bool(enabled)
             return True
 
-        ok = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
         if not ok:
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} User Not Registered", "Target user is not registered."), ephemeral=True)
             return
@@ -139,7 +139,7 @@ class ProfileOwnerCog(commands.Cog):
         await self._set_cosmetic(interaction, user, "badge_id", badge_id)
 
     async def _set_cosmetic(self, interaction: discord.Interaction, user: discord.User, key: str, value: str) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=self._owner_only_embed(data), ephemeral=True)
             return
@@ -158,8 +158,8 @@ class ProfileOwnerCog(commands.Cog):
                 return True
             return False
 
-        ok = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
         if not ok:
             await smart_reply(interaction, embed=make_embed(data, f"{e('warning', data)} User Not Registered", "Target user is not registered."), ephemeral=True)
             return
@@ -168,7 +168,7 @@ class ProfileOwnerCog(commands.Cog):
     @app_commands.command(name="o_profile_preview", description="Owner: preview profile as owner view.")
     @app_commands.guilds(OWNER_GUILD)
     async def o_profile_preview(self, interaction: discord.Interaction, user: discord.User) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=self._owner_only_embed(data), ephemeral=True)
             return

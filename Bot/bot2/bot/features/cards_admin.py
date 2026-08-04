@@ -356,7 +356,7 @@ class AddCardModal(discord.ui.Modal, title="LOOKISM CG • Add Card"):
             _cards_root(data)[payload["name"]] = _to_storage_card(payload)
             return True, payload["name"]
 
-        ok, msg = self.cog.bot.storage.with_lock(mutate)
+        ok, msg = await self.cog.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message(msg, ephemeral=True)
             return
@@ -386,7 +386,7 @@ class CardSelect(discord.ui.Select):
             await interaction.response.send_message("No card selected.", ephemeral=True)
             return
         self.panel.card_key = self.values[0]
-        data = self.panel.cog.bot.storage.load()
+        data = await self.panel.cog.bot.storage.load()
         card = _cards_root(data).get(self.panel.card_key, {})
         self.panel.payload = _ensure_editor_payload(card if isinstance(card, dict) else {})
         await interaction.response.edit_message(embed=_editor_embed(self.panel.payload), view=self.panel)
@@ -687,7 +687,7 @@ class ConfirmDeleteCardModal(discord.ui.Modal, title="Delete Card"):
             _cards_root(data).pop(key, None)
             return True
 
-        ok = self.panel.cog.bot.storage.with_lock(mutate)
+        ok = await self.panel.cog.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message("Card not found.", ephemeral=True)
             return
@@ -704,7 +704,7 @@ class CardEditorPanel(discord.ui.View):
         self.card_key = initial_key
         self.payload: dict[str, Any] = {}
 
-        data = self.cog.bot.storage.load()
+        data = self.cog.bot.storage.load_readonly()
         cards = _cards_root(data)
         self.select = CardSelect(self, cards)
         self.add_item(self.select)
@@ -769,7 +769,7 @@ class CardEditorPanel(discord.ui.View):
             self.card_key = self.payload["name"]
             return True
 
-        self.cog.bot.storage.with_lock(mutate)
+        await self.cog.bot.storage.with_lock(mutate)
         await interaction.response.edit_message(embed=_editor_embed(self.payload), view=self)
 
     @discord.ui.button(label="Delete Card", style=discord.ButtonStyle.danger, row=4)
@@ -784,7 +784,7 @@ class CardsAdminCog(commands.Cog):
         self.bot = bot
 
     async def _card_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         cards = data.get("cards", {})
         if not isinstance(cards, dict):
             return []
@@ -804,7 +804,7 @@ class CardsAdminCog(commands.Cog):
         return out
 
     async def _attack_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         ensure_attacks_structure(data)
         catalog = data["attacks"]["catalog"]
         text = current.strip().lower()
@@ -819,7 +819,7 @@ class CardsAdminCog(commands.Cog):
         return out
 
     async def _assigned_attack_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         card_name = str(getattr(interaction.namespace, "card_name", ""))
         keys = card_attack_keys(data, card_name)
         catalog = data.get("attacks", {}).get("catalog", {}) if isinstance(data.get("attacks", {}), dict) else {}
@@ -899,7 +899,7 @@ class CardsAdminCog(commands.Cog):
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             return add_card_def(data, card)
 
-        ok, msg = self.bot.storage.with_lock(mutate)
+        ok, msg = await self.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message(msg, ephemeral=True)
             return
@@ -938,7 +938,7 @@ class CardsAdminCog(commands.Cog):
         if not is_owner(interaction):
             await interaction.response.send_message("Owner only command.", ephemeral=True)
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         cards = data.get("cards", {}) if isinstance(data.get("cards", {}), dict) else {}
         key = find_catalog_key(cards, card_name)
         current_mastery: list[str] = []
@@ -989,7 +989,7 @@ class CardsAdminCog(commands.Cog):
         def mutate(state: dict[str, Any]) -> tuple[bool, str]:
             return edit_card_def(state, card_name, updates)
 
-        ok, msg = self.bot.storage.with_lock(mutate)
+        ok, msg = await self.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message(msg, ephemeral=True)
             return
@@ -1028,7 +1028,7 @@ class CardsAdminCog(commands.Cog):
             }
             return True, str(name).strip()
 
-        ok, msg = self.bot.storage.with_lock(mutate)
+        ok, msg = await self.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message(msg, ephemeral=True)
             return
@@ -1090,7 +1090,7 @@ class CardsAdminCog(commands.Cog):
             }
             return True, str(name).strip()
 
-        ok, msg = self.bot.storage.with_lock(mutate)
+        ok, msg = await self.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message(msg, ephemeral=True)
             return
@@ -1105,7 +1105,7 @@ class CardsAdminCog(commands.Cog):
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             return delete_card_def(data, card_name, confirm)
 
-        ok, msg = self.bot.storage.with_lock(mutate)
+        ok, msg = await self.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message(msg, ephemeral=True)
             return
@@ -1134,7 +1134,7 @@ class CardsAdminCog(commands.Cog):
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             return add_attack_to_catalog(data, entry)
 
-        ok, msg = self.bot.storage.with_lock(mutate)
+        ok, msg = await self.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message(msg, ephemeral=True)
             return
@@ -1166,7 +1166,7 @@ class CardsAdminCog(commands.Cog):
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             return edit_attack_in_catalog(data, attack_name, updates)
 
-        ok, msg = self.bot.storage.with_lock(mutate)
+        ok, msg = await self.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message(msg, ephemeral=True)
             return
@@ -1192,7 +1192,7 @@ class CardsAdminCog(commands.Cog):
             touched = remove_attack_from_all_cards(data, key)
             return True, f"{key} removed from {touched} card(s)."
 
-        ok, msg = self.bot.storage.with_lock(mutate)
+        ok, msg = await self.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message(msg, ephemeral=True)
             return
@@ -1207,7 +1207,7 @@ class CardsAdminCog(commands.Cog):
         if not is_owner(interaction):
             await interaction.response.send_message("Owner only command.", ephemeral=True)
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         rows = list_attacks(data)
         if not rows:
             await interaction.response.send_message("Attack catalog is empty.", ephemeral=True)
@@ -1228,7 +1228,7 @@ class CardsAdminCog(commands.Cog):
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             return assign_attack_to_card(data, card_name, attack_name)
 
-        ok, msg = self.bot.storage.with_lock(mutate)
+        ok, msg = await self.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message(msg, ephemeral=True)
             return
@@ -1251,7 +1251,7 @@ class CardsAdminCog(commands.Cog):
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
             return remove_attack_from_card(data, card_name, attack_name)
 
-        ok, msg = self.bot.storage.with_lock(mutate)
+        ok, msg = await self.bot.storage.with_lock(mutate)
         if not ok:
             await interaction.response.send_message(msg, ephemeral=True)
             return
@@ -1270,7 +1270,7 @@ class CardsAdminCog(commands.Cog):
         if not is_owner(interaction):
             await interaction.response.send_message("Owner only command.", ephemeral=True)
             return
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         keys = card_attack_keys(data, card_name)
         catalog = data.get("attacks", {}).get("catalog", {}) if isinstance(data.get("attacks", {}), dict) else {}
         if not keys:

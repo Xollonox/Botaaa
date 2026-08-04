@@ -218,7 +218,7 @@ class LookismBot(commands.Bot):
             data.setdefault("trades", {})["pending"] = {}
             return unlocked
 
-        count = self.storage.with_lock(mutate)
+        count = await self.storage.with_lock(mutate)
         logger.warning(
             "[BOOT] Trade recovery: cleared %d transient pending row(s) and unlocked %d card(s).",
             pending_count,
@@ -241,7 +241,7 @@ class LookismBot(commands.Bot):
         if user_id in self._terms_cache:
             return True
 
-        data = self.storage.load()
+        data = await self.storage.load()
         if has_user_accepted_terms(data, str(user_id)):
             self._terms_cache.add(user_id)
             return True

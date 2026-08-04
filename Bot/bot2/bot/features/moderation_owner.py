@@ -30,7 +30,7 @@ class ModerationOwnerCog(commands.Cog):
         target: discord.User,
         reason: str = "No reason provided.",
     ) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Access Denied", "This command is restricted to bot owners only."), ephemeral=True)
             return
@@ -45,8 +45,8 @@ class ModerationOwnerCog(commands.Cog):
             user["ban_reason"] = str(reason)
             return True
 
-        ok = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
 
         if not ok:
             await smart_reply(
@@ -83,7 +83,7 @@ class ModerationOwnerCog(commands.Cog):
         interaction: discord.Interaction,
         target: discord.User,
     ) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Access Denied", "This command is restricted to bot owners only."), ephemeral=True)
             return
@@ -99,8 +99,8 @@ class ModerationOwnerCog(commands.Cog):
             user.pop("ban_reason", None)
             return True, was_banned
 
-        ok, was_banned = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok, was_banned = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
 
         if not ok:
             await smart_reply(
@@ -133,7 +133,7 @@ class ModerationOwnerCog(commands.Cog):
         target: discord.User,
         reason: str = "No reason provided.",
     ) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Access Denied", "This command is restricted to bot owners only."), ephemeral=True)
             return
@@ -148,8 +148,8 @@ class ModerationOwnerCog(commands.Cog):
             user["mute_reason"] = str(reason)
             return True
 
-        ok = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
 
         if not ok:
             await smart_reply(
@@ -180,7 +180,7 @@ class ModerationOwnerCog(commands.Cog):
         interaction: discord.Interaction,
         target: discord.User,
     ) -> None:
-        data = self.bot.storage.load()
+        data = await self.bot.storage.load()
         if not is_owner(interaction):
             await smart_reply(interaction, embed=make_embed(data, f"{e('no', data)} Access Denied", "This command is restricted to bot owners only."), ephemeral=True)
             return
@@ -196,8 +196,8 @@ class ModerationOwnerCog(commands.Cog):
             user.pop("mute_reason", None)
             return True, was_muted
 
-        ok, was_muted = self.bot.storage.with_lock(mutate)
-        data = self.bot.storage.load()
+        ok, was_muted = await self.bot.storage.with_lock(mutate)
+        data = await self.bot.storage.load()
 
         if not ok:
             await smart_reply(
