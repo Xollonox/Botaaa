@@ -47,6 +47,11 @@ class GangInviteView(discord.ui.View):
         return True
 
     async def _handle(self, interaction: discord.Interaction, accept: bool) -> None:
+        try:
+            await interaction.response.defer()
+        except (discord.NotFound, discord.HTTPException):
+            pass
+
         uid = str(interaction.user.id)
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str]:
@@ -92,16 +97,25 @@ class GangInviteView(discord.ui.View):
                 child.disabled = True
 
         if not ok:
-            await interaction.response.edit_message(
-                embed=_err(f"╭─ ❌ Invite Failed\n│ {result}\n╰────────────────"), view=self)
-            return
-
-        if result == "declined":
-            await interaction.response.edit_message(
-                embed=_inf(f"╭─ ❌ Invite Declined\n│ You declined to join **{self.gang_name}**.\n╰────────────────"), view=self)
+            embed = _err(f"╭─ ❌ Invite Failed\n│ {result}\n╰────────────────")
+        elif result == "declined":
+            embed = _inf(f"╭─ ❌ Invite Declined\n│ You declined to join **{self.gang_name}**.\n╰────────────────")
         else:
-            await interaction.response.edit_message(
-                embed=_ok(f"╭─ ✅ Joined Gang!\n│ Welcome to **{self.gang_name}**!\n│ 👤 Role: Member\n╰────────────────"), view=self)
+            embed = _ok(f"╭─ ✅ Joined Gang!\n│ Welcome to **{self.gang_name}**!\n│ 👤 Role: Member\n╰────────────────")
+
+        try:
+            if interaction.response.is_done():
+                await interaction.edit_original_response(embed=embed, view=self)
+            else:
+                await interaction.response.edit_message(embed=embed, view=self)
+        except discord.NotFound:
+            if interaction.message:
+                try:
+                    await interaction.message.edit(embed=embed, view=self)
+                except discord.HTTPException:
+                    pass
+        except discord.HTTPException:
+            pass
 
     @discord.ui.button(label="✅ Accept", style=discord.ButtonStyle.success, row=0)
     async def accept_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
