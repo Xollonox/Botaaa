@@ -128,6 +128,7 @@ class CardToolsCog(commands.Cog):
 
     @app_commands.command(name="card_info", description="View information about a catalog card.")
     async def card_info(self, interaction: discord.Interaction, card_name: str) -> None:
+        await interaction.response.defer()
         data = await self.bot.storage.load()
         catalog = data.get("cards", {})
         card = find_catalog_card(catalog, card_name)
@@ -151,6 +152,7 @@ class CardToolsCog(commands.Cog):
         return _card_name_choices(await self.bot.storage.load(), current)
 
     async def _set_flag(self, interaction: discord.Interaction, query: str, key: str, value: bool, title_key: str) -> None:
+        await interaction.response.defer(ephemeral=True)
         from bot.utils.checks import ensure_registered
         from bot.utils.cards_logic import find_owned_instance
         if not await ensure_registered(interaction, self.bot.storage):

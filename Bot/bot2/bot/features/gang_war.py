@@ -342,6 +342,7 @@ class GangWarCog(commands.Cog):
         app_commands.Choice(name="30v30", value=30),
     ])
     async def war_start(self, i: discord.Interaction, format: app_commands.Choice[int]) -> None:
+        await i.response.defer(ephemeral=True)
         if not await ensure_registered(i, self.bot.storage): return
         data = await self.bot.storage.load()
         uid  = str(i.user.id)
@@ -358,6 +359,7 @@ class GangWarCog(commands.Cog):
 
     @war.command(name="status", description="View current war status.")
     async def war_status(self, i: discord.Interaction) -> None:
+        await i.response.defer()
         if not await ensure_registered(i, self.bot.storage): return
         data = await self.bot.storage.load()
         uid  = str(i.user.id)
@@ -383,6 +385,7 @@ class GangWarCog(commands.Cog):
 
     @war.command(name="attack", description="Attack an opponent in the war.")
     async def war_attack(self, i: discord.Interaction) -> None:
+        await i.response.defer(ephemeral=True)
         if not await ensure_registered(i, self.bot.storage): return
         data = await self.bot.storage.load()
         uid  = str(i.user.id)
@@ -400,6 +403,7 @@ class GangWarCog(commands.Cog):
 
     @war.command(name="record", description="Record your war battle result after fighting.")
     async def war_record(self, i: discord.Interaction) -> None:
+        await i.response.defer()
         if not await ensure_registered(i, self.bot.storage): return
         data = await self.bot.storage.load()
         uid  = str(i.user.id)
@@ -456,6 +460,7 @@ class GangWarCog(commands.Cog):
 
     @war.command(name="cancel_queue", description="Cancel matchmaking — Head/Vice only.")
     async def war_cancel_queue(self, i: discord.Interaction) -> None:
+        await i.response.defer()
         if not await ensure_registered(i, self.bot.storage): return
         data = await self.bot.storage.load()
         uid  = str(i.user.id)
@@ -478,6 +483,7 @@ class GangWarCog(commands.Cog):
         app_commands.Choice(name="OUT \u2014 Skip me for wars",      value="out"),
     ])
     async def war_preference(self, i: discord.Interaction, preference: app_commands.Choice[str]) -> None:
+        await i.response.defer()
         if not await ensure_registered(i, self.bot.storage): return
         uid  = str(i.user.id)
         pref = preference.value
@@ -490,6 +496,7 @@ class GangWarCog(commands.Cog):
 
     @app_commands.command(name="defensive_squad_setup", description="Set your defensive squad for gang wars.")
     async def def_squad(self, i: discord.Interaction) -> None:
+        await i.response.defer(ephemeral=True)
         if not await ensure_registered(i, self.bot.storage): return
         data = await self.bot.storage.load()
         uid  = str(i.user.id)
@@ -508,7 +515,8 @@ class GangWarCog(commands.Cog):
 
     @app_commands.command(name="o_war_start", description="Owner: force-start a war (any format, any gangs).")
     async def o_war_start(self, i: discord.Interaction, gang_a: str, gang_b: str, format: int = 1) -> None:
-        if not is_owner(i): await error_reply(i, embed=_err("\u274c Owner only.")); return
+        await i.response.defer(ephemeral=True)
+        if not is_owner(i): await error_reply(i, embed=_err("❌ Owner only.")); return
         data = await self.bot.storage.load()
         gid_a, ga = find_gang_by_name(data, gang_a)
         gid_b, gb = find_gang_by_name(data, gang_b)
@@ -524,7 +532,8 @@ class GangWarCog(commands.Cog):
 
     @app_commands.command(name="o_war_end", description="Owner: force-end a war.")
     async def o_war_end(self, i: discord.Interaction, war_id: str) -> None:
-        if not is_owner(i): await error_reply(i, embed=_err("\u274c Owner only.")); return
+        await i.response.defer(ephemeral=True)
+        if not is_owner(i): await error_reply(i, embed=_err("❌ Owner only.")); return
         def mutate(d: dict) -> tuple[bool, str]:
             w = _war_root(d)
             war = w["active_wars"].get(war_id)
@@ -539,7 +548,8 @@ class GangWarCog(commands.Cog):
     @app_commands.command(name="o_war_set_phase", description="Owner: force phase change.")
     @app_commands.choices(phase=[app_commands.Choice(name="prep", value="prep"), app_commands.Choice(name="battle", value="battle")])
     async def o_war_set_phase(self, i: discord.Interaction, war_id: str, phase: app_commands.Choice[str]) -> None:
-        if not is_owner(i): await error_reply(i, embed=_err("\u274c Owner only.")); return
+        await i.response.defer(ephemeral=True)
+        if not is_owner(i): await error_reply(i, embed=_err("❌ Owner only.")); return
         def mutate(d: dict) -> bool:
             war = _war_root(d)["active_wars"].get(war_id)
             if not isinstance(war, dict): return False
@@ -549,7 +559,8 @@ class GangWarCog(commands.Cog):
 
     @app_commands.command(name="o_war_set_durations", description="Owner: set phase durations in seconds.")
     async def o_war_set_durations(self, i: discord.Interaction, prep_seconds: int = 300, battle_seconds: int = 300) -> None:
-        if not is_owner(i): await error_reply(i, embed=_err("\u274c Owner only.")); return
+        await i.response.defer(ephemeral=True)
+        if not is_owner(i): await error_reply(i, embed=_err("❌ Owner only.")); return
         import bot.utils.war_logic as wl
         wl.PREP_DURATION = prep_seconds
         wl.BATTLE_DURATION = battle_seconds
@@ -557,7 +568,8 @@ class GangWarCog(commands.Cog):
 
     @app_commands.command(name="o_war_list", description="Owner: list all wars and queue.")
     async def o_war_list(self, i: discord.Interaction) -> None:
-        if not is_owner(i): await error_reply(i, embed=_err("\u274c Owner only.")); return
+        await i.response.defer(ephemeral=True)
+        if not is_owner(i): await error_reply(i, embed=_err("❌ Owner only.")); return
         data = await self.bot.storage.load()
         w    = _war_root(data)
         wlines = []

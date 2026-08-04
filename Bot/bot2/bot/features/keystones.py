@@ -30,6 +30,7 @@ class KeystonesCog(commands.Cog):
 
     @app_commands.command(name="keystone_assign", description="Equip or unequip your keystone on a Mythical+ card.")
     async def keystone_assign(self, interaction: discord.Interaction, card_name: str) -> None:
+        await interaction.response.defer()
         from bot.utils.checks import ensure_registered
         if not await ensure_registered(interaction, self.bot.storage):
             return
@@ -96,6 +97,7 @@ class KeystonesCog(commands.Cog):
 
     @app_commands.command(name="keystone_info", description="View the keystone details for one of your Mythical+ cards.")
     async def keystone_info(self, interaction: discord.Interaction, card_name: str) -> None:
+        await interaction.response.defer()
         from bot.utils.checks import ensure_registered
         if not await ensure_registered(interaction, self.bot.storage):
             return

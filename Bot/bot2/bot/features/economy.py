@@ -41,6 +41,7 @@ class EconomyCog(commands.Cog):
 
     @app_commands.command(name="balance", description="Show your coin and premium balances.")
     async def balance(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer(ephemeral=True)
         if not await ensure_registered(interaction, self.bot.storage):
             return
 
@@ -77,6 +78,7 @@ class EconomyCog(commands.Cog):
         target: discord.User,
         amount: app_commands.Range[int, 1, None],
     ) -> None:
+        await interaction.response.defer(ephemeral=True)
         if not is_owner(interaction):
             data = await self.bot.storage.load()
             embed = make_embed(
@@ -130,6 +132,7 @@ class EconomyCog(commands.Cog):
         target: discord.User,
         amount: app_commands.Range[int, 1, None],
     ) -> None:
+        await interaction.response.defer(ephemeral=True)
         if not is_owner(interaction):
             data = await self.bot.storage.load()
             embed = make_embed(
@@ -184,6 +187,7 @@ class EconomyCog(commands.Cog):
         target: discord.User,
         amount: app_commands.Range[int, 1, None],
     ) -> None:
+        await interaction.response.defer(ephemeral=True)
         if not is_owner(interaction):
             data = await self.bot.storage.load()
             embed = make_embed(

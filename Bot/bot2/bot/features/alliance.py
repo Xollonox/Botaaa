@@ -165,6 +165,7 @@ class AllianceCog(commands.Cog):
     @alliance.command(name="create", description="Create an alliance (Head only).")
     async def alliance_create(self, interaction: discord.Interaction,
                                name: str, description: str = "—") -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         uid = str(interaction.user.id)
@@ -221,6 +222,7 @@ class AllianceCog(commands.Cog):
 
     @alliance.command(name="info", description="Show alliance info.")
     async def alliance_info(self, interaction: discord.Interaction, alliance_name: str | None = None) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         data = await self.bot.storage.load()
@@ -271,6 +273,7 @@ class AllianceCog(commands.Cog):
 
     @alliance.command(name="invite", description="Invite a gang to your alliance (Head only).")
     async def alliance_invite(self, interaction: discord.Interaction, gang_name: str) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         uid = str(interaction.user.id)
@@ -350,6 +353,7 @@ class AllianceCog(commands.Cog):
 
     @alliance.command(name="leave", description="Leave your alliance (Head only).")
     async def alliance_leave(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         uid = str(interaction.user.id)

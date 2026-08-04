@@ -913,6 +913,7 @@ class InventoryCog(commands.Cog):
     @app_commands.command(name="upgrade", description="Upgrade a fighter's star level using a duplicate card.")
     @app_commands.describe(card="The fighter to upgrade (only cards you can upgrade right now are shown).")
     async def upgrade_command(self, interaction: discord.Interaction, card: str) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
 
@@ -975,6 +976,7 @@ class InventoryCog(commands.Cog):
 
     @app_commands.command(name="collection", description="Browse your card collection.")
     async def collection(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
 

@@ -111,10 +111,10 @@ class FakeStorage:
     def __init__(self, data: dict) -> None:
         self.data = data
 
-    def load(self) -> dict:
+    async def load(self) -> dict:
         return self.data
 
-    def with_lock(self, fn):
+    async def with_lock(self, fn):
         return fn(self.data)
 
 

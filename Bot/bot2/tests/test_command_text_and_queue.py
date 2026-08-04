@@ -19,6 +19,15 @@ def test_friendly_acknowledges_before_slow_route_and_storage_work() -> None:
     )
 
 
+def test_gang_create_acknowledges_before_storage_work() -> None:
+    from bot.features.gangs import GangsCog
+
+    source = inspect.getsource(GangsCog.gang_create.callback)
+    assert source.index("await interaction.response.defer()") < source.index(
+        "ensure_registered(interaction, self.bot.storage)"
+    )
+
+
 def test_help_uses_registered_group_command_names() -> None:
     commands = [cmd for category in help_index.HELP_CATEGORIES for cmd, _desc in category["items"]]
 

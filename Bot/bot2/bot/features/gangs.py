@@ -162,6 +162,7 @@ class GangsCog(commands.Cog):
 
     @gang.command(name="create", description=f"Create a gang (costs {GANG_CREATION_COST:,} coins).")
     async def gang_create(self, interaction: discord.Interaction, name: str) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         uid = str(interaction.user.id)
@@ -215,6 +216,7 @@ class GangsCog(commands.Cog):
 
     @gang.command(name="info", description="Show gang info.")
     async def gang_info(self, interaction: discord.Interaction, gang_name: str | None = None) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         data = await self.bot.storage.load()
@@ -265,6 +267,7 @@ class GangsCog(commands.Cog):
 
     @gang.command(name="invite", description="Invite a user to your gang.")
     async def gang_invite(self, interaction: discord.Interaction, user: discord.User) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         actor_id  = str(interaction.user.id)
@@ -331,6 +334,7 @@ class GangsCog(commands.Cog):
 
     @gang.command(name="join", description="Join an open gang.")
     async def gang_join(self, interaction: discord.Interaction, gang_name: str) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         uid = str(interaction.user.id)
@@ -369,6 +373,7 @@ class GangsCog(commands.Cog):
 
     @gang.command(name="leave", description="Leave your gang.")
     async def gang_leave(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         uid = str(interaction.user.id)
@@ -402,6 +407,7 @@ class GangsCog(commands.Cog):
 
     @gang.command(name="kick", description="Kick a member from your gang.")
     async def gang_kick(self, interaction: discord.Interaction, user_id: str) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         actor  = str(interaction.user.id)
@@ -447,6 +453,7 @@ class GangsCog(commands.Cog):
         app_commands.Choice(name="🏅 Elder",       value="elder"),
     ])
     async def gang_promote(self, interaction: discord.Interaction, user_id: str, role: app_commands.Choice[str]) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         actor  = str(interaction.user.id)
@@ -487,6 +494,7 @@ class GangsCog(commands.Cog):
 
     @gang.command(name="demote", description="Demote a member to regular Member.")
     async def gang_demote(self, interaction: discord.Interaction, user_id: str) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         actor  = str(interaction.user.id)
@@ -524,6 +532,7 @@ class GangsCog(commands.Cog):
 
     @gang.command(name="members", description="List gang members.")
     async def gang_members(self, interaction: discord.Interaction, gang_name: str | None = None) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         data = await self.bot.storage.load()
@@ -554,6 +563,7 @@ class GangsCog(commands.Cog):
 
     @gang.command(name="transfer_owner", description="Transfer gang ownership.")
     async def gang_transfer_owner(self, interaction: discord.Interaction, user_id: str) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         actor  = str(interaction.user.id)
@@ -591,6 +601,7 @@ class GangsCog(commands.Cog):
 
     @gang.command(name="set_description", description="Set gang description (Head only).")
     async def gang_set_description(self, interaction: discord.Interaction, text: app_commands.Range[str, 1, 200]) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         actor = str(interaction.user.id)
@@ -623,6 +634,7 @@ class GangsCog(commands.Cog):
         app_commands.Choice(name="🔒 Closed", value="closed"),
     ])
     async def gang_set_status(self, interaction: discord.Interaction, status: app_commands.Choice[str]) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         actor = str(interaction.user.id)
@@ -652,6 +664,7 @@ class GangsCog(commands.Cog):
 
     @gang.command(name="stats", description="Show gang stats.")
     async def gang_stats(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.bot.storage):
             return
         data = await self.bot.storage.load()
