@@ -66,6 +66,17 @@ class TradeGroup(app_commands.Group):
 
     @app_commands.command(name="start", description="Start a trade negotiation with another player.")
     async def start(self, interaction: discord.Interaction, user: discord.User) -> None:
+        # Creating a trade touches both SQLite and JSON storage.  Defer before
+        # any of that work so the slash-command interaction cannot expire.
+        try:
+            await interaction.response.defer(thinking=True, ephemeral=True)
+        except discord.NotFound:
+            logger.warning("/trade start interaction expired before acknowledgement")
+            return
+        except discord.HTTPException:
+            logger.exception("Failed to acknowledge /trade start")
+            return
+
         if not await ensure_registered(interaction, self.cog.bot.storage):
             return
 

@@ -31,6 +31,28 @@ TRADE_PRICE_BANDS: dict[str, tuple[int, int]] = {
 }
 
 
+async def _update_trade_message(
+    interaction: discord.Interaction,
+    *,
+    embed: discord.Embed,
+    view: discord.ui.View | None,
+    prefer_message: bool = False,
+) -> None:
+    """Update a trade panel whether its component interaction was deferred or not."""
+    try:
+        if interaction.response.is_done() or prefer_message:
+            if interaction.message is not None:
+                await interaction.message.edit(embed=embed, view=view)
+        else:
+            await interaction.response.edit_message(embed=embed, view=view)
+    except discord.NotFound:
+        # The component token can expire while a storage operation is running.
+        # The trade state has still been resolved, so there is nothing to retry.
+        logger.warning("Trade interaction expired before its panel could be updated")
+    except discord.HTTPException:
+        logger.exception("Failed to update trade panel message")
+
+
 def _ago(ts: int) -> str:
     diff = now_ts() - ts
     if diff < 60:    return "just now"
@@ -341,7 +363,7 @@ class TradePanel(discord.ui.View):
     async def _refresh(self, interaction: discord.Interaction) -> None:
         self._rebuild()
         embed = _panel_embed(self.session, self.locked_a, self.locked_b)
-        await interaction.response.edit_message(embed=embed, view=self)
+        await _update_trade_message(interaction, embed=embed, view=self)
 
     async def _on_card_a(self, interaction: discord.Interaction) -> None:
         if str(interaction.user.id) != self.a_id:
@@ -351,6 +373,7 @@ class TradePanel(discord.ui.View):
         if uid == "none":
             await interaction.response.defer()
             return
+        await interaction.response.defer()
         data = await self.cog.bot.storage.load()
         player = get_player(data, self.a_id)
         inv = player.get("user", {}).get("inventory", []) if player else []
@@ -369,6 +392,7 @@ class TradePanel(discord.ui.View):
         if uid == "none":
             await interaction.response.defer()
             return
+        await interaction.response.defer()
         data = await self.cog.bot.storage.load()
         player = get_player(data, self.b_id)
         inv = player.get("user", {}).get("inventory", []) if player else []
@@ -426,6 +450,15 @@ class TradePanel(discord.ui.View):
         confirm_view.message = interaction.message
 
     async def _on_cancel(self, interaction: discord.Interaction) -> None:
+        try:
+            await interaction.response.defer()
+        except discord.NotFound:
+            # Continue the cancellation: editing the message itself does not
+            # require the now-expired interaction token.
+            logger.warning("Trade cancel interaction expired before acknowledgement")
+        except discord.HTTPException:
+            logger.exception("Failed to acknowledge trade cancellation")
+
         def mutate(data: dict[str, Any]) -> None:
             for side_id, key in ((self.a_id, "a_card"), (self.b_id, "b_card")):
                 card = self.session.get(key)
@@ -441,7 +474,7 @@ class TradePanel(discord.ui.View):
         self.cog.unregister_panel(self)
         self.stop()
         e = make_embed(None, "LOOKISM CG • TRADE", f"╭─ 🚫 Trade Cancelled\n│ Cancelled by @{interaction.user.name}\n╰────────────────", color=0xE74C3C)
-        await interaction.response.edit_message(embed=e, view=None)
+        await _update_trade_message(interaction, embed=e, view=None, prefer_message=True)
 
 
 class ConfirmView(discord.ui.View):
@@ -472,6 +505,16 @@ class ConfirmView(discord.ui.View):
                 ephemeral=True,
             )
             return
+
+        # Completing a trade performs several storage writes.  Acknowledge the
+        # button first so Discord's three-second component deadline cannot
+        # invalidate the interaction during those writes.
+        try:
+            await interaction.response.defer()
+        except discord.NotFound:
+            logger.warning("Trade confirm interaction expired before acknowledgement")
+        except discord.HTTPException:
+            logger.exception("Failed to acknowledge trade confirmation")
 
         s = self.panel.session
         a_id = self.panel.a_id
@@ -562,7 +605,7 @@ class ConfirmView(discord.ui.View):
             elif reason.startswith("insufficient_b:"):
                 _, have, need = reason.split(":")
                 msg = f"@{s['b_name']} doesn't have enough coins ({int(have):,} / {int(need):,})."
-            await interaction.response.send_message(msg, ephemeral=True)
+            await interaction.followup.send(msg, ephemeral=True)
             return
 
         a_gave = f"{_ri(s['a_card']['rarity'])} {s['a_card']['card_name']}" if s.get("a_card") else f"💰 {int(s.get('a_coins',0)):,} coins"
@@ -574,7 +617,7 @@ class ConfirmView(discord.ui.View):
             "╰────────────────"
         )
         embed = make_embed(None, "LOOKISM CG • TRADE", body, color=0x2ECC71)
-        await interaction.response.edit_message(embed=embed, view=None)
+        await _update_trade_message(interaction, embed=embed, view=None, prefer_message=True)
 
     @discord.ui.button(label="✏️ Edit Offer", style=discord.ButtonStyle.secondary, row=0)
     async def edit_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
@@ -587,6 +630,15 @@ class ConfirmView(discord.ui.View):
 
     @discord.ui.button(label="❌ Cancel", style=discord.ButtonStyle.danger, row=0)
     async def cancel_btn(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
+        try:
+            await interaction.response.defer()
+        except discord.NotFound:
+            # The cancellation itself is still valid; fall back to editing the
+            # message directly once state cleanup is complete.
+            logger.warning("Trade cancel interaction expired before acknowledgement")
+        except discord.HTTPException:
+            logger.exception("Failed to acknowledge trade cancellation")
+
         def mutate(data: dict[str, Any]) -> None:
             for sid, key in ((self.panel.a_id, "a_card"), (self.panel.b_id, "b_card")):
                 card = self.panel.session.get(key)
@@ -602,7 +654,7 @@ class ConfirmView(discord.ui.View):
         self.cog.unregister_panel(self.panel)
         self.stop()
         e = make_embed(None, "LOOKISM CG • TRADE", f"╭─ 🚫 Trade Cancelled\n│ Cancelled by @{interaction.user.name}\n╰────────────────", color=0xE74C3C)
-        await interaction.response.edit_message(embed=e, view=None)
+        await _update_trade_message(interaction, embed=e, view=None, prefer_message=True)
 
 
 def _history_embed_rows(user_id: str, username: str, rows: list[dict[str, Any]]) -> discord.Embed:
