@@ -33,7 +33,7 @@ def test_shop_purchase_tracks_global_and_player_spend() -> None:
 
 
 def _shop_view() -> ShopPages:
-    storage = SimpleNamespace(load=MagicMock(return_value={"players": {}}))
+    storage = SimpleNamespace(load=AsyncMock(return_value={"players": {}}))
     cog = SimpleNamespace(bot=SimpleNamespace(storage=storage))
     return ShopPages(cog, "123", [], "Shop")
 
@@ -42,7 +42,7 @@ def test_shop_component_defers_before_rebuilding_and_loading() -> None:
     events: list[str] = []
     view = _shop_view()
     view._rebuild_selects = MagicMock(side_effect=lambda: events.append("rebuild"))
-    view.cog.bot.storage.load = MagicMock(side_effect=lambda: events.append("load") or {"players": {}})
+    view.cog.bot.storage.load = AsyncMock(side_effect=lambda: events.append("load") or {"players": {}})
     view.embed = MagicMock(return_value=discord.Embed(title="Shop"))
 
     response = SimpleNamespace(
