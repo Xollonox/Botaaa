@@ -1,14 +1,16 @@
 """Firestore-backed storage with the old JSON ``Storage`` public API
-(``load``, ``load_readonly``, ``with_lock``, ``save``, ``async_save``).
+(``load``, ``load_readonly``, ``with_lock``, ``save``).
 
 Data is split between a ``players`` collection (one doc per user id, to
 stay under Firestore's 1MB/doc limit) and a ``bot_state/global`` doc for
-everything else. ``with_lock``/``save`` are synchronous blocking network
-calls; the ~60+ call sites rely on that contract (none ``await`` them).
+everything else. ``load``/``save``/``with_lock`` are ``async`` and offload
+their blocking Firestore network calls to a thread executor so a single
+round-trip can't stall the event loop for every other user's interaction.
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import threading
 from copy import deepcopy
@@ -94,8 +96,12 @@ class FirestoreStorage:
     # Public API (mirrors bot.data.storage.Storage)
     # ------------------------------------------------------------------
 
-    def load(self) -> dict[str, Any]:
+    def _sync_load(self) -> dict[str, Any]:
         return deepcopy(self._live_data())
+
+    async def load(self) -> dict[str, Any]:
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self._sync_load)
 
     def load_readonly(self) -> dict[str, Any]:
         return self._live_data()
@@ -164,25 +170,17 @@ class FirestoreStorage:
         if rest_changed:
             global_ref.set(rest)
 
-    def save(self, data: dict[str, Any]) -> None:
+    def _sync_save(self, data: dict[str, Any]) -> None:
         """Persist *data*, diffing against the current cache to minimize writes."""
         before = self._cache if self._cache is not None else self._load_from_firestore()
         self._commit_diff(data, before)
         self._cache = data
 
-    async def async_save(self, data: dict[str, Any]) -> None:
-        import asyncio
-
+    async def save(self, data: dict[str, Any]) -> None:
         loop = asyncio.get_running_loop()
-        await loop.run_in_executor(None, self.save, data)
+        await loop.run_in_executor(None, self._sync_save, data)
 
-    def with_lock(self, fn: Callable[[dict[str, Any]], T]) -> T:
-        """Execute *fn* with exclusive access to the storage.
-
-        Blocking network I/O to Firestore happens inside this call, matching
-        the original ``Storage.with_lock`` contract (called synchronously,
-        without ``await``, from ~60+ existing call sites).
-        """
+    def _sync_with_lock(self, fn: Callable[[dict[str, Any]], T]) -> T:
         with self.lock:
             data = deepcopy(self._live_data())
             # `self._cache` still points at the pre-mutation snapshot — fn()
@@ -192,3 +190,13 @@ class FirestoreStorage:
             self._commit_diff(data, self._cache)
             self._cache = data
             return result
+
+    async def with_lock(self, fn: Callable[[dict[str, Any]], T]) -> T:
+        """Execute *fn* with exclusive access to the storage.
+
+        Blocking network I/O to Firestore happens in a thread executor so a
+        single Firestore round-trip can't stall the event loop (and every
+        other user's interaction) while this call is in flight.
+        """
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self._sync_with_lock, fn)
