@@ -264,13 +264,17 @@ class MarketGroup(app_commands.Group):
 
     @app_commands.command(name="browse", description="Browse the market.")
     async def browse(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
         if not await ensure_registered(interaction, self.cog.bot.storage):
             return
         data = await self.cog._load_market_data()
         panel = MarketPanel(self.cog, interaction.user.id, data)
         embed, _ = build_market_embed(data, 0, "latest", None)
-        await interaction.response.send_message(embed=embed, view=panel)
-        panel.message = await interaction.original_response()
+        await smart_reply(interaction, embed=embed, view=panel)
+        try:
+            panel.message = await interaction.original_response()
+        except Exception:
+            pass
 
     @app_commands.command(name="add", description="List a card from your inventory for sale.")
     async def add(
@@ -280,6 +284,7 @@ class MarketGroup(app_commands.Group):
         price: app_commands.Range[int, 1, 999_999_999],
         arc: str = "—",
     ) -> None:
+        await interaction.response.defer(ephemeral=True)
         if not await ensure_registered(interaction, self.cog.bot.storage):
             return
 
@@ -427,6 +432,7 @@ class MarketGroup(app_commands.Group):
 
     @app_commands.command(name="remove", description="Remove your market listing.")
     async def remove(self, interaction: discord.Interaction, card_name: str) -> None:
+        await interaction.response.defer(ephemeral=True)
         if not await ensure_registered(interaction, self.cog.bot.storage):
             return
         user_id = str(interaction.user.id)
