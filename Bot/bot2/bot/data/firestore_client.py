@@ -30,6 +30,8 @@ def get_firestore_client(
 
     if credentials_json and credentials_json.strip():
         info = json.loads(credentials_json)
+        if isinstance(info, dict) and "private_key" in info and isinstance(info["private_key"], str):
+            info["private_key"] = info["private_key"].replace("\\n", "\n")
         cred = credentials.Certificate(info)
     elif credentials_path:
         cred = credentials.Certificate(credentials_path)
