@@ -34,7 +34,11 @@ def get_firestore_client(
             info["private_key"] = info["private_key"].replace("\\n", "\n")
         cred = credentials.Certificate(info)
     elif credentials_path:
-        cred = credentials.Certificate(credentials_path)
+        with open(credentials_path, "r", encoding="utf-8") as f:
+            info = json.load(f)
+        if isinstance(info, dict) and "private_key" in info and isinstance(info["private_key"], str):
+            info["private_key"] = info["private_key"].replace("\\n", "\n")
+        cred = credentials.Certificate(info)
     else:
         raise ValueError(
             "No Firebase credentials provided: set FIREBASE_CREDENTIALS_PATH "
