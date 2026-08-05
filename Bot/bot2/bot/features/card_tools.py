@@ -149,7 +149,7 @@ class CardToolsCog(commands.Cog):
         interaction: discord.Interaction,
         current: str,
     ) -> list[app_commands.Choice[str]]:
-        return _card_name_choices(await self.bot.storage.load(), current)
+        return _card_name_choices(self.bot.storage.load_readonly(), current)
 
     async def _set_flag(self, interaction: discord.Interaction, query: str, key: str, value: bool, title_key: str) -> None:
         await interaction.response.defer(ephemeral=True)

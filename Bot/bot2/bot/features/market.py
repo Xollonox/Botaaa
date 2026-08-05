@@ -398,7 +398,7 @@ class MarketGroup(app_commands.Group):
     @add.autocomplete("card_name")
     async def add_card_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         user_id = str(interaction.user.id)
-        data = await self.cog._load_market_data()
+        data = self.cog.bot.storage.load_readonly()
         mkt_settings = await _market_settings(self.cog)
         player  = get_player(data, user_id)
         if not isinstance(player, dict):
@@ -499,7 +499,7 @@ class MarketGroup(app_commands.Group):
     @remove.autocomplete("card_name")
     async def remove_card_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         user_id = str(interaction.user.id)
-        data = await self.cog._load_market_data()
+        data = self.cog.bot.storage.load_readonly()
         m        = market_root(data)
         listings = m.get("listings", {})
         if not isinstance(listings, dict):

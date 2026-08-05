@@ -95,7 +95,7 @@ class ProfileOwnerCog(commands.Cog):
 
     @o_profile_set_default_featured.autocomplete("card_name")
     async def o_profile_set_default_featured_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        data = await self.bot.storage.load()
+        data = self.bot.storage.load_readonly()
         return self._card_choices(data, current)
 
     @app_commands.command(name="o_profile_set_premium", description="Owner: set premium status for a user.")

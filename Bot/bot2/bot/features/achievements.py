@@ -243,7 +243,7 @@ class AchievementsCog(commands.Cog):
     @o_achievement_grant.autocomplete("achievement_id")
     @o_achievement_remove.autocomplete("achievement_id")
     async def achievement_id_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        data = await self.bot.storage.load()
+        data = self.bot.storage.load_readonly()
         return await self._achievement_id_autocomplete(current, data)
 
 

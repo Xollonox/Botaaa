@@ -53,6 +53,11 @@ class BuyConfirmView(discord.ui.View):
 
     @discord.ui.button(label="🛒 Confirm Buy", style=discord.ButtonStyle.success, row=0)
     async def confirm(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
+        try:
+            await interaction.response.defer()
+        except (discord.NotFound, discord.HTTPException):
+            pass
+
         user_id = self.buyer_id
         # Pre-fetch async data before entering the sync with_lock closure
         prefetched_listing = await self.cog.bot.market_service.get_listing(self.listing_id)
@@ -63,7 +68,7 @@ class BuyConfirmView(discord.ui.View):
             if seller_id and seller_id != "owner":
                 claimed_player_listing = await self.cog.bot.market_service.delete_listing(self.listing_id)
                 if not claimed_player_listing:
-                    await interaction.response.send_message("Listing no longer exists.", ephemeral=True)
+                    await smart_reply(interaction, "Listing no longer exists.", ephemeral=True)
                     return
 
         def mutate(data: dict[str, Any]) -> tuple[bool, str, bool]:
@@ -197,7 +202,7 @@ class BuyConfirmView(discord.ui.View):
             if reason.startswith("insufficient:"):
                 _, have, need = reason.split(":")
                 msg = f"Not enough coins. You have {int(have):,} but need {int(need):,}."
-            await interaction.response.send_message(msg, ephemeral=True)
+            await smart_reply(interaction, msg, ephemeral=True)
             return
 
         if delete_player_listing and not claimed_player_listing:
